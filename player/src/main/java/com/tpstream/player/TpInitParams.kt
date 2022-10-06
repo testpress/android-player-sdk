@@ -78,9 +78,6 @@ data class TpInitParams (
         otp: String?,
         playbackInfo: String?
     ): TpInitParams? {
-        val var2 = arrayOfNulls<String>(0)
-        val var3: HashMap<*, *>
-        var3 = HashMap<Any?, Any?>()<init>()
         return TpInitParams(
             otp = otp,
             playbackInfo = playbackInfo

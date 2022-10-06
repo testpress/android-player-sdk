@@ -5,9 +5,10 @@
     android:layout_height="match_parent"
     tools:context=".TpStreamPlayerFragment">
 
-    <TextView
+    <androidx.media3.ui.PlayerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Hello" />
+        android:id="@+id/video_view">
+    </androidx.media3.ui.PlayerView>
 
 </FrameLayout>

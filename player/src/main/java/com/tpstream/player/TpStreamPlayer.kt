@@ -1,4 +1,7 @@
 package com.tpstream.player
 
-interface TpStreamPlayer {
+import androidx.media3.exoplayer.ExoPlayer
+
+public interface TpStreamPlayer: ExoPlayer {
+
 }

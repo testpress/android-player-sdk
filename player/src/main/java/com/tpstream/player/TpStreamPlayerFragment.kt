@@ -63,6 +63,7 @@ class TpStreamPlayerFragment : Fragment() {
         _viewBinding = null
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onStart() {
         super.onStart()
         if (Util.SDK_INT > 23) {
@@ -71,6 +72,7 @@ class TpStreamPlayerFragment : Fragment() {
         Log.d(TAG, "onStart: ")
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onResume() {
         super.onResume()
         hideSystemUi()
@@ -92,6 +94,7 @@ class TpStreamPlayerFragment : Fragment() {
         }
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun initializePlayer() {
         activity?.let { activity ->
             player = ExoPlayer.Builder(activity)
@@ -105,6 +108,7 @@ class TpStreamPlayerFragment : Fragment() {
         }
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun getTrackSelector(activity: FragmentActivity): DefaultTrackSelector {
         return DefaultTrackSelector(activity).apply {
             setParameters(buildUponParameters().setMaxVideoSize(1920, 1080))
@@ -124,6 +128,7 @@ class TpStreamPlayerFragment : Fragment() {
         exoPlayer.prepare()
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onPause() {
         super.onPause()
         if (Util.SDK_INT <= 23) {
@@ -132,6 +137,7 @@ class TpStreamPlayerFragment : Fragment() {
         Log.d(TAG, "onPause: ")
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onStop() {
         super.onStop()
         if (Util.SDK_INT > 23) {
@@ -169,6 +175,7 @@ class TpStreamPlayerFragment : Fragment() {
     }
 
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     class PlayerAnalyticsListener: AnalyticsListener {
         private val TAG = "AnalyticsListener"
         override fun onRenderedFirstFrame(

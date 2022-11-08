@@ -15,6 +15,11 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
+import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
+import androidx.media3.exoplayer.drm.DrmSessionManager
+import androidx.media3.exoplayer.drm.DrmSessionManagerProvider
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 
@@ -80,7 +85,12 @@ class TpStreamPlayerFragment : Fragment() {
     }
 
     private fun initializeExoplayer(): ExoPlayer {
+        val mediaSourceFactory = DefaultMediaSourceFactory(requireContext())
+        mediaSourceFactory.setDrmSessionManagerProvider {
+            DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback("vPFLmw0xCrS", "b8e69226-292f-43a6-bf3e-3fd251a76c18"))
+        }
         return ExoPlayer.Builder(requireActivity())
+            .setMediaSourceFactory(mediaSourceFactory)
             .setTrackSelector(getTrackSelector(requireActivity()))
             .build()
             .also { exoPlayer ->

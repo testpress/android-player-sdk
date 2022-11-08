@@ -12,6 +12,7 @@ class PlayerActivity : AppCompatActivity() {
     private val TAG = "PlayerActivity"
     private val otp = "20160313versASE32334W6BUWHprQUWkxri6svgvB6sPWbtfn3ximrDVA8QMoakr"
     private val playbackInfo = "eyJ2aWRlb0lkIjoiZDNlYzIxOTY3OThhMGZiMzdhOWYyYThmNDAyZDdlZTcifQ=="
+    private val subdomain = "demo"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -19,8 +19,12 @@ class CustomHttpDrmMediaCallback(val orgCode: String, val videoUUID: String, val
 
     fun fetchDRMLicenseURL(): String {
         val url = "/api/v2.5/drm_license/${videoUUID}/?access_token=${accessToken}"
-        val result = Network<DRMLicenseURL>(orgCode).post(url, EMPTY_REQUEST)
-        return result?.licenseUrl ?: ""
+        return try {
+            val result = Network<DRMLicenseURL>(orgCode).post(url, EMPTY_REQUEST)
+            result?.licenseUrl ?: ""
+        } catch (exception:TPException){
+            ""
+        }
     }
 
     override fun executeProvisionRequest(

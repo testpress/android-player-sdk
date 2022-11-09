@@ -42,11 +42,10 @@ class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful){
                     val result = gson.fromJson(response.body?.charStream(), klass)
-                    callback.onSuccess(result,TPException.httpError(response))
+                    callback.onSuccess(result)
                 } else{
-                    callback.onSuccess(null,TPException.httpError(response))
+                    callback.onFailure(TPException.httpError(response))
                 }
-                Log.d("TAG", "onResponse: ${response.code}")
             }
 
             override fun onFailure(call: Call, e: IOException) {
@@ -64,7 +63,7 @@ class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
     }
 
     interface TPResponse<T> {
-        fun onSuccess(result: T?,exception: TPException)
+        fun onSuccess(result: T)
         fun onFailure(exception: TPException)
     }
 }

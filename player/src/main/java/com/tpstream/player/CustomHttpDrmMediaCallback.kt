@@ -14,15 +14,12 @@ import java.net.URL
 import java.util.*
 
 
-class CustomHttpDrmMediaCallback(val videoUUID: String, val accessToken: String):MediaDrmCallback {
+class CustomHttpDrmMediaCallback(val orgCode: String, val videoUUID: String, val accessToken: String):MediaDrmCallback {
     private val httpMediaDrmCallback = HttpMediaDrmCallback("", DefaultHttpDataSource.Factory())
-
-    val BASE_URL = "https://ae2f-49-204-138-95.in.ngrok.io/api/v2.5/drm_license"
-    var client: OkHttpClient = OkHttpClient();
 
     fun fetchDRMLicenseURL(): String {
         val url = "/api/v2.5/drm_license/${videoUUID}/?access_token=${accessToken}"
-        val result = Network<DRMLicenseURL>().post(url, EMPTY_REQUEST)
+        val result = Network<DRMLicenseURL>(orgCode).post(url, EMPTY_REQUEST)
         return result?.licenseUrl ?: ""
     }
 

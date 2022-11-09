@@ -1,11 +1,17 @@
 package com.tpstream.player
 
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.exoplayer.ExoPlayer
+import com.tpstream.player.models.DRMLicenseURL
+import com.tpstream.player.models.VideoInfo
 
 public interface TpStreamPlayer {
-    fun load(url: String)
+    abstract val params: TpInitParams
+    fun load(parameters: TpInitParams)
     fun setPlayWhenReady(canPlay: Boolean)
     fun getPlayWhenReady(): Boolean
     fun getPlaybackState(): Int
@@ -17,13 +23,34 @@ public interface TpStreamPlayer {
 }
 
 class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
-    override fun load(url: String) {
+    override lateinit var params: TpInitParams
+
+    private fun load(url: String) {
         val mediaItem = MediaItem.Builder()
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_MPD)
             .build()
         player.setMediaItem(mediaItem)
         player.prepare()
+    }
+
+    override fun load(parameters: TpInitParams) {
+        params = parameters
+        val url = "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
+        Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
+            override fun onSuccess(result: VideoInfo) {
+
+                result.dashUrl?.let {
+                    Handler(Looper.getMainLooper()).post {
+                        load(it)
+                    }
+                }
+            }
+
+            override fun onFailure() {
+                Log.d("TAG", "onFailure: ")
+            }
+        })
     }
 
     override fun setPlayWhenReady(canPlay: Boolean) {

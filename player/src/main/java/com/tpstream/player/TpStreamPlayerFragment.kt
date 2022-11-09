@@ -107,7 +107,7 @@ class TpStreamPlayerFragment : Fragment() {
     private fun initializeExoplayer(): ExoPlayer {
         val mediaSourceFactory = DefaultMediaSourceFactory(requireContext())
         mediaSourceFactory.setDrmSessionManagerProvider {
-            DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback("vPFLmw0xCrS", "b8e69226-292f-43a6-bf3e-3fd251a76c18"))
+            DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback(player?.params?.orgCode!!, player?.params?.videoId!!, player?.params?.accessToken!!))
         }
         return ExoPlayer.Builder(requireActivity())
             .setMediaSourceFactory(mediaSourceFactory)

@@ -13,8 +13,9 @@ data class TpInitParams (
     var maxVideoBitrateKbps: Int? = null,
     var mediaId: String? = null,
     var offlinePlayback: Boolean? = null,
-    var otp: String? = null,
-    var playbackInfo: String? = null,
+    var accessToken: String? = null,
+    var videoId: String? = null,
+    var orgCode: String,
     var preferredCaptionsLanguage: String? = null,
     var resumeTimeMs: Int? = null,
     var signature: String? = null,
@@ -31,8 +32,9 @@ data class TpInitParams (
         private var maxVideoBitrateKbps: Int? = null
         private var mediaId: String? = null
         private var offlinePlayback: Boolean? = null
-        private var otp: String? = null
-        private var playbackInfo: String? = null
+        private var accessToken: String? = null
+        private var videoId: String? = null
+        private var orgCode: String? = null
         private var preferredCaptionsLanguage: String? = null
         private var resumeTimeMs: Int? = null
         private var signature: String? = null
@@ -45,8 +47,9 @@ data class TpInitParams (
         fun setForceLowestBitrate(forceLowestBitrate: Boolean) = apply { this.forceLowestBitrate = forceLowestBitrate }
         fun setMaxVideoBitrateKbps(maxVideoBitrateKbps: Int) = apply { this.maxVideoBitrateKbps = maxVideoBitrateKbps }
         fun setOfflinePlayback(offlinePlayback: Boolean) = apply { this.offlinePlayback = offlinePlayback }
-        fun setOtp(otp: String) = apply { this.otp = otp }
-        fun setPlaybackInfo(playbackInfo: String) = apply { this.playbackInfo = playbackInfo }
+        fun setAccessToken(accessToken: String) = apply { this.accessToken = accessToken }
+        fun setVideoId(videoId: String) = apply { this.videoId = videoId }
+        fun setOrgCode(subdomain: String) = apply { this.orgCode = subdomain }
         fun setPreferredCaptionsLanguage(preferredCaptionsLanguage: String) = apply { this.preferredCaptionsLanguage = preferredCaptionsLanguage }
         fun setResumeTime(resumeTimeMs: Int) = apply { this.resumeTimeMs = resumeTimeMs }
         fun setSignature(signature: String) = apply { this.signature = signature }
@@ -55,32 +58,41 @@ data class TpInitParams (
         fun setClips(startTimeMs: Int, endTimeMs: Int) = apply { this.startTimeMs = startTimeMs; this.endTimeMs = endTimeMs }
         fun setTechOverride(techOverride: Array<String>) = apply { this.techOverride = techOverride }
 
-        fun build() = TpInitParams(
-            autoPlay,
-            bufferingGoalMs,
-            endTimeMs,
-            forceHighestSupportedBitrate,
-            forceLowestBitrate,
-            maxVideoBitrateKbps,
-            mediaId,
-            offlinePlayback,
-            otp,
-            playbackInfo,
-            preferredCaptionsLanguage,
-            resumeTimeMs,
-            signature,
-            startTimeMs,
-            techOverride
-        )
+        fun build(): TpInitParams {
+            if (orgCode == null) {
+                throw Exception("orgCode should be provided")
+            }
+
+            return TpInitParams(
+                autoPlay,
+                bufferingGoalMs,
+                endTimeMs,
+                forceHighestSupportedBitrate,
+                forceLowestBitrate,
+                maxVideoBitrateKbps,
+                mediaId,
+                offlinePlayback,
+                accessToken,
+                videoId,
+                orgCode!!,
+                preferredCaptionsLanguage,
+                resumeTimeMs,
+                signature,
+                startTimeMs,
+                techOverride
+            )
+        }
     }
 
     fun createParamsWithOtp(
-        otp: String?,
-        playbackInfo: String?
-    ): TpInitParams? {
+        orgCode: String,
+        accessToken: String?,
+        videoId: String?
+    ): TpInitParams {
         return TpInitParams(
-            otp = otp,
-            playbackInfo = playbackInfo
+            accessToken = accessToken,
+            videoId = videoId,
+            orgCode = orgCode
         )
     }
 }

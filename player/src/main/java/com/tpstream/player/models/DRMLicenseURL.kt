@@ -4,5 +4,5 @@ import com.google.gson.annotations.SerializedName
 
 data class DRMLicenseURL(
     @SerializedName("license_url")
-    val licenseUrl: String
+    val licenseUrl: String?
 )

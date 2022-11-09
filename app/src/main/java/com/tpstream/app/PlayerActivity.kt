@@ -3,6 +3,7 @@ package com.tpstream.app
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.tpstream.player.InitializationListener
+import com.tpstream.player.TpInitParams
 import com.tpstream.player.TpStreamPlayer
 import com.tpstream.player.TpStreamPlayerFragment
 
@@ -10,9 +11,9 @@ class PlayerActivity : AppCompatActivity() {
     lateinit var playerFragment: TpStreamPlayerFragment;
     lateinit var player: TpStreamPlayer;
     private val TAG = "PlayerActivity"
-    private val otp = "20160313versASE32334W6BUWHprQUWkxri6svgvB6sPWbtfn3ximrDVA8QMoakr"
-    private val playbackInfo = "eyJ2aWRlb0lkIjoiZDNlYzIxOTY3OThhMGZiMzdhOWYyYThmNDAyZDdlZTcifQ=="
-    private val subdomain = "demo"
+    private val accessToken = "b8e69226-292f-43a6-bf3e-3fd251a76c18"
+    private val videoId = "vPFLmw0xCrS"
+    private val orgCode = "demo"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +22,12 @@ class PlayerActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
         playerFragment.setOnInitializationListener(object: InitializationListener {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
-                player.load(getString(com.tpstream.player.R.string.media_url_dash))
+                val parameters = TpInitParams.Builder()
+                    .setVideoId(videoId)
+                    .setAccessToken(accessToken)
+                    .setOrgCode(orgCode)
+                    .build()
+                player.load(parameters)
                 player.setPlayWhenReady(true)
             }
         });

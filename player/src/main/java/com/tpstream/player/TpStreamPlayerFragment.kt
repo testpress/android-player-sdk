@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -22,11 +23,10 @@ import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.tpstream.player.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 
-class TpStreamPlayerFragment : Fragment() {
+@UnstableApi class TpStreamPlayerFragment : Fragment() {
 
 //    companion object {
 //        fun newInstance() = TpStreamPlayerFragment()
@@ -69,14 +69,14 @@ class TpStreamPlayerFragment : Fragment() {
     private fun addResolutionChangeControl() {
         val resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
         resolutionButton.setOnClickListener {
-            val trackSelectionDialog = TrackSelectionDialog(trackSelector, _player!!.currentTracks.groups)
-            trackSelectionDialog.onClickListener = onResolutionClickListener(trackSelectionDialog)
-            trackSelectionDialog.show(requireActivity().supportFragmentManager, null)
+            val modalBottomSheet = VideoResolutionBottomSheet(trackSelector, _player!!.currentTracks.groups)
+            modalBottomSheet.onClickListener = onResolutionClickListener(modalBottomSheet)
+            modalBottomSheet.show(requireActivity().supportFragmentManager, VideoResolutionBottomSheet.TAG)
         }
     }
 
     private fun onResolutionClickListener(
-        trackSelectionDialog: TrackSelectionDialog
+        trackSelectionDialog: VideoResolutionBottomSheet
     ) = DialogInterface.OnClickListener { p0, p1 ->
         val mappedTrackInfo = trackSelector.currentMappedTrackInfo
         mappedTrackInfo?.let {

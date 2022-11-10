@@ -14,6 +14,28 @@ class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
     private var client: OkHttpClient = OkHttpClient();
     private val gson = Gson()
 
+    fun get(url: String, callback: TPResponse<T>? = null): T? {
+        val request = Request.Builder().url(URL("$BASE_URL$url")).build()
+        return makeRequest(callback, request)
+    }
+
+    fun post(url: String, body: RequestBody, callback: TPResponse<T>? = null): T? {
+        val request = Request.Builder().url(URL("$BASE_URL$url")).post(body).build()
+        return makeRequest(callback, request)
+    }
+
+    private fun makeRequest(
+        callback: TPResponse<T>?,
+        request: Request
+    ): T? {
+        return if (callback != null) {
+            makeAsyncRequest(request, callback)
+            null
+        } else {
+            makeSyncRequest(request)
+        }
+    }
+
     private fun makeAsyncRequest(request: Request, callback: TPResponse<T>) {
         client.newCall(request).enqueue(object: Callback {
             override fun onResponse(call: Call, response: Response) {
@@ -27,32 +49,10 @@ class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
         })
     }
 
-    private fun makeRequest(request: Request): T? {
+    private fun makeSyncRequest(request: Request): T? {
         val response = client.newCall(request).execute()
         if (response.isSuccessful) {
             return gson.fromJson(response.body?.charStream(), klass)
-        }
-        return null
-    }
-
-    fun get(url: String, callback: TPResponse<T>? = null): T? {
-        val request = Request.Builder().url(URL("$BASE_URL$url")).build()
-
-        if (callback != null) {
-            makeAsyncRequest(request, callback)
-        } else {
-            return makeRequest(request)
-        }
-        return null
-    }
-
-    fun post(url: String, body: RequestBody, callback: TPResponse<T>? = null): T? {
-        val request = Request.Builder().url(URL("$BASE_URL$url")).post(body).build()
-
-        if (callback != null) {
-            makeAsyncRequest(request, callback)
-        } else {
-            return makeRequest(request)
         }
         return null
     }

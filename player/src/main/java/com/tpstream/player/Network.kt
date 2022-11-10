@@ -1,5 +1,6 @@
 package com.tpstream.player
 
+import androidx.media3.common.util.Log
 import com.google.gson.Gson
 import okhttp3.*
 import java.io.IOException
@@ -39,12 +40,16 @@ class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
     private fun makeAsyncRequest(request: Request, callback: TPResponse<T>) {
         client.newCall(request).enqueue(object: Callback {
             override fun onResponse(call: Call, response: Response) {
-                val result = gson.fromJson(response.body?.charStream(), klass)
-                callback.onSuccess(result)
+                if (response.isSuccessful){
+                    val result = gson.fromJson(response.body?.charStream(), klass)
+                    callback.onSuccess(result)
+                } else{
+                    callback.onFailure(TPException.httpError(response))
+                }
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                callback.onFailure()
+                callback.onFailure(TPException.networkError(e))
             }
         })
     }
@@ -54,11 +59,11 @@ class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
         if (response.isSuccessful) {
             return gson.fromJson(response.body?.charStream(), klass)
         }
-        return null
+        throw TPException.httpError(response)
     }
 
     interface TPResponse<T> {
         fun onSuccess(result: T)
-        fun onFailure()
+        fun onFailure(exception: TPException)
     }
 }

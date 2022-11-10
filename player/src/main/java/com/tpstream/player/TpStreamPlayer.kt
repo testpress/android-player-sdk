@@ -39,16 +39,24 @@ class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
         val url = "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
         Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
-
+                Log.d("TAG", "onSuccess: ")
                 result.dashUrl?.let {
                     Handler(Looper.getMainLooper()).post {
-                        load(it)
+                       load(it)
                     }
                 }
             }
 
-            override fun onFailure() {
-                Log.d("TAG", "onFailure: ")
+            override fun onFailure(exception: TPException) {
+                if (exception.isNetworkError()){
+                    Log.d("TAG", "isNetworkError: ${exception.response?.code}")
+                } else if (exception.isClientError()){
+                    Log.d("TAG", "isClientError: ${exception.response?.code}")
+                }else if (exception.isUnauthenticated()){
+                    Log.d("TAG", "isUnauthenticated: ${exception.response?.code}")
+                }else if (exception.isServerError()){
+                    Log.d("TAG", "isServerError: ${exception.response?.code}")
+                }
             }
         })
     }

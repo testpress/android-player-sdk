@@ -16,7 +16,7 @@ data class TPException(
         if (response != null) statusCode = response.code
     }
 
-    companion object{
+    companion object {
         fun httpError(response: Response): TPException {
             val message = "${response.code} ${response.message}"
             return TPException(
@@ -37,21 +37,13 @@ data class TPException(
         }
     }
 
-    fun isNetworkError(): Boolean {
-        return errorType == ErrorType.NETWORK
-    }
+    fun isNetworkError() = errorType == ErrorType.NETWORK
 
-    fun isUnauthenticated(): Boolean {
-        return statusCode == 401
-    }
+    fun isUnauthenticated() = statusCode == 401
 
-    fun isClientError(): Boolean {
-        return statusCode in 400..499 && statusCode != 401
-    }
+    fun isClientError() = statusCode in 400..499 && statusCode != 401
 
-    fun isServerError(): Boolean {
-        return statusCode in 500..599
-    }
+    fun isServerError() = statusCode in 500..599
 
 }
 

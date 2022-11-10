@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -29,7 +30,6 @@ import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.tpstream.player.Util.getRendererIndex
 import com.tpstream.player.views.Util.getRendererIndex
 import androidx.media3.ui.PlayerView
@@ -38,7 +38,7 @@ import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
 
-class TpStreamPlayerFragment : Fragment() {
+@UnstableApi class TpStreamPlayerFragment : Fragment() {
 
 //    companion object {
 //        fun newInstance() = TpStreamPlayerFragment()

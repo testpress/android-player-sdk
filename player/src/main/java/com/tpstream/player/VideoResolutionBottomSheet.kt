@@ -1,26 +1,27 @@
 package com.tpstream.player
 
-import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatDialog
-import androidx.fragment.app.DialogFragment
+import android.widget.TextView
 import androidx.media3.common.*
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import androidx.media3.ui.TrackNameProvider
 import androidx.media3.ui.TrackSelectionView
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tpstream.player.databinding.TrackSelectionDialogBinding
 
 
-class TrackSelectionDialog(
-    parameters: DefaultTrackSelector.Parameters,
-    private val trackGroups: List<Tracks.Group>
-) : DialogFragment(),
+@UnstableApi
+class VideoResolutionBottomSheet(parameters: DefaultTrackSelector.Parameters,
+                                 private val trackGroups: List<Tracks.Group>) : BottomSheetDialogFragment(),
     TrackSelectionView.TrackSelectionListener {
+
     private var _binding: TrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     private lateinit var trackSelectionView: TrackSelectionView
@@ -28,6 +29,9 @@ class TrackSelectionDialog(
     var overrides: Map<TrackGroup, TrackSelectionOverride>
     var onClickListener: DialogInterface.OnClickListener? = null
 
+    companion object {
+        const val TAG = "ModalBottomSheet"
+    }
 
     init {
         overrides = parameters.overrides
@@ -47,7 +51,6 @@ class TrackSelectionDialog(
         return binding.root
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -55,14 +58,28 @@ class TrackSelectionDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        configureBottomSheetBehaviour()
         initializeTrackSelectionView(view)
         setOnClickListeners()
+        displayCurrentResolution()
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = AppCompatDialog(requireActivity(), android.R.style.Theme_Material_Dialog_NoActionBar)
-        dialog.setTitle("Choose Quality")
-        return dialog
+    private fun displayCurrentResolution() {
+        val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
+        val currentResolution = requireView().findViewById<TextView>(R.id.current_resolution)
+        if (overrides.isNotEmpty()) {
+            val trackIndex = overrides.values.first().trackIndices.first()
+            currentResolution.text = "${trackGroup.getTrackFormat(trackIndex).height}p"
+        } else {
+            currentResolution.text = "Auto"
+        }
+    }
+
+    private fun configureBottomSheetBehaviour() {
+        val bottomSheetDialog = dialog as BottomSheetDialog
+        bottomSheetDialog.setTitle("Choose Quality")
+        bottomSheetDialog.behavior.isDraggable = false
+        bottomSheetDialog.behavior.isFitToContents = true
     }
 
     private fun initializeTrackSelectionView(view: View) {

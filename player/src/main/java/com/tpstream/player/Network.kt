@@ -58,9 +58,8 @@ class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
         val response = client.newCall(request).execute()
         if (response.isSuccessful) {
             return gson.fromJson(response.body?.charStream(), klass)
-        } else{
-            throw TPException.httpError(response)
         }
+        throw TPException.httpError(response)
     }
 
     interface TPResponse<T> {

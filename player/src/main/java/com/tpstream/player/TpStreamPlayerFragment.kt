@@ -1,25 +1,17 @@
 package com.tpstream.player
 
-import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.OptIn
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
-import androidx.media3.common.Player.STATE_IDLE
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -39,10 +31,6 @@ class TpStreamPlayerFragment : Fragment() {
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
     val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
-    private var currentItem = 0
-    private var playbackPosition = 0L
-    private val playbackStateListener: Player.Listener = PlayerListener()
-    private val playerAnalyticsListener: AnalyticsListener = PlayerAnalyticsListener()
     lateinit var initializationListener: InitializationListener
 
     override fun onCreateView(
@@ -56,11 +44,11 @@ class TpStreamPlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
+        initializePlayer()
     }
 
-    fun initialize(listener: InitializationListener) {
+    fun setOnInitializationListener(listener: InitializationListener) {
         this.initializationListener = listener
-        initializePlayer()
     }
 
     override fun onDestroyView() {
@@ -86,12 +74,6 @@ class TpStreamPlayerFragment : Fragment() {
     }
 
     private fun initializePlayer() {
-        if (activity == null || _viewBinding == null) {
-            Handler(Looper.getMainLooper()).postDelayed({
-                this.initializePlayer()
-            }, 1000)
-            return
-        }
         _player = initializeExoplayer()
         player = TpStreamPlayerImpl(_player!!)
         activity?.let {
@@ -181,5 +163,4 @@ class TpStreamPlayerFragment : Fragment() {
 
 interface InitializationListener {
     fun onInitializationSuccess(player: TpStreamPlayer)
-    fun onInitializationFailure()
 }

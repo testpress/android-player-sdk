@@ -76,9 +76,7 @@ class TpStreamPlayerFragment : Fragment() {
     private fun initializePlayer() {
         _player = initializeExoplayer()
         player = TpStreamPlayerImpl(_player!!)
-        activity?.let {
-            this.initializationListener.onInitializationSuccess(player!!)
-        }
+        this.initializationListener.onInitializationSuccess(player!!)
     }
 
     private fun initializeExoplayer(): ExoPlayer {

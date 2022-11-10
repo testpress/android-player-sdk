@@ -31,7 +31,7 @@ class TpStreamPlayerFragment : Fragment() {
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
     val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
-    lateinit var initializationListener: InitializationListener
+    private var initializationListener: InitializationListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,7 +76,7 @@ class TpStreamPlayerFragment : Fragment() {
     private fun initializePlayer() {
         _player = initializeExoplayer()
         player = TpStreamPlayerImpl(_player!!)
-        this.initializationListener.onInitializationSuccess(player!!)
+        this.initializationListener?.onInitializationSuccess(player!!)
     }
 
     private fun initializeExoplayer(): ExoPlayer {

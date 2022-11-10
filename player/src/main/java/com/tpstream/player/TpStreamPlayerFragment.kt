@@ -22,6 +22,7 @@ import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.tpstream.player.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 
@@ -68,21 +69,24 @@ class TpStreamPlayerFragment : Fragment() {
     private fun addResolutionChangeControl() {
         val resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
         resolutionButton.setOnClickListener {
-            val mappedTrackInfo = trackSelector.currentMappedTrackInfo
-            mappedTrackInfo?.let {
-                val trackSelectionDialog = TrackSelectionDialog(trackSelector, _player!!.currentTracks.groups)
-                trackSelectionDialog.onClickListener =
-                    DialogInterface.OnClickListener { p0, p1 ->
-                        val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-                        if (trackSelectionDialog.overrides.isNotEmpty()) {
-                            val params = TrackSelectionParameters.Builder(requireContext())
-                                .clearOverridesOfType(rendererIndex)
-                                .addOverride(trackSelectionDialog.overrides.values.elementAt(0))
-                                .build()
-                            trackSelector.setParameters(params)
-                        }
-                    }
-                trackSelectionDialog.show(requireActivity().supportFragmentManager, null)
+            val trackSelectionDialog = TrackSelectionDialog(trackSelector, _player!!.currentTracks.groups)
+            trackSelectionDialog.onClickListener = onResolutionClickListener(trackSelectionDialog)
+            trackSelectionDialog.show(requireActivity().supportFragmentManager, null)
+        }
+    }
+
+    private fun onResolutionClickListener(
+        trackSelectionDialog: TrackSelectionDialog
+    ) = DialogInterface.OnClickListener { p0, p1 ->
+        val mappedTrackInfo = trackSelector.currentMappedTrackInfo
+        mappedTrackInfo?.let {
+            val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
+            if (trackSelectionDialog.overrides.isNotEmpty()) {
+                val params = TrackSelectionParameters.Builder(requireContext())
+                    .clearOverridesOfType(rendererIndex)
+                    .addOverride(trackSelectionDialog.overrides.values.elementAt(0))
+                    .build()
+                trackSelector.setParameters(params)
             }
         }
     }

@@ -1,22 +1,17 @@
 package com.tpstream.player
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.OptIn
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -31,15 +26,12 @@ class TpStreamPlayerFragment : Fragment() {
 
     private lateinit var viewModel: TpStreamPlayerViewModel
 
-    private var player: ExoPlayer? = null
+    private var player: TpStreamPlayer? = null
+    private var _player: ExoPlayer? = null
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
     val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
-    private var playWhenReady = true
-    private var currentItem = 0
-    private var playbackPosition = 0L
-    private val playbackStateListener: Player.Listener = PlayerListener()
-    private val playerAnalyticsListener: AnalyticsListener = PlayerAnalyticsListener()
+    private var initializationListener: InitializationListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,10 +44,11 @@ class TpStreamPlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
-        // TODO: Use the ViewModel
+        initializePlayer()
     }
 
-    fun initialize(context: Context) {
+    fun setOnInitializationListener(listener: InitializationListener) {
+        this.initializationListener = listener
     }
 
     override fun onDestroyView() {
@@ -63,21 +56,9 @@ class TpStreamPlayerFragment : Fragment() {
         _viewBinding = null
     }
 
-    override fun onStart() {
-        super.onStart()
-        if (Util.SDK_INT > 23) {
-            initializePlayer()
-        }
-        Log.d(TAG, "onStart: ")
-    }
-
     override fun onResume() {
         super.onResume()
         hideSystemUi()
-        if ((Util.SDK_INT <= 23 || player == null)) {
-            initializePlayer()
-        }
-        Log.d(TAG, "onResume: ")
     }
 
     private fun hideSystemUi() {
@@ -93,16 +74,18 @@ class TpStreamPlayerFragment : Fragment() {
     }
 
     private fun initializePlayer() {
-        activity?.let { activity ->
-            player = ExoPlayer.Builder(activity)
-                .setTrackSelector(getTrackSelector(activity))
-                .build()
-                .also { exoPlayer ->
-                    prepareExoPlayer(exoPlayer)
-                    viewBinding.videoView.player = exoPlayer
-                }
-            Log.d(TAG, "initializePlayer: ")
-        }
+        _player = initializeExoplayer()
+        player = TpStreamPlayerImpl(_player!!)
+        this.initializationListener?.onInitializationSuccess(player!!)
+    }
+
+    private fun initializeExoplayer(): ExoPlayer {
+        return ExoPlayer.Builder(requireActivity())
+            .setTrackSelector(getTrackSelector(requireActivity()))
+            .build()
+            .also { exoPlayer ->
+                viewBinding.videoView.player = exoPlayer
+            }
     }
 
     private fun getTrackSelector(activity: FragmentActivity): DefaultTrackSelector {
@@ -111,23 +94,10 @@ class TpStreamPlayerFragment : Fragment() {
         }
     }
 
-    private fun prepareExoPlayer(exoPlayer: ExoPlayer) {
-        val mediaItem = MediaItem.Builder()
-            .setUri(getString(R.string.media_url_dash))
-            .setMimeType(MimeTypes.APPLICATION_MPD)
-            .build()
-        exoPlayer.setMediaItem(mediaItem)
-        exoPlayer.playWhenReady = playWhenReady
-        exoPlayer.seekTo(currentItem, playbackPosition)
-        exoPlayer.addListener(playbackStateListener)
-        exoPlayer.addAnalyticsListener(playerAnalyticsListener)
-        exoPlayer.prepare()
-    }
-
     override fun onPause() {
         super.onPause()
         if (Util.SDK_INT <= 23) {
-            releasePlayer()
+            player?.release()
         }
         Log.d(TAG, "onPause: ")
     }
@@ -135,22 +105,9 @@ class TpStreamPlayerFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         if (Util.SDK_INT > 23) {
-            releasePlayer()
+            player?.release()
         }
         Log.d(TAG, "onStop: ")
-    }
-
-    private fun releasePlayer() {
-        player?.let { exoPlayer ->
-            playbackPosition = exoPlayer.currentPosition
-            currentItem = exoPlayer.currentMediaItemIndex
-            playWhenReady = exoPlayer.playWhenReady
-            exoPlayer.removeListener(playbackStateListener)
-            exoPlayer.removeAnalyticsListener(playerAnalyticsListener)
-            exoPlayer.release()
-        }
-        player = null
-        Log.d(TAG, "releasePlayer: ")
     }
 
     class PlayerListener : Player.Listener {
@@ -199,4 +156,9 @@ class TpStreamPlayerFragment : Fragment() {
             super.onDroppedVideoFrames(eventTime, droppedFrames, elapsedMs)
         }
     }
+
+}
+
+interface InitializationListener {
+    fun onInitializationSuccess(player: TpStreamPlayer)
 }

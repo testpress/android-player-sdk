@@ -2,6 +2,7 @@ package com.tpstream.app
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.tpstream.player.InitializationListener
 import com.tpstream.player.TpStreamPlayer
 import com.tpstream.player.TpStreamPlayerFragment
 
@@ -17,7 +18,12 @@ class PlayerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_player)
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
-        playerFragment.initialize(this);
+        playerFragment.setOnInitializationListener(object: InitializationListener {
+            override fun onInitializationSuccess(player: TpStreamPlayer) {
+                player.load(getString(com.tpstream.player.R.string.media_url_dash))
+                player.setPlayWhenReady(true)
+            }
+        });
     }
 }
 

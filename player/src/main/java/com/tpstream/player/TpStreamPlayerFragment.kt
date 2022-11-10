@@ -29,6 +29,8 @@ import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.trackselection.MappingTrackSelector
+import com.tpstream.player.Util.getRendererIndex
 import com.tpstream.player.views.Util.getRendererIndex
 import androidx.media3.ui.PlayerView
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding

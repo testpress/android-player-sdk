@@ -1,27 +1,28 @@
 package com.tpstream.player
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.media3.common.C
 import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
-import androidx.media3.exoplayer.drm.DrmSessionManager
-import androidx.media3.exoplayer.drm.DrmSessionManagerProvider
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.exoplayer.source.MediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.tpstream.player.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 
 class TpStreamPlayerFragment : Fragment() {
@@ -38,6 +39,12 @@ class TpStreamPlayerFragment : Fragment() {
     val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
     private var initializationListener: InitializationListener? = null
+    lateinit var trackSelector:DefaultTrackSelector
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        trackSelector = DefaultTrackSelector(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,6 +58,33 @@ class TpStreamPlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
         initializePlayer()
+        addCustomPlayerControls()
+    }
+
+    private fun addCustomPlayerControls() {
+        addResolutionChangeControl()
+    }
+
+    private fun addResolutionChangeControl() {
+        val resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
+        resolutionButton.setOnClickListener {
+            val mappedTrackInfo = trackSelector.currentMappedTrackInfo
+            mappedTrackInfo?.let {
+                val trackSelectionDialog = TrackSelectionDialog(trackSelector, _player!!.currentTracks.groups)
+                trackSelectionDialog.onClickListener =
+                    DialogInterface.OnClickListener { p0, p1 ->
+                        val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
+                        if (trackSelectionDialog.overrides.isNotEmpty()) {
+                            val params = TrackSelectionParameters.Builder(requireContext())
+                                .clearOverridesOfType(rendererIndex)
+                                .addOverride(trackSelectionDialog.overrides.values.elementAt(0))
+                                .build()
+                            trackSelector.setParameters(params)
+                        }
+                    }
+                trackSelectionDialog.show(requireActivity().supportFragmentManager, null)
+            }
+        }
     }
 
     fun setOnInitializationListener(listener: InitializationListener) {
@@ -88,7 +122,7 @@ class TpStreamPlayerFragment : Fragment() {
     private fun initializeExoplayer(): ExoPlayer {
         return ExoPlayer.Builder(requireActivity())
             .setMediaSourceFactory(getMediaSourceFactory())
-            .setTrackSelector(getTrackSelector(requireActivity()))
+            .setTrackSelector(trackSelector)
             .build()
             .also { exoPlayer ->
                 viewBinding.videoView.player = exoPlayer
@@ -101,12 +135,6 @@ class TpStreamPlayerFragment : Fragment() {
             DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback(player?.params?.orgCode!!, player?.params?.videoId!!, player?.params?.accessToken!!))
         }
         return mediaSourceFactory
-    }
-
-    private fun getTrackSelector(activity: FragmentActivity): DefaultTrackSelector {
-        return DefaultTrackSelector(activity).apply {
-            setParameters(buildUponParameters().setMaxVideoSize(1920, 1080))
-        }
     }
 
     override fun onPause() {

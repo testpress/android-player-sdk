@@ -1,12 +1,16 @@
 package com.tpstream.player
 
 import android.content.DialogInterface
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -62,11 +66,31 @@ class TpStreamPlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
         initializePlayer()
+        Log.d("TAG", "onViewCreated: ")
         addCustomPlayerControls()
     }
 
     private fun addCustomPlayerControls() {
         addResolutionChangeControl()
+        Log.d(TAG, "addCustomPlayerControls: ")
+        viewBinding.videoView.setFullscreenButtonClickListener {
+            Log.d(TAG, "addCustomPlayerControls: setFullscreenButtonClickListener")
+            openFullscreen()
+        }
+//        val fullScreenButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_custom_fullscreen)
+//        fullScreenButton.setOnClickListener {
+//            Log.d(TAG, "addCustomPlayerControls: fullScreenButton")
+//            requireActivity().window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN
+//                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+//                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+//            requireActivity().actionBar?.hide()
+//            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+//            val params: ViewGroup.LayoutParams =
+//                viewBinding.videoView.layoutParams as ViewGroup.LayoutParams
+//            params.width = ViewGroup.LayoutParams.MATCH_PARENT
+//            params.height = ViewGroup.LayoutParams.MATCH_PARENT
+//            viewBinding.videoView.layoutParams = params
+//        }
     }
 
     private fun addResolutionChangeControl() {
@@ -137,6 +161,29 @@ class TpStreamPlayerFragment : Fragment() {
         super.onDestroyView()
         _viewBinding = null
     }
+
+    private fun openFullscreen(){
+        val requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        viewBinding.videoView.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.black))
+        val params = viewBinding.videoView.layoutParams as FrameLayout.LayoutParams
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT
+        params.height = FrameLayout.LayoutParams.MATCH_PARENT
+        viewBinding.videoView.layoutParams = params
+        requireActivity().actionBar?.hide()
+        hideSystemUi()
+    }
+
+    private fun closeFullscreen() {
+        val requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        viewBinding.videoView.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+        val params = viewBinding.videoView.layoutParams as FrameLayout.LayoutParams
+        params.width = FrameLayout.LayoutParams.MATCH_PARENT
+        params.height = 0
+        viewBinding.videoView.layoutParams = params
+        requireActivity().actionBar?.show()
+        viewBinding.videoView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+    }
+
 
     override fun onResume() {
         super.onResume()

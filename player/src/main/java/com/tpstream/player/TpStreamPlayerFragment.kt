@@ -128,6 +128,12 @@ class TpStreamPlayerFragment : Fragment() {
             val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
             simpleVideoResolutionSelector.show(requireActivity().supportFragmentManager, SimpleVideoResolutionSelectionSheet.TAG)
         }
+
+        playerViewFullscreen.findViewById<ImageButton>(R.id.exo_resolution).setOnClickListener {
+            val modalBottomSheet = VideoResolutionBottomSheet(trackSelector, _player!!.currentTracks.groups)
+            modalBottomSheet.onClickListener = onResolutionClickListener(modalBottomSheet)
+            modalBottomSheet.show(requireActivity().supportFragmentManager, VideoResolutionBottomSheet.TAG)
+        }
     }
 
     private fun initializeVideoResolutionSelectionSheets(): SimpleVideoResolutionSelectionSheet {

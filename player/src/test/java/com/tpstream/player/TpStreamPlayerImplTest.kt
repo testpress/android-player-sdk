@@ -1,6 +1,5 @@
 package com.tpstream.player
 
-import android.content.Context
 import androidx.media3.common.*
 import androidx.media3.exoplayer.*
 import org.junit.Assert.assertEquals
@@ -14,53 +13,81 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class TpStreamPlayerImplTest {
 
-    @Mock
-    private lateinit var mockContext: Context
+    private val PLAYER_STATE = 1
+    private val PLAYER_CURRENT_POSOTION = 1000L
+    private val PLAYER_BUFFER_TIMING = 1000L
+    private val PLAYER_SEEK_TIME = 1000L
+    private val PLAYBACK_SPEET_TIME = 10.00F
 
     @Mock
     private lateinit var player: ExoPlayer
-
     private lateinit var tpStreamPlayerImpl: TpStreamPlayerImpl
+
+    private var called = false
 
     @Before
     fun createPlayer() {
-        player = ExoPlayer.Builder(mockContext).build()
         tpStreamPlayerImpl = TpStreamPlayerImpl(player)
     }
 
     @Test
     fun testSetPlayWhenReady() {
-        assertEquals(4,4)
-//        `when`(player.getPlayWhenReady()).thenReturn(true)
-//        assertEquals(true,tpStreamPlayerImpl.getPlayWhenReady())
+        called = false
+        `when`(player.setPlayWhenReady(true)).then { isCalled() }
+        tpStreamPlayerImpl.setPlayWhenReady(true)
+        assertEquals(true, called)
     }
-//
-//    @Test
-//    fun testGetPlayWhenReady() {
-//    }
-//
-//    @Test
-//    fun getPlaybackState() {
-//    }
-//
-//    @Test
-//    fun getCurrentTime() {
-//    }
-//
-//    @Test
-//    fun getBufferedTime() {
-//    }
-//
-//    @Test
-//    fun setPlaybackSpeed() {
-//    }
-//
-//    @Test
-//    fun seekTo() {
-//    }
-//
-//    @Test
-//    fun release() {
-//    }
+
+    @Test
+    fun testGetPlayWhenReady() {
+        `when`(player.playWhenReady).thenReturn(true)
+        assertEquals(true, tpStreamPlayerImpl.getPlayWhenReady())
+    }
+
+    @Test
+    fun testGetPlaybackState() {
+        `when`(player.playbackState).thenReturn(PLAYER_STATE)
+        assertEquals(PLAYER_STATE, tpStreamPlayerImpl.getPlaybackState())
+    }
+
+    @Test
+    fun testGetCurrentTime() {
+        `when`(player.currentPosition).thenReturn(PLAYER_CURRENT_POSOTION)
+        assertEquals(PLAYER_CURRENT_POSOTION, tpStreamPlayerImpl.getCurrentTime())
+    }
+
+    @Test
+    fun testGetBufferedTime() {
+        `when`(player.bufferedPosition).thenReturn(PLAYER_BUFFER_TIMING)
+        assertEquals(PLAYER_BUFFER_TIMING, tpStreamPlayerImpl.getBufferedTime())
+    }
+
+    @Test
+    fun testSetPlaybackSpeed() {
+        called = false
+        `when`(player.setPlaybackSpeed(PLAYBACK_SPEET_TIME)).then { isCalled() }
+        tpStreamPlayerImpl.setPlaybackSpeed(PLAYBACK_SPEET_TIME)
+        assertEquals(true, called)
+    }
+
+    @Test
+    fun testSeekTo() {
+        called = false
+        `when`(player.seekTo(PLAYER_SEEK_TIME)).then { isCalled() }
+        tpStreamPlayerImpl.seekTo(PLAYER_SEEK_TIME)
+        assertEquals(true, called)
+    }
+
+    @Test
+    fun testRelease() {
+        called = false
+        `when`(player.release()).then { isCalled() }
+        tpStreamPlayerImpl.release()
+        assertEquals(true, called)
+    }
+
+    private fun isCalled() {
+        called = true
+    }
 
 }

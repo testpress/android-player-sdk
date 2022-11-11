@@ -1,37 +1,39 @@
 package com.tpstream.player
 
 import android.content.Context
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.test.core.app.ApplicationProvider
+import androidx.media3.common.*
+import androidx.media3.exoplayer.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-class TpStreamPlayerImplTest{
+class TpStreamPlayerImplTest {
 
     @Mock
-    lateinit var player:ExoPlayer
+    private lateinit var mockContext: Context
+
     @Mock
-    lateinit var tpStreamPlayerImpl:TpStreamPlayerImpl
-    lateinit var context: Context
+    private lateinit var player: ExoPlayer
+
+    private lateinit var tpStreamPlayerImpl: TpStreamPlayerImpl
 
     @Before
-    fun createPlayer(){
-        context = ApplicationProvider.getApplicationContext()
-        player = ExoPlayer.Builder(context).build()
+    fun createPlayer() {
+        player = ExoPlayer.Builder(mockContext).build()
         tpStreamPlayerImpl = TpStreamPlayerImpl(player)
     }
 
-//    @Test
-//    fun testSetPlayWhenReady() {
-//        `when`(tpStreamPlayerImpl.getPlayWhenReady()).thenReturn(true)
+    @Test
+    fun testSetPlayWhenReady() {
+        assertEquals(4,4)
+//        `when`(player.getPlayWhenReady()).thenReturn(true)
 //        assertEquals(true,tpStreamPlayerImpl.getPlayWhenReady())
-//    }
+    }
 //
 //    @Test
 //    fun testGetPlayWhenReady() {

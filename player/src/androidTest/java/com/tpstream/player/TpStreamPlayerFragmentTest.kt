@@ -4,7 +4,6 @@ package com.tpstream.player
 import android.os.Bundle
 import androidx.fragment.app.testing.launchFragment
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.lifecycle.Lifecycle
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -22,18 +21,8 @@ class TpStreamPlayerFragmentTest {
     }
 
     @Test
-    fun testTpStreamPlayerFragmentLaunchInContainer() {
+    fun test_player_view_is_visible() {
         launchFragmentInContainer<TpStreamPlayerFragment>(Bundle())
         onView(withId(R.id.video_view)).check(matches(isDisplayed()))
     }
-
-    @Test
-    fun testState() {
-        val scenario =
-            launchFragmentInContainer<TpStreamPlayerFragment>(initialState = Lifecycle.State.INITIALIZED)
-        scenario.moveToState(Lifecycle.State.CREATED)
-
-
-    }
-
 }

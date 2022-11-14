@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
@@ -45,7 +46,7 @@ import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
 //    }
 
     private lateinit var viewModel: TpStreamPlayerViewModel
-
+    private val playbackStateListener: Player.Listener = PlayerListener()
     private var player: TpStreamPlayer? = null
     private var _player: ExoPlayer? = null
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
@@ -241,6 +242,7 @@ import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
             .build()
             .also { exoPlayer ->
                 viewBinding.videoView.player = exoPlayer
+                exoPlayer.addListener(playbackStateListener)
             }
     }
 
@@ -281,6 +283,13 @@ import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
             }
             Log.d(TAG, "changed state to $stateString")
         }
+
+        override fun onTracksChanged(tracks: Tracks) {
+            super.onTracksChanged(tracks)
+            Log.d("TAG", "onTracksChanged: ${tracks.groups[0].isSelected}")
+        }
+
+
     }
 
 

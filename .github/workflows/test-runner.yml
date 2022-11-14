@@ -3,7 +3,7 @@ name: Run Test
 on: [ push ]
 
 jobs:
-  release_update:
+  run_test:
     runs-on: ubuntu-latest
 
     steps:

@@ -4,11 +4,14 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.media3.common.Format
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
 import com.google.common.collect.ImmutableList
+import androidx.media3.exoplayer.trackselection.ExoTrackSelection
+import com.tpstream.player.models.DRMLicenseURL
 import com.tpstream.player.models.VideoInfo
 
 public interface TpStreamPlayer {
@@ -24,10 +27,13 @@ public interface TpStreamPlayer {
     fun release()
     fun getVideoFormat(): Format?
     fun getCurrentTrackGroups(): ImmutableList<Tracks.Group>
+    fun getCurrentResolutionEnum(): ResolutionOptions
+    fun getCurrentResolution(): Int
 }
 
 class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
     override lateinit var params: TpInitParams
+    var currentResolutionOption = ResolutionOptions.AUTO
 
     private fun load(url: String) {
         val mediaItem = MediaItem.Builder()
@@ -84,6 +90,17 @@ class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
 
     override fun release() {
         player.release()
+    }
+
+    override fun getCurrentResolutionEnum(): ResolutionOptions {
+        return currentResolutionOption
+    }
+
+    override fun getCurrentResolution(): Int {
+        Log.d("TAG", "getCurrentResolution: ${player.currentTracks.groups.filter { it.type == C.TRACK_TYPE_VIDEO }[0]}")
+        return player.currentTracks.groups
+            .filter { it.type == C.TRACK_TYPE_VIDEO }[0].getTrackFormat(0).width
+
     }
 
     override fun getVideoFormat(): Format? {

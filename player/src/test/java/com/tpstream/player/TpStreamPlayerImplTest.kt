@@ -35,7 +35,7 @@ class TpStreamPlayerImplTest {
         called = false
         `when`(player.setPlayWhenReady(true)).then { isCalled() }
         tpStreamPlayerImpl.setPlayWhenReady(true)
-        assertEquals(false, called)
+        assertEquals(true, called)
     }
 
     @Test

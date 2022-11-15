@@ -2,6 +2,7 @@ package com.tpstream.player
 
 import android.content.Context
 import android.content.DialogInterface
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,12 +11,20 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.media3.common.*
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.offline.DownloadHelper
+
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.databinding.TrackSelectionDialogBinding
+import kotlin.collections.set
+
+private const val video_url = "https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/5b38cef3dd3f48938021c40203749ab3/video.m3u8"
 
 class AdvancedResolutionSelectionSheet(
     parameters: DefaultTrackSelector.Parameters, private val trackGroups: List<Tracks.Group>
@@ -67,6 +76,28 @@ class AdvancedResolutionSelectionSheet(
         if (this.tag == "AdvancedSheetDownload"){
             binding.downloadLayout.visibility = View.VISIBLE
         }
+
+        binding.cancelDownload.setOnClickListener{ dismiss() }
+        binding.startDownload.setOnClickListener {
+
+            val resolution = trackInfos[0]
+            val mediaTrackGroup: TrackGroup = resolution.trackGroup.mediaTrackGroup
+            overrides.clear()
+            overrides[mediaTrackGroup] = TrackSelectionOverride(mediaTrackGroup, ImmutableList.of(resolution.trackIndex))
+
+            val downloadHelper = DownloadHelper.forMediaItem(
+                MediaItem.Builder()
+                    .setUri(video_url)
+                    .build(),
+                DownloadHelper.getDefaultTrackSelectorParameters(requireContext()),
+                DefaultRenderersFactory(requireContext()),
+                DefaultDataSource.Factory(requireContext()),
+            )
+
+            dismiss()
+            Toast.makeText(requireContext(),"${trackInfos[0].format.height}",Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     private fun getTrackInfos(): ArrayList<TrackInfo> {

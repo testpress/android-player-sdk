@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.media3.common.*
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
@@ -83,9 +84,9 @@ class AdvancedResolutionSelectionSheet(
 
     private fun configureBottomSheetBehaviour() {
         val bottomSheetDialog = dialog as BottomSheetDialog
-        bottomSheetDialog.setTitle("Choose Quality")
-        bottomSheetDialog.behavior.isDraggable = false
+        bottomSheetDialog.behavior.isDraggable = true
         bottomSheetDialog.behavior.isFitToContents = true
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     inner class Adapter(context1: Context, dataSource: ArrayList<TrackInfo>, overrides: Map<TrackGroup, TrackSelectionOverride>): ArrayAdapter<TrackInfo>(context1, R.layout.resolution_data, dataSource) {

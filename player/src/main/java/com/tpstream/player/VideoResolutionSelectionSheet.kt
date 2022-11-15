@@ -13,6 +13,7 @@ import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.MappingTrackSelector
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tpstream.player.databinding.TrackSelectionDialogBinding
@@ -87,9 +88,9 @@ class VideoResolutionSelectionSheet(
 
     private fun configureBottomSheetBehaviour() {
         val bottomSheetDialog = dialog as BottomSheetDialog
-        bottomSheetDialog.setTitle("Choose Quality")
-        bottomSheetDialog.behavior.isDraggable = false
+        bottomSheetDialog.behavior.isDraggable = true
         bottomSheetDialog.behavior.isFitToContents = true
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 }
 

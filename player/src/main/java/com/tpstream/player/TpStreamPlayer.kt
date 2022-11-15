@@ -37,8 +37,8 @@ class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
 
     private fun load(url: String) {
         val mediaItem = MediaItem.Builder()
-            .setUri(url)
-            .setMimeType(MimeTypes.APPLICATION_MPD)
+            .setUri("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/5b38cef3dd3f48938021c40203749ab3/video.m3u8")
+            //.setMimeType(MimeTypes.APPLICATION_MPD)
             .build()
         player.setMediaItem(mediaItem)
         player.prepare()

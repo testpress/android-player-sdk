@@ -69,6 +69,7 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
 
     private fun addCustomPlayerControls() {
         addResolutionChangeControl()
+        addDownloadControls()
     }
 
     private fun addResolutionChangeControl() {
@@ -121,6 +122,27 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
                 }
             }
         }
+
+    private fun addDownloadControls(){
+        val downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
+        downloadButton.setOnClickListener{
+            val sheet = AdvancedResolutionSelectionSheet(trackSelector.parameters, _player!!.currentTracks.groups)
+            sheet.onClickListener = DialogInterface.OnClickListener { p0, p1 ->
+                val mappedTrackInfo = trackSelector.currentMappedTrackInfo
+                mappedTrackInfo?.let {
+                    val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
+                    if (sheet.overrides.isNotEmpty()) {
+                        val params = TrackSelectionParameters.Builder(requireContext())
+                            .clearOverridesOfType(rendererIndex)
+                            .addOverride(sheet.overrides.values.elementAt(0))
+                            .build()
+                        trackSelector.setParameters(params)
+                    }
+                }
+            }
+            sheet.show(requireActivity().supportFragmentManager, "AdvancedSheet")
+        }
+    }
 
     fun setOnInitializationListener(listener: InitializationListener) {
         this.initializationListener = listener

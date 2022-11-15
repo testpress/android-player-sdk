@@ -2,7 +2,6 @@ package com.tpstream.player
 
 import android.content.Context
 import android.content.DialogInterface
-import android.media.MediaPlayer.TrackInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,18 +9,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
-import android.widget.ListView
 import android.widget.TextView
 import androidx.media3.common.*
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.ui.TrackSelectionView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
-import com.tpstream.player.databinding.AdvancedTrackSelectionDialogBinding
+import com.tpstream.player.databinding.TrackSelectionDialogBinding
 
-class AdvancedResolutionSelectionSheet(parameters: DefaultTrackSelector.Parameters, private val trackGroups: List<Tracks.Group>): BottomSheetDialogFragment() {
-    private var _binding: AdvancedTrackSelectionDialogBinding? = null
+class AdvancedResolutionSelectionSheet(
+    parameters: DefaultTrackSelector.Parameters, private val trackGroups: List<Tracks.Group>
+): BottomSheetDialogFragment() {
+
+    private var _binding: TrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     var onClickListener: DialogInterface.OnClickListener? = null
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride>
@@ -35,7 +35,9 @@ class AdvancedResolutionSelectionSheet(parameters: DefaultTrackSelector.Paramete
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = AdvancedTrackSelectionDialogBinding.inflate(inflater, container, false)
+        Log.d("TAG", "onCreateView: ${this.tag}")
+        this.tag
+        _binding = TrackSelectionDialogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -50,22 +52,30 @@ class AdvancedResolutionSelectionSheet(parameters: DefaultTrackSelector.Paramete
     }
 
     private fun initializeList() {
+        val trackInfos = getTrackInfos()
+        binding.listview.also { it ->
+            it.adapter = Adapter(requireContext(), trackInfos, overrides)
+            it.setOnItemClickListener { _, _, index, _ ->
+                val resolution = trackInfos[index]
+                val mediaTrackGroup: TrackGroup = resolution.trackGroup.mediaTrackGroup
+                overrides.clear()
+                overrides[mediaTrackGroup] = TrackSelectionOverride(mediaTrackGroup, ImmutableList.of(resolution.trackIndex))
+                onClickListener?.onClick(dialog, DialogInterface.BUTTON_POSITIVE)
+                dismiss()
+            }
+        }
+        if (this.tag == "AdvancedSheetDownload"){
+            binding.downloadLayout.visibility = View.VISIBLE
+        }
+    }
+
+    private fun getTrackInfos(): ArrayList<TrackInfo> {
         val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
         val trackInfos = arrayListOf<TrackInfo>()
         for (trackIndex in 0 until trackGroup.length) {
             trackInfos.add(TrackInfo(trackGroup, trackIndex))
         }
-        val adapter = Adapter(requireContext(), trackInfos, overrides)
-        val listView = requireView().findViewById<ListView>(R.id.listview)
-        listView.adapter = adapter
-        listView.setOnItemClickListener { adapterView, view, i, l ->
-            val resolution = trackInfos[i]
-            val mediaTrackGroup: TrackGroup = resolution.trackGroup.mediaTrackGroup
-            overrides.clear()
-            overrides[mediaTrackGroup] = TrackSelectionOverride(mediaTrackGroup, ImmutableList.of(resolution.trackIndex))
-            onClickListener?.onClick(dialog, DialogInterface.BUTTON_POSITIVE)
-            dismiss()
-        }
+        return trackInfos
     }
 
     private fun configureBottomSheetBehaviour() {
@@ -87,14 +97,17 @@ class AdvancedResolutionSelectionSheet(parameters: DefaultTrackSelector.Paramete
             if (convertView == null) {
                 view =  inflater.inflate(R.layout.resolution_data, parent, false)
             }
-
             view!!.findViewById<TextView>(R.id.title).text = "${resolution.format.height}p"
+            showOrHideCheckMark(view, resolution)
+            return view
+        }
+
+        private fun showOrHideCheckMark(view: View, resolution: TrackInfo) {
             if (resolution.trackIndex in values) {
                 view.findViewById<ImageView>(R.id.auto_icon).visibility = View.VISIBLE
             } else {
                 view.findViewById<ImageView>(R.id.auto_icon).visibility = View.GONE
             }
-            return view
         }
     }
 

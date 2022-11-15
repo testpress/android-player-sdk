@@ -41,6 +41,7 @@ import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
     private val TAG = "TpStreamPlayerFragment"
     private var initializationListener: InitializationListener? = null
     lateinit var trackSelector:DefaultTrackSelector
+    var selectedResolution = ResolutionOptions.AUTO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,28 +69,54 @@ import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 
     private fun addResolutionChangeControl() {
         val resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
+
         resolutionButton.setOnClickListener {
-            val modalBottomSheet = VideoResolutionBottomSheet(trackSelector, _player!!.currentTracks.groups)
-            modalBottomSheet.onClickListener = onResolutionClickListener(modalBottomSheet)
-            modalBottomSheet.show(requireActivity().supportFragmentManager, VideoResolutionBottomSheet.TAG)
+            val videoResolutionSelector = VideoResolutionSelectionSheet(_player!!.currentTracks.groups, selectedResolution)
+            val advancedVideoResolutionSelector = AdvancedResolutionSelectionSheet(trackSelector.parameters, _player!!.currentTracks.groups)
+            advancedVideoResolutionSelector.onClickListener =
+                onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector)
+            videoResolutionSelector.onClickListener =
+                onVideoResolutionSelection(videoResolutionSelector, advancedVideoResolutionSelector)
+
+            videoResolutionSelector.show(requireActivity().supportFragmentManager, VideoResolutionSelectionSheet.TAG)
         }
     }
 
-    private fun onResolutionClickListener(
-        trackSelectionDialog: VideoResolutionBottomSheet
+    private fun onVideoResolutionSelection(
+        videoResolutionSelector: VideoResolutionSelectionSheet,
+        advancedVideoResolutionSelector: AdvancedResolutionSelectionSheet
     ) = DialogInterface.OnClickListener { p0, p1 ->
-        val mappedTrackInfo = trackSelector.currentMappedTrackInfo
-        mappedTrackInfo?.let {
-            val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-            if (trackSelectionDialog.overrides.isNotEmpty()) {
-                val params = TrackSelectionParameters.Builder(requireContext())
-                    .clearOverridesOfType(rendererIndex)
-                    .addOverride(trackSelectionDialog.overrides.values.elementAt(0))
-                    .build()
-                trackSelector.setParameters(params)
+        this@TpStreamPlayerFragment.selectedResolution =
+            videoResolutionSelector.selectedResolution
+        if (videoResolutionSelector.selectedResolution == ResolutionOptions.ADVANCED) {
+            advancedVideoResolutionSelector.show(
+                requireActivity().supportFragmentManager,
+                "AdvancedSheet"
+            )
+            return@OnClickListener
+        }
+
+        val parameters = videoResolutionSelector.selectedResolution.getTrackSelectionParameter(
+            requireContext(),
+            null
+        )
+        trackSelector.setParameters(parameters)
+    }
+
+    private fun onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector: AdvancedResolutionSelectionSheet) =
+        DialogInterface.OnClickListener { p0, p1 ->
+            val mappedTrackInfo = trackSelector.currentMappedTrackInfo
+            mappedTrackInfo?.let {
+                val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
+                if (advancedVideoResolutionSelector.overrides.isNotEmpty()) {
+                    val params = TrackSelectionParameters.Builder(requireContext())
+                        .clearOverridesOfType(rendererIndex)
+                        .addOverride(advancedVideoResolutionSelector.overrides.values.elementAt(0))
+                        .build()
+                    trackSelector.setParameters(params)
+                }
             }
         }
-    }
 
     fun setOnInitializationListener(listener: InitializationListener) {
         this.initializationListener = listener

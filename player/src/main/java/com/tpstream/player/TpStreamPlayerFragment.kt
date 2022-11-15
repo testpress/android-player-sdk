@@ -1,8 +1,8 @@
 package com.tpstream.player
 
+import android.app.Dialog
 import android.content.DialogInterface
 import android.content.pm.ActivityInfo
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -48,13 +48,19 @@ class TpStreamPlayerFragment : Fragment() {
     private val TAG = "TpStreamPlayerFragment"
     private var initializationListener: InitializationListener? = null
     lateinit var trackSelector:DefaultTrackSelector
-    lateinit var playerViewFullscreen: PlayerView
     var selectedResolution = ResolutionOptions.AUTO
+    lateinit var fullScreenDialog: Dialog
+    private var isFullScreen = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         trackSelector = DefaultTrackSelector(requireContext())
-        playerViewFullscreen = PlayerView(requireContext())
+        fullScreenDialog = object :Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+            override fun onBackPressed() {
+                super.onBackPressed()
+                Log.d(TAG, "onBackPressed: ")
+            }
+        }
     }
 
     override fun onCreateView(
@@ -69,7 +75,6 @@ class TpStreamPlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
         initializePlayer()
-        Log.d("TAG", "onViewCreated: ")
         addCustomPlayerControls()
     }
 
@@ -79,46 +84,31 @@ class TpStreamPlayerFragment : Fragment() {
     }
 
     private fun addFullScreenControl() {
-        initializeFullScreenView()
         viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setOnClickListener {
-            openFullScreen()
-        }
-
-        playerViewFullscreen.findViewById<ImageButton>(R.id.fullscreen).setOnClickListener {
-            closeFullScreen()
-        }
-    }
-
-    private fun initializeFullScreenView() {
-        playerViewFullscreen.findViewById<ImageButton>(R.id.fullscreen)
-            .setImageDrawable(requireContext().getDrawable(androidx.media3.ui.R.drawable.exo_styled_controls_fullscreen_exit))
-        playerViewFullscreen.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        playerViewFullscreen.visibility = View.GONE
-        playerViewFullscreen.setBackgroundColor(Color.BLACK)
-        (viewBinding.videoView.rootView as ViewGroup).apply {
-            addView(
-                playerViewFullscreen,
-                childCount
-            )
+            if(isFullScreen) {
+                closeFullScreen()
+            } else {
+                openFullScreen()
+            }
         }
     }
 
     private fun closeFullScreen() {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        viewBinding.videoView.visibility = View.VISIBLE
-        playerViewFullscreen.visibility = View.GONE
-        PlayerView.switchTargetView(_player!!, playerViewFullscreen, viewBinding.videoView)
+        (viewBinding.videoView.parent as ViewGroup).removeView(viewBinding.videoView)
+        viewBinding.mainFrameLayout.addView(viewBinding.videoView)
+        viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_fullscreen_24));
+        fullScreenDialog.dismiss()
+        isFullScreen = false
     }
 
     private fun openFullScreen() {
-        requireActivity().actionBar?.hide()
+        (viewBinding.videoView.parent as ViewGroup).removeView(viewBinding.videoView)
+        fullScreenDialog.addContentView(viewBinding.videoView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_fullscreen_exit_24));
+        fullScreenDialog.show()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        viewBinding.videoView.visibility = View.GONE
-        playerViewFullscreen.visibility = View.VISIBLE
-        PlayerView.switchTargetView(_player!!, viewBinding.videoView, playerViewFullscreen)
+        isFullScreen = true
     }
 
     private fun addResolutionChangeControl() {
@@ -127,12 +117,6 @@ class TpStreamPlayerFragment : Fragment() {
         resolutionButton.setOnClickListener {
             val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
             simpleVideoResolutionSelector.show(requireActivity().supportFragmentManager, SimpleVideoResolutionSelectionSheet.TAG)
-        }
-
-        playerViewFullscreen.findViewById<ImageButton>(R.id.exo_resolution).setOnClickListener {
-            val modalBottomSheet = VideoResolutionBottomSheet(trackSelector, _player!!.currentTracks.groups)
-            modalBottomSheet.onClickListener = onResolutionClickListener(modalBottomSheet)
-            modalBottomSheet.show(requireActivity().supportFragmentManager, VideoResolutionBottomSheet.TAG)
         }
     }
 

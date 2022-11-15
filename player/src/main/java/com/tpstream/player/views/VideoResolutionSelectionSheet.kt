@@ -1,4 +1,4 @@
-package com.tpstream.player
+package com.tpstream.player.views
 
 import android.content.Context
 import android.content.DialogInterface
@@ -15,6 +15,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.tpstream.player.R
+import com.tpstream.player.TpStreamPlayer
 import com.tpstream.player.databinding.TrackSelectionDialogBinding
 
 
@@ -110,7 +112,8 @@ data class Resolution(
     val option: ResolutionOptions
 )
 
-class ResolutionAdapter(context1: Context, dataSource: ArrayList<Resolution>, private val selectedResolution: ResolutionOptions): ArrayAdapter<Resolution>(context1, R.layout.resolution_data, dataSource) {
+class ResolutionAdapter(context1: Context, dataSource: ArrayList<Resolution>, private val selectedResolution: ResolutionOptions): ArrayAdapter<Resolution>(context1,
+    R.layout.resolution_data, dataSource) {
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {

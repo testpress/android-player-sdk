@@ -17,17 +17,15 @@ import com.google.common.collect.ImmutableList
 import com.tpstream.player.databinding.TrackSelectionDialogBinding
 
 class AdvancedResolutionSelectionSheet(
-    parameters: DefaultTrackSelector.Parameters, private val trackGroups: List<Tracks.Group>
+    private val player: TpStreamPlayer,
+    parameters: DefaultTrackSelector.Parameters,
 ): BottomSheetDialogFragment() {
 
     private var _binding: TrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     var onClickListener: DialogInterface.OnClickListener? = null
-    var overrides: MutableMap<TrackGroup, TrackSelectionOverride>
-
-    init {
-        overrides = parameters.overrides.toMutableMap()
-    }
+    var overrides: MutableMap<TrackGroup, TrackSelectionOverride> = parameters.overrides.toMutableMap()
+    private val trackGroups = player.getCurrentTrackGroups()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,8 +42,19 @@ class AdvancedResolutionSelectionSheet(
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initializeList()
+        super.onViewCreated(view, savedInstanceState)
         configureBottomSheetBehaviour()
+        displayCurrentResolution()
+        initializeList()
+    }
+
+    private fun displayCurrentResolution() {
+        val currentResolution = if (player.getVideoFormat() != null) {
+            "${player.getVideoFormat()!!.height}p"
+        } else {
+            "Auto"
+        }
+        binding.currentResolution.text = currentResolution
     }
 
     private fun initializeList() {

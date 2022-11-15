@@ -9,10 +9,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.media3.common.C
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.TrackSelectionParameters
-import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -22,7 +20,7 @@ import com.tpstream.player.databinding.TrackSelectionDialogBinding
 
 @UnstableApi
 class VideoResolutionSelectionSheet(
-    private val trackGroups: List<Tracks.Group>,
+    private val player: TpStreamPlayer,
     var selectedResolution: ResolutionOptions
 ) : BottomSheetDialogFragment(){
 
@@ -50,8 +48,18 @@ class VideoResolutionSelectionSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initializeList()
         configureBottomSheetBehaviour()
+        initializeList()
+        displayCurrentResolution()
+    }
+
+    private fun displayCurrentResolution() {
+        val currentResolution = if (player.getVideoFormat() != null) {
+            "${player.getVideoFormat()!!.height}p"
+        } else {
+            "Auto"
+        }
+        binding.currentResolution.text = currentResolution
     }
 
     private fun initializeList() {

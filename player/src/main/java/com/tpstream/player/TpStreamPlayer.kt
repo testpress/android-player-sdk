@@ -3,10 +3,12 @@ package com.tpstream.player
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
+import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
-import com.tpstream.player.models.DRMLicenseURL
+import com.google.common.collect.ImmutableList
 import com.tpstream.player.models.VideoInfo
 
 public interface TpStreamPlayer {
@@ -20,6 +22,8 @@ public interface TpStreamPlayer {
     fun setPlaybackSpeed(speed: Float)
     fun seekTo(seconds: Long)
     fun release()
+    fun getVideoFormat(): Format?
+    fun getCurrentTrackGroups(): ImmutableList<Tracks.Group>
 }
 
 class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
@@ -80,5 +84,13 @@ class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
 
     override fun release() {
         player.release()
+    }
+
+    override fun getVideoFormat(): Format? {
+        return player.videoFormat
+    }
+
+    override fun getCurrentTrackGroups(): ImmutableList<Tracks.Group> {
+        return player.currentTracks.groups
     }
 }

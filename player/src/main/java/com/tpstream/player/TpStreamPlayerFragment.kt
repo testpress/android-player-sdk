@@ -13,10 +13,12 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.C
+import androidx.media3.common.Format
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
+import androidx.media3.exoplayer.DecoderReuseEvaluation
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
@@ -71,8 +73,8 @@ import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
         val resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
 
         resolutionButton.setOnClickListener {
-            val videoResolutionSelector = VideoResolutionSelectionSheet(_player!!.currentTracks.groups, selectedResolution)
-            val advancedVideoResolutionSelector = AdvancedResolutionSelectionSheet(trackSelector.parameters, _player!!.currentTracks.groups)
+            val videoResolutionSelector = VideoResolutionSelectionSheet(player!!, selectedResolution)
+            val advancedVideoResolutionSelector = AdvancedResolutionSelectionSheet(player!!, trackSelector.parameters)
             advancedVideoResolutionSelector.onClickListener =
                 onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector)
             videoResolutionSelector.onClickListener =

@@ -81,12 +81,17 @@
             <ImageButton
                 android:id="@+id/exo_resolution"
                 style="@style/ExoStyledControls.Button.Bottom"
-                android:src="@drawable/ic_baseline_high_quality_24"
-            />
+                android:src="@drawable/ic_baseline_high_quality_24" />
 
             <ImageButton android:id="@+id/fullscreen"
                 android:src="@drawable/ic_baseline_fullscreen_24"
                 style="@style/ExoStyledControls.Button.Bottom.FullScreen"/>
+
+            <ImageButton
+                android:id="@+id/exo_download"
+                style="@style/ExoStyledControls.Button.Bottom"
+                android:src="@drawable/ic_baseline_download_for_offline_24"/>
+
 
         </LinearLayout>
 

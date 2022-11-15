@@ -160,3 +160,71 @@ object Util{
         return -1
     }
 }
+
+data class Resolution(
+    val title: String,
+    val description: String,
+    val option: ResolutionOptions
+)
+
+class ResolutionAdapter(context1: Context, dataSource: ArrayList<Resolution>, private val selectedResolution: ResolutionOptions): ArrayAdapter<Resolution>(context1, R.layout.resolution_data, dataSource) {
+    private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        val resolution = getItem(position)!!
+        var view = convertView
+        if (convertView == null) {
+            view =  inflater.inflate(R.layout.resolution_data, parent, false)
+        }
+
+        view!!.findViewById<TextView>(R.id.title).text = resolution.title
+        view.findViewById<TextView>(R.id.description).text = resolution.description
+        showOrHideCheckMark(view, resolution)
+        return view
+    }
+
+    private fun showOrHideCheckMark(view: View, resolution: Resolution) {
+        if (resolution.option == selectedResolution) {
+            view.findViewById<ImageView>(R.id.auto_icon).visibility = View.VISIBLE
+        } else {
+            view.findViewById<ImageView>(R.id.auto_icon).visibility = View.GONE
+        }
+    }
+}
+
+enum class ResolutionOptions {
+    AUTO {
+        override fun getTrackSelectionParameter(
+            context: Context,
+            override: TrackSelectionOverride?
+        ): TrackSelectionParameters {
+            return TrackSelectionParameters.Builder(context).build()
+        }
+    },
+    HIGH {
+        override fun getTrackSelectionParameter(
+            context: Context,
+            override: TrackSelectionOverride?
+        ): TrackSelectionParameters {
+            return TrackSelectionParameters.Builder(context).setForceHighestSupportedBitrate(true).build()
+        }
+    },
+    LOW {
+        override fun getTrackSelectionParameter(
+            context: Context,
+            override: TrackSelectionOverride?
+        ): TrackSelectionParameters {
+            return TrackSelectionParameters.Builder(context).setForceLowestBitrate(true).build()
+        }
+    },
+    ADVANCED {
+        override fun getTrackSelectionParameter(
+            context: Context,
+            override: TrackSelectionOverride?
+        ): TrackSelectionParameters {
+            return TrackSelectionParameters.Builder(context).addOverride(override!!).build()
+        }
+    };
+
+    abstract fun getTrackSelectionParameter(context: Context, override: TrackSelectionOverride?=null):TrackSelectionParameters
+}

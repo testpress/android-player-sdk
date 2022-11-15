@@ -1,4 +1,4 @@
-package com.tpstream.player
+package com.tpstream.player.views
 
 import android.content.Context
 import android.content.DialogInterface
@@ -15,6 +15,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
+import com.tpstream.player.R
+import com.tpstream.player.TpStreamPlayer
 import com.tpstream.player.databinding.TrackSelectionDialogBinding
 
 class AdvancedResolutionSelectionSheet(
@@ -89,7 +91,8 @@ class AdvancedResolutionSelectionSheet(
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    inner class Adapter(context1: Context, dataSource: ArrayList<TrackInfo>, overrides: Map<TrackGroup, TrackSelectionOverride>): ArrayAdapter<TrackInfo>(context1, R.layout.resolution_data, dataSource) {
+    inner class Adapter(context1: Context, dataSource: ArrayList<TrackInfo>, overrides: Map<TrackGroup, TrackSelectionOverride>): ArrayAdapter<TrackInfo>(context1,
+        R.layout.resolution_data, dataSource) {
         private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val values = overrides.values.map { trackSelection ->
             trackSelection.trackIndices[0]

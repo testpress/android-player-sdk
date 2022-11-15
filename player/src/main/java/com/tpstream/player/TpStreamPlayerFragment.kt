@@ -3,9 +3,12 @@ package com.tpstream.player
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.pm.ActivityInfo
+import android.hardware.SensorManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -51,6 +54,7 @@ class TpStreamPlayerFragment : Fragment() {
     var selectedResolution = ResolutionOptions.AUTO
     lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
+    lateinit var orientationEventListener: OrientationListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,8 +62,28 @@ class TpStreamPlayerFragment : Fragment() {
         fullScreenDialog = object :Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
             override fun onBackPressed() {
                 super.onBackPressed()
-                Log.d(TAG, "onBackPressed: ")
+                exitFullScreen()
             }
+        }
+    }
+
+    fun enableAutoFullScreenOnRotate() {
+        orientationEventListener = OrientationListener(requireContext())
+        orientationEventListener.setOnChangeListener { isLandscape ->
+            activity?.let {
+                if(isLandscape) {
+                    showFullScreen()
+                } else {
+                    exitFullScreen()
+                }
+            }
+        }
+        orientationEventListener.start()
+    }
+
+    fun disableAutoFullScreenOnRotate() {
+        if(::orientationEventListener.isInitialized) {
+            orientationEventListener.disable()
         }
     }
 
@@ -86,14 +110,14 @@ class TpStreamPlayerFragment : Fragment() {
     private fun addFullScreenControl() {
         viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setOnClickListener {
             if(isFullScreen) {
-                closeFullScreen()
+                exitFullScreen()
             } else {
-                openFullScreen()
+                showFullScreen()
             }
         }
     }
 
-    private fun closeFullScreen() {
+    fun exitFullScreen() {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         (viewBinding.videoView.parent as ViewGroup).removeView(viewBinding.videoView)
         viewBinding.mainFrameLayout.addView(viewBinding.videoView)
@@ -102,7 +126,7 @@ class TpStreamPlayerFragment : Fragment() {
         isFullScreen = false
     }
 
-    private fun openFullScreen() {
+    fun showFullScreen() {
         (viewBinding.videoView.parent as ViewGroup).removeView(viewBinding.videoView)
         fullScreenDialog.addContentView(viewBinding.videoView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_fullscreen_exit_24));
@@ -180,28 +204,10 @@ class TpStreamPlayerFragment : Fragment() {
         _viewBinding = null
     }
 
-    private fun openFullscreen(){
-        viewBinding.videoView.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.black))
-        val params = viewBinding.videoView.layoutParams as FrameLayout.LayoutParams
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT
-        params.height = FrameLayout.LayoutParams.MATCH_PARENT
-        viewBinding.videoView.layoutParams = params
-        requireActivity().actionBar?.hide()
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        hideSystemUi()
+    override fun onDestroy() {
+        super.onDestroy()
+        disableAutoFullScreenOnRotate()
     }
-
-    private fun closeFullscreen() {
-        val requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-        viewBinding.videoView.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-        val params = viewBinding.videoView.layoutParams as FrameLayout.LayoutParams
-        params.width = FrameLayout.LayoutParams.MATCH_PARENT
-        params.height = 0
-        viewBinding.videoView.layoutParams = params
-        requireActivity().actionBar?.show()
-        viewBinding.videoView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
-    }
-
 
     override fun onResume() {
         super.onResume()

@@ -2,7 +2,6 @@ package com.tpstream.player
 
 import android.content.Context
 import android.content.DialogInterface
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,22 +10,14 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.media3.common.*
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.exoplayer.DefaultRenderersFactory
-import androidx.media3.exoplayer.offline.DownloadHelper
-import androidx.media3.exoplayer.source.TrackGroupArray
-
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.databinding.TrackSelectionDialogBinding
 import kotlin.collections.set
 
-private const val video_url = "https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/5b38cef3dd3f48938021c40203749ab3/video.m3u8"
 
 class AdvancedResolutionSelectionSheet(
     parameters: DefaultTrackSelector.Parameters, private val trackGroups: List<Tracks.Group>
@@ -73,41 +64,6 @@ class AdvancedResolutionSelectionSheet(
                 overrides[mediaTrackGroup] = TrackSelectionOverride(mediaTrackGroup, ImmutableList.of(resolution.trackIndex))
                 onClickListener?.onClick(dialog, DialogInterface.BUTTON_POSITIVE)
                 dismiss()
-            }
-        }
-        if (this.tag == "AdvancedSheetDownload"){
-            binding.downloadLayout.visibility = View.VISIBLE
-        }
-
-        binding.cancelDownload.setOnClickListener{ dismiss() }
-        binding.startDownload.setOnClickListener {
-
-            dismiss()
-            Toast.makeText(requireContext(),"${trackInfos[0].format.height}",Toast.LENGTH_SHORT).show()
-        }
-
-    }
-
-    private lateinit var downloadHelper:DownloadHelper
-
-    private fun setSelectedTracks(overrides: List<DefaultTrackSelector.SelectionOverride>) {
-        val mappedTrackInfo = downloadHelper.getMappedTrackInfo(0)
-        for (index in 0 until downloadHelper.periodCount) {
-            downloadHelper.clearTrackSelections(index)
-            var builder = DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT.buildUpon()
-            val videoRendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-            val trackGroupArray: TrackGroupArray = mappedTrackInfo.getTrackGroups(videoRendererIndex)
-            for (i in overrides.indices) {
-                builder.setSelectionOverride(videoRendererIndex, trackGroupArray, overrides[i])
-                downloadHelper.addTrackSelection(index, builder.build())
-            }
-        }
-    }
-
-    private fun getRendererIndex(trackType:Int, mappedTrackInfo: MappingTrackSelector.MappedTrackInfo)  :Int {
-        for (index in 0..mappedTrackInfo.rendererCount){
-            if (mappedTrackInfo.getRendererType(index) == trackType) {
-                return index;
             }
         }
     }

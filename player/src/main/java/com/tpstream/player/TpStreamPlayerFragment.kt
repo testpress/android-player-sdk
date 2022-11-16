@@ -202,7 +202,7 @@ import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
     private fun addDownloadControls(){
         val downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
         downloadButton.setOnClickListener{
-            val sheet = AdvancedResolutionSelectionSheet(trackSelector.parameters, _player!!.currentTracks.groups)
+            val sheet = DownloadResolutionSelectionSheet(trackSelector.parameters, _player!!.currentTracks.groups)
             sheet.onClickListener = DialogInterface.OnClickListener { p0, p1 ->
                 val mappedTrackInfo = trackSelector.currentMappedTrackInfo
                 mappedTrackInfo?.let {

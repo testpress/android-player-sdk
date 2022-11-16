@@ -76,8 +76,12 @@ class AdvancedResolutionSelectionSheet(
     }
 
     private fun getTrackInfos(): ArrayList<TrackInfo> {
-        val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
         val trackInfos = arrayListOf<TrackInfo>()
+        if (trackGroups.none { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }) {
+            return trackInfos
+        }
+
+        val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
         for (trackIndex in 0 until trackGroup.length) {
             trackInfos.add(TrackInfo(trackGroup, trackIndex))
         }

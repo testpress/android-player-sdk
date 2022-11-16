@@ -30,7 +30,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
     private fun load(url: String) {
         val mediaItem = MediaItem.Builder()
             .setUri(url)
-            .setMimeType(MimeTypes.APPLICATION_MATROSKA)
+            .setMimeType(MimeTypes.APPLICATION_MPD)
             .build()
         player.setMediaItem(mediaItem)
         player.prepare()

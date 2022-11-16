@@ -9,6 +9,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/video_view">
+        <TextView
+            android:id="@+id/errorMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:textAlignment="center"
+            android:textSize="14dp"
+            android:text=""/>
     </androidx.media3.ui.PlayerView>
 
 </FrameLayout>

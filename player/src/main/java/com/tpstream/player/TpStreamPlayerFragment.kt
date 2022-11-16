@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
@@ -31,7 +32,7 @@ class TpStreamPlayerFragment : Fragment() {
 //    }
 
     private lateinit var viewModel: TpStreamPlayerViewModel
-
+    private val playerListener = PlayerListener()
     private var player: TpStreamPlayer? = null
     private var _player: ExoPlayer? = null
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
@@ -81,6 +82,7 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun initializePlayer() {
         _player = initializeExoplayer()
+        _player!!.addListener(playerListener)
         player = TpStreamPlayerImpl(_player!!)
         this.initializationListener?.onInitializationSuccess(player!!)
     }
@@ -125,18 +127,33 @@ class TpStreamPlayerFragment : Fragment() {
         Log.d(TAG, "onStop: ")
     }
 
-    class PlayerListener : Player.Listener {
+    fun load(parameters: TpInitParams) {
+        if (player == null) {
+            throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
+        }
+
+        player?.load(parameters) { exception ->
+            requireActivity().runOnUiThread {
+                viewBinding.errorMessage.visibility = View.VISIBLE
+                viewBinding.errorMessage.text = "Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}"
+            }
+        }
+        player?.setPlayWhenReady(parameters.autoPlay==true)
+    }
+
+    inner class PlayerListener : Player.Listener {
         private val TAG = "PlayerListener"
 
         override fun onPlaybackStateChanged(playbackState: Int) {
-            val stateString: String = when (playbackState) {
-                ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE      -"
-                ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING -"
-                ExoPlayer.STATE_READY -> "ExoPlayer.STATE_READY     -"
-                ExoPlayer.STATE_ENDED -> "ExoPlayer.STATE_ENDED     -"
-                else -> "UNKNOWN_STATE             -"
+            if (playbackState == ExoPlayer.STATE_READY) {
+                viewBinding.errorMessage.visibility = View.GONE
             }
-            Log.d(TAG, "changed state to $stateString")
+        }
+
+        override fun onPlayerError(error: PlaybackException) {
+            super.onPlayerError(error)
+            viewBinding.errorMessage.visibility = View.VISIBLE
+            viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
         }
     }
 

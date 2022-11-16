@@ -1,5 +1,7 @@
 package com.tpstream.player
 
+import android.app.Activity
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -11,7 +13,7 @@ import com.tpstream.player.models.VideoInfo
 
 public interface TpStreamPlayer {
     abstract val params: TpInitParams
-    fun load(parameters: TpInitParams)
+    fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit)
     fun setPlayWhenReady(canPlay: Boolean)
     fun getPlayWhenReady(): Boolean
     fun getPlaybackState(): Int
@@ -28,13 +30,13 @@ class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
     private fun load(url: String) {
         val mediaItem = MediaItem.Builder()
             .setUri(url)
-            .setMimeType(MimeTypes.APPLICATION_MPD)
+            .setMimeType(MimeTypes.APPLICATION_MATROSKA)
             .build()
         player.setMediaItem(mediaItem)
         player.prepare()
     }
 
-    override fun load(parameters: TpInitParams) {
+    override fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
         params = parameters
         val url = "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
         Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
@@ -48,15 +50,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
             }
 
             override fun onFailure(exception: TPException) {
-                if (exception.isNetworkError()){
-                    Log.d("TAG", "isNetworkError: ${exception.response?.code}")
-                } else if (exception.isClientError()){
-                    Log.d("TAG", "isClientError: ${exception.response?.code}")
-                }else if (exception.isUnauthenticated()){
-                    Log.d("TAG", "isUnauthenticated: ${exception.response?.code}")
-                }else if (exception.isServerError()){
-                    Log.d("TAG", "isServerError: ${exception.response?.code}")
-                }
+                onError(exception)
             }
         })
     }

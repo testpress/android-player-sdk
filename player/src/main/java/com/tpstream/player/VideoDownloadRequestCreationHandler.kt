@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.util.Util
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
@@ -29,7 +30,7 @@ class VideoDownloadRequestCreationHandler(
     private var keySetId: ByteArray? = null
 
     init {
-        val url = "content.video!!.getPlaybackURL()!!"
+        val url = "https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/5b38cef3dd3f48938021c40203749ab3/video.m3u8"
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         mediaItem = MediaItem.Builder()
             .setUri(url)
@@ -84,25 +85,21 @@ class VideoDownloadRequestCreationHandler(
         listener?.onDownloadRequestHandlerPrepareError(helper, e)
     }
 
-    fun buildDownloadRequest(overrides: List<DefaultTrackSelector.SelectionOverride>): DownloadRequest {
+    fun buildDownloadRequest(overrides: List<TrackSelectionOverride>): DownloadRequest {
         setSelectedTracks(overrides)
         val name = "123"
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 
-    private fun setSelectedTracks(overrides: List<DefaultTrackSelector.SelectionOverride>) {
-        val mappedTrackInfo = downloadHelper.getMappedTrackInfo(0)
-        for (index in 0 until downloadHelper.periodCount) {
+    private fun setSelectedTracks(overrides: List<TrackSelectionOverride>) {
+        for (index in 0 until  downloadHelper.periodCount) {
             downloadHelper.clearTrackSelections(index)
             var builder =
                 DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT.buildUpon()
-            val videoRendererIndex =
-                VideoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-            val trackGroupArray: TrackGroupArray =
-                mappedTrackInfo.getTrackGroups(videoRendererIndex)
+
             for (i in overrides.indices) {
-                builder.setSelectionOverride(videoRendererIndex, trackGroupArray, overrides[i])
-                downloadHelper.addTrackSelection(index, builder.build())
+                builder.addOverride(overrides[i])
+                downloadHelper.addTrackSelection(index, trackSelectionParameters)
             }
         }
     }

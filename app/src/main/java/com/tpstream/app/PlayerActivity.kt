@@ -29,9 +29,9 @@ class PlayerActivity : AppCompatActivity() {
                     .setVideoId(videoId)
                     .setAccessToken(accessToken)
                     .setOrgCode(orgCode)
+                    .setAutoPlay(true)
                     .build()
-                player.load(parameters)
-                player.setPlayWhenReady(true)
+                playerFragment.load(parameters)
             }
         });
     }

@@ -332,18 +332,33 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         Log.d(TAG, "onStop: ")
     }
 
+    fun load(parameters: TpInitParams) {
+        if (player == null) {
+            throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
+        }
+
+        player?.load(parameters) { exception ->
+            requireActivity().runOnUiThread {
+                viewBinding.errorMessage.visibility = View.VISIBLE
+                viewBinding.errorMessage.text = "Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}"
+            }
+        }
+        player?.setPlayWhenReady(parameters.autoPlay==true)
+    }
+
     inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {
         private val TAG = "PlayerListener"
 
         override fun onPlaybackStateChanged(playbackState: Int) {
-            val stateString: String = when (playbackState) {
-                ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE      -"
-                ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING -"
-                ExoPlayer.STATE_READY -> "ExoPlayer.STATE_READY     -"
-                ExoPlayer.STATE_ENDED -> "ExoPlayer.STATE_ENDED     -"
-                else -> "UNKNOWN_STATE             -"
+            if (playbackState == ExoPlayer.STATE_READY) {
+                viewBinding.errorMessage.visibility = View.GONE
             }
-            Log.d(TAG, "changed state to $stateString")
+        }
+
+        override fun onPlayerError(error: PlaybackException) {
+            super.onPlayerError(error)
+            viewBinding.errorMessage.visibility = View.VISIBLE
+            viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
         }
 
         override fun onPlayerError(error: PlaybackException) {

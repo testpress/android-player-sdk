@@ -24,7 +24,7 @@ import kotlinx.coroutines.runBlocking
 public interface TpStreamPlayer {
     abstract val params: TpInitParams
     abstract val videoInfo: VideoInfo?
-    fun load(parameters: TpInitParams)
+    fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit)
     fun setPlayWhenReady(canPlay: Boolean)
     fun getPlayWhenReady(): Boolean
     fun getPlaybackState(): Int
@@ -98,7 +98,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         return builder.build()
     }
 
-    override fun load(parameters: TpInitParams) {
+    override fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
         params = parameters
         populateOfflineVideoInfo(parameters)
         if (checkIsVideoDownloaded()){
@@ -121,7 +121,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
             }
 
             override fun onFailure(exception: TPException) {
-                Log.d("TAG", "onFailure: ")
+                onError(exception)
             }
         })
     }

@@ -52,6 +52,7 @@ class TpStreamPlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
         initializePlayer()
+        viewBinding.frameLayout.setAspectRatio(16f/9f)
     }
 
     fun setOnInitializationListener(listener: InitializationListener) {

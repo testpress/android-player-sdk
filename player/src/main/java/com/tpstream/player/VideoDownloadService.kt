@@ -46,12 +46,11 @@ class VideoDownloadService:DownloadService(
         downloads: MutableList<Download>,
         notMetRequirements: Int
     ): Notification {
-        val navigateToDownloadsActivity = getIntentForNavigateToDownloadsActivity()
 
         return notificationHelper.buildProgressNotification(
             applicationContext,
             R.drawable.ic_baseline_download_for_offline_24,
-            navigateToDownloadsActivity,
+            null,
             null,
             downloads
         )
@@ -69,23 +68,7 @@ class VideoDownloadService:DownloadService(
             Download.STATE_FAILED -> notification = getFailedNotification()
         }
 
-        //notification?.contentIntent = getIntentForNavigateToDownloadsActivity()
         NotificationUtil.setNotification(this, nextNotificationId, notification)
-    }
-
-    private fun getIntentForNavigateToDownloadsActivity(): PendingIntent {
-        val navigateToDownloadsActivity = Intent(this, DownloadsActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PendingIntent.getActivity(
-                this, 0, navigateToDownloadsActivity, PendingIntent.FLAG_IMMUTABLE
-            )
-        } else {
-            PendingIntent.getActivity(
-                this, 0, navigateToDownloadsActivity, PendingIntent.FLAG_UPDATE_CURRENT
-            )
-        }
     }
 
     private fun getFailedNotification(): Notification {

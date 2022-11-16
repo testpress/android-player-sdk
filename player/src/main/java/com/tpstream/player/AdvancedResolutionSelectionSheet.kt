@@ -16,8 +16,10 @@ import androidx.media3.common.*
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.offline.DownloadHelper
+import androidx.media3.exoplayer.source.TrackGroupArray
 
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
@@ -80,25 +82,36 @@ class AdvancedResolutionSelectionSheet(
         binding.cancelDownload.setOnClickListener{ dismiss() }
         binding.startDownload.setOnClickListener {
 
-            val resolution = trackInfos[0]
-            val mediaTrackGroup: TrackGroup = resolution.trackGroup.mediaTrackGroup
-            overrides.clear()
-            overrides[mediaTrackGroup] = TrackSelectionOverride(mediaTrackGroup, ImmutableList.of(resolution.trackIndex))
-
-            val downloadHelper = DownloadHelper.forMediaItem(
-                MediaItem.Builder()
-                    .setUri(video_url)
-                    .build(),
-                DownloadHelper.getDefaultTrackSelectorParameters(requireContext()),
-                DefaultRenderersFactory(requireContext()),
-                DefaultDataSource.Factory(requireContext()),
-            )
-
             dismiss()
             Toast.makeText(requireContext(),"${trackInfos[0].format.height}",Toast.LENGTH_SHORT).show()
         }
 
     }
+
+    private lateinit var downloadHelper:DownloadHelper
+
+    private fun setSelectedTracks(overrides: List<DefaultTrackSelector.SelectionOverride>) {
+        val mappedTrackInfo = downloadHelper.getMappedTrackInfo(0)
+        for (index in 0 until downloadHelper.periodCount) {
+            downloadHelper.clearTrackSelections(index)
+            var builder = DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT.buildUpon()
+            val videoRendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
+            val trackGroupArray: TrackGroupArray = mappedTrackInfo.getTrackGroups(videoRendererIndex)
+            for (i in overrides.indices) {
+                builder.setSelectionOverride(videoRendererIndex, trackGroupArray, overrides[i])
+                downloadHelper.addTrackSelection(index, builder.build())
+            }
+        }
+    }
+
+    private fun getRendererIndex(trackType:Int, mappedTrackInfo: MappingTrackSelector.MappedTrackInfo)  :Int {
+        for (index in 0..mappedTrackInfo.rendererCount){
+            if (mappedTrackInfo.getRendererType(index) == trackType) {
+                return index;
+            }
+        }
+    }
+
 
     private fun getTrackInfos(): ArrayList<TrackInfo> {
         val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }

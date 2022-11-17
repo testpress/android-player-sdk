@@ -1,41 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_height="50dp"
+    android:orientation="vertical">
 
-<!--        <RadioButton-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="16dp"-->
-<!--            android:focusable="false"-->
-<!--            android:focusableInTouchMode="false"-->
-<!--            android:id="@+id/radio_button"/>-->
-<!--        <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:textSize="16sp"-->
-<!--            android:id="@+id/resolution_size"-->
-<!--            android:layout_marginStart="16dp"-->
-<!--            android:textColor="@android:color/black"-->
-<!--            android:text="1080p" />-->
-<!--        <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:textSize="16sp"-->
-<!--            android:id="@+id/file_size"-->
-<!--            android:layout_marginStart="16dp"-->
-<!--            android:textColor="@android:color/black"-->
-<!--            android:text="100 MB" />-->
-
-        <CheckedTextView
-            android:id="@+id/track_selecting"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:textSize="16sp"
-            android:checked="false"
-            android:drawableStart="?android:attr/listChoiceIndicatorSingle"
-            android:text="hi"/>
+            android:layout_height="match_parent">
+                <CheckedTextView
+                    android:id="@+id/track_selecting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="16dp"
+                    android:gravity="center_vertical"
+                    android:text="1080p"
+                    android:textSize="16sp"
+                    android:drawableStart="?android:attr/listChoiceIndicatorSingle"/>
+
+                <TextView
+                    android:id="@+id/track_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="center_vertical"
+                    android:text="100 MB"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"/>
+        </RelativeLayout>
 
 </LinearLayout>

@@ -3,13 +3,10 @@ package com.tpstream.player
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.media3.common.Format
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
-import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
-import com.google.common.collect.ImmutableList
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import com.tpstream.player.models.DRMLicenseURL
 import com.tpstream.player.models.VideoInfo
@@ -25,19 +22,18 @@ public interface TpStreamPlayer {
     fun setPlaybackSpeed(speed: Float)
     fun seekTo(seconds: Long)
     fun release()
-    fun getVideoFormat(): Format?
-    fun getCurrentTrackGroups(): ImmutableList<Tracks.Group>
     fun getCurrentResolutionEnum(): ResolutionOptions
     fun getCurrentResolution(): Int
 }
 
-class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
+class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPlayer {
     override lateinit var params: TpInitParams
+    override lateinit var videoInfo: VideoInfo
     var currentResolutionOption = ResolutionOptions.AUTO
 
     private fun load(url: String) {
         val mediaItem = MediaItem.Builder()
-            .setUri("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/5b38cef3dd3f48938021c40203749ab3/video.m3u8")
+            .setUri(url)
             //.setMimeType(MimeTypes.APPLICATION_MPD)
             .build()
         player.setMediaItem(mediaItem)
@@ -49,10 +45,10 @@ class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
         val url = "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
         Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
-                Log.d("TAG", "onSuccess: ")
-                result.dashUrl?.let {
+                videoInfo = result
+                result.url?.let {
                     Handler(Looper.getMainLooper()).post {
-                       load(it)
+                        load(it)
                     }
                 }
             }

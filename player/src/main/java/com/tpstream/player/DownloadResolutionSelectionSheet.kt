@@ -23,15 +23,16 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
+import com.tpstream.player.models.VideoInfo
 
 
 typealias OnSubmitListener = (DownloadRequest) -> Unit
 
-private const val url = "https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/5b38cef3dd3f48938021c40203749ab3/video.m3u8"
 
 class DownloadResolutionSelectionSheet(
     private val parameters: DefaultTrackSelector.Parameters,
-    private val trackGroups: List<Tracks.Group>
+    private val trackGroups: List<Tracks.Group>,
+    private val videoInfo: VideoInfo
 ) : BottomSheetDialogFragment() {
 
     private var _binding: DownloadTrackSelectionDialogBinding? = null
@@ -48,6 +49,7 @@ class DownloadResolutionSelectionSheet(
         videoDownloadRequestCreateHandler =
             VideoDownloadRequestCreationHandler(
                 requireContext(),
+                videoInfo
             )
         //videoDownloadRequestCreateHandler.listener = this
         overrides = parameters.overrides.toMutableMap()
@@ -76,7 +78,7 @@ class DownloadResolutionSelectionSheet(
 
     private fun initializeTrackSelectionView() {
         val trackInfos = getTrackInfos()
-        val adapter =  Adapter(requireContext(), trackInfos, overrides)
+        val adapter = Adapter(requireContext(), trackInfos, overrides)
         binding.listview.also {
             it.adapter = adapter
             it.setOnItemClickListener { _, _, index, _ ->
@@ -86,8 +88,15 @@ class DownloadResolutionSelectionSheet(
                 overrides[mediaTrackGroup] =
                     TrackSelectionOverride(mediaTrackGroup, ImmutableList.of(resolution.trackIndex))
                 adapter.overrides = overrides
-                onClickListener?.onClick(dialog, DialogInterface.BUTTON_POSITIVE)
-                Log.d("TAG", "initializeTrackSelectionView: 1")
+                //onClickListener?.onClick(dialog, DialogInterface.BUTTON_POSITIVE)
+                Log.d(
+                    "TAG",
+                    "initializeTrackSelectionView: 1 ${
+                        overrides.map { t ->
+                            t.value.trackIndices.get(0)
+                        }
+                    }"
+                )
                 //dismiss()
             }
         }
@@ -138,7 +147,6 @@ class DownloadResolutionSelectionSheet(
     ) : ArrayAdapter<TrackInfo>(context1, R.layout.download_resulotion_data, dataSource) {
         private val inflater =
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        //var selectedPosition = 0
         private var values = overrides.values.map { trackSelection ->
             trackSelection.trackIndices[0]
         }
@@ -152,8 +160,6 @@ class DownloadResolutionSelectionSheet(
             val track = view!!.findViewById<CheckedTextView>(R.id.track_selecting)
             track.text = "${resolution.format.height}p"
             track.isChecked = resolution.trackIndex in values
-//            val radioButton = view.findViewById<RadioButton>(R.id.radio_button)
-            //radioButton.isChecked = resolution.trackIndex in values
 
             notifyDataSetChanged()
 

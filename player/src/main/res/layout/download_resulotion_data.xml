@@ -4,28 +4,38 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:id="@+id/radio_button"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+<!--        <RadioButton-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="16dp"-->
+<!--            android:focusable="false"-->
+<!--            android:focusableInTouchMode="false"-->
+<!--            android:id="@+id/radio_button"/>-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textSize="16sp"-->
+<!--            android:id="@+id/resolution_size"-->
+<!--            android:layout_marginStart="16dp"-->
+<!--            android:textColor="@android:color/black"-->
+<!--            android:text="1080p" />-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textSize="16sp"-->
+<!--            android:id="@+id/file_size"-->
+<!--            android:layout_marginStart="16dp"-->
+<!--            android:textColor="@android:color/black"-->
+<!--            android:text="100 MB" />-->
+
+        <CheckedTextView
+            android:id="@+id/track_selecting"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
             android:textSize="16sp"
-            android:id="@+id/resolution_size"
-            android:layout_marginStart="16dp"
-            android:textColor="@android:color/black"
-            android:text="1080p" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:id="@+id/file_size"
-            android:layout_marginStart="16dp"
-            android:textColor="@android:color/black"
-            android:text="100 MB" />
+            android:checked="false"
+            android:drawableStart="?android:attr/listChoiceIndicatorSingle"
+            android:text="hi"/>
 
 </LinearLayout>

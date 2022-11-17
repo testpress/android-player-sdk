@@ -16,6 +16,7 @@ import com.tpstream.player.models.VideoInfo
 
 public interface TpStreamPlayer {
     abstract val params: TpInitParams
+    abstract val videoInfo: VideoInfo
     fun load(parameters: TpInitParams)
     fun setPlayWhenReady(canPlay: Boolean)
     fun getPlayWhenReady(): Boolean
@@ -29,12 +30,13 @@ public interface TpStreamPlayer {
     fun getCurrentTrackGroups(): ImmutableList<Tracks.Group>
 }
 
-class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
+class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPlayer {
     override lateinit var params: TpInitParams
+    override lateinit var videoInfo: VideoInfo
 
     private fun load(url: String) {
         val mediaItem = MediaItem.Builder()
-            .setUri("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/5b38cef3dd3f48938021c40203749ab3/video.m3u8")
+            .setUri(url)
             //.setMimeType(MimeTypes.APPLICATION_MPD)
             .build()
         player.setMediaItem(mediaItem)
@@ -46,7 +48,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
         val url = "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
         Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
-                Log.d("TAG", "onSuccess: ")
+                videoInfo = result
                 result.dashUrl?.let {
                     Handler(Looper.getMainLooper()).post {
                        load(it)

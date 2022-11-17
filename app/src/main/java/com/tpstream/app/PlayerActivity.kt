@@ -13,9 +13,9 @@ class PlayerActivity : AppCompatActivity() {
     lateinit var playerFragment: TpStreamPlayerFragment;
     lateinit var player: TpStreamPlayer;
     private val TAG = "PlayerActivity"
-    private val accessToken = "bbf23112-0c14-4519-a848-73c95cb024ac"
-    private val videoId = "E44ulfSWhYx"
-    private val orgCode = "drm"
+    private val accessToken = "92c51ffe-4334-49ac-8fb8-f8fa1d918d7a"
+    private val videoId = "147ZxJ17uPA"
+    private val orgCode = "demoveranda"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

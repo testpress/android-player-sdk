@@ -330,6 +330,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun initializeExoplayer(): ExoPlayer {
         return ExoPlayer.Builder(requireActivity())
+            .setMediaSourceFactory(getMediaSourceFactory())
             .setTrackSelector(trackSelector)
             .build()
             .also { exoPlayer ->

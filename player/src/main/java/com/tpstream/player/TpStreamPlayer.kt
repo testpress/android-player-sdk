@@ -1,5 +1,6 @@
 package com.tpstream.player
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -9,6 +10,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.offline.DownloadRequest
 import com.google.common.collect.ImmutableList
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import com.tpstream.player.models.DRMLicenseURL
@@ -35,12 +37,36 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
     override lateinit var videoInfo: VideoInfo
 
     private fun load(url: String) {
-        val mediaItem = MediaItem.Builder()
-            .setUri(url)
-            //.setMimeType(MimeTypes.APPLICATION_MPD)
-            .build()
-        player.setMediaItem(mediaItem)
+        player.setMediaItem(getMediaItem(url))
         player.prepare()
+    }
+
+    private fun getMediaItem(url:String):MediaItem {
+        val downloadTask = DownloadTask(url, context)
+        var mediaItem = MediaItem.Builder()
+            .setUri(url)
+            .setMimeType(MimeTypes.APPLICATION_MPD)
+            .setDrmConfiguration(MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                .setLicenseUri("eyJjb250ZW50QXV0aCI6ImV5SmpiMjUwWlc1MFNXUWlPaUl3T1dVM1pUYzBOV014T0RVME1UUTVZbUV6WmpKak1UaGlZamMzTldNelppSXNJbVY0Y0dseVpYTWlPakUyTmpnMk9EYzBNelY5Iiwic2lnbmF0dXJlIjoiVm9oVWJRR1g2d1p0ZWxhSjoyMDIyMTExN1QxMTE3MTUzMDlaOnBrZVZpcE0zTndfaWZDOTJqMWdzQjdwbkkweUVlMWUzZU5ncTc4N21UR1k9In0")
+                .setMultiSession(true)
+                .build())
+            .build()
+        val downloadRequest: DownloadRequest? = VideoDownload.getDownloadRequest(url, context)
+        Log.d("TAG", "getMediaItem: $url ${downloadTask.isDownloaded()}")
+        if (downloadTask.isDownloaded() && downloadRequest != null) {
+            val builder = mediaItem.buildUpon()
+            builder
+                .setMediaId(downloadRequest.id)
+                .setUri(downloadRequest.uri)
+                .setCustomCacheKey(downloadRequest.customCacheKey)
+                .setMimeType(downloadRequest.mimeType)
+                .setDrmConfiguration(MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setKeySetId(downloadRequest.keySetId)
+                    .build())
+
+            mediaItem = builder.build()
+        }
+        return mediaItem
     }
 
     override fun load(parameters: TpInitParams) {
@@ -57,15 +83,10 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
             }
 
             override fun onFailure(exception: TPException) {
-                if (exception.isNetworkError()){
-                    Log.d("TAG", "isNetworkError: ${exception.response?.code}")
-                } else if (exception.isClientError()){
-                    Log.d("TAG", "isClientError: ${exception.response?.code}")
-                }else if (exception.isUnauthenticated()){
-                    Log.d("TAG", "isUnauthenticated: ${exception.response?.code}")
-                }else if (exception.isServerError()){
-                    Log.d("TAG", "isServerError: ${exception.response?.code}")
+                Handler(Looper.getMainLooper()).post {
+                    load("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/697662f1cafb40f099b64c3562537c1b/video.mpd")
                 }
+                Log.d("TAG", "onFailure: ")
             }
         })
     }

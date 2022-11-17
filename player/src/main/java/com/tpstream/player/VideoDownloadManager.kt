@@ -2,6 +2,7 @@ package com.tpstream.player
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.media3.database.DatabaseProvider
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
@@ -9,18 +10,23 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.NoOpCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.offline.DefaultDownloadIndex
 import androidx.media3.exoplayer.offline.DownloadManager
 import java.io.File
 import java.util.concurrent.Executors
 
-class VideoDownloadManager(var context: Context) {
+class VideoDownloadManager() {
 
     private lateinit var downloadCache: Cache
+    private lateinit var context: Context
     private var downloadManager: DownloadManager? = null
     private lateinit var databaseProvider: StandaloneDatabaseProvider
     private lateinit var downloadDirectory: File
     private lateinit var httpDataSourceFactory: DefaultHttpDataSource.Factory
 
+    init {
+        Log.d("TAG", "videoDownloadManager: ---------------")
+    }
 
     fun get(): DownloadManager {
         if (downloadManager == null) {
@@ -67,6 +73,10 @@ class VideoDownloadManager(var context: Context) {
         return downloadCache
     }
 
+    fun getDownloadIndex(): DefaultDownloadIndex {
+        return DefaultDownloadIndex(databaseProvider)
+    }
+
     @Synchronized
     private fun getDownloadDirectory(): File {
         if (!::downloadDirectory.isInitialized) {
@@ -80,7 +90,7 @@ class VideoDownloadManager(var context: Context) {
     }
 
 
-    private companion object {
+    companion object {
         const val DOWNLOAD_CONTENT_DIRECTORY = "downloads"
         @SuppressLint("StaticFieldLeak")
         private lateinit var INSTANCE: VideoDownloadManager
@@ -89,7 +99,7 @@ class VideoDownloadManager(var context: Context) {
         operator fun invoke(context: Context): VideoDownloadManager {
             synchronized(VideoDownloadManager::class.java) {
                 if (!::INSTANCE.isInitialized) {
-                    INSTANCE = VideoDownloadManager(context)
+                    INSTANCE = VideoDownloadManager()
                     INSTANCE.context = context
                 }
                 return INSTANCE

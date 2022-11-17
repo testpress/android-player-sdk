@@ -15,15 +15,18 @@ import android.widget.Toast
 import androidx.media3.common.*
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
 import com.tpstream.player.models.VideoInfo
+import okio.IOException
 
 
 typealias OnSubmitListener = (DownloadRequest) -> Unit
@@ -32,15 +35,15 @@ typealias OnSubmitListener = (DownloadRequest) -> Unit
 class DownloadResolutionSelectionSheet(
     private val parameters: DefaultTrackSelector.Parameters,
     private val trackGroups: List<Tracks.Group>,
-    private val videoInfo: VideoInfo
-) : BottomSheetDialogFragment() {
+    private val videoInfo: VideoInfo,
+    private val tpInitParams:TpInitParams
+) : BottomSheetDialogFragment(),VideoDownloadRequestCreationHandler.Listener {
 
     private var _binding: DownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     var onClickListener: DialogInterface.OnClickListener? = null
     lateinit var overrides: MutableMap<TrackGroup, TrackSelectionOverride>
 
-    private var onSubmitListener: OnSubmitListener? = null
     lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
 
 
@@ -49,9 +52,10 @@ class DownloadResolutionSelectionSheet(
         videoDownloadRequestCreateHandler =
             VideoDownloadRequestCreationHandler(
                 requireContext(),
-                videoInfo
+                videoInfo,
+                tpInitParams
             )
-        //videoDownloadRequestCreateHandler.listener = this
+        videoDownloadRequestCreateHandler.listener = this
         overrides = parameters.overrides.toMutableMap()
     }
 
@@ -97,7 +101,6 @@ class DownloadResolutionSelectionSheet(
                         }
                     }"
                 )
-                //dismiss()
             }
         }
     }
@@ -105,17 +108,10 @@ class DownloadResolutionSelectionSheet(
     private fun setOnClickListeners() {
         binding.startDownload.setOnClickListener {
             if (::overrides.isInitialized) {
-
                 val downloadRequest =
                     videoDownloadRequestCreateHandler.buildDownloadRequest(overrides.map { it.value }
                         .toList())
-
-                DownloadService.sendAddDownload(
-                    requireContext(),
-                    VideoDownloadService::class.java,
-                    downloadRequest,
-                    false
-                )
+                 DownloadTask(downloadRequest.uri.toString(),requireContext()).start(downloadRequest)
             }
             Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
             dismiss()
@@ -159,6 +155,7 @@ class DownloadResolutionSelectionSheet(
             }
             val track = view!!.findViewById<CheckedTextView>(R.id.track_selecting)
             track.text = "${resolution.format.height}p"
+
             track.isChecked = resolution.trackIndex in values
 
             notifyDataSetChanged()
@@ -174,16 +171,19 @@ class DownloadResolutionSelectionSheet(
             get() = trackGroup.getTrackFormat(trackIndex)
     }
 
-//    override fun onDownloadRequestHandlerPrepared(
-//        mappedTrackInfo: MappingTrackSelector.MappedTrackInfo,
-//        rendererIndex: Int,
-//        overrides: List<DefaultTrackSelector.SelectionOverride>
-//    ) {
-//
-//    }
-//
-//    override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {
-//
-//    }
+    override fun onDownloadRequestHandlerPrepared(
+        mappedTrackInfo: MappingTrackSelector.MappedTrackInfo,
+        rendererIndex: Int,
+        overrides: List<DefaultTrackSelector.SelectionOverride>
+    ) {
+        //this.overrides = overrides
+    }
+
+    override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {
+        binding.startDownload.setOnClickListener {
+            dismiss()
+        }
+        Log.d("VideoDownload", "onDownloadRequestHandlerPrepareError: ${e.localizedMessage}")
+    }
 
 }

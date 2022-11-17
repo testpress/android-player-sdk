@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.CheckedTextView
 import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
@@ -148,10 +149,13 @@ class DownloadResolutionSelectionSheet(
             if (convertView == null) {
                 view = inflater.inflate(R.layout.download_resulotion_data, parent, false)
             }
-            view!!.findViewById<TextView>(R.id.resolution_size).text =
-                "${resolution.format.height}p"
-            val radioButton = view.findViewById<RadioButton>(R.id.radio_button)
-            radioButton.isChecked = resolution.trackIndex in values
+            val track = view!!.findViewById<CheckedTextView>(R.id.track_selecting)
+            track.text = "${resolution.format.height}p"
+            track.isChecked = resolution.trackIndex in values
+//            val radioButton = view.findViewById<RadioButton>(R.id.radio_button)
+            //radioButton.isChecked = resolution.trackIndex in values
+
+            notifyDataSetChanged()
 
             Log.d("TAG", "getView: ${resolution.trackIndex in values}")
 

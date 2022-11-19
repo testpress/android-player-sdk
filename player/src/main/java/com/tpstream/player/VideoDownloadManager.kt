@@ -8,6 +8,7 @@ import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.Cache
+import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.NoOpCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.offline.DefaultDownloadIndex
@@ -60,6 +61,15 @@ class VideoDownloadManager() {
             httpDataSourceFactory = DefaultHttpDataSource.Factory()
         }
         return httpDataSourceFactory
+    }
+
+    fun build(): CacheDataSource.Factory {
+        val cache = VideoDownloadManager(context).getDownloadCache()
+        return CacheDataSource.Factory()
+            .setCache(cache)
+            .setUpstreamDataSourceFactory(getHttpDataSourceFactory())
+            .setCacheWriteDataSinkFactory(null)
+            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
     }
 
     @Synchronized

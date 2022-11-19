@@ -12,14 +12,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.media3.common.C
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
-import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.common.*
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
-import androidx.media3.datasource.DataSource
-import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
@@ -200,15 +195,17 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
 
-        val cacheDataSourceFactory: DataSource.Factory = CacheDataSource.Factory()
-            .setCache(VideoDownloadManager(requireContext()).getDownloadCache())
-            .setUpstreamDataSourceFactory(VideoDownloadManager(requireContext()).getHttpDataSourceFactory())
-            .setCacheWriteDataSinkFactory(null)
-
         val mediaSourceFactory = DefaultMediaSourceFactory(requireContext())
-            .setDataSourceFactory(cacheDataSourceFactory)
-        mediaSourceFactory.setDrmSessionManagerProvider {
-            DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback(player?.params?.orgCode!!, player?.params?.videoId!!, player?.params?.accessToken!!))
+            .setDataSourceFactory(VideoDownloadManager(requireContext()).build())
+        val downloadTask = DownloadTask("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/697662f1cafb40f099b64c3562537c1b/video.mpd", requireContext())
+        if (!downloadTask.isDownloaded()) {
+            mediaSourceFactory.setDrmSessionManagerProvider {
+                DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback(
+                    player?.params?.orgCode!!,
+                    player?.params?.videoId!!,
+                    player?.params?.accessToken!!
+                ))
+            }
         }
         return mediaSourceFactory
     }

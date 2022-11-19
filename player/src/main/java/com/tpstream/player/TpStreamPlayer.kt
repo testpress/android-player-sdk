@@ -4,13 +4,10 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
+import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.trackselection.ExoTrackSelection
-import com.tpstream.player.models.DRMLicenseURL
+import com.google.common.collect.ImmutableList
 import com.tpstream.player.models.VideoInfo
 
 public interface TpStreamPlayer {
@@ -25,14 +22,13 @@ public interface TpStreamPlayer {
     fun setPlaybackSpeed(speed: Float)
     fun seekTo(seconds: Long)
     fun release()
-    fun getCurrentResolutionEnum(): ResolutionOptions
-    fun getCurrentResolution(): Int
+    fun getVideoFormat(): Format?
+    fun getCurrentTrackGroups(): ImmutableList<Tracks.Group>
 }
 
 class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPlayer {
     override lateinit var params: TpInitParams
     override lateinit var videoInfo: VideoInfo
-    var currentResolutionOption = ResolutionOptions.AUTO
 
     private fun load(url: String) {
         player.setMediaItem(getMediaItem(url))
@@ -57,6 +53,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
                 .setUri(downloadRequest.uri)
                 .setCustomCacheKey(downloadRequest.customCacheKey)
                 .setMimeType(downloadRequest.mimeType)
+                .setStreamKeys(downloadRequest.streamKeys)
                 .setDrmConfiguration(MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setKeySetId(downloadRequest.keySetId)
                     .build())
@@ -79,7 +76,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
                 }
             }
 
-            override fun onFailure() {
+            override fun onFailure(exception: TPException) {
                 Handler(Looper.getMainLooper()).post {
                     load("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/697662f1cafb40f099b64c3562537c1b/video.mpd")
                 }
@@ -107,17 +104,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
 
     override fun release() {
         player.release()
-    }
-
-    override fun getCurrentResolutionEnum(): ResolutionOptions {
-        return currentResolutionOption
-    }
-
-    override fun getCurrentResolution(): Int {
-        Log.d("TAG", "getCurrentResolution: ${player.currentTracks.groups.filter { it.type == C.TRACK_TYPE_VIDEO }[0]}")
-        return player.currentTracks.groups
-            .filter { it.type == C.TRACK_TYPE_VIDEO }[0].getTrackFormat(0).width
-
     }
 
     override fun getVideoFormat(): Format? {

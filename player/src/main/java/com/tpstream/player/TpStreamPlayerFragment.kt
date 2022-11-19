@@ -24,6 +24,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
+import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.VideoResolutionSelectionSheet
 
@@ -73,44 +74,52 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
         val resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
 
         resolutionButton.setOnClickListener {
-            val modalBottomSheet = VideoResolutionBottomSheet(trackSelector, _player!!.currentTracks.groups, selectedResolution)
-            val sheet = AdvancedResolutionSelectionSheet(trackSelector.parameters, _player!!.currentTracks.groups)
-            sheet.onClickListener = object : DialogInterface.OnClickListener {
-                override fun onClick(p0: DialogInterface?, p1: Int) {
-                    val mappedTrackInfo = trackSelector.currentMappedTrackInfo
-                    mappedTrackInfo?.let {
-                        val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-                        if (sheet.overrides.isNotEmpty()) {
-                            val params = TrackSelectionParameters.Builder(requireContext())
-                                .clearOverridesOfType(rendererIndex)
-                                .addOverride(sheet.overrides.values.elementAt(0))
-                                .build()
-                            trackSelector.setParameters(params)
-                        }
-                    }
-                }
-            }
-//            modalBottomSheet.onClickListener = onResolutionClickListener(modalBottomSheet)
-            modalBottomSheet.onClickListener = object : DialogInterface.OnClickListener {
-                override fun onClick(p0: DialogInterface?, p1: Int) {
-                    this@TpStreamPlayerFragment.selectedResolution = modalBottomSheet.selectedResolution
-                    if (modalBottomSheet.selectedResolution == ResolutionOptions.ADVANCED) {
-                        sheet.show(requireActivity().supportFragmentManager, "AdvancedSheet")
-                        return
-                    }
-                    val parameters = modalBottomSheet.selectedResolution.getTrackSelectionParameter(requireContext(), null)
-                    trackSelector.setParameters(parameters)
-                    val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO,
-                        trackSelector.currentMappedTrackInfo!!
-                    )
-                    val currentTrackGroup = _player!!.currentTracks.groups.filter { it.type == C.TRACK_TYPE_VIDEO }[0].mediaTrackGroup
-                    val index = trackSelector.currentMappedTrackInfo?.getTrackGroups(rendererIndex)?.indexOf(currentTrackGroup)
-                    Log.d("TAG", "onClick: ${index}")
-                }
-            }
-            modalBottomSheet.show(requireActivity().supportFragmentManager, VideoResolutionBottomSheet.TAG)
+            val videoResolutionSelector = VideoResolutionSelectionSheet(player!!, selectedResolution)
+            val advancedVideoResolutionSelector = AdvancedResolutionSelectionSheet(player!!, trackSelector.parameters)
+            advancedVideoResolutionSelector.onClickListener =
+                onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector)
+            videoResolutionSelector.onClickListener =
+                onVideoResolutionSelection(videoResolutionSelector, advancedVideoResolutionSelector)
+
+            videoResolutionSelector.show(requireActivity().supportFragmentManager, VideoResolutionSelectionSheet.TAG)
         }
     }
+
+    private fun onVideoResolutionSelection(
+        videoResolutionSelector: VideoResolutionSelectionSheet,
+        advancedVideoResolutionSelector: AdvancedResolutionSelectionSheet
+    ) = DialogInterface.OnClickListener { p0, p1 ->
+        this@TpStreamPlayerFragment.selectedResolution =
+            videoResolutionSelector.selectedResolution
+        if (videoResolutionSelector.selectedResolution == ResolutionOptions.ADVANCED) {
+            advancedVideoResolutionSelector.show(
+                requireActivity().supportFragmentManager,
+                "AdvancedSheet"
+            )
+            return@OnClickListener
+        }
+
+        val parameters = videoResolutionSelector.selectedResolution.getTrackSelectionParameter(
+            requireContext(),
+            null
+        )
+        trackSelector.setParameters(parameters)
+    }
+
+    private fun onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector: AdvancedResolutionSelectionSheet) =
+        DialogInterface.OnClickListener { p0, p1 ->
+            val mappedTrackInfo = trackSelector.currentMappedTrackInfo
+            mappedTrackInfo?.let {
+                val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
+                if (advancedVideoResolutionSelector.overrides.isNotEmpty()) {
+                    val params = TrackSelectionParameters.Builder(requireContext())
+                        .clearOverridesOfType(rendererIndex)
+                        .addOverride(advancedVideoResolutionSelector.overrides.values.elementAt(0))
+                        .build()
+                    trackSelector.setParameters(params)
+                }
+            }
+        }
 
     private fun addDownloadControls(){
         val downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
@@ -132,23 +141,6 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
             sheet.show(requireActivity().supportFragmentManager, "AdvancedSheetDownload")
         }
     }
-
-
-
-    private fun onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector: AdvancedResolutionSelectionSheet) =
-        DialogInterface.OnClickListener { p0, p1 ->
-            val mappedTrackInfo = trackSelector.currentMappedTrackInfo
-            mappedTrackInfo?.let {
-                val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-                if (advancedVideoResolutionSelector.overrides.isNotEmpty()) {
-                    val params = TrackSelectionParameters.Builder(requireContext())
-                        .clearOverridesOfType(rendererIndex)
-                        .addOverride(advancedVideoResolutionSelector.overrides.values.elementAt(0))
-                        .build()
-                    trackSelector.setParameters(params)
-                }
-            }
-        }
 
     fun setOnInitializationListener(listener: InitializationListener) {
         this.initializationListener = listener
@@ -189,7 +181,7 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
             .build()
             .also { exoPlayer ->
                 viewBinding.videoView.player = exoPlayer
-                exoPlayer.addListener(playbackStateListener)
+                exoPlayer.addListener(PlayerListener())
             }
     }
 

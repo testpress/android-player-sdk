@@ -3,13 +3,9 @@ package com.tpstream.player
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.media3.common.C
-import androidx.media3.common.DrmInitData
-import androidx.media3.common.MediaItem
+import androidx.media3.common.*
 import androidx.media3.common.MediaItem.DrmConfiguration
-import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.util.Util
-import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
@@ -17,7 +13,6 @@ import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.trackselection.MappingTrackSelector
-import com.tpstream.player.VideoPlayerUtil.getLowBitrateTrackIndex
 import com.tpstream.player.models.VideoInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +28,7 @@ class VideoDownloadRequestCreationHandler(
     private val downloadHelper: DownloadHelper
     private val trackSelectionParameters: DefaultTrackSelector.Parameters
     var listener: Listener? = null
+    private lateinit var override: MutableMap<TrackGroup, TrackSelectionOverride>
     private val mediaItem: MediaItem
     private var keySetId: ByteArray? = null
 
@@ -43,7 +39,6 @@ class VideoDownloadRequestCreationHandler(
             .setUri(url)
             .setDrmConfiguration(
                 DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                    .setLicenseUri("https://demoveranda.testpress.in/api/v2.5/chapter_contents/drm_license_key/?path=wv/eyJjb250ZW50QXV0aCI6ImV5SmpiMjUwWlc1MFNXUWlPaUl3T1dVM1pUYzBOV014T0RVME1UUTVZbUV6WmpKak1UaGlZamMzTldNelppSXNJbVY0Y0dseVpYTWlPakUyTmpnMk9EYzBNelY5Iiwic2lnbmF0dXJlIjoiVm9oVWJRR1g2d1p0ZWxhSjoyMDIyMTExN1QxMTE3MTUzMDlaOnBrZVZpcE0zTndfaWZDOTJqMWdzQjdwbkkweUVlMWUzZU5ncTc4N21UR1k9In0=")
                     .setMultiSession(true)
                     .build()
             )
@@ -62,7 +57,7 @@ class VideoDownloadRequestCreationHandler(
                 )
             )
         sessionManager.setMode(DefaultDrmSessionManager.MODE_DOWNLOAD, null)
-        val dataSourceFactory = DefaultDataSource.Factory(context)
+        val dataSourceFactory = VideoDownloadManager(context).build()
         val renderersFactory = DefaultRenderersFactory(context)
         return DownloadHelper.forMediaItem(
             mediaItem,
@@ -78,7 +73,7 @@ class VideoDownloadRequestCreationHandler(
         val isDRMProtectedVideo = videoOrAudioData != null
         if (isDRMProtectedVideo) {
             if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
-                OfflineDRMLicenseHelper.fetchLicense(context, tpInitParams, downloadHelper, this)
+                OfflineDRMLicenseHelper.fetchLicense(tpInitParams, downloadHelper, this)
             } else {
                 Toast.makeText(
                     context,
@@ -88,6 +83,11 @@ class VideoDownloadRequestCreationHandler(
             }
             return
         }
+        listener?.onDownloadRequestHandlerPrepared(
+            getMappedTrackInfo(),
+            getRendererIndex(),
+            override
+            )
     }
 
     private fun hasDRMSchemaData(drmInitData: DrmInitData): Boolean {
@@ -104,38 +104,39 @@ class VideoDownloadRequestCreationHandler(
         listener?.onDownloadRequestHandlerPrepareError(helper, e)
     }
 
-    fun buildDownloadRequest(overrides: List<TrackSelectionOverride>): DownloadRequest {
+    fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
+        override = overrides
         setSelectedTracks(overrides)
         val name = videoInfo.title!!
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 
-    private fun setSelectedTracks(overrides: List<TrackSelectionOverride>) {
+    private fun setSelectedTracks(overrides: MutableMap<TrackGroup, TrackSelectionOverride>) {
         for (index in 0 until downloadHelper.periodCount) {
             downloadHelper.clearTrackSelections(index)
-            var builder =
-                DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT.buildUpon()
-
-            for (i in overrides.indices) {
-                builder.addOverride(overrides[i])
+            var builder = TrackSelectionParameters.Builder(context)
+            for (i in overrides.values) {
+                builder.addOverride(i)
                 downloadHelper.addTrackSelection(index, builder.build())
             }
         }
     }
 
-    interface Listener {
-        fun onDownloadRequestHandlerPrepared(
-            mappedTrackInfo: MappingTrackSelector.MappedTrackInfo,
-            rendererIndex: Int,
-            overrides: List<DefaultTrackSelector.SelectionOverride>
-        )
+    private fun getMappedTrackInfo(): MappingTrackSelector.MappedTrackInfo {
+        return downloadHelper.getMappedTrackInfo(0)
+    }
 
-        fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException)
+    private fun getRendererIndex(): Int {
+        return VideoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, getMappedTrackInfo())
     }
 
     override fun onLicenseFetchSuccess(keySetId: ByteArray) {
         CoroutineScope(Dispatchers.Main).launch {
-
+            listener?.onDownloadRequestHandlerPrepared(
+                getMappedTrackInfo(),
+                getRendererIndex(),
+                override
+                )
         }
     }
 
@@ -147,5 +148,15 @@ class VideoDownloadRequestCreationHandler(
                 Toast.LENGTH_LONG
             ).show()
         }
+    }
+
+    interface Listener {
+        fun onDownloadRequestHandlerPrepared(
+            mappedTrackInfo: MappingTrackSelector.MappedTrackInfo,
+            rendererIndex: Int,
+            overrides: MutableMap<TrackGroup, TrackSelectionOverride>
+        )
+
+        fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException)
     }
 }

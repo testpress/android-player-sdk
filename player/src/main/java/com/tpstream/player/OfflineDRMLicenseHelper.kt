@@ -1,9 +1,10 @@
 package com.tpstream.player
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.net.Uri
+import android.util.Base64
 import android.util.Log
-import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.dash.DashUtil
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.drm.DrmSession
@@ -15,28 +16,29 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import com.tpstream.player.VideoDownload.getDownloadRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 object OfflineDRMLicenseHelper {
-//    @JvmStatic
-//    fun renewLicense(url:String, contentId: Long, context: Context, callback: DRMLicenseFetchCallback) {
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val dataSource = DefaultHttpDataSource.Factory().createDataSource()
-//            val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
-//            val sessionManager = DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback())
-//            val drmInitData = DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
-//            val keySetId = OfflineLicenseHelper(
-//                sessionManager,
-//                DrmSessionEventListener.EventDispatcher()
-//            ).downloadLicense(
-//                drmInitData!!
-//            )
-//
-//            replaceKeysInExistingDownloadedVideo(url, context, keySetId)
-//            callback.onLicenseFetchSuccess(keySetId)
-//        }
-//    }
+    @JvmStatic
+    fun renewLicense(url:String, tpInitParams: TpInitParams, context: Context, callback: DRMLicenseFetchCallback) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val dataSource = VideoDownloadManager(context).getHttpDataSourceFactory().createDataSource()
+            val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
+            val sessionManager = DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback(tpInitParams.orgCode,tpInitParams.videoId!!,tpInitParams.accessToken!!))
+            val drmInitData = DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
+            val keySetId = OfflineLicenseHelper(
+                sessionManager,
+                DrmSessionEventListener.EventDispatcher()
+            ).downloadLicense(
+                drmInitData!!
+            )
+
+            replaceKeysInExistingDownloadedVideo(url, context, keySetId)
+            callback.onLicenseFetchSuccess(keySetId)
+        }
+    }
 
     private fun replaceKeysInExistingDownloadedVideo(
         url: String,
@@ -79,16 +81,18 @@ object OfflineDRMLicenseHelper {
         )
     }
 
-    fun fetchLicense(context: Context, tpInitParams: TpInitParams, downloadHelper: DownloadHelper, callback: DRMLicenseFetchCallback) {
+    fun fetchLicense(tpInitParams: TpInitParams, downloadHelper: DownloadHelper, callback: DRMLicenseFetchCallback) {
+        Log.d("TAG", "fetchLicense1: 11111111111111111111")
         val sessionManager = DefaultDrmSessionManager.Builder()
             .build(CustomHttpDrmMediaCallback(tpInitParams.orgCode,tpInitParams.videoId!!,tpInitParams.accessToken!!))
         val offlineLicenseHelper = OfflineLicenseHelper(
             sessionManager, DrmSessionEventListener.EventDispatcher()
         )
+        val s = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
+        Log.d("TAG", "fetchLicense:----------------------${s?.drmInitData!=null} ")
 
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             try {
-                Log.d("TAG", "fetchLicense: 11111111111111111111")
                 val keySetId = offlineLicenseHelper.downloadLicense(
                     VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(
                         downloadHelper

@@ -47,7 +47,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_MPD)
             .setDrmConfiguration(MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                .setLicenseUri("eyJjb250ZW50QXV0aCI6ImV5SmpiMjUwWlc1MFNXUWlPaUl3T1dVM1pUYzBOV014T0RVME1UUTVZbUV6WmpKak1UaGlZamMzTldNelppSXNJbVY0Y0dseVpYTWlPakUyTmpnMk9EYzBNelY5Iiwic2lnbmF0dXJlIjoiVm9oVWJRR1g2d1p0ZWxhSjoyMDIyMTExN1QxMTE3MTUzMDlaOnBrZVZpcE0zTndfaWZDOTJqMWdzQjdwbkkweUVlMWUzZU5ncTc4N21UR1k9In0")
                 .setMultiSession(true)
                 .build())
             .build()

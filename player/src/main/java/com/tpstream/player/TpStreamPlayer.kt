@@ -9,6 +9,7 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Tracks
+import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.DownloadRequest
 import com.google.common.collect.ImmutableList
@@ -59,6 +60,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
                 .setUri(downloadRequest.uri)
                 .setCustomCacheKey(downloadRequest.customCacheKey)
                 .setMimeType(downloadRequest.mimeType)
+                .setStreamKeys(downloadRequest.streamKeys)
                 .setDrmConfiguration(MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setKeySetId(downloadRequest.keySetId)
                     .build())

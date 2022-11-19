@@ -1,4 +1,4 @@
-package com.tpstream.player
+package com.tpstream.player.views
 
 import android.content.Context
 import android.content.DialogInterface
@@ -19,9 +19,13 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
+import com.tpstream.player.DownloadTask
+import com.tpstream.player.TpInitParams
+import com.tpstream.player.VideoDownloadRequestCreationHandler
 import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
 import com.tpstream.player.models.VideoInfo
 import okio.IOException
+import com.tpstream.player.R
 
 
 typealias OnSubmitListener = (DownloadRequest) -> Unit
@@ -31,8 +35,8 @@ class DownloadResolutionSelectionSheet(
     private val parameters: DefaultTrackSelector.Parameters,
     private val trackGroups: List<Tracks.Group>,
     private val videoInfo: VideoInfo,
-    private val tpInitParams:TpInitParams
-) : BottomSheetDialogFragment(),VideoDownloadRequestCreationHandler.Listener {
+    private val tpInitParams: TpInitParams
+) : BottomSheetDialogFragment(), VideoDownloadRequestCreationHandler.Listener {
 
     private var _binding: DownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!

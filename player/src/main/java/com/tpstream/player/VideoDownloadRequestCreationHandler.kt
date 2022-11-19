@@ -83,11 +83,11 @@ class VideoDownloadRequestCreationHandler(
             }
             return
         }
-        listener?.onDownloadRequestHandlerPrepared(
-            getMappedTrackInfo(),
-            getRendererIndex(),
-            override
-            )
+//        listener?.onDownloadRequestHandlerPrepared(
+//            getMappedTrackInfo(),
+//            getRendererIndex(),
+//            override
+//            )
     }
 
     private fun hasDRMSchemaData(drmInitData: DrmInitData): Boolean {

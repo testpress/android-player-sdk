@@ -78,7 +78,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
 
             override fun onFailure(exception: TPException) {
                 Handler(Looper.getMainLooper()).post {
-                    load("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/697662f1cafb40f099b64c3562537c1b/video.mpd")
+                    load("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/video-content/videos/transcoded/7e983f94530c4dadb2d4bed8b9e02f1e/video.mpd")
                 }
                 Log.d("TAG", "onFailure: ")
             }

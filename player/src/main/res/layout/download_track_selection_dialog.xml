@@ -19,40 +19,59 @@
             />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/listview"
-        android:layout_width="match_parent"
+    <ProgressBar
+        android:id="@+id/loadingProgress"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:indeterminate="true"
+        android:visibility="visible" />
 
     <LinearLayout
-        android:id="@+id/download_layout"
-        android:layout_width="match_parent"
+        android:id="@+id/resolutionLayout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="visible"
-        android:layout_weight="2">
+        android:visibility="gone"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/cancel_download"
-            android:layout_width="0dp"
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Cancel"/>
+            android:layout_marginBottom="10dp"/>
 
-        <Button
-            android:id="@+id/start_download"
-            android:layout_width="0dp"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+        <LinearLayout
+            android:id="@+id/download_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Download"/>
+            android:orientation="horizontal"
+            android:visibility="visible"
+            android:layout_weight="2">
 
+            <Button
+                android:id="@+id/cancel_download"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Cancel"/>
+
+            <Button
+                android:id="@+id/start_download"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Download"/>
+
+        </LinearLayout>
 
     </LinearLayout>
+
+
 
 </LinearLayout>

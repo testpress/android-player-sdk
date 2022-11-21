@@ -6,13 +6,11 @@ import android.widget.Toast
 import androidx.media3.common.*
 import androidx.media3.common.MediaItem.DrmConfiguration
 import androidx.media3.common.util.Util
-import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.tpstream.player.models.VideoInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +49,7 @@ class VideoDownloadRequestCreationHandler(
         val sessionManager = DefaultDrmSessionManager.Builder()
             .build(
                 CustomHttpDrmMediaCallback(
+                    context,
                     tpInitParams.orgCode,
                     tpInitParams.videoId!!,
                     tpInitParams.accessToken!!
@@ -73,7 +72,7 @@ class VideoDownloadRequestCreationHandler(
         val isDRMProtectedVideo = videoOrAudioData != null
         if (isDRMProtectedVideo) {
             if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
-                OfflineDRMLicenseHelper.fetchLicense(tpInitParams, downloadHelper, this)
+                OfflineDRMLicenseHelper.fetchLicense(context, tpInitParams, downloadHelper, this)
             } else {
                 Toast.makeText(
                     context,
@@ -83,11 +82,7 @@ class VideoDownloadRequestCreationHandler(
             }
             return
         }
-//        listener?.onDownloadRequestHandlerPrepared(
-//            getMappedTrackInfo(),
-//            getRendererIndex(),
-//            override
-//            )
+        listener?.onDownloadRequestHandlerPrepared(true)
     }
 
     private fun hasDRMSchemaData(drmInitData: DrmInitData): Boolean {
@@ -108,13 +103,14 @@ class VideoDownloadRequestCreationHandler(
         override = overrides
         setSelectedTracks(overrides)
         val name = videoInfo.title!!
+        Log.d("TAG", "buildDownloadRequest: ")
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 
     private fun setSelectedTracks(overrides: MutableMap<TrackGroup, TrackSelectionOverride>) {
         for (index in 0 until downloadHelper.periodCount) {
             downloadHelper.clearTrackSelections(index)
-            var builder = TrackSelectionParameters.Builder(context)
+            val builder = TrackSelectionParameters.Builder(context)
             for (i in overrides.values) {
                 builder.addOverride(i)
                 downloadHelper.addTrackSelection(index, builder.build())
@@ -122,21 +118,15 @@ class VideoDownloadRequestCreationHandler(
         }
     }
 
-    private fun getMappedTrackInfo(): MappingTrackSelector.MappedTrackInfo {
-        return downloadHelper.getMappedTrackInfo(0)
-    }
-
-    private fun getRendererIndex(): Int {
-        return VideoPlayerUtil.getRendererIndex(C.TRACK_TYPE_VIDEO, getMappedTrackInfo())
-    }
-
     override fun onLicenseFetchSuccess(keySetId: ByteArray) {
+        this.keySetId = keySetId
         CoroutineScope(Dispatchers.Main).launch {
-            listener?.onDownloadRequestHandlerPrepared(
-                getMappedTrackInfo(),
-                getRendererIndex(),
-                override
-                )
+            Toast.makeText(
+                context,
+                "starting video download (License Done)",
+                Toast.LENGTH_LONG
+            ).show()
+            listener?.onDownloadRequestHandlerPrepared(true)
         }
     }
 
@@ -151,11 +141,7 @@ class VideoDownloadRequestCreationHandler(
     }
 
     interface Listener {
-        fun onDownloadRequestHandlerPrepared(
-            mappedTrackInfo: MappingTrackSelector.MappedTrackInfo,
-            rendererIndex: Int,
-            overrides: MutableMap<TrackGroup, TrackSelectionOverride>
-        )
+        fun onDownloadRequestHandlerPrepared(isPrepared: Boolean)
 
         fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException)
     }

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlayerActivity">
+    tools:context=".PlayerActivity"
+    android:orientation="vertical">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/tpstream_player_fragment"
@@ -13,4 +14,19 @@
         android:layout_height="wrap_content"
         android:keepScreenOn="true"
         tools:layout="@layout/fragment_tp_stream_player" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:onClick="videoDownloadButton"
+        android:text="Download"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:onClick="videoDeleteButton"
+        android:text="Delete"/>
+
 </LinearLayout>

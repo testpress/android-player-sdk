@@ -1,10 +1,8 @@
 package com.tpstream.player
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.net.Uri
-import android.util.Base64
-import android.util.Log
+import androidx.media3.common.Format
 import androidx.media3.exoplayer.dash.DashUtil
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.drm.DrmSession
@@ -16,25 +14,37 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import com.tpstream.player.VideoDownload.getDownloadRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 object OfflineDRMLicenseHelper {
     @JvmStatic
-    fun renewLicense(url:String, tpInitParams: TpInitParams, context: Context, callback: DRMLicenseFetchCallback) {
+    fun renewLicense(
+        url: String,
+        tpInitParams: TpInitParams,
+        context: Context,
+        callback: DRMLicenseFetchCallback
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val dataSource = VideoDownloadManager(context).getHttpDataSourceFactory().createDataSource()
+            val dataSource =
+                VideoDownloadManager(context).getHttpDataSourceFactory().createDataSource()
             val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
-            val sessionManager = DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback(tpInitParams.orgCode,tpInitParams.videoId!!,tpInitParams.accessToken!!))
-            val drmInitData = DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
+            val sessionManager = DefaultDrmSessionManager.Builder().build(
+                CustomHttpDrmMediaCallback(
+                    context,
+                    tpInitParams.orgCode,
+                    tpInitParams.videoId!!,
+                    tpInitParams.accessToken!!
+                )
+            )
+            val drmInitData =
+                DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
             val keySetId = OfflineLicenseHelper(
                 sessionManager,
                 DrmSessionEventListener.EventDispatcher()
             ).downloadLicense(
                 drmInitData!!
             )
-
             replaceKeysInExistingDownloadedVideo(url, context, keySetId)
             callback.onLicenseFetchSuccess(keySetId)
         }
@@ -56,7 +66,10 @@ object OfflineDRMLicenseHelper {
         }
     }
 
-    private fun cloneDownloadRequestWithNewKeys(downloadRequest: DownloadRequest, keySetId: ByteArray): DownloadRequest {
+    private fun cloneDownloadRequestWithNewKeys(
+        downloadRequest: DownloadRequest,
+        keySetId: ByteArray
+    ): DownloadRequest {
         return DownloadRequest.Builder(
             downloadRequest.id,
             downloadRequest.uri
@@ -69,7 +82,10 @@ object OfflineDRMLicenseHelper {
             .build()
     }
 
-    fun cloneDownloadWithNewDownloadRequest(download: Download, downloadRequest: DownloadRequest): Download {
+    private fun cloneDownloadWithNewDownloadRequest(
+        download: Download,
+        downloadRequest: DownloadRequest
+    ): Download {
         return Download(
             download.request.copyWithMergedRequest(downloadRequest),
             download.state,
@@ -81,23 +97,28 @@ object OfflineDRMLicenseHelper {
         )
     }
 
-    fun fetchLicense(tpInitParams: TpInitParams, downloadHelper: DownloadHelper, callback: DRMLicenseFetchCallback) {
-        Log.d("TAG", "fetchLicense1: 11111111111111111111")
+    fun fetchLicense(
+        context: Context,
+        tpInitParams: TpInitParams,
+        downloadHelper: DownloadHelper,
+        callback: DRMLicenseFetchCallback
+    ) {
         val sessionManager = DefaultDrmSessionManager.Builder()
-            .build(CustomHttpDrmMediaCallback(tpInitParams.orgCode,tpInitParams.videoId!!,tpInitParams.accessToken!!))
+            .build(
+                CustomHttpDrmMediaCallback(
+                    context,
+                    tpInitParams.orgCode,
+                    tpInitParams.videoId!!,
+                    tpInitParams.accessToken!!
+                )
+            )
         val offlineLicenseHelper = OfflineLicenseHelper(
             sessionManager, DrmSessionEventListener.EventDispatcher()
         )
-        val s = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
-        Log.d("TAG", "fetchLicense:----------------------${s?.drmInitData!=null} ")
-
-        CoroutineScope(Dispatchers.Main).launch {
+        val format = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
+        CoroutineScope(Dispatchers.IO).launch {
             try {
-                val keySetId = offlineLicenseHelper.downloadLicense(
-                    VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(
-                        downloadHelper
-                    )!!)
-                Log.d("TAG", "fetchLicense: 222222222222222")
+                val keySetId = offlineLicenseHelper.downloadLicense(format!!)
                 callback.onLicenseFetchSuccess(keySetId)
             } catch (e: DrmSession.DrmSessionException) {
                 callback.onLicenseFetchFailure()
@@ -105,6 +126,28 @@ object OfflineDRMLicenseHelper {
                 offlineLicenseHelper.release()
             }
         }
+    }
+}
+
+object VideoPlayerUtil{
+    @JvmStatic
+    fun getAudioOrVideoInfoWithDrmInitData(helper: DownloadHelper): Format? {
+        for (periodIndex in 0 until helper.periodCount) {
+            val mappedTrackInfo = helper.getMappedTrackInfo(periodIndex)
+            for (rendererIndex in 0 until mappedTrackInfo.rendererCount) {
+                val trackGroups = mappedTrackInfo.getTrackGroups(rendererIndex)
+                for (trackGroupIndex in 0 until trackGroups.length) {
+                    val trackGroup = trackGroups[trackGroupIndex]
+                    for (formatIndex in 0 until trackGroup.length) {
+                        val format = trackGroup.getFormat(formatIndex)
+                        if (format.drmInitData != null) {
+                            return format
+                        }
+                    }
+                }
+            }
+        }
+        return null
     }
 }
 

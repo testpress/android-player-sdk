@@ -12,9 +12,7 @@ import android.widget.CheckedTextView
 import android.widget.Toast
 import androidx.media3.common.*
 import androidx.media3.exoplayer.offline.DownloadHelper
-import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -26,10 +24,6 @@ import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
 import com.tpstream.player.models.VideoInfo
 import okio.IOException
 import com.tpstream.player.R
-
-
-typealias OnSubmitListener = (DownloadRequest) -> Unit
-
 
 class DownloadResolutionSelectionSheet(
     private val parameters: DefaultTrackSelector.Parameters,
@@ -81,7 +75,7 @@ class DownloadResolutionSelectionSheet(
 
     private fun initializeTrackSelectionView() {
         val trackInfos = getTrackInfos()
-        val adapter = Adapter(requireContext(), trackInfos,null)
+        val adapter = Adapter(requireContext(), trackInfos, null)
         binding.listview.also {
             it.adapter = adapter
             it.setOnItemClickListener { _, _, index, _ ->
@@ -101,7 +95,10 @@ class DownloadResolutionSelectionSheet(
             if (::overrides.isInitialized) {
                 val downloadRequest =
                     videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
-                 DownloadTask(downloadRequest.uri.toString(),requireContext()).start(downloadRequest)
+                DownloadTask(
+                    downloadRequest.uri.toString(),
+                    requireContext()
+                ).start(downloadRequest)
             }
             Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
             dismiss()
@@ -133,7 +130,7 @@ class DownloadResolutionSelectionSheet(
     inner class Adapter(
         context1: Context,
         dataSource: ArrayList<TrackInfo>,
-        var trackPosition:Int?
+        var trackPosition: Int?
     ) : ArrayAdapter<TrackInfo>(context1, R.layout.download_resulotion_data, dataSource) {
         private val inflater =
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -147,7 +144,7 @@ class DownloadResolutionSelectionSheet(
             val track = view!!.findViewById<CheckedTextView>(R.id.track_selecting)
             track.text = "${resolution.format.height}p"
 
-            track.isChecked = (trackPosition ?: (count - 1)) == position
+            track.isChecked = (trackPosition ?: 0) == position
 
             return view
         }
@@ -158,12 +155,11 @@ class DownloadResolutionSelectionSheet(
             get() = trackGroup.getTrackFormat(trackIndex)
     }
 
-    override fun onDownloadRequestHandlerPrepared(
-        mappedTrackInfo: MappingTrackSelector.MappedTrackInfo,
-        rendererIndex: Int,
-        overrides: MutableMap<TrackGroup, TrackSelectionOverride>
-    ) {
-        this.overrides = overrides
+    override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean) {
+        if (isPrepared) {
+            binding.loadingProgress.visibility = View.GONE
+            binding.resolutionLayout.visibility = View.VISIBLE
+        }
     }
 
     override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {

@@ -42,7 +42,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
         player.prepare()
     }
 
-    private fun getMediaItem(url:String):MediaItem {
+    internal fun getMediaItem(url:String):MediaItem {
         val downloadTask = DownloadTask(url, context)
         var mediaItem = MediaItem.Builder()
             .setUri(url)

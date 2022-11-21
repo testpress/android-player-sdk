@@ -103,7 +103,6 @@ class VideoDownloadRequestCreationHandler(
         override = overrides
         setSelectedTracks(overrides)
         val name = videoInfo.title!!
-        Log.d("TAG", "buildDownloadRequest: ")
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 
@@ -121,11 +120,7 @@ class VideoDownloadRequestCreationHandler(
     override fun onLicenseFetchSuccess(keySetId: ByteArray) {
         this.keySetId = keySetId
         CoroutineScope(Dispatchers.Main).launch {
-            Toast.makeText(
-                context,
-                "starting video download (License Done)",
-                Toast.LENGTH_LONG
-            ).show()
+            Log.d("TAG", "onLicenseFetchSuccess: Success")
             listener?.onDownloadRequestHandlerPrepared(true)
         }
     }

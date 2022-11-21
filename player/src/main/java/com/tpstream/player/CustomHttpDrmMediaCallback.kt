@@ -1,24 +1,20 @@
 package com.tpstream.player
 
+import android.content.Context
 import android.util.Log
-import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.drm.ExoMediaDrm
 import androidx.media3.exoplayer.drm.HttpMediaDrmCallback
 import androidx.media3.exoplayer.drm.MediaDrmCallback
-import com.google.gson.Gson
 import com.tpstream.player.models.DRMLicenseURL
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.internal.EMPTY_REQUEST
-import java.net.URL
 import java.util.*
 
 
-class CustomHttpDrmMediaCallback(val orgCode: String, val videoUUID: String, val accessToken: String):MediaDrmCallback {
-    private val httpMediaDrmCallback = HttpMediaDrmCallback("", DefaultHttpDataSource.Factory())
+class CustomHttpDrmMediaCallback(context: Context,val orgCode: String, val videoUUID: String, val accessToken: String):MediaDrmCallback {
+    private val httpMediaDrmCallback = HttpMediaDrmCallback("", VideoDownloadManager(context).getHttpDataSourceFactory())
 
-    fun fetchDRMLicenseURL(): String {
-        val url = "/api/v2.5/drm_license/${videoUUID}/?access_token=${accessToken}"
+    private fun fetchDRMLicenseURL(): String {
+        val url = "/api/v2.5/drm_license/${videoUUID}/?download=true&access_token=${accessToken}"
         return try {
             val result = Network<DRMLicenseURL>(orgCode).post(url, EMPTY_REQUEST)
             result?.licenseUrl ?: ""

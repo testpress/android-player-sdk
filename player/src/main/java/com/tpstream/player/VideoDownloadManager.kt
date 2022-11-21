@@ -16,7 +16,7 @@ import androidx.media3.exoplayer.offline.DownloadManager
 import java.io.File
 import java.util.concurrent.Executors
 
-class VideoDownloadManager() {
+class VideoDownloadManager {
 
     private lateinit var downloadCache: Cache
     private lateinit var context: Context

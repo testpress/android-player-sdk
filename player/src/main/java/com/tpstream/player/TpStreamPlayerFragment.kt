@@ -1,6 +1,7 @@
 package com.tpstream.player
 
 import android.content.DialogInterface
+import android.media.MediaCodec
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,17 +19,20 @@ import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
+import androidx.media3.exoplayer.drm.DrmSession
+import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
+import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.views.VideoResolutionSelectionSheet
 
-@UnstableApi class TpStreamPlayerFragment : Fragment() {
+@UnstableApi
+class TpStreamPlayerFragment : Fragment() {
 
 //    companion object {
 //        fun newInstance() = TpStreamPlayerFragment()
@@ -121,23 +125,15 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
             }
         }
 
-    private fun addDownloadControls(){
+    private fun addDownloadControls() {
         val downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
-        downloadButton.setOnClickListener{
-            val sheet = DownloadResolutionSelectionSheet(trackSelector.parameters, _player!!.currentTracks.groups,player?.videoInfo!!,player?.params!!)
-            sheet.onClickListener = DialogInterface.OnClickListener { p0, p1 ->
-                val mappedTrackInfo = trackSelector.currentMappedTrackInfo
-                mappedTrackInfo?.let {
-                    val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-                    if (sheet.overrides.isNotEmpty()) {
-                        val params = TrackSelectionParameters.Builder(requireContext())
-                            .clearOverridesOfType(rendererIndex)
-                            .addOverride(sheet.overrides.values.elementAt(0))
-                            .build()
-                        trackSelector.setParameters(params)
-                    }
-                }
-            }
+        downloadButton.setOnClickListener {
+            val sheet = DownloadResolutionSelectionSheet(
+                trackSelector.parameters,
+                _player!!.currentTracks.groups,
+                player?.videoInfo!!,
+                player?.params!!
+            )
             sheet.show(requireActivity().supportFragmentManager, "AdvancedSheetDownload")
         }
     }
@@ -192,11 +188,14 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
         val downloadTask = DownloadTask("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/697662f1cafb40f099b64c3562537c1b/video.mpd", requireContext())
         if (!downloadTask.isDownloaded()) {
             mediaSourceFactory.setDrmSessionManagerProvider {
-                DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback(
-                    player?.params?.orgCode!!,
-                    player?.params?.videoId!!,
-                    player?.params?.accessToken!!
-                ))
+                DefaultDrmSessionManager.Builder().build(
+                    CustomHttpDrmMediaCallback(
+                        requireContext(),
+                        player?.params?.orgCode!!,
+                        player?.params?.videoId!!,
+                        player?.params?.accessToken!!
+                    )
+                )
             }
         }
         return mediaSourceFactory
@@ -218,7 +217,7 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
         Log.d(TAG, "onStop: ")
     }
 
-    class PlayerListener : Player.Listener {
+    inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {
         private val TAG = "PlayerListener"
 
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -232,16 +231,42 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
             Log.d(TAG, "changed state to $stateString")
         }
 
-        override fun onTracksChanged(tracks: Tracks) {
-            super.onTracksChanged(tracks)
-            Log.d("TAG", "onTracksChanged: ${tracks.groups[0].isSelected}")
+        override fun onPlayerError(error: PlaybackException) {
+            if (isDRMException(error.cause!!)) {
+                val downloadTask = DownloadTask(player?.videoInfo?.dashUrl!!, requireActivity())
+                drmLicenseRetries += 1
+                if (drmLicenseRetries < 2 && downloadTask.isDownloaded()) {
+                    OfflineDRMLicenseHelper.renewLicense(player?.videoInfo?.dashUrl!!,player?.params!!, requireActivity(), this)
+                }
+            }
         }
 
+        override fun onLicenseFetchSuccess(keySetId: ByteArray) {
+            requireActivity().runOnUiThread(Runnable {
+                val mediaItem: MediaItem = TpStreamPlayerImpl(
+                    _player!!,
+                    requireContext()
+                ).getMediaItem(player?.videoInfo?.dashUrl!!)
+                _player?.setMediaItem(mediaItem)
+                _player?.prepare()
+                _player?.playWhenReady = true
+            })
+        }
+
+        override fun onLicenseFetchFailure() {
+            TODO("Not yet implemented")
+        }
+
+        private fun isDRMException(cause: Throwable): Boolean {
+            return cause is DrmSession.DrmSessionException || cause is MediaCodec.CryptoException || cause is MediaDrmCallbackException
+        }
+
+        private var drmLicenseRetries = 0
 
     }
 
 
-    class PlayerAnalyticsListener: AnalyticsListener {
+    class PlayerAnalyticsListener : AnalyticsListener {
         private val TAG = "AnalyticsListener"
         override fun onRenderedFirstFrame(
             eventTime: AnalyticsListener.EventTime,

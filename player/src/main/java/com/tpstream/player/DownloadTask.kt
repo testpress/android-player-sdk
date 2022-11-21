@@ -2,15 +2,44 @@ package com.tpstream.player
 
 
 import android.content.Context
+import androidx.media3.common.TrackGroup
+import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
+import com.tpstream.player.models.VideoInfo
 
-class DownloadTask(val url: String, val context: Context) {
+class DownloadTask private constructor(val context: Context) {
+
+    private lateinit var url : String
+    private lateinit var videoInfo: VideoInfo
+    private lateinit var tpInitParams: TpInitParams
+    private lateinit var override: MutableMap<TrackGroup, TrackSelectionOverride>
+
+    internal constructor(url: String, context: Context) : this(context) {
+        this.url = url
+    }
+
+    constructor(videoId: String,accessToken:String,context: Context):this(context){
+
+    }
+
     private val downloadManager = VideoDownloadManager(context).get()
     private val downloadIndex = downloadManager.downloadIndex
 
-    fun start(downloadRequest: DownloadRequest) {
+
+    fun start(resolutionType:Int,tpInitParams: TpInitParams){
+        Thread.sleep(2000)
+        start(VideoDownloadRequestCreationHandler(
+            context,
+            videoInfo,
+            tpInitParams
+        ).buildDownloadRequest(override))
+
+    }
+
+
+    internal fun start(downloadRequest: DownloadRequest) {
         DownloadService.sendAddDownload(
             context,
             VideoDownloadService::class.java,

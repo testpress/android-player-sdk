@@ -2,20 +2,13 @@ package com.tpstream.player
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.gson.annotations.SerializedName
-import com.tpstream.player.models.DRMLicenseURL
-import com.tpstream.player.models.VideoInfo
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import okhttp3.internal.EMPTY_REQUEST
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
@@ -46,7 +39,6 @@ class NetworkTest {
                 override fun onFailure(exception: TPException) {
                     callbackException = exception
                 }
-
             }
         }
     }
@@ -66,13 +58,13 @@ class NetworkTest {
     }
 
     @Test
-    fun isErrorReceiveOnGetSyncRequest(){
+    fun isErrorReceiveOnGetSyncRequest() {
         val errorResponse = MockResponse().setResponseCode(400)
         mockWebServer.enqueue(errorResponse)
         try {
             network.get(mockWebServer.url("/").toString())
             mockWebServer.takeRequest()
-        } catch (exception: TPException){
+        } catch (exception: TPException) {
             assertEquals(exception.response?.code, 400)
         }
     }
@@ -93,12 +85,57 @@ class NetworkTest {
     fun isErrorReceiveOnGetAsyncRequest() {
         val errorResponse = MockResponse().setResponseCode(400)
         mockWebServer.enqueue(errorResponse)
+        runBlocking {
+            network.get(mockWebServer.url("/").toString(), callbackResponse)
+            mockWebServer.takeRequest()
+            delay(50)
+        }
+        assertEquals(callbackException.response?.code, 400)
+    }
+
+    @Test
+    fun isDataReceiveOnPostSyncRequest() {
+        val successResponse = MockResponse().setResponseCode(200).setBody(getDataJSON())
+        mockWebServer.enqueue(successResponse)
+        val response = network.post(mockWebServer.url("/").toString(), EMPTY_REQUEST)
+        mockWebServer.takeRequest()
+        assertEquals(response?.data, "foo")
+    }
+
+    @Test
+    fun isErrorReceiveOnPostSyncRequest() {
+        val errorResponse = MockResponse().setResponseCode(400)
+        mockWebServer.enqueue(errorResponse)
         try {
-            network.get(mockWebServer.url("/").toString())
+            network.post(mockWebServer.url("/").toString(), EMPTY_REQUEST)
             mockWebServer.takeRequest()
         } catch (exception: TPException) {
             assertEquals(exception.response?.code, 400)
         }
+    }
+
+    @Test
+    fun isDataReceiveOnPostAsyncRequest() {
+        val successResponse = MockResponse().setResponseCode(200).setBody(getDataJSON())
+        mockWebServer.enqueue(successResponse)
+        runBlocking {
+            network.post(mockWebServer.url("/").toString(), EMPTY_REQUEST, callbackResponse)
+            mockWebServer.takeRequest()
+            delay(50)
+        }
+        assertEquals(callbackResult.data, "foo")
+    }
+
+    @Test
+    fun isErrorReceiveOnPostAsyncRequest() {
+        val errorResponse = MockResponse().setResponseCode(400)
+        mockWebServer.enqueue(errorResponse)
+        runBlocking {
+            network.post(mockWebServer.url("/").toString(), EMPTY_REQUEST, callbackResponse)
+            mockWebServer.takeRequest()
+            delay(50)
+        }
+        assertEquals(callbackException.response?.code, 400)
     }
 
     private fun getDataJSON(): String {

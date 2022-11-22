@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.CheckedTextView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.media3.common.*
 import androidx.media3.exoplayer.offline.DownloadHelper
@@ -17,23 +18,22 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
-import com.tpstream.player.DownloadTask
-import com.tpstream.player.TpInitParams
-import com.tpstream.player.VideoDownloadRequestCreationHandler
-import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
-import com.tpstream.player.models.VideoInfo
-import okio.IOException
+import com.tpstream.player.*
 import com.tpstream.player.R
+import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
+import okio.IOException
+import kotlin.math.roundToInt
 
 class DownloadResolutionSelectionSheet(
+    val player: TpStreamPlayer,
     parameters: DefaultTrackSelector.Parameters,
     private val trackGroups: List<Tracks.Group>,
-    private val videoInfo: VideoInfo,
-    private val tpInitParams: TpInitParams
 ) : BottomSheetDialogFragment(), VideoDownloadRequestCreationHandler.Listener {
 
     private var _binding: DownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
+    private var videoInfo = player.videoInfo
+    private val tpInitParams = player.params
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()
 
@@ -143,7 +143,15 @@ class DownloadResolutionSelectionSheet(
 
             track.isChecked = trackPosition == position
 
+            view.findViewById<TextView>(R.id.track_size).text = "${getVideoSize(resolution)} MB"
+
             return view
+        }
+
+        private fun getVideoSize(trackInfo: TrackInfo):Int{
+            val mbps = (((trackInfo.format.bitrate).toFloat()/8f/1024f)/1024f)
+            val videoLengthInSecond = (player.getDuration().toFloat()/1000f)
+            return ((mbps*videoLengthInSecond)).roundToInt()
         }
     }
 

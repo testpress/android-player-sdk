@@ -151,7 +151,7 @@ class DownloadResolutionSelectionSheet(
         private fun getVideoSize(trackInfo: TrackInfo):Int{
             val mbps = (((trackInfo.format.bitrate).toFloat()/8f/1024f)/1024f)
             val videoLengthInSecond = (player.getDuration().toFloat()/1000f)
-            return ((mbps*videoLengthInSecond)).roundToInt()
+            return ((mbps*videoLengthInSecond)).roundToInt()  //Mbps
         }
     }
 

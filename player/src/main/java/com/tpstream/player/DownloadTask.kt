@@ -9,9 +9,6 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.models.VideoInfo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class DownloadTask private constructor(val context: Context) {
 
@@ -44,7 +41,6 @@ class DownloadTask private constructor(val context: Context) {
     init {
         trackSelector = DefaultTrackSelector(context)
         override = trackSelector.parameters.overrides.toMutableMap()
-
     }
 
     private val downloadManager = VideoDownloadManager(context).get()

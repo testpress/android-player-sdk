@@ -1,5 +1,6 @@
 package com.tpstream.player
 
+import android.content.Context
 import androidx.media3.common.*
 import androidx.media3.exoplayer.*
 import org.junit.Assert.assertEquals
@@ -21,13 +22,15 @@ class TpStreamPlayerImplTest {
 
     @Mock
     private lateinit var player: ExoPlayer
+    @Mock
+    private lateinit var context: Context
     private lateinit var tpStreamPlayerImpl: TpStreamPlayerImpl
 
     private var called = false
 
     @Before
     fun createPlayer() {
-        tpStreamPlayerImpl = TpStreamPlayerImpl(player)
+        tpStreamPlayerImpl = TpStreamPlayerImpl(player,context)
     }
 
     @Test

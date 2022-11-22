@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <LinearLayout
@@ -13,9 +14,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
+            android:textSize="20sp"
             android:textColor="@android:color/black"
-            android:text="Download Quality Selection"
+            android:text="Download Quality"
             />
     </LinearLayout>
 
@@ -32,13 +33,14 @@
         android:id="@+id/resolutionLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         android:orientation="vertical">
 
         <ListView
             android:id="@+id/listview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            tools:listitem="@layout/download_resulotion_data"
             android:layout_marginBottom="10dp"/>
 
         <View
@@ -58,14 +60,20 @@
                 android:id="@+id/cancel_download"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:text="Cancel"/>
 
             <Button
                 android:id="@+id/start_download"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
+                style="@style/Widget.MaterialComponents.Button"
                 android:text="Download"/>
 
         </LinearLayout>

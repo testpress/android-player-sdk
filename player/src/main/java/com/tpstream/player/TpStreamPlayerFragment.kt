@@ -127,14 +127,23 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun addDownloadControls() {
         val downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
+
+        val downloadTask = DownloadTask(
+            "https://verandademo-cdn.testpress.in/institute/demoveranda/courses/video-content/videos/transcoded/7e983f94530c4dadb2d4bed8b9e02f1e/video.mpd",
+            requireContext()
+        )
+        if (downloadTask.isDownloaded()) {
+            downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
+            return
+        }
         downloadButton.setOnClickListener {
-            val sheet = DownloadResolutionSelectionSheet(
+            val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                 trackSelector.parameters,
                 _player!!.currentTracks.groups,
                 player?.videoInfo!!,
                 player?.params!!
             )
-            sheet.show(requireActivity().supportFragmentManager, "AdvancedSheetDownload")
+            downloadResolutionSelectionSheet.show(requireActivity().supportFragmentManager, "AdvancedSheetDownload")
         }
     }
 
@@ -185,7 +194,7 @@ class TpStreamPlayerFragment : Fragment() {
 
         val mediaSourceFactory = DefaultMediaSourceFactory(requireContext())
             .setDataSourceFactory(VideoDownloadManager(requireContext()).build())
-        val downloadTask = DownloadTask("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/my-course/videos/transcoded/697662f1cafb40f099b64c3562537c1b/video.mpd", requireContext())
+        val downloadTask = DownloadTask("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/video-content/videos/transcoded/7e983f94530c4dadb2d4bed8b9e02f1e/video.mpd", requireContext())
         if (!downloadTask.isDownloaded()) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(

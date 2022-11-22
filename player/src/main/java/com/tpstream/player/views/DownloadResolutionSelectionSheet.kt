@@ -26,7 +26,7 @@ import okio.IOException
 import com.tpstream.player.R
 
 class DownloadResolutionSelectionSheet(
-    private val parameters: DefaultTrackSelector.Parameters,
+    parameters: DefaultTrackSelector.Parameters,
     private val trackGroups: List<Tracks.Group>,
     private val videoInfo: VideoInfo,
     private val tpInitParams: TpInitParams
@@ -34,10 +34,10 @@ class DownloadResolutionSelectionSheet(
 
     private var _binding: DownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
-    var onClickListener: DialogInterface.OnClickListener? = null
-    lateinit var overrides: MutableMap<TrackGroup, TrackSelectionOverride>
+    var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
+        parameters.overrides.toMutableMap()
 
-    lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
+    private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +49,6 @@ class DownloadResolutionSelectionSheet(
                 tpInitParams
             )
         videoDownloadRequestCreateHandler.listener = this
-        overrides = parameters.overrides.toMutableMap()
     }
 
     override fun onCreateView(
@@ -92,14 +91,12 @@ class DownloadResolutionSelectionSheet(
 
     private fun setOnClickListeners() {
         binding.startDownload.setOnClickListener {
-            if (::overrides.isInitialized) {
-                val downloadRequest =
-                    videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
-                DownloadTask(
-                    downloadRequest.uri.toString(),
-                    requireContext()
-                ).start(downloadRequest)
-            }
+            val downloadRequest =
+                videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
+            DownloadTask(
+                downloadRequest.uri.toString(),
+                requireContext()
+            ).start(downloadRequest)
             Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
             dismiss()
         }
@@ -144,7 +141,7 @@ class DownloadResolutionSelectionSheet(
             val track = view!!.findViewById<CheckedTextView>(R.id.track_selecting)
             track.text = "${resolution.format.height}p"
 
-            track.isChecked = (trackPosition ?: 0) == position
+            track.isChecked = trackPosition == position
 
             return view
         }

@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 
 object OfflineDRMLicenseHelper {
-    @JvmStatic
+
     fun renewLicense(
         url: String,
         tpInitParams: TpInitParams,

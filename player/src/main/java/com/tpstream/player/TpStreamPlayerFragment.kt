@@ -138,10 +138,9 @@ class TpStreamPlayerFragment : Fragment() {
         }
         downloadButton.setOnClickListener {
             val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
+                player!!,
                 trackSelector.parameters,
                 _player!!.currentTracks.groups,
-                player?.videoInfo!!,
-                player?.params!!
             )
             downloadResolutionSelectionSheet.show(requireActivity().supportFragmentManager, "AdvancedSheetDownload")
         }

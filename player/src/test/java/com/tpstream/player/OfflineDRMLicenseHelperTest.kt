@@ -12,6 +12,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
+import java.io.IOException
 
 
 @RunWith(MockitoJUnitRunner::class)
@@ -51,12 +52,16 @@ class OfflineDRMLicenseHelperTest {
     @Before
     fun createService() {
         mockWebServer = MockWebServer()
-//        downloadHelper = DownloadHelper(
-//            MediaItem.EMPTY,
-//            null,
-//            DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT,
-//            arrayOf()
-//        )
+        val helper = object :DownloadHelper.Callback{
+            override fun onPrepared(helper: DownloadHelper) {
+
+            }
+
+            override fun onPrepareError(helper: DownloadHelper, e: IOException) {
+
+            }
+        }
+
         drmLicenseFetchCallback = object : DRMLicenseFetchCallback {
             override fun onLicenseFetchSuccess(keySetId: ByteArray) {
                 println("$keySetId-----------------------------------")

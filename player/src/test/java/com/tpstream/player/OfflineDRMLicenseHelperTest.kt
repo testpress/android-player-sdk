@@ -5,6 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.offline.DownloadHelper
+import kotlinx.coroutines.*
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.*
 import org.junit.runner.RunWith
@@ -43,27 +44,29 @@ class OfflineDRMLicenseHelperTest {
         .build()
 
     private lateinit var newLicenseKey: ByteArray
+    private var licenseFailed: Boolean = false
 
-    private var drmLicenseFetchCallback = object : DRMLicenseFetchCallback {
-        override fun onLicenseFetchSuccess(keySetId: ByteArray) {
-            newLicenseKey = keySetId
-        }
-
-        override fun onLicenseFetchFailure() {
-
-        }
-
-    }
+    private lateinit var drmLicenseFetchCallback: DRMLicenseFetchCallback
 
     @Before
     fun createService() {
         mockWebServer = MockWebServer()
-        downloadHelper = DownloadHelper(
-            MediaItem.EMPTY,
-            null,
-            DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT,
-            arrayOf()
-        )
+//        downloadHelper = DownloadHelper(
+//            MediaItem.EMPTY,
+//            null,
+//            DownloadHelper.DEFAULT_TRACK_SELECTOR_PARAMETERS_WITHOUT_CONTEXT,
+//            arrayOf()
+//        )
+        drmLicenseFetchCallback = object : DRMLicenseFetchCallback {
+            override fun onLicenseFetchSuccess(keySetId: ByteArray) {
+                println("$keySetId-----------------------------------")
+                newLicenseKey = keySetId
+            }
+
+            override fun onLicenseFetchFailure() {
+                licenseFailed = true
+            }
+        }
     }
 
     @After
@@ -81,9 +84,19 @@ class OfflineDRMLicenseHelperTest {
             drmLicenseFetchCallback
         )
 
-        Mockito.`when`(OfflineDRMLicenseHelper.getKetSetID(format)).thenReturn(byteArrayOf(123))
+    }
 
-        Assert.assertEquals(byteArrayOf(123), newLicenseKey)
+    @Test
+    fun isFetchRenewLicense() {
+
+        runBlocking {
+            OfflineDRMLicenseHelper.renewLicense("", tpInitParams, context, drmLicenseFetchCallback)
+            delay(5000)
+        }
+
+        Assert.assertEquals(byteArrayOf(12),newLicenseKey)
+        Assert.assertEquals(true, licenseFailed)
+
     }
 
 

@@ -142,19 +142,28 @@ class DownloadResolutionSelectionSheet(
                 view = inflater.inflate(R.layout.download_resulotion_data, parent, false)
             }
             val track = view!!.findViewById<CheckedTextView>(R.id.track_selecting)
-            track.text = "${resolution.format.height}p"
+            track.text = getResolution(resolution.format.height)
 
             track.isChecked = trackPosition == position
 
-            view.findViewById<TextView>(R.id.track_size).text = "${getVideoSize(resolution)} MB"
+            view.findViewById<TextView>(R.id.track_size).text = getVideoSize(resolution)
 
             return view
         }
 
-        private fun getVideoSize(trackInfo: TrackInfo):Int{
-            val mbps = (((trackInfo.format.bitrate).toFloat()/8f/1024f)/1024f)
-            val videoLengthInSecond = (player.getDuration().toFloat()/1000f)
-            return ((mbps*videoLengthInSecond)).roundToInt()  //Mbps
+        private fun getVideoSize(trackInfo: TrackInfo): String {
+            val mbps = (((trackInfo.format.bitrate).toFloat() / 8f / 1024f) / 1024f)
+            val videoLengthInSecond = (player.getDuration().toFloat() / 1000f)
+            return "${((mbps * videoLengthInSecond)).roundToInt()} MB"            //Mbps
+        }
+
+        private fun getResolution(height: Int): String {
+            return when {
+                height > 720 -> "Very High (${height}p)"
+                height > 360 -> "High (${height}p)"
+                height > 240 -> "Medium (${height}p)"
+                else -> "Low (${height}p)"
+            }
         }
     }
 

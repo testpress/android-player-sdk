@@ -45,40 +45,45 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
+            android:background="@color/tp_light_gray"/>
 
         <LinearLayout
             android:id="@+id/download_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             android:orientation="horizontal"
-            android:visibility="visible"
             android:layout_weight="2">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/cancel_download"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginEnd="4dp"
                 android:layout_weight="1"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:text="Cancel"/>
+                android:text="Cancel"
+                android:textColor="@color/tp_blue"
+                android:gravity="center"
+                android:background="@drawable/tp_cancel_button"
+                android:textSize="12sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/start_download"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="16dp"
                 android:layout_weight="1"
-                style="@style/Widget.MaterialComponents.Button"
+                android:textSize="12sp"
+                android:textColor="@color/tp_white"
+                android:gravity="center"
+                android:background="@drawable/tp_download_button"
                 android:text="Download"/>
 
         </LinearLayout>
 
     </LinearLayout>
-
-
 
 </LinearLayout>

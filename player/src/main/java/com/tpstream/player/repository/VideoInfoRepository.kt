@@ -9,23 +9,23 @@ class VideoInfoRepository(val context: Context) {
 
     private val videoInfoDao = TPStreamsDatabase(context).videoInfoDao()
 
-    fun getVideoInfoByUrl(url:String) : LiveData<VideoInfo?>{
+    fun getVideoInfoByUrl(url: String): VideoInfo? {
         return videoInfoDao.getByUrl(url)
     }
 
-    fun getVideoInfoByDashUrl(dashUrl:String):LiveData<VideoInfo?>{
+    fun getVideoInfoByDashUrl(dashUrl: String): VideoInfo? {
         return videoInfoDao.getByDashUrl(dashUrl)
     }
 
-    fun getVideoUrlByVideoId(videoID:String):VideoInfo?{
-        return videoInfoDao.getVideoUrlByVideoId(videoID)
+    fun getVideoUrlByVideoId(videoID: String): VideoInfo? {
+        return videoInfoDao.getVideoInfoByVideoId(videoID)
     }
 
-    fun addVideoInfo(videoInfo: VideoInfo){
+    fun addVideoInfo(videoInfo: VideoInfo) {
         videoInfoDao.insert(videoInfo)
     }
 
-    fun removeVideoInfo(videoInfo: VideoInfo){
+    fun removeVideoInfo(videoInfo: VideoInfo) {
         videoInfoDao.insert(videoInfo)
     }
 }

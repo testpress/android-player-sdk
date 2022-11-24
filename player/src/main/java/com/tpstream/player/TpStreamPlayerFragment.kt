@@ -217,14 +217,15 @@ class TpStreamPlayerFragment : Fragment() {
 
         try {
             val downloadTask = DownloadTask(
-                TPStreamsDatabase.invoke(requireContext()).videoInfoDao().getVideoUrlByVideoId(player?.params?.videoId!!)?.dashUrl!!,
+                TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
+                    .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!,
                 requireContext()
             )
             if (downloadTask.isDownloaded()) {
                 downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
                 return
             }
-        } catch (exception :Exception){
+        } catch (exception: Exception) {
             Log.d("TAG", "addDownloadControls: Video Not Download")
         }
 
@@ -234,7 +235,10 @@ class TpStreamPlayerFragment : Fragment() {
                 trackSelector.parameters,
                 _player!!.currentTracks.groups,
             )
-            downloadResolutionSelectionSheet.show(requireActivity().supportFragmentManager, "AdvancedSheetDownload")
+            downloadResolutionSelectionSheet.show(
+                requireActivity().supportFragmentManager,
+                "AdvancedSheetDownload"
+            )
         }
     }
 
@@ -271,7 +275,7 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun initializePlayer() {
         _player = initializeExoplayer()
-        player = TpStreamPlayerImpl(_player!!,requireContext())
+        player = TpStreamPlayerImpl(_player!!, requireContext())
         this.initializationListener?.onInitializationSuccess(player!!)
     }
 
@@ -287,15 +291,16 @@ class TpStreamPlayerFragment : Fragment() {
     }
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
-        var downloadTask:DownloadTask? = null
+        var downloadTask: DownloadTask? = null
         val mediaSourceFactory = DefaultMediaSourceFactory(requireContext())
             .setDataSourceFactory(VideoDownloadManager(requireContext()).build())
         try {
             downloadTask = DownloadTask(
-                TPStreamsDatabase.invoke(requireContext()).videoInfoDao().getVideoUrlByVideoId(player?.params?.videoId!!)?.dashUrl!!,
+                TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
+                    .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!,
                 requireContext()
             )
-        } catch (exception : Exception){
+        } catch (exception: Exception) {
             Log.d("TAG", "getMediaSourceFactory: Video Not Download")
         }
         if (downloadTask == null || !downloadTask.isDownloaded()) {

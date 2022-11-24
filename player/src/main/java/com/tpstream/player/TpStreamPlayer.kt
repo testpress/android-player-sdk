@@ -87,7 +87,11 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
 
             override fun onFailure(exception: TPException) {
                 Handler(Looper.getMainLooper()).post {
-                    load(TPStreamsDatabase.invoke(context).videoInfoDao().getVideoUrlByVideoId(parameters.videoId!!)?.dashUrl!!)
+                    try{
+                        load(TPStreamsDatabase.invoke(context).videoInfoDao().getVideoInfoByVideoId(parameters.videoId!!)?.dashUrl!!)
+                    } catch (exception : Exception){
+                        Log.d("TAG", "Video not in offline")
+                    }
                 }
                 Log.d("TAG", "onFailure: ")
             }

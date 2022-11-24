@@ -6,7 +6,10 @@ import android.os.Looper
 import android.util.Log
 import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.offline.DownloadRequest
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSource
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.VideoInfo
@@ -33,8 +36,37 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
     override lateinit var videoInfo: VideoInfo
 
     private fun load(url: String) {
-        player.setMediaItem(getMediaItem(url))
+        player.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         player.prepare()
+    }
+
+    private fun getMediaSourceFactory(): MediaSource.Factory {
+        var downloadTask: DownloadTask? = null
+        val mediaSourceFactory = DefaultMediaSourceFactory(context)
+            .setDataSourceFactory(VideoDownloadManager(context).build())
+        Log.d("TAG", "${params.videoId}")
+        try {
+            downloadTask = DownloadTask(
+                TPStreamsDatabase.invoke(context).videoInfoDao()
+                    .getVideoInfoByVideoId(params.videoId!!)?.dashUrl!!,
+                context
+            )
+        } catch (exception: Exception) {
+            Log.d("TAG", "getMediaSourceFactory: Video Not Download")
+        }
+        if (downloadTask == null || !downloadTask.isDownloaded()) {
+            mediaSourceFactory.setDrmSessionManagerProvider {
+                DefaultDrmSessionManager.Builder().build(
+                    CustomHttpDrmMediaCallback(
+                        context,
+                        params.orgCode,
+                        params.videoId!!,
+                        params.accessToken!!
+                    )
+                )
+            }
+        }
+        return mediaSourceFactory
     }
 
     internal fun getMediaItem(url:String):MediaItem {

@@ -12,8 +12,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
@@ -26,17 +24,12 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.database.TPStreamsDatabase
-import com.tpstream.player.database.dao.VideoInfoDao
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
-import com.tpstream.player.models.VideoInfo
-import com.tpstream.player.repository.VideoInfoRepository
-import com.tpstream.player.viewmodels.VideoInfoViewModel
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.views.VideoResolutionSelectionSheet
-import kotlinx.coroutines.runBlocking
 
 @UnstableApi
 class TpStreamPlayerFragment : Fragment() {
@@ -56,20 +49,9 @@ class TpStreamPlayerFragment : Fragment() {
     lateinit var trackSelector: DefaultTrackSelector
     var selectedResolution = ResolutionOptions.AUTO
 
-    //private lateinit var videoInfoDao: VideoInfoDao
-    private var videoInfo: VideoInfo? = null
-
-    private lateinit var viewModel: VideoInfoViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         trackSelector = DefaultTrackSelector(requireContext())
-        //videoInfoDao = TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
-        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return VideoInfoViewModel(VideoInfoRepository(requireContext())) as T
-            }
-        }).get(VideoInfoViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -212,7 +194,6 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun initializeExoplayer(): ExoPlayer {
         return ExoPlayer.Builder(requireActivity())
-            .setMediaSourceFactory(getMediaSourceFactory())
             .setTrackSelector(trackSelector)
             .build()
             .also { exoPlayer ->
@@ -281,34 +262,6 @@ class TpStreamPlayerFragment : Fragment() {
 
         override fun onPlayerError(error: PlaybackException) {
 
-//            try {
-//                val downloadTask = DownloadTask(
-//                    TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
-//                        .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!,
-//                    requireContext()
-//                )
-//                if (downloadTask.isDownloaded()) {
-//                    _player?.setMediaItem(
-//                        TpStreamPlayerImpl(_player!!, requireContext()).getMediaItem(
-//                            TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
-//                                .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!
-//                        )
-//                    )
-//                    _player?.prepare()
-//                    _player?.playWhenReady = true
-//                }
-//            } catch (exception: Exception) {
-//                Log.d("TAG", "player Error: Video Not Download")
-//            }
-//
-//
-//            if (isDRMException(error.cause!!)) {
-//                val downloadTask = DownloadTask(player?.videoInfo?.dashUrl!!, requireActivity())
-//                drmLicenseRetries += 1
-//                if (drmLicenseRetries < 2 && downloadTask.isDownloaded()) {
-//                    OfflineDRMLicenseHelper.renewLicense(player?.videoInfo?.dashUrl!!,player?.params!!, requireActivity(), this)
-//                }
-//            }
         }
 
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {

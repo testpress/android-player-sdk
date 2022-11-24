@@ -13,6 +13,13 @@ class MainActivity : AppCompatActivity() {
 
     fun buttonClick(view: View) {
         val myIntent = Intent(this, PlayerActivity::class.java)
+        myIntent.putExtra("params",1)
+        startActivity(myIntent)
+    }
+
+    fun buttonClick2(view: View) {
+        val myIntent = Intent(this, PlayerActivity::class.java)
+        myIntent.putExtra("params",2)
         startActivity(myIntent)
     }
 }

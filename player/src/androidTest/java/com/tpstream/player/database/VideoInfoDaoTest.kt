@@ -34,7 +34,7 @@ class VideoInfoDaoTest :TPStreamsDatabaseTest(){
         val videoInfo = createData()
         db.videoInfoDao().insert(videoInfo)
 
-        val fetchVideoInfo = db.videoInfoDao().getVideoUrlByVideoId("Test")
+        val fetchVideoInfo = db.videoInfoDao().getVideoInfoByVideoId("Test")
         assertThat(fetchVideoInfo, equalTo(videoInfo))
     }
 
@@ -55,8 +55,6 @@ class VideoInfoDaoTest :TPStreamsDatabaseTest(){
         val videoInfo = createData()
         db.videoInfoDao().insert(videoInfo)
 
-        assertThat(db.videoInfoDao().getVideoUrlByVideoId("Test"), equalTo(videoInfo))
+        assertThat(db.videoInfoDao().getVideoInfoByVideoId("Test"), equalTo(videoInfo))
     }
-
-
 }

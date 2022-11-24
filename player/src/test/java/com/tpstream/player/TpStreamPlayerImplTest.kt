@@ -19,9 +19,14 @@ class TpStreamPlayerImplTest {
     private val PLAYER_BUFFER_TIMING = 1000L
     private val PLAYER_SEEK_TIME = 1000L
     private val PLAYBACK_SPEET_TIME = 10.00F
+    private val VIDEO_DURATION = 10000L
+    private val format = Format.Builder()
+        .setHeight(1080)
+        .build()
 
     @Mock
     private lateinit var player: ExoPlayer
+
     @Mock
     private lateinit var context: Context
     private lateinit var tpStreamPlayerImpl: TpStreamPlayerImpl
@@ -30,7 +35,7 @@ class TpStreamPlayerImplTest {
 
     @Before
     fun createPlayer() {
-        tpStreamPlayerImpl = TpStreamPlayerImpl(player,context)
+        tpStreamPlayerImpl = TpStreamPlayerImpl(player, context)
     }
 
     @Test
@@ -64,6 +69,19 @@ class TpStreamPlayerImplTest {
         `when`(player.bufferedPosition).thenReturn(PLAYER_BUFFER_TIMING)
         assertEquals(PLAYER_BUFFER_TIMING, tpStreamPlayerImpl.getBufferedTime())
     }
+
+    @Test
+    fun testGetVideoFormat() {
+        `when`(player.videoFormat).thenReturn(format)
+        assertEquals(format.height, tpStreamPlayerImpl.getVideoFormat()?.height)
+    }
+
+    @Test
+    fun testGetDuration() {
+        `when`(player.duration).thenReturn(VIDEO_DURATION)
+        assertEquals(VIDEO_DURATION, tpStreamPlayerImpl.getDuration())
+    }
+
 
     @Test
     fun testSetPlaybackSpeed() {

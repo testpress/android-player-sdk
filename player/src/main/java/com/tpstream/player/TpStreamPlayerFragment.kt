@@ -55,6 +55,7 @@ class TpStreamPlayerFragment : Fragment() {
     private var initializationListener: InitializationListener? = null
     lateinit var trackSelector: DefaultTrackSelector
     var selectedResolution = ResolutionOptions.AUTO
+
     //private lateinit var videoInfoDao: VideoInfoDao
     private var videoInfo: VideoInfo? = null
 
@@ -95,14 +96,19 @@ class TpStreamPlayerFragment : Fragment() {
         val resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
 
         resolutionButton.setOnClickListener {
-            val videoResolutionSelector = VideoResolutionSelectionSheet(player!!, selectedResolution)
-            val advancedVideoResolutionSelector = AdvancedResolutionSelectionSheet(player!!, trackSelector.parameters)
+            val videoResolutionSelector =
+                VideoResolutionSelectionSheet(player!!, selectedResolution)
+            val advancedVideoResolutionSelector =
+                AdvancedResolutionSelectionSheet(player!!, trackSelector.parameters)
             advancedVideoResolutionSelector.onClickListener =
                 onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector)
             videoResolutionSelector.onClickListener =
                 onVideoResolutionSelection(videoResolutionSelector, advancedVideoResolutionSelector)
 
-            videoResolutionSelector.show(requireActivity().supportFragmentManager, VideoResolutionSelectionSheet.TAG)
+            videoResolutionSelector.show(
+                requireActivity().supportFragmentManager,
+                VideoResolutionSelectionSheet.TAG
+            )
         }
     }
 
@@ -147,24 +153,28 @@ class TpStreamPlayerFragment : Fragment() {
 
         try {
             val downloadTask = DownloadTask(
-                TPStreamsDatabase.invoke(requireContext()).videoInfoDao().getVideoUrlByVideoId(player?.params?.videoId!!)?.dashUrl!!,
+                TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
+                    .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!,
                 requireContext()
             )
             if (downloadTask.isDownloaded()) {
                 downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
                 return
             }
-        } catch (exception :Exception){
+        } catch (exception: Exception) {
             Log.d("TAG", "addDownloadControls: Video Not Download")
         }
-        
+
         downloadButton.setOnClickListener {
             val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                 player!!,
                 trackSelector.parameters,
                 _player!!.currentTracks.groups,
             )
-            downloadResolutionSelectionSheet.show(requireActivity().supportFragmentManager, "AdvancedSheetDownload")
+            downloadResolutionSelectionSheet.show(
+                requireActivity().supportFragmentManager,
+                "AdvancedSheetDownload"
+            )
         }
     }
 
@@ -196,7 +206,7 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun initializePlayer() {
         _player = initializeExoplayer()
-        player = TpStreamPlayerImpl(_player!!,requireContext())
+        player = TpStreamPlayerImpl(_player!!, requireContext())
         this.initializationListener?.onInitializationSuccess(player!!)
     }
 
@@ -212,15 +222,16 @@ class TpStreamPlayerFragment : Fragment() {
     }
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
-        var downloadTask:DownloadTask? = null
+        var downloadTask: DownloadTask? = null
         val mediaSourceFactory = DefaultMediaSourceFactory(requireContext())
             .setDataSourceFactory(VideoDownloadManager(requireContext()).build())
         try {
             downloadTask = DownloadTask(
-                TPStreamsDatabase.invoke(requireContext()).videoInfoDao().getVideoUrlByVideoId(player?.params?.videoId!!)?.dashUrl!!,
+                TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
+                    .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!,
                 requireContext()
             )
-        } catch (exception : Exception){
+        } catch (exception: Exception) {
             Log.d("TAG", "getMediaSourceFactory: Video Not Download")
         }
         if (downloadTask == null || !downloadTask.isDownloaded()) {
@@ -269,13 +280,35 @@ class TpStreamPlayerFragment : Fragment() {
         }
 
         override fun onPlayerError(error: PlaybackException) {
-            if (isDRMException(error.cause!!)) {
-                val downloadTask = DownloadTask(player?.videoInfo?.dashUrl!!, requireActivity())
-                drmLicenseRetries += 1
-                if (drmLicenseRetries < 2 && downloadTask.isDownloaded()) {
-                    OfflineDRMLicenseHelper.renewLicense(player?.videoInfo?.dashUrl!!,player?.params!!, requireActivity(), this)
-                }
-            }
+
+//            try {
+//                val downloadTask = DownloadTask(
+//                    TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
+//                        .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!,
+//                    requireContext()
+//                )
+//                if (downloadTask.isDownloaded()) {
+//                    _player?.setMediaItem(
+//                        TpStreamPlayerImpl(_player!!, requireContext()).getMediaItem(
+//                            TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
+//                                .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!
+//                        )
+//                    )
+//                    _player?.prepare()
+//                    _player?.playWhenReady = true
+//                }
+//            } catch (exception: Exception) {
+//                Log.d("TAG", "player Error: Video Not Download")
+//            }
+//
+//
+//            if (isDRMException(error.cause!!)) {
+//                val downloadTask = DownloadTask(player?.videoInfo?.dashUrl!!, requireActivity())
+//                drmLicenseRetries += 1
+//                if (drmLicenseRetries < 2 && downloadTask.isDownloaded()) {
+//                    OfflineDRMLicenseHelper.renewLicense(player?.videoInfo?.dashUrl!!,player?.params!!, requireActivity(), this)
+//                }
+//            }
         }
 
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {

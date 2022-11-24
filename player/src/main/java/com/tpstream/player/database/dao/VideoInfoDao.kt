@@ -13,16 +13,16 @@ interface VideoInfoDao {
     fun delete(videoInfo: VideoInfo)
 
     @Query("SELECT * FROM videoinfo WHERE url=:url")
-    fun getByUrl(url: String): LiveData<VideoInfo?>
+    fun getByUrl(url: String): VideoInfo?
 
     @Query("SELECT * FROM videoinfo WHERE dashUrl=:dashUrl")
-    fun getByDashUrl(dashUrl: String): LiveData<VideoInfo?>
+    fun getByDashUrl(dashUrl: String): VideoInfo?
 
     @Query("SELECT * FROM videoinfo ORDER BY title ASC")
-    fun getAllVideoInfo():LiveData<List<VideoInfo>>
+    fun getAllVideoInfo():List<VideoInfo>
 
     @Query("SELECT * FROM videoinfo WHERE videoId=:videoID")
-    fun getVideoUrlByVideoId(videoID:String):VideoInfo?
+    fun getVideoInfoByVideoId(videoID:String):VideoInfo?
 
 
 }

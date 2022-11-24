@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
 data class VideoInfo(
     @PrimaryKey
     var videoId:String,
-    val title: String,
+    val title: String?,
     val thumbnail: String?,
 
     @SerializedName("thumbnail_small")

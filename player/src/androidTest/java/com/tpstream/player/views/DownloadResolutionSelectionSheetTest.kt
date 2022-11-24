@@ -1,20 +1,21 @@
 package com.tpstream.player.views
 
 import android.content.Context
-import androidx.fragment.app.testing.FragmentScenario
+import android.os.Bundle
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.fragment.app.testing.withFragment
 import androidx.lifecycle.Lifecycle
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.rule.ActivityTestRule
 import com.tpstream.player.TpStreamPlayer
 import com.tpstream.player.TpStreamPlayerFragment
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,22 +32,52 @@ class DownloadResolutionSelectionSheetTest {
 
     private var dialogFragment: DownloadResolutionSelectionSheet? = null
 
-    @Test
-    fun create() {
+    @Rule
+    val activityTestRule: ActivityTestRule<TestActivity> =
+        ActivityTestRule(TestActivity::class.java)
 
-        val scenario = launchFragmentInContainer<TpStreamPlayerFragment>()
-        scenario.moveToState(Lifecycle.State.STARTED)
-        scenario.withFragment {
-            dialogFragment = DownloadResolutionSelectionSheet(
-                player,
-                DefaultTrackSelector.Parameters.Builder(ApplicationProvider.getApplicationContext<Context?>().applicationContext)
-                    .build(), player.getCurrentTrackGroups()
+
+    @Before
+    fun showDialog() {
+        // Create a dismiss listener to check with verifyDialogWasDismissed().
+        dialogFragment = DownloadResolutionSelectionSheet(
+            player,
+            DefaultTrackSelector.Parameters.Builder(
+                ApplicationProvider.getApplicationContext<Context?>().applicationContext
             )
-            dialogFragment!!.show(
-                this.childFragmentManager.beginTransaction(),
-                "AdvancedSheetDownload"
-            )
+                .build(),
+            player.getCurrentTrackGroups()
+        )
+        dialogFragment!!.show(activityTestRule.activity.supportFragmentManager, "AdvancedSheetDownload")
+
+        // Wait for dialog to be shown.
+        onView(withText("Download Quality")).check(matches(isDisplayed()))
+    }
+
+    @After
+    fun tearDown() {
+        if (dialogFragment != null && dialogFragment!!.dialog != null && dialogFragment!!.dialog!!.isShowing
+        ) {
+            // Close the dialog
+            Espresso.pressBack()
         }
+    }
+
+    @Test
+    fun a() {
+        val scenario = launchFragmentInContainer<TpStreamPlayerFragment>(Bundle())
+        scenario.moveToState(Lifecycle.State.STARTED)
+//        scenario.withFragment {
+//            dialogFragment = DownloadResolutionSelectionSheet(
+//                player,
+//                DefaultTrackSelector.Parameters.Builder(ApplicationProvider.getApplicationContext<Context?>().applicationContext)
+//                    .build(), player.getCurrentTrackGroups()
+//            )
+//            dialogFragment!!.show(
+//                this.childFragmentManager.beginTransaction(),
+//                "AdvancedSheetDownload"
+//            )
+//        }
         // Wait for dialog to be shown.
 
         // Wait for dialog to be shown.

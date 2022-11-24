@@ -39,9 +39,6 @@ import com.tpstream.player.Util.getRendererIndex
 import com.tpstream.player.views.Util.getRendererIndex
 import androidx.media3.ui.PlayerView
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
-import com.tpstream.player.models.VideoInfo
-import com.tpstream.player.repository.VideoInfoRepository
-import com.tpstream.player.viewmodels.VideoInfoViewModel
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
@@ -281,7 +278,6 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun initializeExoplayer(): ExoPlayer {
         return ExoPlayer.Builder(requireActivity())
-            .setMediaSourceFactory(getMediaSourceFactory())
             .setTrackSelector(trackSelector)
             .build()
             .also { exoPlayer ->

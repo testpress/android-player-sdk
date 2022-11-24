@@ -26,6 +26,7 @@ class VideoDownloadRequestCreationHandlerTest {
     private lateinit var context: Context
 
     private var videoInfo: VideoInfo = VideoInfo(
+        "123",
         null,
         null,
         null,
@@ -62,14 +63,14 @@ class VideoDownloadRequestCreationHandlerTest {
     @Test
     fun test_downloadRequest() {
         val videoDownloadRequestCreationHandler = VideoDownloadRequestCreationHandler(
-            context,videoInfo,tpInitParams
+            context, videoInfo, tpInitParams
         )
 
         val buildDownloadRequest = videoDownloadRequestCreationHandler.buildDownloadRequest(
             DefaultTrackSelector.Parameters.Builder(context).build().overrides.toMutableMap()
         )
 
-        Assert.assertEquals(downloadRequest,buildDownloadRequest)
+        Assert.assertEquals(downloadRequest, buildDownloadRequest)
 
     }
 

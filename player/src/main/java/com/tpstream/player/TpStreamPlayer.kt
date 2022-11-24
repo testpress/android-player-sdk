@@ -15,6 +15,7 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import com.google.common.collect.ImmutableList
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import com.tpstream.player.models.DRMLicenseURL
+import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.VideoInfo
 
 public interface TpStreamPlayer {
@@ -86,7 +87,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
 
             override fun onFailure(exception: TPException) {
                 Handler(Looper.getMainLooper()).post {
-                    load("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/video-content/videos/transcoded/7e983f94530c4dadb2d4bed8b9e02f1e/video.mpd")
+                    load(TPStreamsDatabase.invoke(context).videoInfoDao().getVideoUrlByVideoId(parameters.videoId!!)?.dashUrl!!)
                 }
                 Log.d("TAG", "onFailure: ")
             }

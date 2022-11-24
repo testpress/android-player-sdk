@@ -20,6 +20,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.*
 import com.tpstream.player.R
+import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
 import okio.IOException
 import kotlin.math.roundToInt
@@ -98,6 +99,8 @@ class DownloadResolutionSelectionSheet(
                 requireContext()
             ).start(downloadRequest)
             Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
+            videoInfo.videoId = tpInitParams.videoId!!
+            TPStreamsDatabase.invoke(requireContext()).videoInfoDao().insert(videoInfo)
             dismiss()
         }
         binding.cancelDownload.setOnClickListener { dismiss() }

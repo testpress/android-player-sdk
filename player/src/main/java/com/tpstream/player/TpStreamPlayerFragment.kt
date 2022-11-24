@@ -18,6 +18,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
 import androidx.media3.common.util.UnstableApi
@@ -32,10 +33,15 @@ import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.tpstream.player.database.TPStreamsDatabase
+import com.tpstream.player.database.dao.VideoInfoDao
 import com.tpstream.player.Util.getRendererIndex
 import com.tpstream.player.views.Util.getRendererIndex
 import androidx.media3.ui.PlayerView
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
+import com.tpstream.player.models.VideoInfo
+import com.tpstream.player.repository.VideoInfoRepository
+import com.tpstream.player.viewmodels.VideoInfoViewModel
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
@@ -58,11 +64,13 @@ class TpStreamPlayerFragment : Fragment() {
     val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
     private var initializationListener: InitializationListener? = null
-    lateinit var trackSelector:DefaultTrackSelector
+    lateinit var trackSelector: DefaultTrackSelector
     var selectedResolution = ResolutionOptions.AUTO
     lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
     lateinit var orientationEventListener: OrientationListener
+    //private lateinit var videoInfoDao: VideoInfoDao
+    private var videoInfo: VideoInfo? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,7 +113,7 @@ class TpStreamPlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
+        ///viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
         initializePlayer()
         addCustomPlayerControls()
     }
@@ -207,14 +215,19 @@ class TpStreamPlayerFragment : Fragment() {
     private fun addDownloadControls() {
         val downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
 
-        val downloadTask = DownloadTask(
-            "https://verandademo-cdn.testpress.in/institute/demoveranda/courses/video-content/videos/transcoded/7e983f94530c4dadb2d4bed8b9e02f1e/video.mpd",
-            requireContext()
-        )
-        if (downloadTask.isDownloaded()) {
-            downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-            return
+        try {
+            val downloadTask = DownloadTask(
+                TPStreamsDatabase.invoke(requireContext()).videoInfoDao().getVideoUrlByVideoId(player?.params?.videoId!!)?.dashUrl!!,
+                requireContext()
+            )
+            if (downloadTask.isDownloaded()) {
+                downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
+                return
+            }
+        } catch (exception :Exception){
+            Log.d("TAG", "addDownloadControls: Video Not Download")
         }
+
         downloadButton.setOnClickListener {
             val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                 player!!,
@@ -274,11 +287,18 @@ class TpStreamPlayerFragment : Fragment() {
     }
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
-
+        var downloadTask:DownloadTask? = null
         val mediaSourceFactory = DefaultMediaSourceFactory(requireContext())
             .setDataSourceFactory(VideoDownloadManager(requireContext()).build())
-        val downloadTask = DownloadTask("https://verandademo-cdn.testpress.in/institute/demoveranda/courses/video-content/videos/transcoded/7e983f94530c4dadb2d4bed8b9e02f1e/video.mpd", requireContext())
-        if (!downloadTask.isDownloaded()) {
+        try {
+            downloadTask = DownloadTask(
+                TPStreamsDatabase.invoke(requireContext()).videoInfoDao().getVideoUrlByVideoId(player?.params?.videoId!!)?.dashUrl!!,
+                requireContext()
+            )
+        } catch (exception : Exception){
+            Log.d("TAG", "getMediaSourceFactory: Video Not Download")
+        }
+        if (downloadTask == null || !downloadTask.isDownloaded()) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(
                     CustomHttpDrmMediaCallback(

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tp_gray">#606060</color>
+    <color name="tp_light_gray">#E5E5E5</color>
+    <color name="tp_blue">#065FD4</color>
+    <color name="tp_white">#FFFFFF</color>
+</resources>

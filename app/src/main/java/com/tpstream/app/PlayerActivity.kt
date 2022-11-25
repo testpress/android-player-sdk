@@ -1,7 +1,9 @@
 package com.tpstream.app
 
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.tpstream.player.InitializationListener
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.TpStreamPlayer
@@ -20,6 +22,7 @@ class PlayerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_player)
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
+        playerFragment.enableAutoFullScreenOnRotate()
         playerFragment.setOnInitializationListener(object: InitializationListener {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
                 val parameters = TpInitParams.Builder()

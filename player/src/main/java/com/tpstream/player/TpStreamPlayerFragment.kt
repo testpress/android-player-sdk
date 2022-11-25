@@ -1,12 +1,19 @@
 package com.tpstream.player
 
+import android.app.Dialog
 import android.content.DialogInterface
+import android.content.pm.ActivityInfo
+import android.hardware.SensorManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageButton
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -23,6 +30,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.views.Util.getRendererIndex
+import androidx.media3.ui.PlayerView
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
@@ -44,10 +52,39 @@ class TpStreamPlayerFragment : Fragment() {
     private var initializationListener: InitializationListener? = null
     lateinit var trackSelector:DefaultTrackSelector
     var selectedResolution = ResolutionOptions.AUTO
+    lateinit var fullScreenDialog: Dialog
+    private var isFullScreen = false
+    lateinit var orientationEventListener: OrientationListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         trackSelector = DefaultTrackSelector(requireContext())
+        fullScreenDialog = object :Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+            override fun onBackPressed() {
+                super.onBackPressed()
+                exitFullScreen()
+            }
+        }
+    }
+
+    fun enableAutoFullScreenOnRotate() {
+        orientationEventListener = OrientationListener(requireContext())
+        orientationEventListener.setOnChangeListener { isLandscape ->
+            activity?.let {
+                if(isLandscape) {
+                    showFullScreen()
+                } else {
+                    exitFullScreen()
+                }
+            }
+        }
+        orientationEventListener.start()
+    }
+
+    fun disableAutoFullScreenOnRotate() {
+        if(::orientationEventListener.isInitialized) {
+            orientationEventListener.disable()
+        }
     }
 
     override fun onCreateView(
@@ -67,6 +104,35 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun addCustomPlayerControls() {
         addResolutionChangeControl()
+        addFullScreenControl()
+    }
+
+    private fun addFullScreenControl() {
+        viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setOnClickListener {
+            if(isFullScreen) {
+                exitFullScreen()
+            } else {
+                showFullScreen()
+            }
+        }
+    }
+
+    fun exitFullScreen() {
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        (viewBinding.videoView.parent as ViewGroup).removeView(viewBinding.videoView)
+        viewBinding.mainFrameLayout.addView(viewBinding.videoView)
+        viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_fullscreen_24));
+        fullScreenDialog.dismiss()
+        isFullScreen = false
+    }
+
+    fun showFullScreen() {
+        (viewBinding.videoView.parent as ViewGroup).removeView(viewBinding.videoView)
+        fullScreenDialog.addContentView(viewBinding.videoView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_fullscreen_exit_24));
+        fullScreenDialog.show()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        isFullScreen = true
     }
 
     private fun addResolutionChangeControl() {
@@ -136,6 +202,11 @@ class TpStreamPlayerFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _viewBinding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disableAutoFullScreenOnRotate()
     }
 
     override fun onResume() {

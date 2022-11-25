@@ -261,7 +261,16 @@ class TpStreamPlayerFragment : Fragment() {
         }
 
         override fun onPlayerError(error: PlaybackException) {
-
+            val url = TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
+                .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!
+            val cause: Throwable = error.cause!!
+            if (isDRMException(cause)) {
+                val downloadTask = DownloadTask(url, requireActivity())
+                drmLicenseRetries += 1
+                if (drmLicenseRetries < 2 && downloadTask.isDownloaded()) {
+                    OfflineDRMLicenseHelper.renewLicense(url,player?.params!!,requireActivity(), this)
+                }
+            }
         }
 
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {

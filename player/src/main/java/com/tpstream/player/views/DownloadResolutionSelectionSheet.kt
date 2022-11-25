@@ -40,7 +40,6 @@ class DownloadResolutionSelectionSheet(
 
     private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         videoDownloadRequestCreateHandler =
@@ -104,7 +103,6 @@ class DownloadResolutionSelectionSheet(
             dismiss()
         }
         binding.cancelDownload.setOnClickListener { dismiss() }
-
     }
 
     private fun getTrackInfos(): ArrayList<TrackInfo> {
@@ -180,10 +178,7 @@ class DownloadResolutionSelectionSheet(
     }
 
     override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {
-        binding.startDownload.setOnClickListener {
-            dismiss()
-        }
-        Log.d("VideoDownload", "onDownloadRequestHandlerPrepareError: ${e.localizedMessage}")
+        dismiss()
     }
 
 }

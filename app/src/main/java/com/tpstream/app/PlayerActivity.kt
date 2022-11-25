@@ -49,11 +49,11 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     fun videoDownloadButton(view: View){
-        DownloadTask(parameters,this).start(0)
+
     }
 
     fun videoDeleteButton(view: View){
-        DownloadTask(parameters,this).delete()
+
     }
 }
 

@@ -15,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionParameters
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -27,9 +26,9 @@ import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
-import com.tpstream.player.views.VideoResolutionSelectionSheet
+import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
 
-@UnstableApi class TpStreamPlayerFragment : Fragment() {
+class TpStreamPlayerFragment : Fragment() {
 
 //    companion object {
 //        fun newInstance() = TpStreamPlayerFragment()
@@ -74,19 +73,28 @@ import com.tpstream.player.views.VideoResolutionSelectionSheet
         val resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
 
         resolutionButton.setOnClickListener {
-            val videoResolutionSelector = VideoResolutionSelectionSheet(player!!, selectedResolution)
-            val advancedVideoResolutionSelector = AdvancedResolutionSelectionSheet(player!!, trackSelector.parameters)
-            advancedVideoResolutionSelector.onClickListener =
-                onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector)
-            videoResolutionSelector.onClickListener =
-                onVideoResolutionSelection(videoResolutionSelector, advancedVideoResolutionSelector)
-
-            videoResolutionSelector.show(requireActivity().supportFragmentManager, VideoResolutionSelectionSheet.TAG)
+            val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
+            simpleVideoResolutionSelector.show(requireActivity().supportFragmentManager, SimpleVideoResolutionSelectionSheet.TAG)
         }
     }
 
+    private fun initializeVideoResolutionSelectionSheets(): SimpleVideoResolutionSelectionSheet {
+        val simpleVideoResolutionSelector =
+            SimpleVideoResolutionSelectionSheet(player!!, selectedResolution)
+        val advancedVideoResolutionSelector =
+            AdvancedResolutionSelectionSheet(player!!, trackSelector.parameters)
+        advancedVideoResolutionSelector.onClickListener =
+            onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector)
+        simpleVideoResolutionSelector.onClickListener =
+            onVideoResolutionSelection(
+                simpleVideoResolutionSelector,
+                advancedVideoResolutionSelector
+            )
+        return simpleVideoResolutionSelector
+    }
+
     private fun onVideoResolutionSelection(
-        videoResolutionSelector: VideoResolutionSelectionSheet,
+        videoResolutionSelector: SimpleVideoResolutionSelectionSheet,
         advancedVideoResolutionSelector: AdvancedResolutionSelectionSheet
     ) = DialogInterface.OnClickListener { p0, p1 ->
         this@TpStreamPlayerFragment.selectedResolution =

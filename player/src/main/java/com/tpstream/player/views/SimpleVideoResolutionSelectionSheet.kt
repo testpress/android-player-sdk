@@ -22,7 +22,7 @@ import com.tpstream.player.databinding.TrackSelectionDialogBinding
 
 
 @UnstableApi
-class VideoResolutionSelectionSheet(
+class SimpleVideoResolutionSelectionSheet(
     private val player: TpStreamPlayer,
     var selectedResolution: ResolutionOptions
 ) : BottomSheetDialogFragment(){
@@ -56,13 +56,11 @@ class VideoResolutionSelectionSheet(
         displayCurrentResolution()
     }
 
-    private fun displayCurrentResolution() {
-        val currentResolution = if (player.getVideoFormat() != null) {
-            "${player.getVideoFormat()!!.height}p"
-        } else {
-            "Auto"
-        }
-        binding.currentResolution.text = currentResolution
+    private fun configureBottomSheetBehaviour() {
+        val bottomSheetDialog = dialog as BottomSheetDialog
+        bottomSheetDialog.behavior.isDraggable = true
+        bottomSheetDialog.behavior.isFitToContents = true
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun initializeList() {
@@ -72,7 +70,7 @@ class VideoResolutionSelectionSheet(
             it.adapter = ResolutionAdapter(requireContext(), list, selectedResolution)
             it.setOnItemClickListener { adapterView, view, i, l ->
                 val resolution = list[i]
-                this@VideoResolutionSelectionSheet.selectedResolution = resolution.option
+                this@SimpleVideoResolutionSelectionSheet.selectedResolution = resolution.option
                 onClickListener?.onClick(dialog, DialogInterface.BUTTON_POSITIVE)
                 dismiss()
             }
@@ -88,11 +86,13 @@ class VideoResolutionSelectionSheet(
         )
     }
 
-    private fun configureBottomSheetBehaviour() {
-        val bottomSheetDialog = dialog as BottomSheetDialog
-        bottomSheetDialog.behavior.isDraggable = true
-        bottomSheetDialog.behavior.isFitToContents = true
-        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+    private fun displayCurrentResolution() {
+        val currentResolution = if (player.getVideoFormat() != null) {
+            "${player.getVideoFormat()!!.height}p"
+        } else {
+            "Auto"
+        }
+        binding.currentResolution.text = currentResolution
     }
 }
 

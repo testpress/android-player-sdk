@@ -86,11 +86,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer): TpStreamPlayer {
         player.release()
     }
 
-    override fun getVideoFormat(): Format? {
-        return player.videoFormat
-    }
-
-    override fun getCurrentTrackGroups(): ImmutableList<Tracks.Group> {
-        return player.currentTracks.groups
-    }
+    override fun getVideoFormat(): Format? = player.videoFormat
+    override fun getCurrentTrackGroups(): ImmutableList<Tracks.Group> = player.currentTracks.groups
 }

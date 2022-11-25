@@ -19,15 +19,18 @@ class OrientationListener(val context: Context): OrientationEventListener(contex
             return
         }
 
+        if (isLandscape != isOrientationChanged(orientation)) {
+            isLandscape = !isLandscape
+            listener?.onChange(isLandscape)
+        }
+    }
+
+    private fun isOrientationChanged(orientation: Int): Boolean {
         var isLandscapeCurrently = false
         if (orientation in 45..135 || orientation in 225..300) {
             isLandscapeCurrently = true
         }
-
-        if (isLandscape != isLandscapeCurrently) {
-            isLandscape = isLandscapeCurrently
-            listener?.onChange(isLandscape)
-        }
+        return isLandscapeCurrently
     }
 
     fun setOnChangeListener(listener: OnOrientationChangeListener) {

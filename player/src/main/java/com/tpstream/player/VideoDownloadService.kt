@@ -52,7 +52,8 @@ class VideoDownloadService:DownloadService(
             R.drawable.ic_baseline_download_for_offline_24,
             null,
             null,
-            downloads
+            downloads,
+            0
         )
     }
 
@@ -90,6 +91,5 @@ class VideoDownloadService:DownloadService(
             message
         )
     }
-
 
 }

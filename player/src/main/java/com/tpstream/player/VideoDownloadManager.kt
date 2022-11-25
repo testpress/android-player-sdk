@@ -25,10 +25,6 @@ class VideoDownloadManager {
     private lateinit var downloadDirectory: File
     private lateinit var httpDataSourceFactory: DefaultHttpDataSource.Factory
 
-    init {
-        Log.d("TAG", "videoDownloadManager: ---------------")
-    }
-
     fun get(): DownloadManager {
         if (downloadManager == null) {
             initializeDownloadManger()

@@ -31,21 +31,22 @@ class TestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initTpPlayer()
+
+        val format1: Format = videoFormat(500, 0, 1080)
+        val format2: Format = videoFormat(1940185,0,720)
+        val format3: Format = videoFormat(837776, 0, 360)
+        val format4: Format = videoFormat(413306, 0, 240)
+
         view.findViewById<Button>(R.id.bottom_sheet_button).setOnClickListener {
             val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                 player,
                 DefaultTrackSelector.Parameters.Builder(requireContext()).build(),
                 immutableListOf(
                     Tracks.Group(
-                        TrackGroup(
-                            Format.Builder()
-                                .setHeight(1080)
-                                .setAverageBitrate(1000000)
-                                .build()
-                        ),
-                        false,
-                        intArrayOf(C.FORMAT_HANDLED),
-                        booleanArrayOf(true)
+                        TrackGroup(format1,format2,format3,format4),
+                        true,
+                        intArrayOf(C.FORMAT_HANDLED,C.FORMAT_HANDLED,C.FORMAT_HANDLED,C.FORMAT_HANDLED),
+                        booleanArrayOf(true,false,false,false)
                     )
                 )
             )
@@ -54,6 +55,16 @@ class TestFragment : Fragment() {
                 "AdvancedSheetDownload"
             )
         }
+    }
+
+    private fun videoFormat(bitrate: Int, width: Int, height: Int): Format {
+        return Format.Builder()
+            .setSampleMimeType(MimeTypes.VIDEO_H264)
+            .setAverageBitrate(bitrate)
+            .setPeakBitrate(bitrate)
+            .setWidth(width)
+            .setHeight(height)
+            .build()
     }
 
     private fun initTpPlayer() {

@@ -10,14 +10,14 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
 
-class CustomHttpDrmMediaCallback(context: Context,val orgCode: String, val videoUUID: String, val accessToken: String):MediaDrmCallback {
+class CustomHttpDrmMediaCallback(context: Context, private val tpInitParams: TpInitParams):MediaDrmCallback {
     private val httpMediaDrmCallback = HttpMediaDrmCallback("", VideoDownloadManager(context).getHttpDataSourceFactory())
 
     private fun fetchDRMLicenseURL(): String {
-        val url = "/api/v2.5/drm_license/${videoUUID}/?access_token=${accessToken}"
+        val url = "/api/v2.5/drm_license/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}"
         val body: RequestBody = ("{\"download\":true}").toRequestBody("application/json".toMediaTypeOrNull())
         return try {
-            val result = Network<DRMLicenseURL>(orgCode).post(url, body)
+            val result = Network<DRMLicenseURL>(tpInitParams.orgCode).post(url, body)
             result?.licenseUrl ?: ""
         } catch (exception:TPException){
             ""

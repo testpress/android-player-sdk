@@ -30,12 +30,7 @@ object OfflineDRMLicenseHelper {
                 VideoDownloadManager(context).getHttpDataSourceFactory().createDataSource()
             val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
             val sessionManager = DefaultDrmSessionManager.Builder().build(
-                CustomHttpDrmMediaCallback(
-                    context,
-                    tpInitParams.orgCode,
-                    tpInitParams.videoId!!,
-                    tpInitParams.accessToken!!
-                )
+                CustomHttpDrmMediaCallback(context, tpInitParams)
             )
             val drmInitData =
                 DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
@@ -105,12 +100,7 @@ object OfflineDRMLicenseHelper {
     ) {
         val sessionManager = DefaultDrmSessionManager.Builder()
             .build(
-                CustomHttpDrmMediaCallback(
-                    context,
-                    tpInitParams.orgCode,
-                    tpInitParams.videoId!!,
-                    tpInitParams.accessToken!!
-                )
+                CustomHttpDrmMediaCallback(context, tpInitParams)
             )
         val offlineLicenseHelper = OfflineLicenseHelper(
             sessionManager, DrmSessionEventListener.EventDispatcher()
@@ -129,7 +119,7 @@ object OfflineDRMLicenseHelper {
     }
 }
 
-object VideoPlayerUtil{
+object VideoPlayerUtil {
     @JvmStatic
     fun getAudioOrVideoInfoWithDrmInitData(helper: DownloadHelper): Format? {
         for (periodIndex in 0 until helper.periodCount) {

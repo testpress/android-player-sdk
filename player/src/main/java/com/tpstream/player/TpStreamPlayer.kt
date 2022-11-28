@@ -56,12 +56,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         if (downloadTask == null || !downloadTask.isDownloaded()) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(
-                    CustomHttpDrmMediaCallback(
-                        context,
-                        params.orgCode,
-                        params.videoId!!,
-                        params.accessToken!!
-                    )
+                    CustomHttpDrmMediaCallback(context, params)
                 )
             }
         }

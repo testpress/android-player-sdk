@@ -47,14 +47,7 @@ class VideoDownloadRequestCreationHandler(
 
     private fun getDownloadHelper(): DownloadHelper {
         val sessionManager = DefaultDrmSessionManager.Builder()
-            .build(
-                CustomHttpDrmMediaCallback(
-                    context,
-                    tpInitParams.orgCode,
-                    tpInitParams.videoId!!,
-                    tpInitParams.accessToken!!
-                )
-            )
+            .build(CustomHttpDrmMediaCallback(context, tpInitParams))
         sessionManager.setMode(DefaultDrmSessionManager.MODE_DOWNLOAD, null)
         val dataSourceFactory = VideoDownloadManager(context).build()
         val renderersFactory = DefaultRenderersFactory(context)

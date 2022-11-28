@@ -92,7 +92,6 @@
                 style="@style/ExoStyledControls.Button.Bottom"
                 android:src="@drawable/ic_baseline_download_for_offline_24"/>
 
-
         </LinearLayout>
 
         <HorizontalScrollView android:id="@id/exo_extra_controls_scroll_view"

@@ -48,10 +48,10 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         var downloadTask: DownloadTask? = null
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build())
-        val url = TPStreamsDatabase.invoke(context).videoInfoDao()
+        val downloadedUrl = TPStreamsDatabase.invoke(context).videoInfoDao()
             .getVideoInfoByVideoId(params.videoId!!)?.dashUrl
-        if (url != null) {
-            downloadTask = DownloadTask(url, context)
+        if (downloadedUrl != null) {
+            downloadTask = DownloadTask(downloadedUrl, context)
         }
         if (downloadTask == null || !downloadTask.isDownloaded()) {
             mediaSourceFactory.setDrmSessionManagerProvider {

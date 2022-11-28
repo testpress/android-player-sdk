@@ -93,7 +93,7 @@ class TpStreamPlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ///viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
+        //viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
         initializePlayer()
         addCustomPlayerControls()
     }
@@ -194,11 +194,10 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun addDownloadControls() {
         val downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
-        val url = TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
+        val downloadedUrl = TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
             .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl
-        Log.d("TAG", "addDownloadControls: $url")
-        if (url != null){
-            val downloadTask = DownloadTask(url, requireContext())
+        if (downloadedUrl != null){
+            val downloadTask = DownloadTask(downloadedUrl, requireContext())
             if (downloadTask.isDownloaded()) {
                 downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
                 return

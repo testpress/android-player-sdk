@@ -2,8 +2,6 @@ package com.tpstream.player
 
 import com.google.gson.Gson
 import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import java.net.URL
 

@@ -1,9 +1,7 @@
 package com.tpstream.player.views
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,10 +33,10 @@ class DownloadResolutionSelectionSheet(
     private val binding get() = _binding!!
     private var videoInfo = player.videoInfo
     private val tpInitParams = player.params
+    private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()
-
-    private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
+    var isResolutionSelected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,16 +89,20 @@ class DownloadResolutionSelectionSheet(
 
     private fun setOnClickListeners() {
         binding.startDownload.setOnClickListener {
-            val downloadRequest =
-                videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
-            DownloadTask(
-                downloadRequest.uri.toString(),
-                requireContext()
-            ).start(downloadRequest)
-            Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
-            videoInfo.videoId = tpInitParams.videoId!!
-            TPStreamsDatabase.invoke(requireContext()).videoInfoDao().insert(videoInfo)
-            dismiss()
+            if (isResolutionSelected){
+                val downloadRequest =
+                    videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
+                DownloadTask(
+                    downloadRequest.uri.toString(),
+                    requireContext()
+                ).start(downloadRequest)
+                Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
+                videoInfo.videoId = tpInitParams.videoId!!
+                TPStreamsDatabase.invoke(requireContext()).videoInfoDao().insert(videoInfo)
+                dismiss()
+            } else {
+                Toast.makeText(requireContext(), "Please choose download quality", Toast.LENGTH_SHORT).show()
+            }
         }
         binding.cancelDownload.setOnClickListener { dismiss() }
     }
@@ -143,6 +145,10 @@ class DownloadResolutionSelectionSheet(
             track.text = getResolution(resolution.format.height)
 
             track.isChecked = trackPosition == position
+
+            if (track.isChecked){
+                isResolutionSelected = true
+            }
 
             view.findViewById<TextView>(R.id.track_size).text = getVideoSize(resolution)
 

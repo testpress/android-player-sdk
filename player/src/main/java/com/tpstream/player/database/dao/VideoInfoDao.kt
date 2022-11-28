@@ -13,7 +13,7 @@ interface VideoInfoDao {
     fun delete(videoInfo: VideoInfo)
 
     @Query("SELECT * FROM videoinfo")
-    fun getAllVideoInfo():List<VideoInfo>
+    fun getAllVideoInfo():List<VideoInfo>?
 
     @Query("SELECT * FROM videoinfo WHERE videoId=:videoID")
     fun getVideoInfoByVideoId(videoID:String):VideoInfo?

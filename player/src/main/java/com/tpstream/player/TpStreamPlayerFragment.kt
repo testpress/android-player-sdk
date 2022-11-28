@@ -3,48 +3,33 @@ package com.tpstream.player
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.pm.ActivityInfo
-import android.hardware.SensorManager
+import android.media.MediaCodec
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
-import androidx.media3.datasource.DataSource
-import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
-import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.database.TPStreamsDatabase
-import com.tpstream.player.database.dao.VideoInfoDao
-import com.tpstream.player.Util.getRendererIndex
 import com.tpstream.player.views.Util.getRendererIndex
-import androidx.media3.ui.PlayerView
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
-import com.tpstream.player.views.Util.getRendererIndex
-import com.tpstream.player.views.VideoResolutionSelectionSheet
 
 @UnstableApi
 class TpStreamPlayerFragment : Fragment() {
@@ -66,8 +51,6 @@ class TpStreamPlayerFragment : Fragment() {
     lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
     lateinit var orientationEventListener: OrientationListener
-    //private lateinit var videoInfoDao: VideoInfoDao
-    private var videoInfo: VideoInfo? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -211,21 +194,16 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun addDownloadControls() {
         val downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
-
-        try {
-            val downloadTask = DownloadTask(
-                TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
-                    .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!,
-                requireContext()
-            )
+        val url = TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
+            .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl
+        Log.d("TAG", "addDownloadControls: $url")
+        if (url != null){
+            val downloadTask = DownloadTask(url, requireContext())
             if (downloadTask.isDownloaded()) {
                 downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
                 return
             }
-        } catch (exception: Exception) {
-            Log.d("TAG", "addDownloadControls: Video Not Download")
         }
-
         downloadButton.setOnClickListener {
             val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                 player!!,
@@ -234,7 +212,7 @@ class TpStreamPlayerFragment : Fragment() {
             )
             downloadResolutionSelectionSheet.show(
                 requireActivity().supportFragmentManager,
-                "AdvancedSheetDownload"
+                "DownloadSelectionSheet"
             )
         }
     }
@@ -282,36 +260,8 @@ class TpStreamPlayerFragment : Fragment() {
             .build()
             .also { exoPlayer ->
                 viewBinding.videoView.player = exoPlayer
-                exoPlayer.addListener(PlayerListener())
+                exoPlayer.addListener(playbackStateListener)
             }
-    }
-
-    private fun getMediaSourceFactory(): MediaSource.Factory {
-        var downloadTask: DownloadTask? = null
-        val mediaSourceFactory = DefaultMediaSourceFactory(requireContext())
-            .setDataSourceFactory(VideoDownloadManager(requireContext()).build())
-        try {
-            downloadTask = DownloadTask(
-                TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
-                    .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!,
-                requireContext()
-            )
-        } catch (exception: Exception) {
-            Log.d("TAG", "getMediaSourceFactory: Video Not Download")
-        }
-        if (downloadTask == null || !downloadTask.isDownloaded()) {
-            mediaSourceFactory.setDrmSessionManagerProvider {
-                DefaultDrmSessionManager.Builder().build(
-                    CustomHttpDrmMediaCallback(
-                        requireContext(),
-                        player?.params?.orgCode!!,
-                        player?.params?.videoId!!,
-                        player?.params?.accessToken!!
-                    )
-                )
-            }
-        }
-        return mediaSourceFactory
     }
 
     override fun onPause() {
@@ -378,7 +328,6 @@ class TpStreamPlayerFragment : Fragment() {
 
     }
 
-
     class PlayerAnalyticsListener : AnalyticsListener {
         private val TAG = "AnalyticsListener"
         override fun onRenderedFirstFrame(
@@ -409,7 +358,6 @@ class TpStreamPlayerFragment : Fragment() {
             super.onDroppedVideoFrames(eventTime, droppedFrames, elapsedMs)
         }
     }
-
 }
 
 interface InitializationListener {

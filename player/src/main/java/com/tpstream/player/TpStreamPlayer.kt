@@ -9,15 +9,12 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Tracks
-import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import com.google.common.collect.ImmutableList
-import androidx.media3.exoplayer.trackselection.ExoTrackSelection
-import com.tpstream.player.models.DRMLicenseURL
 import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.VideoInfo
 
@@ -38,7 +35,7 @@ public interface TpStreamPlayer {
     fun getDuration(): Long
 }
 
-class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPlayer {
+class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStreamPlayer {
     override lateinit var params: TpInitParams
     override lateinit var videoInfo: VideoInfo
 
@@ -51,15 +48,10 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
         var downloadTask: DownloadTask? = null
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build())
-        Log.d("TAG", "${params.videoId}")
-        try {
-            downloadTask = DownloadTask(
-                TPStreamsDatabase.invoke(context).videoInfoDao()
-                    .getVideoInfoByVideoId(params.videoId!!)?.dashUrl!!,
-                context
-            )
-        } catch (exception: Exception) {
-            Log.d("TAG", "getMediaSourceFactory: Video Not Download")
+        val url = TPStreamsDatabase.invoke(context).videoInfoDao()
+            .getVideoInfoByVideoId(params.videoId!!)?.dashUrl
+        if (url != null) {
+            downloadTask = DownloadTask(url, context)
         }
         if (downloadTask == null || !downloadTask.isDownloaded()) {
             mediaSourceFactory.setDrmSessionManagerProvider {
@@ -76,17 +68,18 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
         return mediaSourceFactory
     }
 
-    internal fun getMediaItem(url:String):MediaItem {
+    internal fun getMediaItem(url: String): MediaItem {
         val downloadTask = DownloadTask(url, context)
         var mediaItem = MediaItem.Builder()
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_MPD)
-            .setDrmConfiguration(MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                .setMultiSession(true)
-                .build())
+            .setDrmConfiguration(
+                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setMultiSession(true)
+                    .build()
+            )
             .build()
         val downloadRequest: DownloadRequest? = VideoDownload.getDownloadRequest(url, context)
-        Log.d("TAG", "getMediaItem: $url ${downloadTask.isDownloaded()}")
         if (downloadTask.isDownloaded() && downloadRequest != null) {
             val builder = mediaItem.buildUpon()
             builder
@@ -95,9 +88,11 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
                 .setCustomCacheKey(downloadRequest.customCacheKey)
                 .setMimeType(downloadRequest.mimeType)
                 .setStreamKeys(downloadRequest.streamKeys)
-                .setDrmConfiguration(MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                    .setKeySetId(downloadRequest.keySetId)
-                    .build())
+                .setDrmConfiguration(
+                    MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                        .setKeySetId(downloadRequest.keySetId)
+                        .build()
+                )
 
             mediaItem = builder.build()
         }
@@ -106,23 +101,24 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
 
     override fun load(parameters: TpInitParams) {
         params = parameters
-        val url = "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
+        val url =
+            "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
         Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
                 result.dashUrl?.let {
                     Handler(Looper.getMainLooper()).post {
-                       load(it)
+                        load(it)
                     }
                 }
             }
 
             override fun onFailure(exception: TPException) {
                 Handler(Looper.getMainLooper()).post {
-                    try{
-                        load(TPStreamsDatabase.invoke(context).videoInfoDao().getVideoInfoByVideoId(parameters.videoId!!)?.dashUrl!!)
-                    } catch (exception : Exception){
-                        Log.d("TAG", "Video not in offline")
+                    val downloadUrl = TPStreamsDatabase.invoke(context).videoInfoDao()
+                        .getVideoInfoByVideoId(parameters.videoId!!)?.dashUrl
+                    if (downloadUrl != null) {
+                        load(url)
                     }
                 }
                 Log.d("TAG", "onFailure: ")
@@ -138,7 +134,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
     override fun getPlaybackState(): Int = player.playbackState
     override fun getCurrentTime(): Long = player.currentPosition
     override fun getBufferedTime(): Long = player.bufferedPosition
-    override fun getDuration(): Long = player.duration
 
     override fun setPlaybackSpeed(speed: Float) {
         player.setPlaybackSpeed(speed)
@@ -154,4 +149,5 @@ class TpStreamPlayerImpl(val player: ExoPlayer,val context: Context): TpStreamPl
 
     override fun getVideoFormat(): Format? = player.videoFormat
     override fun getCurrentTrackGroups(): ImmutableList<Tracks.Group> = player.currentTracks.groups
+    override fun getDuration(): Long = player.duration
 }

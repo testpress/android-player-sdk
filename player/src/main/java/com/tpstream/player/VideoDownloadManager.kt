@@ -2,7 +2,6 @@ package com.tpstream.player
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.media3.database.DatabaseProvider
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource

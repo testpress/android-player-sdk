@@ -2,9 +2,6 @@ package com.tpstream.app
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import com.tpstream.player.*
-import android.util.Log
 import com.tpstream.player.InitializationListener
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.TpStreamPlayer
@@ -54,12 +51,5 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    fun videoDownloadButton(view: View){
-
-    }
-
-    fun videoDeleteButton(view: View){
-
-    }
 }
 

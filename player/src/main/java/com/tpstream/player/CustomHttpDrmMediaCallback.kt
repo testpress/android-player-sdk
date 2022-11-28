@@ -34,7 +34,6 @@ class CustomHttpDrmMediaCallback(context: Context, private val tpInitParams: TpI
 
     override fun executeKeyRequest(uuid: UUID, request: ExoMediaDrm.KeyRequest): ByteArray {
         val licenseURL = fetchDRMLicenseURL()
-        Log.d("TAG", "executeKeyRequest: $licenseURL")
         val updatedRequest = ExoMediaDrm.KeyRequest(request.data, licenseURL)
         return httpMediaDrmCallback.executeKeyRequest(uuid, updatedRequest)
     }

@@ -25,11 +25,11 @@ class VideoInfoDaoTest : TPStreamsDatabaseTest() {
         val videoInfo = createData()
         db.videoInfoDao().insert(videoInfo)
 
-        assertTrue(db.videoInfoDao().getAllVideoInfo().isNotEmpty())
+        assertTrue(db.videoInfoDao().getAllVideoInfo()!!.isNotEmpty())
 
         db.videoInfoDao().delete(videoInfo)
 
-        assertTrue(db.videoInfoDao().getAllVideoInfo().isEmpty())
+        assertTrue(db.videoInfoDao().getAllVideoInfo()!!.isEmpty())
     }
 
     @Test
@@ -50,7 +50,7 @@ class VideoInfoDaoTest : TPStreamsDatabaseTest() {
         db.videoInfoDao().insert(data2)
         db.videoInfoDao().insert(data3)
 
-        assertThat(db.videoInfoDao().getAllVideoInfo().size, equalTo(3))
+        assertThat(db.videoInfoDao().getAllVideoInfo()!!.size, equalTo(3))
     }
 
     private fun createData(count: String = ""): VideoInfo {

@@ -19,7 +19,7 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
-        selectVideoParams(intent.getIntExtra("params",-1))
+        selectVideoParams(intent.getIntExtra("VideoParameter",-1))
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
         playerFragment.enableAutoFullScreenOnRotate()

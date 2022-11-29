@@ -5,6 +5,8 @@ import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.media.MediaCodec
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +32,8 @@ import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 @UnstableApi
 class TpStreamPlayerFragment : Fragment() {
@@ -194,13 +198,18 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun addDownloadControls() {
         val downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
-        val downloadedUrl = TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
-            .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl
-        if (downloadedUrl != null){
-            val downloadTask = DownloadTask(downloadedUrl, requireContext())
-            if (downloadTask.isDownloaded()) {
-                downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-                return
+        runBlocking(Dispatchers.IO){
+            val downloadedUrl = TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
+                .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl
+            if (downloadedUrl != null){
+                val downloadTask = DownloadTask(downloadedUrl, requireContext())
+                if (downloadTask.isDownloaded()) {
+                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
+                    downloadButton.visibility = View.VISIBLE
+                    return@runBlocking
+                }
+            } else{
+                downloadButton.visibility = View.VISIBLE
             }
         }
         downloadButton.setOnClickListener {

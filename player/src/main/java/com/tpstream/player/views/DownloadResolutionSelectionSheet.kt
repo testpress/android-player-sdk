@@ -20,6 +20,8 @@ import com.tpstream.player.*
 import com.tpstream.player.R
 import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import okio.IOException
 import kotlin.math.roundToInt
 
@@ -43,7 +45,7 @@ class DownloadResolutionSelectionSheet(
         videoDownloadRequestCreateHandler =
             VideoDownloadRequestCreationHandler(
                 requireContext(),
-                videoInfo,
+                videoInfo!!,
                 tpInitParams
             )
         videoDownloadRequestCreateHandler.listener = this
@@ -97,8 +99,10 @@ class DownloadResolutionSelectionSheet(
                     requireContext()
                 ).start(downloadRequest)
                 Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
-                videoInfo.videoId = tpInitParams.videoId!!
-                TPStreamsDatabase.invoke(requireContext()).videoInfoDao().insert(videoInfo)
+                runBlocking(Dispatchers.IO){
+                    videoInfo?.videoId = tpInitParams.videoId!!
+                    TPStreamsDatabase.invoke(requireContext()).videoInfoDao().insert(videoInfo!!)
+                }
                 dismiss()
             } else {
                 Toast.makeText(requireContext(), "Please choose download quality", Toast.LENGTH_SHORT).show()

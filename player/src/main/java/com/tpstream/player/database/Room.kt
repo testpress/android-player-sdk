@@ -20,7 +20,6 @@ abstract class TPStreamsDatabase : RoomDatabase() {
                 if (!::INSTANCE.isInitialized) {
                     INSTANCE = Room.databaseBuilder(context.applicationContext,
                         TPStreamsDatabase::class.java, "tpStreams-database")
-                        .allowMainThreadQueries()
                         .build()
                 }
             }

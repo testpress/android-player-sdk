@@ -325,7 +325,7 @@ class TpStreamPlayerFragment : Fragment() {
         }
 
         override fun onLicenseFetchFailure() {
-            TODO("Not yet implemented")
+            Log.d(TAG, "onLicenseFetchFailure: ")
         }
 
         private fun isDRMException(cause: Throwable): Boolean {

@@ -2,6 +2,7 @@ package com.tpstream.player
 
 
 import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import androidx.media3.common.TrackGroup
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.exoplayer.offline.Download
@@ -9,6 +10,7 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.models.VideoInfo
+import com.tpstream.player.views.DownloadResolutionSelectionSheet
 
 class DownloadTask private constructor(val context: Context) {
 
@@ -22,22 +24,6 @@ class DownloadTask private constructor(val context: Context) {
         this.url = url
     }
 
-    constructor(tpInitParams: TpInitParams,context: Context):this(context){
-        this.tpInitParams = tpInitParams
-        val urlUrl = "/api/v2.5/video_info/C3XLe1CCcOq/?access_token=c381512b-7337-4d8e-a8cf-880f4f08fd08"
-        Network<VideoInfo>(tpInitParams.orgCode).get(urlUrl,object :Network.TPResponse<VideoInfo>{
-            override fun onSuccess(result: VideoInfo) {
-                this@DownloadTask.videoInfo = result
-                VideoDownloadRequestCreationHandler(this@DownloadTask.context,videoInfo,this@DownloadTask.tpInitParams)
-            }
-
-            override fun onFailure(exception: TPException) {
-                TODO("Not yet implemented")
-            }
-
-        })
-    }
-
     init {
         trackSelector = DefaultTrackSelector(context)
         override = trackSelector.parameters.overrides.toMutableMap()
@@ -47,8 +33,8 @@ class DownloadTask private constructor(val context: Context) {
     private val downloadIndex = downloadManager.downloadIndex
 
 
-    fun start(downloadQuality:Int){
-        Thread.sleep(5000)
+    fun start(){
+
         start(VideoDownloadRequestCreationHandler(
             context,
             videoInfo,

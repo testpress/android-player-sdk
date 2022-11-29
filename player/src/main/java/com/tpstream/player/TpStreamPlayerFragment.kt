@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -205,23 +206,30 @@ class TpStreamPlayerFragment : Fragment() {
                 val downloadTask = DownloadTask(downloadedUrl, requireContext())
                 if (downloadTask.isDownloaded()) {
                     downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
+                    downloadButton.tag = "Downloaded"
                     downloadButton.visibility = View.VISIBLE
                     return@runBlocking
                 }
             } else{
+                downloadButton.tag = "Not Downloaded"
                 downloadButton.visibility = View.VISIBLE
             }
         }
         downloadButton.setOnClickListener {
-            val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
-                player!!,
-                trackSelector.parameters,
-                _player!!.currentTracks.groups,
-            )
-            downloadResolutionSelectionSheet.show(
-                requireActivity().supportFragmentManager,
-                "DownloadSelectionSheet"
-            )
+            if (downloadButton.tag == "Not Downloaded"){
+                val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
+                    player!!,
+                    trackSelector.parameters,
+                    _player!!.currentTracks.groups,
+                )
+                downloadResolutionSelectionSheet.show(
+                    requireActivity().supportFragmentManager,
+                    "DownloadSelectionSheet"
+                )
+            } else {
+                Toast.makeText(requireContext(),"Download Already Completed",Toast.LENGTH_SHORT).show()
+            }
+
         }
     }
 

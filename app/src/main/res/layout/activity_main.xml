@@ -42,15 +42,4 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="560dp" />
 
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Download List"
-        android:onClick="downloadListButton"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

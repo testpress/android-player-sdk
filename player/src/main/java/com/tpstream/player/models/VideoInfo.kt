@@ -1,6 +1,5 @@
 package com.tpstream.player.models
 
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class VideoInfo(

@@ -27,5 +27,9 @@ data class VideoInfo(
     val description: String?,
 
     @SerializedName("transcoding_status")
-    val transcodingStatus: String?
+    val transcodingStatus: String?,
+
+    var percentageDownloaded: Int = 0,
+    var bytesDownloaded: Long = 0,
+    var totalSize: Long = 0,
 )

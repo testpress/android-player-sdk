@@ -1,14 +1,13 @@
 package com.tpstream.player
 
 import android.app.Notification
-import android.app.PendingIntent
-import android.content.Intent
-import android.os.Build
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.offline.*
 import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 
 private const val JOB_ID = 1
@@ -25,9 +24,11 @@ class VideoDownloadService:DownloadService(
 ) , DownloadManager.Listener{
 
     private lateinit var notificationHelper: DownloadNotificationHelper
+    private lateinit var videoInfoRepository: VideoInfoRepository
 
     override fun onCreate() {
         super.onCreate()
+        videoInfoRepository = VideoInfoRepository(this)
         notificationHelper = DownloadNotificationHelper(this, CHANNEL_ID)
     }
 
@@ -65,7 +66,12 @@ class VideoDownloadService:DownloadService(
         var notification: Notification? = null
 
         when (download.state) {
-            Download.STATE_COMPLETED -> notification = getCompletedNotification()
+            Download.STATE_COMPLETED ->{
+                notification = getCompletedNotification()
+                runBlocking(Dispatchers.IO){
+                    videoInfoRepository.updateDownloadStatus(download)
+                }
+            }
             Download.STATE_FAILED -> notification = getFailedNotification()
         }
 

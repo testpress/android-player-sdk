@@ -2,17 +2,18 @@ package com.tpstream.player
 
 
 import android.content.Context
-import androidx.fragment.app.FragmentActivity
 import androidx.media3.common.TrackGroup
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.VideoInfo
-import com.tpstream.player.views.DownloadResolutionSelectionSheet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
-class DownloadTask private constructor(val context: Context) {
+class DownloadTask (val context: Context) {
 
     private lateinit var url : String
     private lateinit var videoInfo: VideoInfo
@@ -20,7 +21,7 @@ class DownloadTask private constructor(val context: Context) {
     private var trackSelector: DefaultTrackSelector
     private var override: MutableMap<TrackGroup, TrackSelectionOverride>
 
-    internal constructor(url: String, context: Context) : this(context) {
+    constructor(url: String, context: Context) : this(context) {
         this.url = url
     }
 
@@ -100,6 +101,12 @@ class DownloadTask private constructor(val context: Context) {
     fun isBeingDownloaded(): Boolean {
         val download = downloadIndex.getDownload(url)
         return download != null && download.state == Download.STATE_DOWNLOADING
+    }
+
+    fun getAllDownloads():List<VideoInfo>?{
+        return runBlocking(Dispatchers.IO) {
+            TPStreamsDatabase.invoke(context).videoInfoDao().getAllVideoInfo()
+        }
     }
 
 }

@@ -22,4 +22,9 @@ class MainActivity : AppCompatActivity() {
         myIntent.putExtra("VideoParameter",2)
         startActivity(myIntent)
     }
+
+    fun downloadListButton(view: View){
+        val myIntent = Intent(this, DownloadListActivity::class.java)
+        startActivity(myIntent)
+    }
 }

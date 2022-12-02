@@ -5,8 +5,6 @@ import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.media.MediaCodec
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +16,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
@@ -26,15 +26,12 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 
 @UnstableApi
 class TpStreamPlayerFragment : Fragment() {
@@ -56,6 +53,9 @@ class TpStreamPlayerFragment : Fragment() {
     lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
     lateinit var orientationEventListener: OrientationListener
+    private lateinit var videoInfoViewModel: VideoInfoViewModel
+    private lateinit var downloadButton : ImageButton
+    private lateinit var resolutionButton : ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +66,11 @@ class TpStreamPlayerFragment : Fragment() {
                 exitFullScreen()
             }
         }
+        videoInfoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return VideoInfoViewModel(VideoInfoRepository(requireContext())) as T
+            }
+        }).get(VideoInfoViewModel::class.java)
     }
 
     fun enableAutoFullScreenOnRotate() {
@@ -100,7 +105,27 @@ class TpStreamPlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         //viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
         initializePlayer()
+        updateDownloadButtonImage()
         addCustomPlayerControls()
+    }
+
+    private fun updateDownloadButtonImage(){
+        Log.d("TAG", "updateDownloadButtonImage: ${player?.params?.videoId!!}")
+        videoInfoViewModel.get(player?.params?.videoId!!).observe(viewLifecycleOwner) {
+            Log.d("TAG", "updateDownloadButtonImage: ${it?.percentageDownloaded}")
+            when (it?.percentageDownloaded) {
+                100 ->{
+                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24).also { downloadButton.tag = "Downloaded" }
+                    resolutionButton.tag = "Downloaded"
+                }
+                null -> {
+                    downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24).also { downloadButton.tag = "Not Downloaded" }
+                }
+                0 ->{
+                    downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24).also { downloadButton.tag = "Downloading" }
+                }
+            }
+        }
     }
 
     private fun addCustomPlayerControls() {
@@ -138,11 +163,14 @@ class TpStreamPlayerFragment : Fragment() {
     }
 
     private fun addResolutionChangeControl() {
-        val resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
-
+        resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
         resolutionButton.setOnClickListener {
-            val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
-            simpleVideoResolutionSelector.show(requireActivity().supportFragmentManager, SimpleVideoResolutionSelectionSheet.TAG)
+            if (resolutionButton.tag == "Downloaded"){
+                Toast.makeText(requireContext(),"Quality Unavailable",Toast.LENGTH_SHORT).show()
+            } else {
+                val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
+                simpleVideoResolutionSelector.show(requireActivity().supportFragmentManager, SimpleVideoResolutionSelectionSheet.TAG)
+            }
         }
     }
 
@@ -198,38 +226,27 @@ class TpStreamPlayerFragment : Fragment() {
         }
 
     private fun addDownloadControls() {
-        val downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
-        runBlocking(Dispatchers.IO){
-            val downloadedUrl = TPStreamsDatabase.invoke(requireContext()).videoInfoDao()
-                .getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl
-            if (downloadedUrl != null){
-                val downloadTask = DownloadTask(downloadedUrl, requireContext())
-                if (downloadTask.isDownloaded()) {
-                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-                    downloadButton.tag = "Downloaded"
-                    downloadButton.visibility = View.VISIBLE
-                    return@runBlocking
-                }
-            } else{
-                downloadButton.tag = "Not Downloaded"
-                downloadButton.visibility = View.VISIBLE
-            }
-        }
+        downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
         downloadButton.setOnClickListener {
-            if (downloadButton.tag == "Not Downloaded"){
-                val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
-                    player!!,
-                    trackSelector.parameters,
-                    _player!!.currentTracks.groups,
-                )
-                downloadResolutionSelectionSheet.show(
-                    requireActivity().supportFragmentManager,
-                    "DownloadSelectionSheet"
-                )
-            } else {
-                Toast.makeText(requireContext(),"Download Already Completed",Toast.LENGTH_SHORT).show()
+            when (downloadButton.tag) {
+                "Not Downloaded" -> {
+                    val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
+                        player!!,
+                        trackSelector.parameters,
+                        player?.getCurrentTrackGroups()!!,
+                    )
+                    downloadResolutionSelectionSheet.show(
+                        requireActivity().supportFragmentManager,
+                        "DownloadSelectionSheet"
+                    )
+                }
+                "Downloaded" -> {
+                    Toast.makeText(requireContext(),"Download Already Completed",Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    Toast.makeText(requireContext(),"Downloading",Toast.LENGTH_SHORT).show()
+                }
             }
-
         }
     }
 

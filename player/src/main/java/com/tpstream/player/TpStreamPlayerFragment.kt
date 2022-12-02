@@ -26,12 +26,15 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 @UnstableApi
 class TpStreamPlayerFragment : Fragment() {
@@ -115,8 +118,16 @@ class TpStreamPlayerFragment : Fragment() {
             Log.d("TAG", "updateDownloadButtonImage: ${it?.percentageDownloaded}")
             when (it?.percentageDownloaded) {
                 100 ->{
+                    val currentPosition = player?.getCurrentTime()
+                    var url : String? = null
                     downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24).also { downloadButton.tag = "Downloaded" }
                     resolutionButton.tag = "Downloaded"
+                    runBlocking(Dispatchers.IO) {
+                        url = TPStreamsDatabase.invoke(requireContext()).videoInfoDao().getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!
+                    }
+                    val tpImp = TpStreamPlayerImpl(_player!!, requireContext())
+                    tpImp.params = player?.params!!
+                    tpImp.load(url!!,currentPosition!!)
                 }
                 null -> {
                     downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24).also { downloadButton.tag = "Not Downloaded" }

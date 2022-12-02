@@ -41,8 +41,9 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     override lateinit var params: TpInitParams
     override var videoInfo: VideoInfo? = null
 
-    private fun load(url: String) {
+    internal fun load(url: String,startPosition: Long = 0) {
         player.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
+        player.seekTo(startPosition)
         player.prepare()
     }
 

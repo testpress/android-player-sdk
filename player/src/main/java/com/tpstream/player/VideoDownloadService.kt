@@ -1,12 +1,17 @@
 package com.tpstream.player
 
 import android.app.Notification
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.offline.*
 import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 
@@ -68,9 +73,7 @@ class VideoDownloadService:DownloadService(
         when (download.state) {
             Download.STATE_COMPLETED ->{
                 notification = getCompletedNotification()
-                runBlocking(Dispatchers.IO){
-                    offlineVideoInfoRepository.updateDownloadStatus(download)
-                }
+                updateDownloadStatus(download)
             }
             Download.STATE_FAILED -> notification = getFailedNotification()
         }
@@ -96,6 +99,12 @@ class VideoDownloadService:DownloadService(
             null,
             message
         )
+    }
+
+    private fun updateDownloadStatus(download:Download){
+        CoroutineScope(Dispatchers.IO).launch{
+            offlineVideoInfoRepository.updateDownloadStatus(download)
+        }
     }
 
 }

@@ -12,10 +12,10 @@ import com.tpstream.player.models.OfflineVideoInfo
 interface OfflineVideoInfoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(offlineVideoInfo: OfflineVideoInfo)
+    suspend fun insert(offlineVideoInfo: OfflineVideoInfo)
 
     @Delete
-    fun delete(offlineVideoInfo: OfflineVideoInfo)
+    suspend fun delete(offlineVideoInfo: OfflineVideoInfo)
 
     @Query("SELECT * FROM OfflineVideoInfo")
     fun getAllOfflineVideoInfo():List<OfflineVideoInfo>?

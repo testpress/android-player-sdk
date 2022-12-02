@@ -26,15 +26,12 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 
 @UnstableApi
 class TpStreamPlayerFragment : Fragment() {
@@ -118,7 +115,7 @@ class TpStreamPlayerFragment : Fragment() {
                 100 ->{
                     downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24).also { downloadButton.tag = "Downloaded" }
                     resolutionButton.tag = "Downloaded"
-                    playOfflineVideo()
+                    //playOfflineVideo()
                 }
                 null -> {
                     downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24).also { downloadButton.tag = "Not Downloaded" }
@@ -132,13 +129,9 @@ class TpStreamPlayerFragment : Fragment() {
 
     private fun playOfflineVideo(){
         val currentPosition = player?.getCurrentTime()
-        var url : String? = null
-        runBlocking(Dispatchers.IO) {
-            url = TPStreamsDatabase.invoke(requireContext()).offlineVideoInfoDao().getOfflineVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!
-        }
-        val tpImp = TpStreamPlayerImpl(_player!!, requireContext())
-        tpImp.params = player?.params!!
-        tpImp.load(url!!,currentPosition!!)
+        Log.d("TAG", "playOfflineVideo: ${player?.videoInfo?.dashUrl}")
+        val tpImp = player as TpStreamPlayerImpl
+        tpImp.load(player?.videoInfo?.dashUrl!!,currentPosition!!)
     }
 
     private fun addCustomPlayerControls() {

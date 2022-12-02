@@ -15,10 +15,8 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import com.google.common.collect.ImmutableList
-import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.OfflineVideoInfo
 import com.tpstream.player.models.VideoInfo
-import com.tpstream.player.models.asOfflineVideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -105,7 +103,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     private fun checkVideoIsDownloaded(parameters: TpInitParams):Boolean{
         runBlocking(Dispatchers.IO) {
             offlineVideoInfo = try {
-                TPStreamsDatabase.invoke(context).offlineVideoInfoDao().getOfflineVideoInfoByVideoId(parameters.videoId!!)
+                OfflineVideoInfoRepository(context).getOfflineVideoInfoByVideoId(parameters.videoId!!)
             } catch (exception: Exception){
                 null
             }

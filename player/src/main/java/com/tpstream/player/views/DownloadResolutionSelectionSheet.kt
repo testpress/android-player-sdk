@@ -9,6 +9,8 @@ import android.widget.ArrayAdapter
 import android.widget.CheckedTextView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
@@ -18,11 +20,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.*
 import com.tpstream.player.R
-import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
 import com.tpstream.player.models.asOfflineVideoInfo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import okio.IOException
 import kotlin.math.roundToInt
 
@@ -40,6 +39,7 @@ class DownloadResolutionSelectionSheet(
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()
     var isResolutionSelected = false
+    private lateinit var offlineVideoInfoViewModel: OfflineVideoInfoViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +71,11 @@ class DownloadResolutionSelectionSheet(
         initializeTrackSelectionView()
         setOnClickListeners()
         configureBottomSheetBehaviour()
+        offlineVideoInfoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return OfflineVideoInfoViewModel(OfflineVideoInfoRepository(requireContext())) as T
+            }
+        }).get(OfflineVideoInfoViewModel::class.java)
     }
 
     private fun initializeTrackSelectionView() {
@@ -100,10 +105,8 @@ class DownloadResolutionSelectionSheet(
                     requireContext()
                 ).start(downloadRequest)
                 Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
-                runBlocking(Dispatchers.IO){
-                    offlineVideoInfo?.videoId = tpInitParams.videoId!!
-                    TPStreamsDatabase.invoke(requireContext()).offlineVideoInfoDao().insert(offlineVideoInfo!!)
-                }
+                offlineVideoInfo?.videoId = tpInitParams.videoId!!
+                offlineVideoInfoViewModel.insert(offlineVideoInfo!!)
                 dismiss()
             } else {
                 Toast.makeText(requireContext(), "Please choose download quality", Toast.LENGTH_SHORT).show()

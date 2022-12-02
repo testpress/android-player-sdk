@@ -26,11 +26,13 @@ class VideoDownloadService:DownloadService(
 
     private lateinit var notificationHelper: DownloadNotificationHelper
     private lateinit var offlineVideoInfoRepository: OfflineVideoInfoRepository
+    private lateinit var downloadCallback : DownloadCallback
 
     override fun onCreate() {
         super.onCreate()
         offlineVideoInfoRepository = OfflineVideoInfoRepository(this)
         notificationHelper = DownloadNotificationHelper(this, CHANNEL_ID)
+        downloadCallback = DownloadCallback.invoke()
     }
 
 
@@ -69,6 +71,7 @@ class VideoDownloadService:DownloadService(
         when (download.state) {
             Download.STATE_COMPLETED ->{
                 notification = getCompletedNotification()
+                downloadCallback.onDownloadSuccess()
                 updateDownloadStatus(download)
             }
             Download.STATE_FAILED -> notification = getFailedNotification()
@@ -103,4 +106,31 @@ class VideoDownloadService:DownloadService(
         }
     }
 
+}
+
+class DownloadCallback private constructor(){
+
+    var callback: Listener? = null
+
+    fun onDownloadSuccess() {
+        callback?.onDownloadsSuccess()
+    }
+
+    companion object {
+
+        private lateinit var INSTANCE: DownloadCallback
+
+        operator fun invoke(): DownloadCallback {
+            synchronized(DownloadCallback::class.java) {
+                if (!::INSTANCE.isInitialized) {
+                    INSTANCE = DownloadCallback()
+                }
+                return INSTANCE
+            }
+        }
+    }
+
+    interface Listener {
+        fun onDownloadsSuccess()
+    }
 }

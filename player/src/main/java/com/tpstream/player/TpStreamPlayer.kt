@@ -100,15 +100,16 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         return mediaItem
     }
 
-    private fun checkVideoIsDownloaded(parameters: TpInitParams):Boolean{
+    private fun checkIsVideoDownloadCompleted(parameters: TpInitParams):Boolean{
+        var downloadTask : DownloadTask? = null
         runBlocking(Dispatchers.IO) {
-            offlineVideoInfo = try {
-                OfflineVideoInfoRepository(context).getOfflineVideoInfoByVideoId(parameters.videoId!!)
-            } catch (exception: Exception){
-                null
+            offlineVideoInfo = OfflineVideoInfoRepository(context)
+                .getOfflineVideoInfoByVideoId(parameters.videoId!!)
+            if (offlineVideoInfo != null){
+                downloadTask = DownloadTask(offlineVideoInfo?.dashUrl!!,context)
             }
         }
-        if(offlineVideoInfo != null){
+        if(downloadTask != null && downloadTask?.isDownloaded()!!){
             return true
         }
         return false
@@ -116,7 +117,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
 
     override fun load(parameters: TpInitParams) {
         params = parameters
-        if (checkVideoIsDownloaded(parameters)){
+        if (checkIsVideoDownloadCompleted(parameters)){
             Handler(Looper.getMainLooper()).post {
                 if (offlineVideoInfo != null) {
                     load(offlineVideoInfo?.dashUrl!!)

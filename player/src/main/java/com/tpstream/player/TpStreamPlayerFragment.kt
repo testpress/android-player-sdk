@@ -34,7 +34,7 @@ import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
 
 @UnstableApi
-class TpStreamPlayerFragment : Fragment() {
+class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
 //    companion object {
 //        fun newInstance() = TpStreamPlayerFragment()
@@ -107,6 +107,7 @@ class TpStreamPlayerFragment : Fragment() {
         initializePlayer()
         updateDownloadButtonImage()
         addCustomPlayerControls()
+        DownloadCallback.invoke().callback = this
     }
 
     private fun updateDownloadButtonImage(){
@@ -115,7 +116,6 @@ class TpStreamPlayerFragment : Fragment() {
                 100 ->{
                     downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24).also { downloadButton.tag = "Downloaded" }
                     resolutionButton.tag = "Downloaded"
-                    //playOfflineVideo()
                 }
                 null -> {
                     downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24).also { downloadButton.tag = "Not Downloaded" }
@@ -127,11 +127,15 @@ class TpStreamPlayerFragment : Fragment() {
         }
     }
 
+    override fun onDownloadsSuccess() {
+        playOfflineVideo()
+    }
+
     private fun playOfflineVideo(){
         val currentPosition = player?.getCurrentTime()
-        Log.d("TAG", "playOfflineVideo: ${player?.videoInfo?.dashUrl}")
+        val url = player?.videoInfo?.dashUrl!!
         val tpImp = player as TpStreamPlayerImpl
-        tpImp.load(player?.videoInfo?.dashUrl!!,currentPosition!!)
+        tpImp.load(url,currentPosition!!)
     }
 
     private fun addCustomPlayerControls() {
@@ -245,6 +249,12 @@ class TpStreamPlayerFragment : Fragment() {
                         requireActivity().supportFragmentManager,
                         "DownloadSelectionSheet"
                     )
+                    downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest ->
+                        DownloadTask(
+                            downloadRequest.uri.toString(),
+                            requireContext()
+                        ).start(downloadRequest)
+                    }
                 }
                 "Downloaded" -> {
                     Toast.makeText(requireContext(),"Download Already Completed",Toast.LENGTH_SHORT).show()

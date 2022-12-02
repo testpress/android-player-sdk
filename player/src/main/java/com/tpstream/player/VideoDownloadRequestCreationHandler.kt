@@ -19,8 +19,7 @@ import java.io.IOException
 
 class VideoDownloadRequestCreationHandler(
     val context: Context,
-    private val videoInfo: VideoInfo,
-    private val tpInitParams: TpInitParams
+    private val player: TpStreamPlayer
 ) :
     DownloadHelper.Callback, DRMLicenseFetchCallback {
     private val downloadHelper: DownloadHelper
@@ -31,7 +30,7 @@ class VideoDownloadRequestCreationHandler(
     private var keySetId: ByteArray? = null
 
     init {
-        val url = videoInfo.dashUrl
+        val url = player.videoInfo?.dashUrl
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         mediaItem = MediaItem.Builder()
             .setUri(url)
@@ -47,7 +46,7 @@ class VideoDownloadRequestCreationHandler(
 
     private fun getDownloadHelper(): DownloadHelper {
         val sessionManager = DefaultDrmSessionManager.Builder()
-            .build(CustomHttpDrmMediaCallback(context, tpInitParams))
+            .build(CustomHttpDrmMediaCallback(context, player.params))
         sessionManager.setMode(DefaultDrmSessionManager.MODE_DOWNLOAD, null)
         val dataSourceFactory = VideoDownloadManager(context).build()
         val renderersFactory = DefaultRenderersFactory(context)
@@ -65,7 +64,7 @@ class VideoDownloadRequestCreationHandler(
         val isDRMProtectedVideo = videoOrAudioData != null
         if (isDRMProtectedVideo) {
             if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
-                OfflineDRMLicenseHelper.fetchLicense(context, tpInitParams, downloadHelper, this)
+                OfflineDRMLicenseHelper.fetchLicense(context, player.params, downloadHelper, this)
             } else {
                 Toast.makeText(
                     context,
@@ -95,7 +94,7 @@ class VideoDownloadRequestCreationHandler(
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
         override = overrides
         setSelectedTracks(overrides)
-        val name = videoInfo.title!!
+        val name = player.videoInfo?.title!!
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 

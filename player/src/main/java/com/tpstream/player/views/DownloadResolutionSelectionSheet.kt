@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
 import androidx.media3.exoplayer.offline.DownloadHelper
+import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -24,6 +25,8 @@ import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
 import com.tpstream.player.models.asOfflineVideoInfo
 import okio.IOException
 import kotlin.math.roundToInt
+
+typealias OnSubmitListener = (DownloadRequest) -> Unit
 
 class DownloadResolutionSelectionSheet(
     val player: TpStreamPlayer,
@@ -40,14 +43,14 @@ class DownloadResolutionSelectionSheet(
         parameters.overrides.toMutableMap()
     var isResolutionSelected = false
     private lateinit var offlineVideoInfoViewModel: OfflineVideoInfoViewModel
+    private var onSubmitListener: OnSubmitListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         videoDownloadRequestCreateHandler =
             VideoDownloadRequestCreationHandler(
                 requireContext(),
-                player.videoInfo!!,
-                tpInitParams
+                player
             )
         videoDownloadRequestCreateHandler.listener = this
     }
@@ -100,10 +103,7 @@ class DownloadResolutionSelectionSheet(
             if (isResolutionSelected){
                 val downloadRequest =
                     videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
-                DownloadTask(
-                    downloadRequest.uri.toString(),
-                    requireContext()
-                ).start(downloadRequest)
+                onSubmitListener?.invoke(downloadRequest)
                 Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
                 offlineVideoInfo?.videoId = tpInitParams.videoId!!
                 offlineVideoInfoViewModel.insert(offlineVideoInfo!!)
@@ -193,6 +193,10 @@ class DownloadResolutionSelectionSheet(
 
     override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {
         dismiss()
+    }
+
+    fun setOnSubmitListener(listener: OnSubmitListener) {
+        onSubmitListener = listener
     }
 
 }

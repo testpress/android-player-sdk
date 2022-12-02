@@ -35,17 +35,6 @@ class DownloadTask (val context: Context) {
     private val downloadIndex = downloadManager.downloadIndex
 
 
-    fun start(){
-
-        start(VideoDownloadRequestCreationHandler(
-            context,
-            videoInfo,
-            tpInitParams
-        ).buildDownloadRequest(override))
-
-    }
-
-
     internal fun start(downloadRequest: DownloadRequest) {
         DownloadService.sendAddDownload(
             context,

@@ -20,6 +20,7 @@ import com.tpstream.player.*
 import com.tpstream.player.R
 import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
+import com.tpstream.player.models.asOfflineVideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okio.IOException
@@ -33,7 +34,7 @@ class DownloadResolutionSelectionSheet(
 
     private var _binding: DownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
-    private var videoInfo = player.videoInfo
+    private val offlineVideoInfo = player.videoInfo?.asOfflineVideoInfo()
     private val tpInitParams = player.params
     private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
@@ -45,7 +46,7 @@ class DownloadResolutionSelectionSheet(
         videoDownloadRequestCreateHandler =
             VideoDownloadRequestCreationHandler(
                 requireContext(),
-                videoInfo!!,
+                player.videoInfo!!,
                 tpInitParams
             )
         videoDownloadRequestCreateHandler.listener = this
@@ -100,8 +101,8 @@ class DownloadResolutionSelectionSheet(
                 ).start(downloadRequest)
                 Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
                 runBlocking(Dispatchers.IO){
-                    videoInfo?.videoId = tpInitParams.videoId!!
-                    TPStreamsDatabase.invoke(requireContext()).videoInfoDao().insert(videoInfo!!)
+                    offlineVideoInfo?.videoId = tpInitParams.videoId!!
+                    TPStreamsDatabase.invoke(requireContext()).offlineVideoInfoDao().insert(offlineVideoInfo!!)
                 }
                 dismiss()
             } else {

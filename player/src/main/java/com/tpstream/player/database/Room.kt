@@ -4,13 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.tpstream.player.database.dao.VideoInfoDao
-import com.tpstream.player.models.VideoInfo
+import com.tpstream.player.database.dao.OfflineVideoInfoDao
+import com.tpstream.player.models.OfflineVideoInfo
 
-@Database(version = 1, entities = [VideoInfo::class], exportSchema = true)
+@Database(version = 1, entities = [OfflineVideoInfo::class], exportSchema = true)
 abstract class TPStreamsDatabase : RoomDatabase() {
 
-    abstract fun videoInfoDao():VideoInfoDao
+    abstract fun offlineVideoInfoDao():OfflineVideoInfoDao
 
     companion object {
         private lateinit var INSTANCE: TPStreamsDatabase

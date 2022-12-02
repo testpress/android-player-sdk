@@ -9,6 +9,7 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.database.TPStreamsDatabase
+import com.tpstream.player.models.OfflineVideoInfo
 import com.tpstream.player.models.VideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -103,9 +104,9 @@ class DownloadTask (val context: Context) {
         return download != null && download.state == Download.STATE_DOWNLOADING
     }
 
-    fun getAllDownloads():List<VideoInfo>?{
+    fun getAllDownloads():List<OfflineVideoInfo>?{
         return runBlocking(Dispatchers.IO) {
-            TPStreamsDatabase.invoke(context).videoInfoDao().getAllVideoInfo()
+            TPStreamsDatabase.invoke(context).offlineVideoInfoDao().getAllOfflineVideoInfo()
         }
     }
 

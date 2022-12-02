@@ -1,13 +1,9 @@
 package com.tpstream.player.models
 
-import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-@Entity
 data class VideoInfo(
-    @PrimaryKey
-    var videoId:String,
     val title: String?,
     val thumbnail: String?,
 
@@ -27,9 +23,16 @@ data class VideoInfo(
     val description: String?,
 
     @SerializedName("transcoding_status")
-    val transcodingStatus: String?,
-
-    var percentageDownloaded: Int = 0,
-    var bytesDownloaded: Long = 0,
-    var totalSize: Long = 0,
+    val transcodingStatus: String?
 )
+
+fun VideoInfo.asOfflineVideoInfo():OfflineVideoInfo{
+    return OfflineVideoInfo(
+        title = title!!,
+        url = url!!,
+        dashUrl = dashUrl!!,
+        hlsUrl = hlsUrl!!,
+        duration = duration!!,
+        transcodingStatus = transcodingStatus!!
+    )
+}

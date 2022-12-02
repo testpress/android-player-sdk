@@ -24,11 +24,11 @@ class VideoDownloadService:DownloadService(
 ) , DownloadManager.Listener{
 
     private lateinit var notificationHelper: DownloadNotificationHelper
-    private lateinit var videoInfoRepository: VideoInfoRepository
+    private lateinit var offlineVideoInfoRepository: OfflineVideoInfoRepository
 
     override fun onCreate() {
         super.onCreate()
-        videoInfoRepository = VideoInfoRepository(this)
+        offlineVideoInfoRepository = OfflineVideoInfoRepository(this)
         notificationHelper = DownloadNotificationHelper(this, CHANNEL_ID)
     }
 
@@ -69,7 +69,7 @@ class VideoDownloadService:DownloadService(
             Download.STATE_COMPLETED ->{
                 notification = getCompletedNotification()
                 runBlocking(Dispatchers.IO){
-                    videoInfoRepository.updateDownloadStatus(download)
+                    offlineVideoInfoRepository.updateDownloadStatus(download)
                 }
             }
             Download.STATE_FAILED -> notification = getFailedNotification()

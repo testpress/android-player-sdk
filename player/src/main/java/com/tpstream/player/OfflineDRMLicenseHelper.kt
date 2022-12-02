@@ -26,23 +26,31 @@ object OfflineDRMLicenseHelper {
         callback: DRMLicenseFetchCallback
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val dataSource =
-                VideoDownloadManager(context).getHttpDataSourceFactory().createDataSource()
-            val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
-            val sessionManager = DefaultDrmSessionManager.Builder().build(
-                CustomHttpDrmMediaCallback(context, tpInitParams)
-            )
-            val drmInitData =
-                DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
-            val keySetId = OfflineLicenseHelper(
-                sessionManager,
-                DrmSessionEventListener.EventDispatcher()
-            ).downloadLicense(
-                drmInitData!!
-            )
+            val keySetId = downloadDRMKeySetId(context, tpInitParams, url)
             replaceKeysInExistingDownloadedVideo(url, context, keySetId)
             callback.onLicenseFetchSuccess(keySetId)
         }
+    }
+
+    private fun downloadDRMKeySetId(
+        context: Context,
+        tpInitParams: TpInitParams,
+        url: String
+    ): ByteArray {
+        val dataSource =
+            VideoDownloadManager(context).getHttpDataSourceFactory().createDataSource()
+        val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
+        val sessionManager = DefaultDrmSessionManager.Builder().build(
+            CustomHttpDrmMediaCallback(context, tpInitParams)
+        )
+        val drmInitData =
+            DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
+        return OfflineLicenseHelper(
+            sessionManager,
+            DrmSessionEventListener.EventDispatcher()
+        ).downloadLicense(
+            drmInitData!!
+        )
     }
 
     private fun replaceKeysInExistingDownloadedVideo(
@@ -54,10 +62,11 @@ object OfflineDRMLicenseHelper {
         if (downloadRequest != null) {
             val newDownloadRequest: DownloadRequest =
                 cloneDownloadRequestWithNewKeys(downloadRequest, keySetId)
-            val download = VideoDownload.getDownload(url, context)
-            val newDownload = cloneDownloadWithNewDownloadRequest(download!!, newDownloadRequest)
-            val dowloadIndex = VideoDownloadManager(context).getDownloadIndex()
-            dowloadIndex.putDownload(newDownload)
+            val newDownload = cloneDownloadWithNewDownloadRequest(
+                VideoDownload.getDownload(url, context)!!,
+                newDownloadRequest
+            )
+            VideoDownloadManager(context).getDownloadIndex().putDownload(newDownload)
         }
     }
 

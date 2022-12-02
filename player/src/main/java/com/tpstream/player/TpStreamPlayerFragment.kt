@@ -56,7 +56,7 @@ class TpStreamPlayerFragment : Fragment() {
     lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
     lateinit var orientationEventListener: OrientationListener
-    private lateinit var videoInfoViewModel: VideoInfoViewModel
+    private lateinit var offlineVideoInfoViewModel: OfflineVideoInfoViewModel
     private lateinit var downloadButton : ImageButton
     private lateinit var resolutionButton : ImageButton
 
@@ -69,11 +69,11 @@ class TpStreamPlayerFragment : Fragment() {
                 exitFullScreen()
             }
         }
-        videoInfoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+        offlineVideoInfoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return VideoInfoViewModel(VideoInfoRepository(requireContext())) as T
+                return OfflineVideoInfoViewModel(OfflineVideoInfoRepository(requireContext())) as T
             }
-        }).get(VideoInfoViewModel::class.java)
+        }).get(OfflineVideoInfoViewModel::class.java)
     }
 
     fun enableAutoFullScreenOnRotate() {
@@ -113,21 +113,12 @@ class TpStreamPlayerFragment : Fragment() {
     }
 
     private fun updateDownloadButtonImage(){
-        Log.d("TAG", "updateDownloadButtonImage: ${player?.params?.videoId!!}")
-        videoInfoViewModel.get(player?.params?.videoId!!).observe(viewLifecycleOwner) {
-            Log.d("TAG", "updateDownloadButtonImage: ${it?.percentageDownloaded}")
+        offlineVideoInfoViewModel.get(player?.params?.videoId!!).observe(viewLifecycleOwner) {
             when (it?.percentageDownloaded) {
                 100 ->{
-                    val currentPosition = player?.getCurrentTime()
-                    var url : String? = null
                     downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24).also { downloadButton.tag = "Downloaded" }
                     resolutionButton.tag = "Downloaded"
-                    runBlocking(Dispatchers.IO) {
-                        url = TPStreamsDatabase.invoke(requireContext()).videoInfoDao().getVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!
-                    }
-                    val tpImp = TpStreamPlayerImpl(_player!!, requireContext())
-                    tpImp.params = player?.params!!
-                    tpImp.load(url!!,currentPosition!!)
+                    playOfflineVideo()
                 }
                 null -> {
                     downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24).also { downloadButton.tag = "Not Downloaded" }
@@ -137,6 +128,17 @@ class TpStreamPlayerFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun playOfflineVideo(){
+        val currentPosition = player?.getCurrentTime()
+        var url : String? = null
+        runBlocking(Dispatchers.IO) {
+            url = TPStreamsDatabase.invoke(requireContext()).offlineVideoInfoDao().getOfflineVideoInfoByVideoId(player?.params?.videoId!!)?.dashUrl!!
+        }
+        val tpImp = TpStreamPlayerImpl(_player!!, requireContext())
+        tpImp.params = player?.params!!
+        tpImp.load(url!!,currentPosition!!)
     }
 
     private fun addCustomPlayerControls() {

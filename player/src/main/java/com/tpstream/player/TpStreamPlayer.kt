@@ -16,7 +16,9 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.database.TPStreamsDatabase
+import com.tpstream.player.models.OfflineVideoInfo
 import com.tpstream.player.models.VideoInfo
+import com.tpstream.player.models.asOfflineVideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -39,7 +41,8 @@ public interface TpStreamPlayer {
 
 class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStreamPlayer {
     override lateinit var params: TpInitParams
-    override var videoInfo: VideoInfo? = null
+    override lateinit var videoInfo: VideoInfo
+    var offlineVideoInfo: OfflineVideoInfo? = null
 
     internal fun load(url: String,startPosition: Long = 0) {
         player.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
@@ -51,8 +54,8 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         var downloadTask: DownloadTask? = null
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build())
-        if (videoInfo != null) {
-            downloadTask = DownloadTask(videoInfo?.dashUrl!!, context)
+        if (offlineVideoInfo != null) {
+            downloadTask = DownloadTask(offlineVideoInfo?.dashUrl!!, context)
         }
         if (downloadTask == null || !downloadTask.isDownloaded()) {
             mediaSourceFactory.setDrmSessionManagerProvider {
@@ -65,7 +68,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     }
 
     internal fun getMediaItem(url: String): MediaItem {
-        val downloadTask = DownloadTask(url, context)
         var mediaItem = MediaItem.Builder()
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_MPD)
@@ -75,9 +77,14 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
                     .build()
             )
             .build()
+        return setDownloadedMediaItem(url,mediaItem)
+    }
+
+    private fun setDownloadedMediaItem(url:String,mediaItem: MediaItem):MediaItem{
+        val downloadTask = DownloadTask(url, context)
         val downloadRequest: DownloadRequest? = VideoDownload.getDownloadRequest(url, context)
         if (downloadTask.isDownloaded() && downloadRequest != null) {
-            val builder = mediaItem.buildUpon()
+            val builder = MediaItem.Builder()
             builder
                 .setMediaId(downloadRequest.id)
                 .setUri(downloadRequest.uri)
@@ -90,24 +97,35 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
                         .build()
                 )
 
-            mediaItem = builder.build()
+            return builder.build()
         }
         return mediaItem
     }
 
-    private fun checkVideoIsDownloaded(parameters: TpInitParams){
+    private fun checkVideoIsDownloaded(parameters: TpInitParams):Boolean{
         runBlocking(Dispatchers.IO) {
-            videoInfo = try {
-                TPStreamsDatabase.invoke(context).videoInfoDao().getVideoInfoByVideoId(parameters.videoId!!)
+            offlineVideoInfo = try {
+                TPStreamsDatabase.invoke(context).offlineVideoInfoDao().getOfflineVideoInfoByVideoId(parameters.videoId!!)
             } catch (exception: Exception){
                 null
             }
         }
+        if(offlineVideoInfo != null){
+            return true
+        }
+        return false
     }
 
     override fun load(parameters: TpInitParams) {
         params = parameters
-        checkVideoIsDownloaded(parameters)
+        if (checkVideoIsDownloaded(parameters)){
+            Handler(Looper.getMainLooper()).post {
+                if (offlineVideoInfo != null) {
+                    load(offlineVideoInfo?.dashUrl!!)
+                }
+            }
+            return
+        }
         val url =
             "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
         Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
@@ -121,11 +139,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
             }
 
             override fun onFailure(exception: TPException) {
-                Handler(Looper.getMainLooper()).post {
-                    if (videoInfo != null) {
-                        load(videoInfo?.dashUrl!!)
-                    }
-                }
                 Log.d("TAG", "onFailure: ")
             }
         })

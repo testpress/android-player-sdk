@@ -25,7 +25,7 @@ data class VideoInfo(
     val transcodingStatus: String?
 )
 
-fun VideoInfo.asOfflineVideoInfo():OfflineVideoInfo{
+internal fun VideoInfo.asOfflineVideoInfo():OfflineVideoInfo{
     return OfflineVideoInfo(
         title = title!!,
         url = url!!,

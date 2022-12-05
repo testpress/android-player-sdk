@@ -5,7 +5,9 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tpstream.player.models.OfflineVideoInfo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class OfflineVideoInfoViewModel(private val offlineVideoInfoRepository: OfflineVideoInfoRepository):ViewModel() {
 
@@ -21,9 +23,13 @@ class OfflineVideoInfoViewModel(private val offlineVideoInfoRepository: OfflineV
         }
     }
 
-    fun delete(offlineVideoInfo: OfflineVideoInfo){
+    fun delete(videoId: String){
         viewModelScope.launch {
-            offlineVideoInfoRepository.delete(offlineVideoInfo)
+            var offlineVideoInfo : OfflineVideoInfo? = null
+            runBlocking(Dispatchers.IO) {
+                offlineVideoInfo = offlineVideoInfoRepository.getOfflineVideoInfoByVideoId(videoId)
+            }
+            offlineVideoInfoRepository.delete(offlineVideoInfo!!)
         }
     }
 }

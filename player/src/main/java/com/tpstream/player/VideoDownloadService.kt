@@ -9,6 +9,7 @@ import androidx.media3.exoplayer.scheduler.Scheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 
 private const val JOB_ID = 1
@@ -67,14 +68,22 @@ class VideoDownloadService:DownloadService(
         finalException: Exception?
     ) {
         var notification: Notification? = null
+        var videoId : String?
+
+        runBlocking(Dispatchers.IO) {
+            videoId = offlineVideoInfoRepository.grtVideoIdByUrl(download.request.uri.toString())
+        }
 
         when (download.state) {
             Download.STATE_COMPLETED ->{
                 notification = getCompletedNotification()
-                downloadCallback.onDownloadSuccess()
+                downloadCallback.onDownloadSuccess(videoId)
                 updateDownloadStatus(download)
             }
             Download.STATE_FAILED -> notification = getFailedNotification()
+            Download.STATE_STOPPED -> updateDownloadStatus(download)
+            Download.STATE_DOWNLOADING -> updateDownloadStatus(download)
+            Download.STATE_REMOVING -> updateDownloadStatus(download)
         }
 
         NotificationUtil.setNotification(this, nextNotificationId, notification)
@@ -112,8 +121,8 @@ class DownloadCallback private constructor(){
 
     var callback: Listener? = null
 
-    fun onDownloadSuccess() {
-        callback?.onDownloadsSuccess()
+    fun onDownloadSuccess(videoId:String?) {
+        callback?.onDownloadsSuccess(videoId)
     }
 
     companion object {
@@ -131,6 +140,6 @@ class DownloadCallback private constructor(){
     }
 
     interface Listener {
-        fun onDownloadsSuccess()
+        fun onDownloadsSuccess(videoId:String?)
     }
 }

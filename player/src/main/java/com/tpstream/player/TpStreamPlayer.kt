@@ -17,6 +17,7 @@ import androidx.media3.exoplayer.source.MediaSource
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.models.OfflineVideoInfo
 import com.tpstream.player.models.VideoInfo
+import com.tpstream.player.models.asVideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -49,13 +50,9 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     }
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
-        var downloadTask: DownloadTask? = null
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build())
-        if (offlineVideoInfo != null) {
-            downloadTask = DownloadTask(offlineVideoInfo?.dashUrl!!, context)
-        }
-        if (downloadTask == null || !downloadTask.isDownloaded()) {
+        if (offlineVideoInfo == null) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(
                     CustomHttpDrmMediaCallback(context, params)
@@ -65,7 +62,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         return mediaSourceFactory
     }
 
-    internal fun getMediaItem(url: String): MediaItem {
+    private fun getMediaItem(url: String): MediaItem {
         var mediaItem = MediaItem.Builder()
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_MPD)
@@ -79,9 +76,8 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     }
 
     private fun setDownloadedMediaItem(url:String,mediaItem: MediaItem):MediaItem{
-        val downloadTask = DownloadTask(url, context)
         val downloadRequest: DownloadRequest? = VideoDownload.getDownloadRequest(url, context)
-        if (downloadTask.isDownloaded() && downloadRequest != null) {
+        if (DownloadTask(context).isDownloaded(url) && downloadRequest != null) {
             val builder = MediaItem.Builder()
             builder
                 .setMediaId(downloadRequest.id)
@@ -94,22 +90,22 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
                         .setKeySetId(downloadRequest.keySetId)
                         .build()
                 )
-
             return builder.build()
         }
         return mediaItem
     }
 
     private fun checkIsVideoDownloadCompleted(parameters: TpInitParams):Boolean{
-        var downloadTask : DownloadTask? = null
+        var isVideoDownloaded = false
         runBlocking(Dispatchers.IO) {
             offlineVideoInfo = OfflineVideoInfoRepository(context)
                 .getOfflineVideoInfoByVideoId(parameters.videoId!!)
-            if (offlineVideoInfo != null){
-                downloadTask = DownloadTask(offlineVideoInfo?.dashUrl!!,context)
+            if (offlineVideoInfo != null && DownloadTask(context).isDownloaded(offlineVideoInfo?.dashUrl!!)){
+                isVideoDownloaded = true
             }
         }
-        if(downloadTask != null && downloadTask?.isDownloaded()!!){
+        if(isVideoDownloaded){
+            videoInfo = offlineVideoInfo?.asVideoInfo()!!
             return true
         }
         return false

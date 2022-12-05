@@ -2,38 +2,18 @@ package com.tpstream.player
 
 
 import android.content.Context
-import androidx.media3.common.TrackGroup
-import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.OfflineVideoInfo
-import com.tpstream.player.models.VideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 class DownloadTask (val context: Context) {
 
-    private lateinit var url : String
-    private lateinit var videoInfo: VideoInfo
-    private lateinit var tpInitParams: TpInitParams
-    private var trackSelector: DefaultTrackSelector
-    private var override: MutableMap<TrackGroup, TrackSelectionOverride>
-
-    constructor(url: String, context: Context) : this(context) {
-        this.url = url
-    }
-
-    init {
-        trackSelector = DefaultTrackSelector(context)
-        override = trackSelector.parameters.overrides.toMutableMap()
-    }
-
     private val downloadManager = VideoDownloadManager(context).get()
     private val downloadIndex = downloadManager.downloadIndex
-
 
     internal fun start(downloadRequest: DownloadRequest) {
         DownloadService.sendAddDownload(
@@ -44,7 +24,7 @@ class DownloadTask (val context: Context) {
         )
     }
 
-    fun pause() {
+    internal fun pause(url:String) {
         val download = downloadIndex.getDownload(url)
         val STOP_REASON_PAUSED = 1
         download?.let {
@@ -58,7 +38,7 @@ class DownloadTask (val context: Context) {
         }
     }
 
-    fun resume() {
+    internal fun resume(url:String) {
         val download = downloadIndex.getDownload(url)
         download?.let {
             DownloadService.sendSetStopReason(
@@ -71,7 +51,7 @@ class DownloadTask (val context: Context) {
         }
     }
 
-    fun delete() {
+    internal fun delete(url:String) {
         val download = downloadIndex.getDownload(url)
         download?.let {
             DownloadService.sendRemoveDownload(
@@ -83,12 +63,12 @@ class DownloadTask (val context: Context) {
         }
     }
 
-    fun isDownloaded(): Boolean {
+    internal fun isDownloaded(url:String): Boolean {
         val download = downloadIndex.getDownload(url)
         return download != null && download.state == Download.STATE_COMPLETED
     }
 
-    fun isBeingDownloaded(): Boolean {
+    internal fun isBeingDownloaded(url:String): Boolean {
         val download = downloadIndex.getDownload(url)
         return download != null && download.state == Download.STATE_DOWNLOADING
     }

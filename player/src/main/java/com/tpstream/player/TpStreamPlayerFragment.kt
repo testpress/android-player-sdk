@@ -19,7 +19,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -28,12 +27,19 @@ import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
+import com.tpstream.player.models.OfflineVideoState
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
 
-@UnstableApi
+internal const val DOWNLOADING_TAG = "Downloading"
+internal const val PAUSE_TAG = "Pause"
+internal const val NOT_DOWNLOADING_TAG = "Not Downloaded"
+internal const val DOWNLOADED_TAG = "Downloaded"
+internal const val EMPTY_TAG = ""
+
+
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
 //    companion object {
@@ -111,24 +117,37 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun updateDownloadButtonImage(){
-        offlineVideoInfoViewModel.get(player?.params?.videoId!!).observe(viewLifecycleOwner) {
-            when (it?.percentageDownloaded) {
-                100 ->{
-                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24).also { downloadButton.tag = "Downloaded" }
-                    resolutionButton.tag = "Downloaded"
+        offlineVideoInfoViewModel.get(player?.params?.videoId!!).observe(viewLifecycleOwner) { offlineVideoInfo ->
+            when (offlineVideoInfo?.downloadState) {
+                OfflineVideoState.DOWNLOADING ->{
+                    downloadButton.also {
+                        it.setImageResource(R.drawable.ic_baseline_downloading_24)
+                        it.tag = DOWNLOADING_TAG
+                    }
+                    resolutionButton.tag = EMPTY_TAG
                 }
-                null -> {
-                    downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24).also { downloadButton.tag = "Not Downloaded" }
+                OfflineVideoState.COMPLETE ->{
+                    downloadButton.also {
+                        it.setImageResource(R.drawable.ic_baseline_file_download_done_24)
+                        it.tag = DOWNLOADED_TAG
+                    }
+                    resolutionButton.tag = DOWNLOADED_TAG
                 }
-                0 ->{
-                    downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24).also { downloadButton.tag = "Downloading" }
+                else -> {
+                    downloadButton.also {
+                        it.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
+                        it.tag = NOT_DOWNLOADING_TAG
+                    }
+                    resolutionButton.tag = EMPTY_TAG
                 }
             }
         }
     }
 
-    override fun onDownloadsSuccess() {
-        playOfflineVideo()
+    override fun onDownloadsSuccess(videoId:String?) {
+        if (videoId == player?.params?.videoId){
+            playOfflineVideo()
+        }
     }
 
     private fun playOfflineVideo(){
@@ -239,7 +258,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
         downloadButton.setOnClickListener {
             when (downloadButton.tag) {
-                "Not Downloaded" -> {
+                NOT_DOWNLOADING_TAG -> {
                     val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                         player!!,
                         trackSelector.parameters,
@@ -250,16 +269,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                         "DownloadSelectionSheet"
                     )
                     downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest ->
-                        DownloadTask(
-                            downloadRequest.uri.toString(),
-                            requireContext()
-                        ).start(downloadRequest)
+                        DownloadTask(requireContext()).start(downloadRequest)
                     }
                 }
-                "Downloaded" -> {
-                    Toast.makeText(requireContext(),"Download Already Completed",Toast.LENGTH_SHORT).show()
+                DOWNLOADED_TAG -> {
+                    Toast.makeText(requireContext(),"Download complete",Toast.LENGTH_SHORT).show()
                 }
-                else -> {
+                DOWNLOADING_TAG -> {
                     Toast.makeText(requireContext(),"Downloading",Toast.LENGTH_SHORT).show()
                 }
             }
@@ -345,35 +361,21 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onPlayerError(error: PlaybackException) {
             if (isDRMException(error.cause!!)) {
-                val downloadTask = DownloadTask(player?.videoInfo?.dashUrl!!, requireActivity())
-                drmLicenseRetries += 1
-                if (drmLicenseRetries < 2 && downloadTask.isDownloaded()) {
-                    OfflineDRMLicenseHelper.renewLicense(player?.videoInfo?.dashUrl!!,player?.params!!, requireActivity(), this)
-                }
+                onDownloadsSuccess(player?.videoInfo?.dashUrl!!)
             }
         }
 
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {
-            requireActivity().runOnUiThread(Runnable {
-                val mediaItem: MediaItem = TpStreamPlayerImpl(
-                    _player!!,
-                    requireContext()
-                ).getMediaItem(player?.videoInfo?.dashUrl!!)
-                _player?.setMediaItem(mediaItem)
-                _player?.prepare()
-                _player?.playWhenReady = true
-            })
+            Log.d("TAG", "onLicenseFetchSuccess: ")
         }
 
         override fun onLicenseFetchFailure() {
-            Log.d(TAG, "onLicenseFetchFailure: ")
+            Log.d("TAG", "onLicenseFetchFailure: ")
         }
 
         private fun isDRMException(cause: Throwable): Boolean {
             return cause is DrmSession.DrmSessionException || cause is MediaCodec.CryptoException || cause is MediaDrmCallbackException
         }
-
-        private var drmLicenseRetries = 0
 
     }
 

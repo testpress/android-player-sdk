@@ -33,10 +33,6 @@ import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
 
-private const val NOT_DOWNLOADING = 0
-private const val DOWNLOADING = 1
-private const val DOWNLOADED = 2
-
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
 //    companion object {
@@ -59,7 +55,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private lateinit var offlineVideoInfoViewModel: OfflineVideoInfoViewModel
     private lateinit var downloadButton : ImageButton
     private lateinit var resolutionButton : ImageButton
-    private var downloadState = -1
+    private var downloadState :OfflineVideoState? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,18 +112,18 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun updateDownloadButtonImage(){
         offlineVideoInfoViewModel.get(player?.params?.videoId!!).observe(viewLifecycleOwner) { offlineVideoInfo ->
-            when (offlineVideoInfo?.downloadState) {
+            downloadState = when (offlineVideoInfo?.downloadState) {
                 OfflineVideoState.DOWNLOADING ->{
                     downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
-                    downloadState = DOWNLOADING
+                    OfflineVideoState.DOWNLOADING
                 }
                 OfflineVideoState.COMPLETE ->{
                     downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-                    downloadState = DOWNLOADED
+                    OfflineVideoState.COMPLETE
                 }
                 else -> {
                     downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
-                    downloadState = NOT_DOWNLOADING
+                    null
                 }
             }
         }
@@ -183,7 +179,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun addResolutionChangeControl() {
         resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
         resolutionButton.setOnClickListener {
-            if (downloadState == DOWNLOADED){
+            if (downloadState == OfflineVideoState.COMPLETE){
                 Toast.makeText(requireContext(),"Quality Unavailable",Toast.LENGTH_SHORT).show()
             } else {
                 val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
@@ -247,7 +243,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
         downloadButton.setOnClickListener {
             when (downloadState) {
-                NOT_DOWNLOADING -> {
+                OfflineVideoState.COMPLETE -> {
+                    Toast.makeText(requireContext(),"Download complete",Toast.LENGTH_SHORT).show()
+                }
+                OfflineVideoState.DOWNLOADING -> {
+                    Toast.makeText(requireContext(),"Downloading",Toast.LENGTH_SHORT).show()
+                }
+                else -> {
                     val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                         player!!,
                         trackSelector.parameters,
@@ -262,12 +264,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                         offlineVideoInfo?.videoId = player?.params?.videoId!!
                         offlineVideoInfoViewModel.insert(offlineVideoInfo!!)
                     }
-                }
-                DOWNLOADED -> {
-                    Toast.makeText(requireContext(),"Download complete",Toast.LENGTH_SHORT).show()
-                }
-                DOWNLOADING -> {
-                    Toast.makeText(requireContext(),"Downloading",Toast.LENGTH_SHORT).show()
                 }
             }
         }

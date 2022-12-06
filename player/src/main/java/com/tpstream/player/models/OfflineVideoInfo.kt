@@ -20,7 +20,9 @@ class OfflineVideoInfo(
     var percentageDownloaded: Int = 0,
     var bytesDownloaded: Long = 0,
     var totalSize: Long = 0,
-    var downloadState: OfflineVideoState? = null
+    var downloadState: OfflineVideoState? = null,
+    var videoWidth: Int = 0,
+    var videoHeight: Int = 0
 )
 
 internal fun OfflineVideoInfo.asVideoInfo():VideoInfo{

@@ -63,43 +63,46 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     }
 
     private fun getMediaItem(url: String): MediaItem {
-        var mediaItem = MediaItem.Builder()
+        val downloadRequest: DownloadRequest? = VideoDownload.getDownloadRequest(url, context)
+        if (DownloadTask(context).isDownloaded(url) && downloadRequest != null) {
+            return buildDownloadedMediaItem(downloadRequest)
+        }
+        return buildMediaItem(url)
+    }
+
+    private fun buildMediaItem(url: String): MediaItem {
+        return MediaItem.Builder()
             .setUri(url)
             .setMimeType(MimeTypes.APPLICATION_MPD)
             .setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
                     .build()
-            )
-            .build()
-        mediaItem = setMediaItemIfAlreadyDownloaded(url,mediaItem)
-        return mediaItem
+            ).build()
     }
 
-    private fun setMediaItemIfAlreadyDownloaded(url:String,mediaItem:MediaItem):MediaItem{
-        val downloadRequest: DownloadRequest? = VideoDownload.getDownloadRequest(url, context)
-        if (DownloadTask(context).isDownloaded(url) && downloadRequest != null) {
-            val builder = MediaItem.Builder()
-            builder
-                .setMediaId(downloadRequest.id)
-                .setUri(downloadRequest.uri)
-                .setCustomCacheKey(downloadRequest.customCacheKey)
-                .setMimeType(downloadRequest.mimeType)
-                .setStreamKeys(downloadRequest.streamKeys)
-                .setDrmConfiguration(
-                    MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                        .setKeySetId(downloadRequest.keySetId)
-                        .build()
-                )
-            return builder.build()
-        }
-        return mediaItem
+    private fun buildDownloadedMediaItem(downloadRequest: DownloadRequest):MediaItem{
+        Log.d("TAG", "buildDownloadedMediaItem: ")
+        val builder = MediaItem.Builder()
+        builder
+            .setMediaId(downloadRequest.id)
+            .setUri(downloadRequest.uri)
+            .setCustomCacheKey(downloadRequest.customCacheKey)
+            .setMimeType(downloadRequest.mimeType)
+            .setStreamKeys(downloadRequest.streamKeys)
+            .setDrmConfiguration(
+                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setKeySetId(downloadRequest.keySetId)
+                    .build()
+            )
+        return builder.build()
     }
 
     override fun load(parameters: TpInitParams) {
         params = parameters
-        populateVideoInfo(parameters)
-        if (checkIsVideoDownloadCompleted()){
+        populateOfflineVideoInfo(parameters)
+        if (checkIsVideoDownloaded()){
+            videoInfo = offlineVideoInfo?.asVideoInfo()!!
             Handler(Looper.getMainLooper()).post {
                 load(offlineVideoInfo?.dashUrl!!)
             }
@@ -123,20 +126,18 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         })
     }
 
-    private fun populateVideoInfo(parameters: TpInitParams){
+    private fun populateOfflineVideoInfo(parameters: TpInitParams){
         runBlocking(Dispatchers.IO) {
             offlineVideoInfo = OfflineVideoInfoRepository(context)
                 .getOfflineVideoInfoByVideoId(parameters.videoId!!)
-            if (offlineVideoInfo != null && DownloadTask(context).isDownloaded(offlineVideoInfo?.dashUrl!!)){
-                videoInfo = offlineVideoInfo?.asVideoInfo()!!
-            } else {
-                offlineVideoInfo = null
-            }
         }
     }
 
-    private fun checkIsVideoDownloadCompleted():Boolean{
-        return offlineVideoInfo != null
+    private fun checkIsVideoDownloaded():Boolean{
+        if (offlineVideoInfo != null && DownloadTask(context).isDownloaded(offlineVideoInfo?.dashUrl!!)){
+            return true
+        }
+        return false
     }
 
     override fun setPlayWhenReady(canPlay: Boolean) {

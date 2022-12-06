@@ -9,8 +9,6 @@ import android.widget.ArrayAdapter
 import android.widget.CheckedTextView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
@@ -22,11 +20,12 @@ import com.google.common.collect.ImmutableList
 import com.tpstream.player.*
 import com.tpstream.player.R
 import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
+import com.tpstream.player.models.OfflineVideoInfo
 import com.tpstream.player.models.asOfflineVideoInfo
 import okio.IOException
 import kotlin.math.roundToInt
 
-typealias OnSubmitListener = (DownloadRequest) -> Unit
+typealias OnSubmitListener = (DownloadRequest,OfflineVideoInfo?) -> Unit
 
 class DownloadResolutionSelectionSheet(
     val player: TpStreamPlayer,
@@ -37,12 +36,10 @@ class DownloadResolutionSelectionSheet(
     private var _binding: DownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     private val offlineVideoInfo = player.videoInfo?.asOfflineVideoInfo()
-    private val tpInitParams = player.params
     private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()
     var isResolutionSelected = false
-    private lateinit var offlineVideoInfoViewModel: OfflineVideoInfoViewModel
     private var onSubmitListener: OnSubmitListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,11 +71,6 @@ class DownloadResolutionSelectionSheet(
         initializeTrackSelectionView()
         setOnClickListeners()
         configureBottomSheetBehaviour()
-        offlineVideoInfoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return OfflineVideoInfoViewModel(OfflineVideoInfoRepository(requireContext())) as T
-            }
-        }).get(OfflineVideoInfoViewModel::class.java)
     }
 
     private fun initializeTrackSelectionView() {
@@ -103,10 +95,8 @@ class DownloadResolutionSelectionSheet(
             if (isResolutionSelected){
                 val downloadRequest =
                     videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
-                onSubmitListener?.invoke(downloadRequest)
+                onSubmitListener?.invoke(downloadRequest,offlineVideoInfo)
                 Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
-                offlineVideoInfo?.videoId = tpInitParams.videoId!!
-                offlineVideoInfoViewModel.insert(offlineVideoInfo!!)
                 dismiss()
             } else {
                 Toast.makeText(requireContext(), "Please choose download quality", Toast.LENGTH_SHORT).show()
@@ -185,7 +175,7 @@ class DownloadResolutionSelectionSheet(
     }
 
     override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean) {
-        if (isPrepared) {
+        if (isPrepared && this.isVisible) {
             binding.loadingProgress.visibility = View.GONE
             binding.resolutionLayout.visibility = View.VISIBLE
         }

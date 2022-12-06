@@ -33,12 +33,9 @@ import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
 
-internal const val DOWNLOADING_TAG = "Downloading"
-internal const val PAUSE_TAG = "Pause"
-internal const val NOT_DOWNLOADING_TAG = "Not Downloaded"
-internal const val DOWNLOADED_TAG = "Downloaded"
-internal const val EMPTY_TAG = ""
-
+private const val NOT_DOWNLOADING = 0
+private const val DOWNLOADING = 1
+private const val DOWNLOADED = 2
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
@@ -62,6 +59,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private lateinit var offlineVideoInfoViewModel: OfflineVideoInfoViewModel
     private lateinit var downloadButton : ImageButton
     private lateinit var resolutionButton : ImageButton
+    private var downloadState = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,25 +118,16 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         offlineVideoInfoViewModel.get(player?.params?.videoId!!).observe(viewLifecycleOwner) { offlineVideoInfo ->
             when (offlineVideoInfo?.downloadState) {
                 OfflineVideoState.DOWNLOADING ->{
-                    downloadButton.also {
-                        it.setImageResource(R.drawable.ic_baseline_downloading_24)
-                        it.tag = DOWNLOADING_TAG
-                    }
-                    resolutionButton.tag = EMPTY_TAG
+                    downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
+                    downloadState = DOWNLOADING
                 }
                 OfflineVideoState.COMPLETE ->{
-                    downloadButton.also {
-                        it.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-                        it.tag = DOWNLOADED_TAG
-                    }
-                    resolutionButton.tag = DOWNLOADED_TAG
+                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
+                    downloadState = DOWNLOADED
                 }
                 else -> {
-                    downloadButton.also {
-                        it.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
-                        it.tag = NOT_DOWNLOADING_TAG
-                    }
-                    resolutionButton.tag = EMPTY_TAG
+                    downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
+                    downloadState = NOT_DOWNLOADING
                 }
             }
         }
@@ -146,11 +135,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onDownloadsSuccess(videoId:String?) {
         if (videoId == player?.params?.videoId){
-            playOfflineVideo()
+            reloadVideo()
         }
     }
 
-    private fun playOfflineVideo(){
+    private fun reloadVideo(){
         val currentPosition = player?.getCurrentTime()
         val url = player?.videoInfo?.dashUrl!!
         val tpImp = player as TpStreamPlayerImpl
@@ -194,7 +183,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun addResolutionChangeControl() {
         resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
         resolutionButton.setOnClickListener {
-            if (resolutionButton.tag == "Downloaded"){
+            if (downloadState == DOWNLOADED){
                 Toast.makeText(requireContext(),"Quality Unavailable",Toast.LENGTH_SHORT).show()
             } else {
                 val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
@@ -257,8 +246,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun addDownloadControls() {
         downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
         downloadButton.setOnClickListener {
-            when (downloadButton.tag) {
-                NOT_DOWNLOADING_TAG -> {
+            when (downloadState) {
+                NOT_DOWNLOADING -> {
                     val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                         player!!,
                         trackSelector.parameters,
@@ -268,14 +257,16 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                         requireActivity().supportFragmentManager,
                         "DownloadSelectionSheet"
                     )
-                    downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest ->
+                    downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest,offlineVideoInfo ->
                         DownloadTask(requireContext()).start(downloadRequest)
+                        offlineVideoInfo?.videoId = player?.params?.videoId!!
+                        offlineVideoInfoViewModel.insert(offlineVideoInfo!!)
                     }
                 }
-                DOWNLOADED_TAG -> {
+                DOWNLOADED -> {
                     Toast.makeText(requireContext(),"Download complete",Toast.LENGTH_SHORT).show()
                 }
-                DOWNLOADING_TAG -> {
+                DOWNLOADING -> {
                     Toast.makeText(requireContext(),"Downloading",Toast.LENGTH_SHORT).show()
                 }
             }

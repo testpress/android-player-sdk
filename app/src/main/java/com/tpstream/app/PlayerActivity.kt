@@ -23,7 +23,6 @@ class PlayerActivity : AppCompatActivity() {
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
         playerFragment.enableAutoFullScreenOnRotate()
-        playerFragment.enableDownload()
         playerFragment.setOnInitializationListener(object: InitializationListener {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
                 parameters = TpInitParams.Builder()
@@ -31,6 +30,7 @@ class PlayerActivity : AppCompatActivity() {
                     .setAccessToken(accessToken)
                     .setOrgCode(orgCode)
                     .setAutoPlay(true)
+                    .enableDownloadSupport(true)
                     .build()
                 playerFragment.load(parameters)
             }

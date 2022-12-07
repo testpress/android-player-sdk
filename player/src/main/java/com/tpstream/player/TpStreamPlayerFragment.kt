@@ -56,7 +56,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private lateinit var downloadButton : ImageButton
     private lateinit var resolutionButton : ImageButton
     private var downloadState :OfflineVideoState? = null
-    private var isDownloadEnable = false
+    private var showDownloadButton = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,10 +92,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         if(::orientationEventListener.isInitialized) {
             orientationEventListener.disable()
         }
-    }
-
-    fun enableDownload() {
-        isDownloadEnable = true
     }
 
     override fun onCreateView(
@@ -246,7 +242,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun addDownloadControls() {
         downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
-        if (isDownloadEnable){
+        if (showDownloadButton){
             downloadButton.visibility = View.VISIBLE
         }
         downloadButton.setOnClickListener {
@@ -352,6 +348,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
         player?.setPlayWhenReady(parameters.autoPlay==true)
+        showDownloadButton = parameters.isDownloadEnable
     }
 
     inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {

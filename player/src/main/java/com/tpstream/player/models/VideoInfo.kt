@@ -24,3 +24,14 @@ data class VideoInfo(
     @SerializedName("transcoding_status")
     val transcodingStatus: String?
 )
+
+internal fun VideoInfo.asOfflineVideoInfo():OfflineVideoInfo{
+    return OfflineVideoInfo(
+        title = title!!,
+        url = url!!,
+        dashUrl = dashUrl!!,
+        hlsUrl = hlsUrl!!,
+        duration = duration!!,
+        transcodingStatus = transcodingStatus!!
+    )
+}

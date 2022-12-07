@@ -9,4 +9,11 @@
     <string name="media_url_dash"><![CDATA[https://www.youtube.com/api/manifest/dash/id/bf5bb2419360daf1/source/youtube?as=fmp4_audio_clear,fmp4_sd_hd_clear&sparams=ip,ipbits,expire,source,id,as&ip=0.0.0.0&ipbits=0&expire=19000000000&signature=51AF5F39AB0CEC3E5497CD9C900EBFEAECCCB5C7.8506521BFC350652163895D4C26DEE124209AA9E&key=ik0]]></string>
     <string name="logo">Google logo</string>
     <string name="media_url_drm">https://d7pdowhru2wq4.cloudfront.net/institute/demo/courses/drm-2/videos/transcoded/d025bfdca5024a3388354131b74bc6ff/video.mpd</string>
+
+    <string name="download">Download</string>
+    <string name="download_description">Download Descrition</string>
+
+    <style name="RadioButtonTheme" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">@color/tp_blue</item>
+    </style>
 </resources>

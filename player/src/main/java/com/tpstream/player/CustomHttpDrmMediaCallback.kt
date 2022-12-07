@@ -1,26 +1,23 @@
 package com.tpstream.player
 
-import android.util.Log
-import androidx.media3.datasource.DefaultHttpDataSource
+import android.content.Context
 import androidx.media3.exoplayer.drm.ExoMediaDrm
 import androidx.media3.exoplayer.drm.HttpMediaDrmCallback
 import androidx.media3.exoplayer.drm.MediaDrmCallback
-import com.google.gson.Gson
 import com.tpstream.player.models.DRMLicenseURL
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.internal.EMPTY_REQUEST
-import java.net.URL
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
 
+class CustomHttpDrmMediaCallback(context: Context, private val tpInitParams: TpInitParams):MediaDrmCallback {
+    private val httpMediaDrmCallback = HttpMediaDrmCallback("", VideoDownloadManager(context).getHttpDataSourceFactory())
 
-class CustomHttpDrmMediaCallback(val orgCode: String, val videoUUID: String, val accessToken: String):MediaDrmCallback {
-    private val httpMediaDrmCallback = HttpMediaDrmCallback("", DefaultHttpDataSource.Factory())
-
-    fun fetchDRMLicenseURL(): String {
-        val url = "/api/v2.5/drm_license/${videoUUID}/?access_token=${accessToken}"
+    private fun fetchDRMLicenseURL(): String {
+        val url = "/api/v2.5/drm_license/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}"
+        val body: RequestBody = ("{\"download\":true}").toRequestBody("application/json".toMediaTypeOrNull())
         return try {
-            val result = Network<DRMLicenseURL>(orgCode).post(url, EMPTY_REQUEST)
+            val result = Network<DRMLicenseURL>(tpInitParams.orgCode).post(url, body)
             result?.licenseUrl ?: ""
         } catch (exception:TPException){
             ""

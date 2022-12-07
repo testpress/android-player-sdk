@@ -1,9 +1,7 @@
 package com.tpstream.app
 
-import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import com.tpstream.player.InitializationListener
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.TpStreamPlayer
@@ -13,19 +11,21 @@ class PlayerActivity : AppCompatActivity() {
     lateinit var playerFragment: TpStreamPlayerFragment;
     lateinit var player: TpStreamPlayer;
     private val TAG = "PlayerActivity"
-    private val accessToken = "bbf23112-0c14-4519-a848-73c95cb024ac"
-    private val videoId = "E44ulfSWhYx"
-    private val orgCode = "drm"
+    private lateinit var accessToken :String
+    private lateinit var videoId :String
+    private lateinit var orgCode :String
+    private lateinit var parameters : TpInitParams
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
+        selectVideoParams(intent.getIntExtra("VideoParameter",-1))
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
         playerFragment.enableAutoFullScreenOnRotate()
         playerFragment.setOnInitializationListener(object: InitializationListener {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
-                val parameters = TpInitParams.Builder()
+                parameters = TpInitParams.Builder()
                     .setVideoId(videoId)
                     .setAccessToken(accessToken)
                     .setOrgCode(orgCode)
@@ -35,5 +35,21 @@ class PlayerActivity : AppCompatActivity() {
             }
         });
     }
+
+    private fun selectVideoParams(int : Int){
+        when(int){
+            1 -> {
+                accessToken = "c381512b-7337-4d8e-a8cf-880f4f08fd08"
+                videoId = "C3XLe1CCcOq"
+                orgCode = "demoveranda"
+            }
+            2 -> {
+                accessToken = "c39cd7a3-2e0f-431b-b7cc-844e515d2046"
+                videoId = "JISUX8uDKfZ"
+                orgCode = "demoveranda"
+            }
+        }
+    }
+
 }
 

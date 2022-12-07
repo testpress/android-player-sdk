@@ -348,7 +348,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
         player?.setPlayWhenReady(parameters.autoPlay==true)
-        showDownloadButton = parameters.isDownloadEnable
+        showDownloadButton = parameters.isDownloadEnabled
     }
 
     inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {

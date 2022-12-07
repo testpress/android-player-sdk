@@ -21,7 +21,7 @@ data class TpInitParams (
     var signature: String? = null,
     var startTimeMs: Int? = null,
     var techOverride: Array<String>? = null,
-    var isDownloadEnable: Boolean = false
+    var isDownloadEnabled: Boolean = false
 ): Parcelable {
     
     class Builder {
@@ -41,7 +41,7 @@ data class TpInitParams (
         private var signature: String? = null
         private var startTimeMs: Int? = null
         private var techOverride: Array<String>? = null
-        private var isDownloadEnable: Boolean = false
+        private var isDownloadEnabled: Boolean = false
 
         fun setAutoPlay(autoPlay: Boolean) = apply { this.autoPlay = autoPlay }
         fun setBufferingGoalMs(bufferingGoalMs: Int) = apply { this.bufferingGoalMs = bufferingGoalMs }
@@ -59,7 +59,7 @@ data class TpInitParams (
         fun setEndTimeMs(endTimeMs: Int) = apply { this.endTimeMs = endTimeMs }
         fun setClips(startTimeMs: Int, endTimeMs: Int) = apply { this.startTimeMs = startTimeMs; this.endTimeMs = endTimeMs }
         fun setTechOverride(techOverride: Array<String>) = apply { this.techOverride = techOverride }
-        fun enableDownloadSupport(isDownloadEnable: Boolean) = apply { this.isDownloadEnable = isDownloadEnable }
+        fun enableDownloadSupport(isDownloadEnabled: Boolean) = apply { this.isDownloadEnabled = isDownloadEnabled }
 
         fun build(): TpInitParams {
             if (orgCode == null) {
@@ -83,7 +83,7 @@ data class TpInitParams (
                 signature,
                 startTimeMs,
                 techOverride,
-                isDownloadEnable
+                isDownloadEnabled
             )
         }
     }

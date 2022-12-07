@@ -32,6 +32,7 @@ import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
+import io.sentry.Sentry
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
@@ -364,7 +365,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             super.onPlayerError(error)
             viewBinding.errorMessage.visibility = View.VISIBLE
             viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
-
+            Sentry.captureException(error)
             if (isDRMException(error.cause!!)) {
                 onDownloadsSuccess(player?.videoInfo?.dashUrl!!)
             }

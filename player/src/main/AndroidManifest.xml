@@ -12,6 +12,13 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </service>
+
+        <meta-data android:name="io.sentry.dsn" android:value="https://d384a4c918c947a3b68a1af0c8d59343@sentry.testpress.in/10" />
+
+        <meta-data android:name="io.sentry.traces.sample-rate" android:value="1.0" />
+
+        <meta-data android:name="io.sentry.traces.user-interaction.enable" android:value="true" />
+
     </application>
 
 </manifest>

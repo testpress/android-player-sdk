@@ -30,6 +30,7 @@ class PlayerActivity : AppCompatActivity() {
                     .setAccessToken(accessToken)
                     .setOrgCode(orgCode)
                     .setAutoPlay(true)
+                    .enableDownloadSupport(true)
                     .build()
                 playerFragment.load(parameters)
             }

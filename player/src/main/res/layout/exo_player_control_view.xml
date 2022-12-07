@@ -89,6 +89,7 @@
 
             <ImageButton
                 android:id="@+id/exo_download"
+                android:visibility="gone"
                 style="@style/ExoStyledControls.Button.Bottom"
                 android:src="@drawable/ic_baseline_download_for_offline_24"/>
 

@@ -55,6 +55,7 @@ dependencies {
     api "androidx.media3:media3-exoplayer:$mediaVersion"
     api "androidx.media3:media3-ui:$mediaVersion"
     api "androidx.media3:media3-exoplayer-dash:$mediaVersion"
+    api "androidx.media3:media3-exoplayer-hls:$mediaVersion"
     api "androidx.media3:media3-datasource-okhttp:$mediaVersion"
     api "com.google.code.gson:gson:2.10"
 

@@ -5,13 +5,14 @@ import android.content.Context
 import androidx.media3.database.DatabaseProvider
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
-import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.NoOpCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.offline.DefaultDownloadIndex
 import androidx.media3.exoplayer.offline.DownloadManager
+import okhttp3.OkHttpClient
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -22,7 +23,7 @@ class VideoDownloadManager {
     private var downloadManager: DownloadManager? = null
     private lateinit var databaseProvider: StandaloneDatabaseProvider
     private lateinit var downloadDirectory: File
-    private lateinit var httpDataSourceFactory: DefaultHttpDataSource.Factory
+    private lateinit var httpDataSourceFactory: OkHttpDataSource.Factory
 
     fun get(): DownloadManager {
         if (downloadManager == null) {
@@ -53,7 +54,10 @@ class VideoDownloadManager {
     @Synchronized
     fun getHttpDataSourceFactory(): DataSource.Factory {
         if (!::httpDataSourceFactory.isInitialized) {
-            httpDataSourceFactory = DefaultHttpDataSource.Factory()
+            val okHttpClient = OkHttpClient.Builder()
+                .addInterceptor(VideoPlayerInterceptor(context))
+                .build()
+            httpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
         }
         return httpDataSourceFactory
     }

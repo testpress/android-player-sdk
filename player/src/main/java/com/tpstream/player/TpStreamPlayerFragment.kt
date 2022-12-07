@@ -359,9 +359,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             super.onPlayerError(error)
             viewBinding.errorMessage.visibility = View.VISIBLE
             viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
-        }
 
-        override fun onPlayerError(error: PlaybackException) {
             if (isDRMException(error.cause!!)) {
                 onDownloadsSuccess(player?.videoInfo?.dashUrl!!)
             }

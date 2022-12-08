@@ -44,7 +44,7 @@ class PlayerActivity : AppCompatActivity() {
                 videoId = "C3XLe1CCcOq"
                 orgCode = "demoveranda"
             }
-            "Only Encrypt" -> {
+            "AES Encrypt" -> {
                 accessToken = "143a0c71-567e-4ecd-b22d-06177228c25b"
                 videoId = "o7pOsacWaJt"
                 orgCode = "demoveranda"

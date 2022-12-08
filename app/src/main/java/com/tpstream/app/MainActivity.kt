@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     fun buttonClick2(view: View) {
         val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter","Only Encrypt")
+        myIntent.putExtra("VideoParameter","AES Encrypt")
         startActivity(myIntent)
     }
 

@@ -19,7 +19,7 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
-        selectVideoParams(intent.getIntExtra("VideoParameter",-1))
+        selectVideoParams(intent.getStringExtra("VideoParameter")!!)
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
         playerFragment.enableAutoFullScreenOnRotate()
@@ -37,16 +37,21 @@ class PlayerActivity : AppCompatActivity() {
         });
     }
 
-    private fun selectVideoParams(int : Int){
-        when(int){
-            1 -> {
+    private fun selectVideoParams(videoType: String){
+        when(videoType){
+            "DRM" -> {
                 accessToken = "c381512b-7337-4d8e-a8cf-880f4f08fd08"
                 videoId = "C3XLe1CCcOq"
                 orgCode = "demoveranda"
             }
-            2 -> {
-                accessToken = "c39cd7a3-2e0f-431b-b7cc-844e515d2046"
-                videoId = "JISUX8uDKfZ"
+            "AES Encrypt" -> {
+                accessToken = "143a0c71-567e-4ecd-b22d-06177228c25b"
+                videoId = "o7pOsacWaJt"
+                orgCode = "demoveranda"
+            }
+            "Clear" -> {
+                accessToken = "70f61402-3724-4ed8-99de-5473b2310efe"
+                videoId = "qJQlWGLJvNv"
                 orgCode = "demoveranda"
             }
         }

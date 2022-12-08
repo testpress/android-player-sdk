@@ -13,13 +13,19 @@ class MainActivity : AppCompatActivity() {
 
     fun buttonClick(view: View) {
         val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter",1)
+        myIntent.putExtra("VideoParameter","DRM")
         startActivity(myIntent)
     }
 
     fun buttonClick2(view: View) {
         val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter",2)
+        myIntent.putExtra("VideoParameter","AES Encrypt")
+        startActivity(myIntent)
+    }
+
+    fun buttonClick3(view: View) {
+        val myIntent = Intent(this, PlayerActivity::class.java)
+        myIntent.putExtra("VideoParameter","Clear")
         startActivity(myIntent)
     }
 

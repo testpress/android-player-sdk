@@ -51,7 +51,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
-            .setDataSourceFactory(VideoDownloadManager(context).build())
+            .setDataSourceFactory(VideoDownloadManager(context).build(params))
         if (offlineVideoInfo == null) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(
@@ -73,7 +73,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     private fun buildMediaItem(url: String): MediaItem {
         return MediaItem.Builder()
             .setUri(url)
-            .setMimeType(MimeTypes.APPLICATION_MPD)
             .setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
@@ -82,7 +81,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     }
 
     private fun buildDownloadedMediaItem(downloadRequest: DownloadRequest):MediaItem{
-        Log.d("TAG", "buildDownloadedMediaItem: ")
         val builder = MediaItem.Builder()
         builder
             .setMediaId(downloadRequest.id)
@@ -113,10 +111,8 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
-                result.dashUrl?.let {
-                    Handler(Looper.getMainLooper()).post {
-                        load(it)
-                    }
+                Handler(Looper.getMainLooper()).post {
+                    load(result.dashUrl?:result.url!!)
                 }
             }
 

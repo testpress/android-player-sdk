@@ -51,11 +51,10 @@ class VideoDownloadManager {
         return databaseProvider
     }
 
-    @Synchronized
-    fun getHttpDataSourceFactory(): DataSource.Factory {
+    fun getHttpDataSourceFactory(params: TpInitParams? = null): DataSource.Factory {
         if (!::httpDataSourceFactory.isInitialized) {
             val okHttpClient = OkHttpClient.Builder()
-                .addInterceptor(VideoPlayerInterceptor(context))
+                .addInterceptor(VideoPlayerInterceptor(context,params))
                 .build()
             httpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
         }

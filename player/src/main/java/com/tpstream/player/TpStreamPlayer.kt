@@ -50,8 +50,10 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     }
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
+        val videoDownloadManager = VideoDownloadManager(context)
+        videoDownloadManager.getHttpDataSourceFactory(params)
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
-            .setDataSourceFactory(VideoDownloadManager(context).build())
+            .setDataSourceFactory(videoDownloadManager.build())
         if (offlineVideoInfo == null) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(
@@ -81,7 +83,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     }
 
     private fun buildDownloadedMediaItem(downloadRequest: DownloadRequest):MediaItem{
-        Log.d("TAG", "buildDownloadedMediaItem: ")
         val builder = MediaItem.Builder()
         builder
             .setMediaId(downloadRequest.id)

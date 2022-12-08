@@ -45,8 +45,8 @@ class PlayerActivity : AppCompatActivity() {
                 orgCode = "demoveranda"
             }
             2 -> {
-                accessToken = "c39cd7a3-2e0f-431b-b7cc-844e515d2046"
-                videoId = "JISUX8uDKfZ"
+                accessToken = "143a0c71-567e-4ecd-b22d-06177228c25b"
+                videoId = "o7pOsacWaJt"
                 orgCode = "demoveranda"
             }
         }

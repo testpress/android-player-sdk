@@ -53,7 +53,7 @@ class VideoDownloadManager {
 
     fun getHttpDataSourceFactory(): DataSource.Factory {
         val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(VideoPlayerInterceptor(context,Params.params))
+            .addInterceptor(VideoPlayerInterceptor(context))
             .build()
         httpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
         return httpDataSourceFactory
@@ -74,13 +74,13 @@ class VideoDownloadManager {
             val downloadContentDirectory =
                 File(getDownloadDirectory(), DOWNLOAD_CONTENT_DIRECTORY)
             downloadCache =
-                SimpleCache(downloadContentDirectory, NoOpCacheEvictor(), databaseProvider)
+                SimpleCache(downloadContentDirectory, NoOpCacheEvictor(), getDatabaseProvider(context))
         }
         return downloadCache
     }
 
     fun getDownloadIndex(): DefaultDownloadIndex {
-        return DefaultDownloadIndex(databaseProvider)
+        return DefaultDownloadIndex(getDatabaseProvider(context))
     }
 
     private fun getDownloadDirectory(): File {

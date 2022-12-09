@@ -51,19 +51,19 @@ class VideoDownloadManager {
         return databaseProvider
     }
 
-    fun getHttpDataSourceFactory(params: TpInitParams? = null): DataSource.Factory {
+    fun getHttpDataSourceFactory(): DataSource.Factory {
         val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(VideoPlayerInterceptor(context,params))
+            .addInterceptor(VideoPlayerInterceptor(context,Params.params))
             .build()
         httpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
         return httpDataSourceFactory
     }
 
-    fun build(params: TpInitParams? = null): CacheDataSource.Factory {
+    fun build(): CacheDataSource.Factory {
         val cache = VideoDownloadManager(context).getDownloadCache()
         return CacheDataSource.Factory()
             .setCache(cache)
-            .setUpstreamDataSourceFactory(getHttpDataSourceFactory(params))
+            .setUpstreamDataSourceFactory(getHttpDataSourceFactory())
             .setCacheWriteDataSinkFactory(null)
             .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
     }
@@ -74,7 +74,7 @@ class VideoDownloadManager {
             val downloadContentDirectory =
                 File(getDownloadDirectory(), DOWNLOAD_CONTENT_DIRECTORY)
             downloadCache =
-                SimpleCache(downloadContentDirectory, NoOpCacheEvictor(), getDatabaseProvider(context))
+                SimpleCache(downloadContentDirectory, NoOpCacheEvictor(), databaseProvider)
         }
         return downloadCache
     }
@@ -83,7 +83,6 @@ class VideoDownloadManager {
         return DefaultDownloadIndex(databaseProvider)
     }
 
-    @Synchronized
     private fun getDownloadDirectory(): File {
         if (!::downloadDirectory.isInitialized) {
             downloadDirectory = if (context.getExternalFilesDir(null) != null) {

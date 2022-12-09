@@ -24,7 +24,10 @@ interface OfflineVideoInfoDao {
     fun getOfflineVideoInfoByVideoId(videoID:String): OfflineVideoInfo?
 
     @Query("SELECT * FROM OfflineVideoInfo WHERE dashUrl=:dashUrl")
-    fun getOfflineVideoInfoByUrl(dashUrl:String): OfflineVideoInfo?
+    fun getOfflineVideoInfoByDashUrl(dashUrl:String): OfflineVideoInfo?
+
+    @Query("SELECT * FROM OfflineVideoInfo WHERE url=:url")
+    fun getOfflineVideoInfoByUrl(url:String): OfflineVideoInfo?
 
     @Query("SELECT * FROM OfflineVideoInfo WHERE videoId=:videoId")
     fun getOfflineVideoInfoById(videoId:String): LiveData<OfflineVideoInfo?>

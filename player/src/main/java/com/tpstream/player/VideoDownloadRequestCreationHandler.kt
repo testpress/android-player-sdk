@@ -11,7 +11,6 @@ import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.tpstream.player.models.VideoInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +29,7 @@ class VideoDownloadRequestCreationHandler(
     private var keySetId: ByteArray? = null
 
     init {
-        val url = player.videoInfo?.dashUrl
+        val url = player.videoInfo?.dashUrl?:player.videoInfo?.url
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         mediaItem = MediaItem.Builder()
             .setUri(url)
@@ -94,7 +93,7 @@ class VideoDownloadRequestCreationHandler(
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
         override = overrides
         setSelectedTracks(overrides)
-        val name = player.videoInfo?.title!!
+        val name = player.videoInfo?.title?:""
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 

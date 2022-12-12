@@ -116,6 +116,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         addDownloadControls()
         if (showDownloadButton){
             downloadButton.visibility = View.VISIBLE
+        } else {
+            downloadButton.visibility = View.GONE
         }
         offlineVideoInfoViewModel.get(params.videoId!!).observe(viewLifecycleOwner) { offlineVideoInfo ->
             downloadState = when (offlineVideoInfo?.downloadState) {

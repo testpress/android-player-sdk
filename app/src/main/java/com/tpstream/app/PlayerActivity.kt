@@ -2,8 +2,6 @@ package com.tpstream.app
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import androidx.media3.datasource.okhttp.OkHttpDataSource
 import com.tpstream.player.InitializationListener
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.TpStreamPlayer

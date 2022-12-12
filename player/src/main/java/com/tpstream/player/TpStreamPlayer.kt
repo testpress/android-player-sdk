@@ -53,7 +53,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
-            .setDataSourceFactory(VideoDownloadManager(context).build())
+            .setDataSourceFactory(VideoDownloadManager(context).build(params))
         if (!videoInfo.dashUrl.equals("") && offlineVideoInfo == null) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(

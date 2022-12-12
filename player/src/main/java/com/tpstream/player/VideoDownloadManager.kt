@@ -2,6 +2,7 @@ package com.tpstream.player
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.media3.database.DatabaseProvider
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
@@ -32,8 +33,15 @@ class VideoDownloadManager {
         return downloadManager!!
     }
 
+    val params = TpInitParams.Builder()
+        .setOrgCode("demoveranda")
+        .setVideoId("o7pOsacWaJt")
+        .setAccessToken("143a0c71-567e-4ecd-b22d-06177228c25b")
+        .build()
+
     @Synchronized
     private fun initializeDownloadManger() {
+        Log.d("TAG", "initializeDownloadManger: ")
         downloadManager = DownloadManager(
             context,
             getDatabaseProvider(context),
@@ -51,19 +59,21 @@ class VideoDownloadManager {
         return databaseProvider
     }
 
-    fun getHttpDataSourceFactory(): DataSource.Factory {
+    fun getHttpDataSourceFactory(tpInitParams: TpInitParams? = null): DataSource.Factory {
+        Log.d("TAG", "getHttpDataSourceFactory: ${tpInitParams?.videoId}")
         val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(VideoPlayerInterceptor(context))
+            .addInterceptor(VideoPlayerInterceptor(context,tpInitParams))
             .build()
         httpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
         return httpDataSourceFactory
     }
 
-    fun build(): CacheDataSource.Factory {
+    fun build(tpInitParams: TpInitParams? = null): CacheDataSource.Factory {
+        Log.d("TAG", "build: ")
         val cache = VideoDownloadManager(context).getDownloadCache()
         return CacheDataSource.Factory()
             .setCache(cache)
-            .setUpstreamDataSourceFactory(getHttpDataSourceFactory())
+            .setUpstreamDataSourceFactory(getHttpDataSourceFactory(tpInitParams))
             .setCacheWriteDataSinkFactory(null)
             .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
     }

@@ -47,7 +47,7 @@ class VideoDownloadRequestCreationHandler(
         val sessionManager = DefaultDrmSessionManager.Builder()
             .build(CustomHttpDrmMediaCallback(context, player.params))
         sessionManager.setMode(DefaultDrmSessionManager.MODE_DOWNLOAD, null)
-        val dataSourceFactory = VideoDownloadManager(context).build()
+        val dataSourceFactory = VideoDownloadManager(context).build(player.params)
         val renderersFactory = DefaultRenderersFactory(context)
         return DownloadHelper.forMediaItem(
             mediaItem,

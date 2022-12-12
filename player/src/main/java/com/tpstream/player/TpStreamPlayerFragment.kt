@@ -107,13 +107,17 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         super.onViewCreated(view, savedInstanceState)
         //viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
         initializePlayer()
-        updateDownloadButtonImage()
         addCustomPlayerControls()
         DownloadCallback.invoke().callback = this
     }
 
-    private fun updateDownloadButtonImage(){
-        offlineVideoInfoViewModel.get(player?.params?.videoId!!).observe(viewLifecycleOwner) { offlineVideoInfo ->
+    private fun updateDownloadButtonImage(params: TpInitParams){
+        downloadButton = viewBinding.videoView.findViewById(R.id.exo_download)
+        addDownloadControls()
+        if (showDownloadButton){
+            downloadButton.visibility = View.VISIBLE
+        }
+        offlineVideoInfoViewModel.get(params.videoId!!).observe(viewLifecycleOwner) { offlineVideoInfo ->
             downloadState = when (offlineVideoInfo?.downloadState) {
                 OfflineVideoState.DOWNLOADING ->{
                     downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
@@ -147,7 +151,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun addCustomPlayerControls() {
         addResolutionChangeControl()
         addFullScreenControl()
-        addDownloadControls()
     }
 
     private fun addFullScreenControl() {
@@ -242,10 +245,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
     private fun addDownloadControls() {
-        downloadButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_download)
-        if (showDownloadButton){
-            downloadButton.visibility = View.VISIBLE
-        }
         downloadButton.setOnClickListener {
             when (downloadState) {
                 OfflineVideoState.COMPLETE -> {
@@ -350,6 +349,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
         player?.setPlayWhenReady(parameters.autoPlay==true)
         showDownloadButton = parameters.isDownloadEnabled
+        updateDownloadButtonImage(parameters)
     }
 
     inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {

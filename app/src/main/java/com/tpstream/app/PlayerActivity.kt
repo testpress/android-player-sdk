@@ -2,6 +2,8 @@ package com.tpstream.app
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import androidx.media3.datasource.okhttp.OkHttpDataSource
 import com.tpstream.player.InitializationListener
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.TpStreamPlayer
@@ -9,7 +11,7 @@ import com.tpstream.player.TpStreamPlayerFragment
 
 class PlayerActivity : AppCompatActivity() {
     lateinit var playerFragment: TpStreamPlayerFragment;
-    lateinit var player: TpStreamPlayer;
+    lateinit var tpStreamPlayer: TpStreamPlayer;
     private val TAG = "PlayerActivity"
     private lateinit var accessToken :String
     private lateinit var videoId :String
@@ -25,16 +27,21 @@ class PlayerActivity : AppCompatActivity() {
         playerFragment.enableAutoFullScreenOnRotate()
         playerFragment.setOnInitializationListener(object: InitializationListener {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
-                parameters = TpInitParams.Builder()
-                    .setVideoId(videoId)
-                    .setAccessToken(accessToken)
-                    .setOrgCode(orgCode)
-                    .setAutoPlay(true)
-                    .enableDownloadSupport(true)
-                    .build()
-                playerFragment.load(parameters)
+                play()
             }
         });
+    }
+
+    fun play(){
+        parameters = TpInitParams.Builder()
+            .setVideoId(videoId)
+            .setAccessToken(accessToken)
+            .setOrgCode(orgCode)
+            .setAutoPlay(true)
+            .enableDownloadSupport(true)
+            .build()
+        playerFragment.load(parameters)
+
     }
 
     private fun selectVideoParams(videoType: String){

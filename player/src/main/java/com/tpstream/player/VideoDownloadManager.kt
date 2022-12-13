@@ -33,15 +33,8 @@ class VideoDownloadManager {
         return downloadManager!!
     }
 
-    val params = TpInitParams.Builder()
-        .setOrgCode("demoveranda")
-        .setVideoId("o7pOsacWaJt")
-        .setAccessToken("143a0c71-567e-4ecd-b22d-06177228c25b")
-        .build()
-
     @Synchronized
     private fun initializeDownloadManger() {
-        Log.d("TAG", "initializeDownloadManger: ")
         downloadManager = DownloadManager(
             context,
             getDatabaseProvider(context),
@@ -59,21 +52,20 @@ class VideoDownloadManager {
         return databaseProvider
     }
 
-    fun getHttpDataSourceFactory(tpInitParams: TpInitParams? = null): DataSource.Factory {
-        Log.d("TAG", "getHttpDataSourceFactory: ${tpInitParams?.videoId}")
+    fun getHttpDataSourceFactory(): DataSource.Factory {
         val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(VideoPlayerInterceptor(context,tpInitParams))
+            .addInterceptor(VideoPlayerInterceptor(context))
             .build()
         httpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
         return httpDataSourceFactory
     }
 
-    fun build(tpInitParams: TpInitParams? = null): CacheDataSource.Factory {
+    fun build(): CacheDataSource.Factory {
         Log.d("TAG", "build: ")
         val cache = VideoDownloadManager(context).getDownloadCache()
         return CacheDataSource.Factory()
             .setCache(cache)
-            .setUpstreamDataSourceFactory(getHttpDataSourceFactory(tpInitParams))
+            .setUpstreamDataSourceFactory(getHttpDataSourceFactory())
             .setCacheWriteDataSinkFactory(null)
             .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
     }

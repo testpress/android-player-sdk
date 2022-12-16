@@ -71,7 +71,7 @@ class VideoDownloadService:DownloadService(
         var videoId : String?
 
         runBlocking(Dispatchers.IO) {
-            videoId = offlineVideoInfoRepository.grtVideoIdByUrl(download.request.uri.toString())
+            videoId = offlineVideoInfoRepository.getVideoIdByUrl(download.request.uri.toString())
         }
 
         when (download.state) {

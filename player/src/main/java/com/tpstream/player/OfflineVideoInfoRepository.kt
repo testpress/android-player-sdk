@@ -13,7 +13,7 @@ class OfflineVideoInfoRepository(context: Context) {
     private val offlineVideoInfoDao = TPStreamsDatabase(context).offlineVideoInfoDao()
 
     suspend fun updateDownloadStatus(download: Download) {
-        val offlineVideoInfo = offlineVideoInfoDao.getOfflineVideoInfoByUrl(download.request.uri.toString())
+        val offlineVideoInfo = getOfflineVideoInfoByUrl(download.request.uri.toString())
         offlineVideoInfo?.let {
             offlineVideoInfo.percentageDownloaded = download.percentDownloaded.toInt()
             offlineVideoInfo.bytesDownloaded = download.bytesDownloaded
@@ -23,12 +23,22 @@ class OfflineVideoInfoRepository(context: Context) {
         }
     }
 
+    private fun getOfflineVideoInfoByUrl(url:String):OfflineVideoInfo? {
+        if (url.contains(".m3u8")){
+            return offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)
+        }
+        return offlineVideoInfoDao.getOfflineVideoInfoByDashUrl(url)
+    }
+
     fun get(videoId: String): LiveData<OfflineVideoInfo?> {
         return offlineVideoInfoDao.getOfflineVideoInfoById(videoId)
     }
 
-    fun grtVideoIdByUrl(url:String):String? {
-        return offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)?.videoId
+    fun getVideoIdByUrl(url:String):String? {
+        if (url.contains(".m3u8")){
+            return offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)?.videoId
+        }
+        return offlineVideoInfoDao.getOfflineVideoInfoByDashUrl(url)?.videoId
     }
 
     suspend fun insert(offlineVideoInfo: OfflineVideoInfo){

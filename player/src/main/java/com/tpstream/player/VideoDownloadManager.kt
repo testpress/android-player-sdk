@@ -2,6 +2,7 @@ package com.tpstream.player
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.media3.database.DatabaseProvider
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
@@ -51,19 +52,20 @@ class VideoDownloadManager {
         return databaseProvider
     }
 
-    fun getHttpDataSourceFactory(params: TpInitParams? = null): DataSource.Factory {
+    fun getHttpDataSourceFactory(): DataSource.Factory {
         val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(VideoPlayerInterceptor(context,params))
+            .addInterceptor(VideoPlayerInterceptor(context))
             .build()
         httpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
         return httpDataSourceFactory
     }
 
-    fun build(params: TpInitParams? = null): CacheDataSource.Factory {
+    fun build(): CacheDataSource.Factory {
+        Log.d("TAG", "build: ")
         val cache = VideoDownloadManager(context).getDownloadCache()
         return CacheDataSource.Factory()
             .setCache(cache)
-            .setUpstreamDataSourceFactory(getHttpDataSourceFactory(params))
+            .setUpstreamDataSourceFactory(getHttpDataSourceFactory())
             .setCacheWriteDataSinkFactory(null)
             .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
     }
@@ -80,10 +82,9 @@ class VideoDownloadManager {
     }
 
     fun getDownloadIndex(): DefaultDownloadIndex {
-        return DefaultDownloadIndex(databaseProvider)
+        return DefaultDownloadIndex(getDatabaseProvider(context))
     }
 
-    @Synchronized
     private fun getDownloadDirectory(): File {
         if (!::downloadDirectory.isInitialized) {
             downloadDirectory = if (context.getExternalFilesDir(null) != null) {

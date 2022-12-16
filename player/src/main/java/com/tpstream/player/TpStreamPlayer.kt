@@ -3,11 +3,9 @@ package com.tpstream.player
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.media3.common.Format
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
 import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
@@ -38,6 +36,10 @@ public interface TpStreamPlayer {
     fun getDuration(): Long
 }
 
+internal object Params{
+    lateinit var params:TpInitParams
+}
+
 class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStreamPlayer {
     override lateinit var params: TpInitParams
     override lateinit var videoInfo: VideoInfo
@@ -51,8 +53,8 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
-            .setDataSourceFactory(VideoDownloadManager(context).build(params))
-        if (offlineVideoInfo == null) {
+            .setDataSourceFactory(VideoDownloadManager(context).build())
+        if (!(videoInfo.dashUrl == null || videoInfo.dashUrl.equals("")) && offlineVideoInfo == null) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(
                     CustomHttpDrmMediaCallback(context, params)
@@ -71,13 +73,16 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     }
 
     private fun buildMediaItem(url: String): MediaItem {
-        return MediaItem.Builder()
+        val builder = MediaItem.Builder()
             .setUri(url)
-            .setDrmConfiguration(
+        if (!videoInfo.dashUrl.equals("")){
+            builder.setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
                     .build()
-            ).build()
+            )
+        }
+        return builder.build()
     }
 
     private fun buildDownloadedMediaItem(downloadRequest: DownloadRequest):MediaItem{
@@ -88,21 +93,28 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
             .setCustomCacheKey(downloadRequest.customCacheKey)
             .setMimeType(downloadRequest.mimeType)
             .setStreamKeys(downloadRequest.streamKeys)
-            .setDrmConfiguration(
+        if (!offlineVideoInfo?.dashUrl.equals("")){
+            builder.setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setKeySetId(downloadRequest.keySetId)
                     .build()
             )
+        }
         return builder.build()
     }
 
     override fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
         params = parameters
+        Params.params = parameters
         populateOfflineVideoInfo(parameters)
         if (checkIsVideoDownloaded()){
             videoInfo = offlineVideoInfo?.asVideoInfo()!!
             Handler(Looper.getMainLooper()).post {
-                load(offlineVideoInfo?.dashUrl!!)
+                if (offlineVideoInfo?.dashUrl.equals("")){
+                    load(offlineVideoInfo?.url!!)
+                } else {
+                    load(offlineVideoInfo?.dashUrl!!)
+                }
             }
             return
         }
@@ -130,8 +142,15 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     }
 
     private fun checkIsVideoDownloaded():Boolean{
-        if (offlineVideoInfo != null && DownloadTask(context).isDownloaded(offlineVideoInfo?.dashUrl!!)){
-            return true
+        if (offlineVideoInfo != null){
+            val url = if (offlineVideoInfo?.dashUrl.equals("")){
+                offlineVideoInfo?.url!!
+            } else {
+                offlineVideoInfo?.dashUrl!!
+            }
+            if (DownloadTask(context).isDownloaded(url)) {
+                return true
+            }
         }
         return false
     }

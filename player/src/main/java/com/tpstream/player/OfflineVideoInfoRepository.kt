@@ -13,7 +13,7 @@ class OfflineVideoInfoRepository(context: Context) {
     private val offlineVideoInfoDao = TPStreamsDatabase(context).offlineVideoInfoDao()
 
     suspend fun updateDownloadStatus(download: Download) {
-        val offlineVideoInfo = offlineVideoInfoDao.getOfflineVideoInfoByUrl(download.request.uri.toString())
+        val offlineVideoInfo = getOfflineVideoInfoByUrl(download.request.uri.toString())
         offlineVideoInfo?.let {
             offlineVideoInfo.percentageDownloaded = download.percentDownloaded.toInt()
             offlineVideoInfo.bytesDownloaded = download.bytesDownloaded
@@ -27,8 +27,20 @@ class OfflineVideoInfoRepository(context: Context) {
         return offlineVideoInfoDao.getOfflineVideoInfoById(videoId)
     }
 
-    fun grtVideoIdByUrl(url:String):String? {
-        return offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)?.videoId
+    private fun getOfflineVideoInfoByUrl(url: String):OfflineVideoInfo?{
+        return if (isDash(url)){
+            offlineVideoInfoDao.getOfflineVideoInfoByDashUrl(url)
+        } else {
+            offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)
+        }
+    }
+
+    fun getVideoIdByUrl(url:String):String? {
+        return if (isDash(url)){
+            offlineVideoInfoDao.getOfflineVideoInfoByDashUrl(url)?.videoId
+        } else {
+            offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)?.videoId
+        }
     }
 
     suspend fun insert(offlineVideoInfo: OfflineVideoInfo){
@@ -41,6 +53,10 @@ class OfflineVideoInfoRepository(context: Context) {
 
     fun getOfflineVideoInfoByVideoId(videoID:String): OfflineVideoInfo?{
         return offlineVideoInfoDao.getOfflineVideoInfoByVideoId(videoID)
+    }
+
+    private fun isDash(url: String):Boolean{
+        return !url.contains(".m3u8")
     }
 
 }

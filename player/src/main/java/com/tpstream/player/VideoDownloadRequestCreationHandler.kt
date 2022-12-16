@@ -30,7 +30,11 @@ class VideoDownloadRequestCreationHandler(
     private var keySetId: ByteArray? = null
 
     init {
-        val url = player.videoInfo?.dashUrl
+        val url = if (player.videoInfo?.dashUrl == null){
+            player.videoInfo?.url!!
+        } else {
+            player.videoInfo?.dashUrl!!
+        }
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         mediaItem = MediaItem.Builder()
             .setUri(url)

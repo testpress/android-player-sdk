@@ -30,7 +30,7 @@ class VideoDownloadRequestCreationHandler(
     private var keySetId: ByteArray? = null
 
     init {
-        val url = player.videoInfo?.dashUrl
+        val url = player.videoInfo?.dashUrl?:player.videoInfo?.url!!
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         mediaItem = MediaItem.Builder()
             .setUri(url)
@@ -48,7 +48,7 @@ class VideoDownloadRequestCreationHandler(
         val sessionManager = DefaultDrmSessionManager.Builder()
             .build(CustomHttpDrmMediaCallback(context, player.params))
         sessionManager.setMode(DefaultDrmSessionManager.MODE_DOWNLOAD, null)
-        val dataSourceFactory = VideoDownloadManager(context).build()
+        val dataSourceFactory = VideoDownloadManager(context).build(player.params)
         val renderersFactory = DefaultRenderersFactory(context)
         return DownloadHelper.forMediaItem(
             mediaItem,

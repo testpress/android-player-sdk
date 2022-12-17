@@ -41,7 +41,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 //    }
 
     private lateinit var viewModel: TpStreamPlayerViewModel
-    private val playbackStateListener: Player.Listener = PlayerListener()
+    var playbackStateListener: TPPlayerListener? = null
+    private val _playbackStateListener: Player.Listener = PlayerListener()
     private var player: TpStreamPlayer? = null
     private var _player: ExoPlayer? = null
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
@@ -318,7 +319,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             .build()
             .also { exoPlayer ->
                 viewBinding.videoView.player = exoPlayer
-                exoPlayer.addListener(playbackStateListener)
+                exoPlayer.addListener(_playbackStateListener)
             }
     }
 
@@ -361,6 +362,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             if (playbackState == ExoPlayer.STATE_READY) {
                 viewBinding.errorMessage.visibility = View.GONE
             }
+            playbackStateListener?.onPlaybackStateChanged(playbackState)
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -371,6 +373,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             if (isDRMException(error.cause!!)) {
                 onDownloadsSuccess(player?.videoInfo?.dashUrl!!)
             }
+            playbackStateListener?.onPlayerError(error)
         }
 
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {
@@ -379,6 +382,75 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onLicenseFetchFailure() {
             Log.d("TAG", "onLicenseFetchFailure: ")
+        }
+
+        override fun onTracksChanged(tracks: Tracks) {
+            super.onTracksChanged(tracks)
+            playbackStateListener?.onTracksChanged(tracks)
+        }
+
+        override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+            super.onPlayWhenReadyChanged(playWhenReady, reason)
+            playbackStateListener?.onPlayWhenReadyChanged(playWhenReady, reason)
+        }
+
+        override fun onDeviceInfoChanged(deviceInfo: DeviceInfo) {
+            super.onDeviceInfoChanged(deviceInfo)
+            playbackStateListener?.onDeviceInfoChanged(deviceInfo)
+        }
+
+        override fun onIsLoadingChanged(isLoading: Boolean) {
+            super.onIsLoadingChanged(isLoading)
+            playbackStateListener?.onIsLoadingChanged(isLoading)
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
+            playbackStateListener?.onIsPlayingChanged(isPlaying)
+        }
+
+        override fun onMetadata(metadata: Metadata) {
+            super.onMetadata(metadata)
+            playbackStateListener?.onMetadata(metadata)
+        }
+
+        override fun onEvents(exoplayer: Player, events: Player.Events) {
+            super.onEvents(exoplayer, events)
+            playbackStateListener?.onEvents(player, events)
+        }
+
+        override fun onSeekBackIncrementChanged(seekBackIncrementMs: Long) {
+            super.onSeekBackIncrementChanged(seekBackIncrementMs)
+            playbackStateListener?.onSeekBackIncrementChanged(seekBackIncrementMs)
+        }
+
+        override fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long) {
+            super.onSeekForwardIncrementChanged(seekForwardIncrementMs)
+            playbackStateListener?.onSeekForwardIncrementChanged(seekForwardIncrementMs)
+        }
+
+        override fun onVideoSizeChanged(videoSize: VideoSize) {
+            super.onVideoSizeChanged(videoSize)
+            playbackStateListener?.onVideoSizeChanged(videoSize)
+        }
+
+        override fun onPositionDiscontinuity(
+            oldPosition: Player.PositionInfo,
+            newPosition: Player.PositionInfo,
+            reason: Int
+        ) {
+            super.onPositionDiscontinuity(oldPosition, newPosition, reason)
+            playbackStateListener?.onPositionDiscontinuity(oldPosition, newPosition, reason)
+        }
+
+        override fun onPlayerErrorChanged(error: PlaybackException?) {
+            super.onPlayerErrorChanged(error)
+            playbackStateListener?.onPlayerErrorChanged(error)
+        }
+
+        override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+            super.onTimelineChanged(timeline, reason)
+            playbackStateListener?.onTimelineChanged(timeline, reason)
         }
 
         private fun isDRMException(cause: Throwable): Boolean {
@@ -421,4 +493,22 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
 interface InitializationListener {
     fun onInitializationSuccess(player: TpStreamPlayer)
+}
+
+interface TPPlayerListener {
+    fun onTracksChanged(tracks: Tracks)
+    fun onMetadata(metadata: Metadata)
+    fun onIsPlayingChanged(playing: Boolean)
+    fun onIsLoadingChanged(loading: Boolean)
+    fun onDeviceInfoChanged(deviceInfo: DeviceInfo)
+    fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int)
+    fun onEvents(player: TpStreamPlayer?, events: Player.Events)
+    fun onSeekBackIncrementChanged(seekBackIncrementMs: Long)
+    fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long)
+    fun onVideoSizeChanged(videoSize: VideoSize)
+    fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int)
+    fun onPlayerErrorChanged(error: PlaybackException?)
+    fun onTimelineChanged(timeline: Timeline, reason: Int)
+    fun onPlaybackStateChanged(playbackState: Int)
+    fun onPlayerError(error: PlaybackException)
 }

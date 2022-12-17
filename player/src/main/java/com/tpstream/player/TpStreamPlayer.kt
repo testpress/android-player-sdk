@@ -3,12 +3,7 @@ package com.tpstream.player
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import androidx.media3.common.Format
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
-import androidx.media3.common.Tracks
+import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.offline.DownloadRequest
@@ -22,6 +17,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 public interface TpStreamPlayer {
+    object PLAYBACK_STATE {
+        val STATE_IDLE = 1
+        val STATE_BUFFERING = 2
+        val STATE_READY = 3
+        val STATE_ENDED = 4
+    }
     abstract val params: TpInitParams
     abstract val videoInfo: VideoInfo?
     fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit)

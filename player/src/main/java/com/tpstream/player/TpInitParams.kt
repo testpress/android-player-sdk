@@ -7,7 +7,6 @@ import kotlinx.parcelize.Parcelize
 data class TpInitParams (
     var autoPlay: Boolean? = null,
     var bufferingGoalMs: Int? = null,
-    var endTimeMs: Int? = null,
     var forceHighestSupportedBitrate: Boolean? = null,
     var forceLowestBitrate: Boolean? = null,
     var maxVideoBitrateKbps: Int? = null,
@@ -17,9 +16,7 @@ data class TpInitParams (
     var videoId: String? = null,
     var orgCode: String,
     var preferredCaptionsLanguage: String? = null,
-    var resumeTimeMs: Int? = null,
     var signature: String? = null,
-    var startTimeMs: Int? = null,
     var techOverride: Array<String>? = null,
     var isDownloadEnabled: Boolean = false
 ): Parcelable {
@@ -27,7 +24,6 @@ data class TpInitParams (
     class Builder {
         private var autoPlay: Boolean? = null
         private var bufferingGoalMs: Int? = null
-        private var endTimeMs: Int? = null
         private var forceHighestSupportedBitrate: Boolean? = null
         private var forceLowestBitrate: Boolean? = null
         private var maxVideoBitrateKbps: Int? = null
@@ -37,9 +33,7 @@ data class TpInitParams (
         private var videoId: String? = null
         private var orgCode: String? = null
         private var preferredCaptionsLanguage: String? = null
-        private var resumeTimeMs: Int? = null
         private var signature: String? = null
-        private var startTimeMs: Int? = null
         private var techOverride: Array<String>? = null
         private var isDownloadEnabled: Boolean = false
 
@@ -53,11 +47,7 @@ data class TpInitParams (
         fun setVideoId(videoId: String) = apply { this.videoId = videoId }
         fun setOrgCode(subdomain: String) = apply { this.orgCode = subdomain }
         fun setPreferredCaptionsLanguage(preferredCaptionsLanguage: String) = apply { this.preferredCaptionsLanguage = preferredCaptionsLanguage }
-        fun setResumeTime(resumeTimeMs: Int) = apply { this.resumeTimeMs = resumeTimeMs }
         fun setSignature(signature: String) = apply { this.signature = signature }
-        fun setStartTimeMs(startTimeMs: Int) = apply { this.startTimeMs = startTimeMs }
-        fun setEndTimeMs(endTimeMs: Int) = apply { this.endTimeMs = endTimeMs }
-        fun setClips(startTimeMs: Int, endTimeMs: Int) = apply { this.startTimeMs = startTimeMs; this.endTimeMs = endTimeMs }
         fun setTechOverride(techOverride: Array<String>) = apply { this.techOverride = techOverride }
         fun enableDownloadSupport(isDownloadEnabled: Boolean) = apply { this.isDownloadEnabled = isDownloadEnabled }
 
@@ -69,7 +59,6 @@ data class TpInitParams (
             return TpInitParams(
                 autoPlay,
                 bufferingGoalMs,
-                endTimeMs,
                 forceHighestSupportedBitrate,
                 forceLowestBitrate,
                 maxVideoBitrateKbps,
@@ -79,9 +68,7 @@ data class TpInitParams (
                 videoId,
                 orgCode!!,
                 preferredCaptionsLanguage,
-                resumeTimeMs,
                 signature,
-                startTimeMs,
                 techOverride,
                 isDownloadEnabled
             )

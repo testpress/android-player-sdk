@@ -103,7 +103,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         if (checkIsVideoDownloaded()){
             videoInfo = offlineVideoInfo?.asVideoInfo()!!
             Handler(Looper.getMainLooper()).post {
-                load(offlineVideoInfo?.url!!)
+                load(offlineVideoInfo?.dashUrl!!)
             }
             return
         }
@@ -131,7 +131,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     }
 
     private fun checkIsVideoDownloaded():Boolean{
-        if (offlineVideoInfo != null && DownloadTask(context).isDownloaded(offlineVideoInfo?.url!!)){
+        if (offlineVideoInfo != null && DownloadTask(context).isDownloaded(offlineVideoInfo?.dashUrl!!)){
             return true
         }
         return false

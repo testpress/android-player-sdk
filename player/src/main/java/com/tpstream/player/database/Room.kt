@@ -6,7 +6,7 @@ import com.tpstream.player.database.dao.OfflineVideoInfoDao
 import com.tpstream.player.models.OfflineVideoInfo
 
 @Database(
-    version = 1,
+    version = 2,
     entities = [OfflineVideoInfo::class],
     exportSchema = true
 )

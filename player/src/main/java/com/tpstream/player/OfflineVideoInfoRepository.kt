@@ -28,19 +28,11 @@ class OfflineVideoInfoRepository(context: Context) {
     }
 
     private fun getOfflineVideoInfoByUrl(url: String):OfflineVideoInfo?{
-        return if (isDash(url)){
-            offlineVideoInfoDao.getOfflineVideoInfoByDashUrl(url)
-        } else {
-            offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)
-        }
+        return offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)
     }
 
     fun getVideoIdByUrl(url:String):String? {
-        return if (isDash(url)){
-            offlineVideoInfoDao.getOfflineVideoInfoByDashUrl(url)?.videoId
-        } else {
-            offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)?.videoId
-        }
+        return offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)?.videoId
     }
 
     suspend fun insert(offlineVideoInfo: OfflineVideoInfo){
@@ -53,10 +45,6 @@ class OfflineVideoInfoRepository(context: Context) {
 
     fun getOfflineVideoInfoByVideoId(videoID:String): OfflineVideoInfo?{
         return offlineVideoInfoDao.getOfflineVideoInfoByVideoId(videoID)
-    }
-
-    private fun isDash(url: String):Boolean{
-        return !url.contains(".m3u8")
     }
 
 }

@@ -18,7 +18,8 @@ data class TpInitParams (
     var preferredCaptionsLanguage: String? = null,
     var signature: String? = null,
     var techOverride: Array<String>? = null,
-    var isDownloadEnabled: Boolean = false
+    var isDownloadEnabled: Boolean = false,
+    var startAt: Int = 0
 ): Parcelable {
     
     class Builder {
@@ -36,8 +37,10 @@ data class TpInitParams (
         private var signature: String? = null
         private var techOverride: Array<String>? = null
         private var isDownloadEnabled: Boolean = false
+        private var startAt: Int = 0
 
         fun setAutoPlay(autoPlay: Boolean) = apply { this.autoPlay = autoPlay }
+        fun startAt(timeInSeconds: Int) = apply { this.startAt = timeInSeconds }
         fun setBufferingGoalMs(bufferingGoalMs: Int) = apply { this.bufferingGoalMs = bufferingGoalMs }
         fun setForceHighestSupportedBitrate(forceHighestSupportedBitrate: Boolean) = apply { this.forceHighestSupportedBitrate = forceHighestSupportedBitrate }
         fun setForceLowestBitrate(forceLowestBitrate: Boolean) = apply { this.forceLowestBitrate = forceLowestBitrate }
@@ -70,7 +73,8 @@ data class TpInitParams (
                 preferredCaptionsLanguage,
                 signature,
                 techOverride,
-                isDownloadEnabled
+                isDownloadEnabled,
+                startAt
             )
         }
     }

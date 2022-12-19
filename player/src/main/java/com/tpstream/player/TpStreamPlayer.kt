@@ -103,7 +103,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         if (checkIsVideoDownloaded()){
             videoInfo = offlineVideoInfo?.asVideoInfo()!!
             Handler(Looper.getMainLooper()).post {
-                load(offlineVideoInfo?.dashUrl!!)
+                load(offlineVideoInfo?.dashUrl!!, parameters.startAt * 1000L)
             }
             return
         }
@@ -113,7 +113,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
                 Handler(Looper.getMainLooper()).post {
-                    load(result.dashUrl?:result.url!!)
+                    load(result.dashUrl?:result.url!!, parameters.startAt * 1000L)
                 }
             }
 

@@ -19,7 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.*
 import com.tpstream.player.R
-import com.tpstream.player.databinding.DownloadTrackSelectionDialogBinding
+import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
 import com.tpstream.player.models.OfflineVideoInfo
 import com.tpstream.player.models.asOfflineVideoInfo
 import okio.IOException
@@ -33,7 +33,7 @@ class DownloadResolutionSelectionSheet(
     private val trackGroups: List<Tracks.Group>,
 ) : BottomSheetDialogFragment(), VideoDownloadRequestCreationHandler.Listener {
 
-    private var _binding: DownloadTrackSelectionDialogBinding? = null
+    private var _binding: TpDownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     private val offlineVideoInfo = player.videoInfo?.asOfflineVideoInfo()
     private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
@@ -57,7 +57,7 @@ class DownloadResolutionSelectionSheet(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = DownloadTrackSelectionDialogBinding.inflate(inflater, container, false)
+        _binding = TpDownloadTrackSelectionDialogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -129,7 +129,7 @@ class DownloadResolutionSelectionSheet(
         context1: Context,
         dataSource: ArrayList<TrackInfo>,
         var trackPosition: Int?
-    ) : ArrayAdapter<TrackInfo>(context1, R.layout.download_resulotion_data, dataSource) {
+    ) : ArrayAdapter<TrackInfo>(context1, R.layout.tp_download_resulotion_data, dataSource) {
         private val inflater =
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -137,7 +137,7 @@ class DownloadResolutionSelectionSheet(
             val resolution = getItem(position)!!
             var view = convertView
             if (convertView == null) {
-                view = inflater.inflate(R.layout.download_resulotion_data, parent, false)
+                view = inflater.inflate(R.layout.tp_download_resulotion_data, parent, false)
             }
             val track = view!!.findViewById<CheckedTextView>(R.id.track_selecting)
             track.text = getResolution(resolution.format.height)

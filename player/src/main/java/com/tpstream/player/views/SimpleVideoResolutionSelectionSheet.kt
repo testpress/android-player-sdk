@@ -18,7 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tpstream.player.R
 import com.tpstream.player.TpStreamPlayer
-import com.tpstream.player.databinding.TrackSelectionDialogBinding
+import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
 
 
 @UnstableApi
@@ -27,7 +27,7 @@ class SimpleVideoResolutionSelectionSheet(
     var selectedResolution: ResolutionOptions
 ) : BottomSheetDialogFragment(){
 
-    private var _binding: TrackSelectionDialogBinding? = null
+    private var _binding: TpTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     var onClickListener: DialogInterface.OnClickListener? = null
 
@@ -40,7 +40,7 @@ class SimpleVideoResolutionSelectionSheet(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = TrackSelectionDialogBinding.inflate(inflater, container, false)
+        _binding = TpTrackSelectionDialogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -114,14 +114,14 @@ data class Resolution(
 )
 
 class ResolutionAdapter(context1: Context, dataSource: ArrayList<Resolution>, private val selectedResolution: ResolutionOptions): ArrayAdapter<Resolution>(context1,
-    R.layout.resolution_data, dataSource) {
+    R.layout.tp_resolution_data, dataSource) {
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val resolution = getItem(position)!!
         var view = convertView
         if (convertView == null) {
-            view =  inflater.inflate(R.layout.resolution_data, parent, false)
+            view =  inflater.inflate(R.layout.tp_resolution_data, parent, false)
         }
 
         view!!.findViewById<TextView>(R.id.title).text = resolution.title

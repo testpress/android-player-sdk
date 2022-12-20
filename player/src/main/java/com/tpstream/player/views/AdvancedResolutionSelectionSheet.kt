@@ -17,14 +17,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.R
 import com.tpstream.player.TpStreamPlayer
-import com.tpstream.player.databinding.TrackSelectionDialogBinding
+import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
 
 class AdvancedResolutionSelectionSheet(
     private val player: TpStreamPlayer,
     parameters: DefaultTrackSelector.Parameters,
 ): BottomSheetDialogFragment() {
 
-    private var _binding: TrackSelectionDialogBinding? = null
+    private var _binding: TpTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     var onClickListener: DialogInterface.OnClickListener? = null
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> = parameters.overrides.toMutableMap()
@@ -35,7 +35,7 @@ class AdvancedResolutionSelectionSheet(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = TrackSelectionDialogBinding.inflate(inflater, container, false)
+        _binding = TpTrackSelectionDialogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -96,7 +96,7 @@ class AdvancedResolutionSelectionSheet(
     }
 
     inner class Adapter(context1: Context, dataSource: ArrayList<TrackInfo>, overrides: Map<TrackGroup, TrackSelectionOverride>): ArrayAdapter<TrackInfo>(context1,
-        R.layout.resolution_data, dataSource) {
+        R.layout.tp_resolution_data, dataSource) {
         private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val values = overrides.values.map { trackSelection ->
             trackSelection.trackIndices[0]
@@ -106,7 +106,7 @@ class AdvancedResolutionSelectionSheet(
             val resolution = getItem(position)!!
             var view = convertView
             if (convertView == null) {
-                view =  inflater.inflate(R.layout.resolution_data, parent, false)
+                view =  inflater.inflate(R.layout.tp_resolution_data, parent, false)
             }
             view!!.findViewById<TextView>(R.id.title).text = "${resolution.format.height}p"
             showOrHideCheckMark(view, resolution)

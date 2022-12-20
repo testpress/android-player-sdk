@@ -84,7 +84,7 @@ class PlayerActivity : AppCompatActivity() {
             .setAccessToken(accessToken)
             .setOrgCode(orgCode)
             .setAutoPlay(true)
-            .startAt(20)
+            .startAt(20L)
             .enableDownloadSupport(true)
             .build()
         playerFragment.load(parameters)

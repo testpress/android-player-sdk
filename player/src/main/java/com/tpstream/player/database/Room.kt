@@ -3,6 +3,7 @@ package com.tpstream.player.database
 import android.content.Context
 import androidx.room.*
 import com.tpstream.player.database.dao.OfflineVideoInfoDao
+import com.tpstream.player.database.roomMigration.RoomMigration1To2.MIGRATION_1_2
 import com.tpstream.player.models.OfflineVideoInfo
 
 @Database(
@@ -17,13 +18,16 @@ abstract class TPStreamsDatabase : RoomDatabase() {
     companion object {
         private lateinit var INSTANCE: TPStreamsDatabase
 
+        private val MIGRATIONS = arrayOf(MIGRATION_1_2)
+
         operator fun invoke(context: Context): TPStreamsDatabase {
             synchronized(TPStreamsDatabase::class.java) {
                 if (!::INSTANCE.isInitialized) {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
                         TPStreamsDatabase::class.java, "tpStreams-database"
-                    ).build()
+                    ).addMigrations(*MIGRATIONS)
+                        .build()
                 }
             }
             return INSTANCE

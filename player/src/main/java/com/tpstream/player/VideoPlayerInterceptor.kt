@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.*
-import okhttp3.ResponseBody.Companion.toResponseBody
 
 class VideoPlayerInterceptor(val context: Context, private val params: TpInitParams?) : Interceptor {
 
@@ -15,18 +14,14 @@ class VideoPlayerInterceptor(val context: Context, private val params: TpInitPar
 
         var request = chain.request()
 
-        Log.d("TAG", "intercept: ${request.url}")
-
         if (request.url.toString().contains("encryption_key")) {
             if (params != null) {
-                KeyCallback(context, request.url.toString(), params).get()
+                KeyCallback(context, request, params).put()
                 request = request.newBuilder()
                     .url("https://${params.orgCode}.testpress.in/api/v2.5/encryption_key/${params.videoId}/?access_token=${params.accessToken}")
                     .build()
             } else {
-                val byteArray = KeyCallback(context,request.url.toString(),null).getKey()
-
-                return Response.Builder().body(pausedAt?.toResponseBody()).build()
+                return KeyCallback(context,request,null).get()
             }
         }
 
@@ -36,11 +31,11 @@ class VideoPlayerInterceptor(val context: Context, private val params: TpInitPar
 
 class KeyCallback(
     private val context: Context,
-    private val url: String,
+    private val request: Request,
     private val params: TpInitParams?
     ){
 
-    fun get() {
+    fun put() {
         val request = Request.Builder()
             .url("https://${params?.orgCode}.testpress.in/api/v2.5/encryption_key/${params?.videoId}/?access_token=${params?.accessToken}")
             .build()
@@ -49,16 +44,16 @@ class KeyCallback(
         CoroutineScope(Dispatchers.IO).launch {
             val sharedPreference = context.getSharedPreferences("VIDEO_ACCESS_KEY", Context.MODE_PRIVATE)
             with(sharedPreference.edit()){
-                putString("Key",response.body?.byteStream()?.readBytes()!!.contentToString())
+                putString(this@KeyCallback.request.url.toString(),response.body?.byteStream()?.readBytes()!!.contentToString())
                 apply()
                 Log.d("TAG", "get: done")
             }
         }
     }
 
-    fun getKey(): ByteArray? {
+    private fun saveKey(): ByteArray? {
         val sharedPreference = context.getSharedPreferences("VIDEO_ACCESS_KEY", Context.MODE_PRIVATE)
-        val encryptionKey = sharedPreference.getString("Key", null)
+        val encryptionKey = sharedPreference.getString(request.url.toString(), null)
         if (encryptionKey != null){
             val split = encryptionKey.substring(1,encryptionKey.length - 1).split(", ").toTypedArray()
             val array = ByteArray(split.size)
@@ -68,6 +63,18 @@ class KeyCallback(
             return array
         }
         return null
+    }
+
+    fun get(): Response {
+        val responseBody = ResponseBody.create(request.body?.contentType(), saveKey()!!)
+
+        return Response.Builder()
+            .code(200)
+            .request(request)
+            .message("OK")
+            .protocol(Protocol.HTTP_1_1)
+            .body(responseBody)
+            .build()
     }
 
 }

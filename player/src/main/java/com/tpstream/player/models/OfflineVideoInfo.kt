@@ -5,15 +5,12 @@ import androidx.room.PrimaryKey
 
 @Entity
 class OfflineVideoInfo(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    val id : Long = 0L,
     var videoId: String = "",
     var title: String = "",
     var thumbnail: String = "",
-    var thumbnailSmall: String = "",
-    var thumbnailMedium: String = "",
     var url: String = "",
-    var dashUrl: String = "",
-    var hlsUrl: String = "",
     var duration: String = "",
     var description: String = "",
     var transcodingStatus: String = "",
@@ -29,11 +26,11 @@ internal fun OfflineVideoInfo.asVideoInfo():VideoInfo{
 return VideoInfo(
     title,
     thumbnail,
-    thumbnailSmall,
-    thumbnailMedium,
+    null,
+    null,
     url,
-    dashUrl,
-    hlsUrl,
+    null,
+    null,
     duration,
     description,
     transcodingStatus

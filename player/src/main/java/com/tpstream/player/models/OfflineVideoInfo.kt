@@ -24,7 +24,6 @@ class OfflineVideoInfo(
 
 internal fun OfflineVideoInfo.asVideoInfo():VideoInfo{
 return VideoInfo(
-    videoId,
     title,
     thumbnail,
     null,

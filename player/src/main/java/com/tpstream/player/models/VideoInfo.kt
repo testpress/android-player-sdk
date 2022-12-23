@@ -3,7 +3,6 @@ package com.tpstream.player.models
 import com.google.gson.annotations.SerializedName
 
 data class VideoInfo(
-    var videoId:String?,
     val title: String?,
     val thumbnail: String?,
 
@@ -24,17 +23,17 @@ data class VideoInfo(
 
     @SerializedName("transcoding_status")
     val transcodingStatus: String?
-)
+) {
+    fun asOfflineVideoInfo():OfflineVideoInfo{
+        return OfflineVideoInfo(
+            title = title!!,
+            url = dashUrl?:url!!,
+            duration = duration!!,
+            transcodingStatus = transcodingStatus!!
+        )
+    }
 
-internal fun VideoInfo.asOfflineVideoInfo():OfflineVideoInfo{
-    return OfflineVideoInfo(
-        title = title!!,
-        url = dashUrl?:url!!,
-        duration = duration!!,
-        transcodingStatus = transcodingStatus!!
-    )
-}
-
-internal fun VideoInfo.getPlaybackURL():String{
-    return dashUrl ?: url!!
+    fun getPlaybackURL():String{
+        return dashUrl ?: url ?: ""
+    }
 }

@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.media.MediaCodec
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,13 +25,13 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.models.OfflineVideoState
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
-import com.tpstream.player.views.Util.getRendererIndex
 import io.sentry.Sentry
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {

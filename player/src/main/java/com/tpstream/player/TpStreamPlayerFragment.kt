@@ -146,9 +146,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun reloadVideo(){
         val currentPosition = player?.getCurrentTime()
-        val url = player?.videoInfo?.dashUrl!!
         val tpImp = player as TpStreamPlayerImpl
-        tpImp.load(url,currentPosition!!)
+        tpImp.load(player?.videoInfo?.getPlaybackURL()!!,currentPosition!!)
     }
 
     private fun addCustomPlayerControls() {

@@ -21,7 +21,6 @@ import com.tpstream.player.*
 import com.tpstream.player.R
 import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
 import com.tpstream.player.models.OfflineVideoInfo
-import com.tpstream.player.models.asOfflineVideoInfo
 import okio.IOException
 import kotlin.math.roundToInt
 

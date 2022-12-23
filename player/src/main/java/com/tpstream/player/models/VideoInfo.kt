@@ -3,7 +3,6 @@ package com.tpstream.player.models
 import com.google.gson.annotations.SerializedName
 
 data class VideoInfo(
-    val videoId: String?,
     val title: String?,
     val thumbnail: String?,
 

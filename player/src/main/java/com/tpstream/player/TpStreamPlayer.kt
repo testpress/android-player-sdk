@@ -3,7 +3,6 @@ package com.tpstream.player
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
@@ -46,7 +45,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
     var offlineVideoInfo: OfflineVideoInfo? = null
 
     internal fun load(url: String,startPosition: Long = 0) {
-        Log.d("TAG", "load: ")
         player.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         player.seekTo(startPosition)
         player.prepare()
@@ -101,7 +99,6 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
 
     override fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
         params = parameters
-        Log.d("TAG", "load1: ")
         populateOfflineVideoInfo(parameters)
         if (checkIsVideoDownloaded()){
             videoInfo = offlineVideoInfo?.asVideoInfo()!!

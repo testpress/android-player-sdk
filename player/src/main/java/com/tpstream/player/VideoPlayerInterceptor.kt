@@ -1,10 +1,6 @@
 package com.tpstream.player
 
 import android.content.Context
-import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import okhttp3.*
 
 class VideoPlayerInterceptor(val context: Context, private val params: TpInitParams?) : Interceptor {

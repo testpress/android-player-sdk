@@ -94,8 +94,8 @@ class PlayerActivity : AppCompatActivity() {
     private fun selectVideoParams(videoType: String){
         when(videoType){
             "DRM" -> {
-                accessToken = "1630b77c-a5c4-4813-bf3e-8f6b9dde8e48"
-                videoId = "vDTimhUHaJQ"
+                accessToken = "c381512b-7337-4d8e-a8cf-880f4f08fd08"
+                videoId = "C3XLe1CCcOq"
                 orgCode = "demoveranda"
             }
             "AES Encrypt" -> {
@@ -104,8 +104,8 @@ class PlayerActivity : AppCompatActivity() {
                 orgCode = "demoveranda"
             }
             "Clear" -> {
-                accessToken = "f85035fe-7b7b-4e4d-bcf8-5151e385dc95"
-                videoId = "r8W3kSNVj0v"
+                accessToken = "70f61402-3724-4ed8-99de-5473b2310efe"
+                videoId = "qJQlWGLJvNv"
                 orgCode = "demoveranda"
             }
         }

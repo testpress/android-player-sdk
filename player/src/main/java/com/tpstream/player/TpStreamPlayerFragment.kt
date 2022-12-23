@@ -59,6 +59,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private lateinit var resolutionButton : ImageButton
     private var downloadState :OfflineVideoState? = null
     private var showDownloadButton = false
+    private var startPosition : Long = -1L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +108,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
-        initializePlayer()
         addCustomPlayerControls()
         DownloadCallback.invoke().callback = this
     }
@@ -291,6 +291,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onResume() {
         super.onResume()
+        initializePlayer()
         hideSystemUi()
     }
 
@@ -325,6 +326,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     override fun onPause() {
         super.onPause()
         if (Util.SDK_INT <= 23) {
+            getStartPosition()
             player?.release()
         }
         Log.d(TAG, "onPause: ")
@@ -333,14 +335,22 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     override fun onStop() {
         super.onStop()
         if (Util.SDK_INT > 23) {
+            getStartPosition()
             player?.release()
         }
         Log.d(TAG, "onStop: ")
     }
 
+    private fun getStartPosition(){
+        startPosition = player?.getCurrentTime()?.div(1000L) ?: -1L
+    }
+
     fun load(parameters: TpInitParams) {
         if (player == null) {
             throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
+        }
+        if (startPosition != -1L){
+            parameters.startAt = startPosition
         }
 
         player?.load(parameters) { exception ->

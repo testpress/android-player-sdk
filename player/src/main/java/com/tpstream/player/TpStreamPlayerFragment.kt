@@ -370,7 +370,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
             Sentry.captureException(error)
             if (isDRMException(error.cause!!)) {
-                onDownloadsSuccess(player?.videoInfo?.dashUrl!!)
+                onDownloadsSuccess(player?.videoInfo?.getPlaybackURL())
             }
             playbackStateListener?.onPlayerError(error)
         }

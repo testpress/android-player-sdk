@@ -11,13 +11,13 @@ data class VideoInfo(
 
     @SerializedName("thumbnail_medium")
     val thumbnailMedium: String?,
-    val url: String?,
+    private val url: String?,
 
     @SerializedName("dash_url")
-    val dashUrl: String?,
+    private val dashUrl: String?,
 
     @SerializedName("hls_url")
-    val hlsUrl: String?,
+    private val hlsUrl: String?,
     val duration: String?,
     val description: String?,
 

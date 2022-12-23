@@ -113,7 +113,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
                 Handler(Looper.getMainLooper()).post {
-                    load(result.dashUrl?:result.url!!, parameters.startAt * 1000L)
+                    load(result.getPlaybackURL(), parameters.startAt * 1000L)
                 }
             }
 

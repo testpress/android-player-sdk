@@ -12,7 +12,7 @@ class StoreEncryptionKey(
     private val request: Request,
     private val params: TpInitParams?
 ) {
-    fun put() {
+    fun putKeyInLocal() {
         val request = Request.Builder()
             .url("https://${params?.orgCode}.testpress.in/api/v2.5/encryption_key/${params?.videoId}/?access_token=${params?.accessToken}")
             .build()
@@ -28,7 +28,7 @@ class StoreEncryptionKey(
         }
     }
 
-    private fun saveKey(): ByteArray? {
+    private fun getLocalKey(): ByteArray? {
         val sharedPreference = context.getSharedPreferences("VIDEO_ACCESS_KEY", Context.MODE_PRIVATE)
         val encryptionKey = sharedPreference.getString(request.url.toString(), null)
         if (encryptionKey != null){
@@ -42,8 +42,8 @@ class StoreEncryptionKey(
         return null
     }
 
-    fun get(): Response {
-        val responseBody = ResponseBody.create(request.body?.contentType(), saveKey()!!)
+    fun getResponseWithKey(): Response {
+        val responseBody = ResponseBody.create(request.body?.contentType(), getLocalKey()!!)
 
         return Response.Builder()
             .code(200)

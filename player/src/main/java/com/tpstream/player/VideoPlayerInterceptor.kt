@@ -15,12 +15,12 @@ class VideoPlayerInterceptor(val context: Context, private val params: TpInitPar
 
         if (request.url.toString().contains("encryption_key")) {
             if (params != null) {
-                StoreEncryptionKey(context, request, params).put()
+                StoreEncryptionKey(context, request, params).putKeyInLocal()
                 request = request.newBuilder()
                     .url("https://${params.orgCode}.testpress.in/api/v2.5/encryption_key/${params.videoId}/?access_token=${params.accessToken}")
                     .build()
             } else {
-                return StoreEncryptionKey(context,request,null).get()
+                return StoreEncryptionKey(context,request,null).getResponseWithKey()
             }
         }
 

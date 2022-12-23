@@ -28,6 +28,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.models.OfflineVideoState
+import com.tpstream.player.models.getPlaybackURL
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
@@ -146,13 +147,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun reloadVideo(){
         val currentPosition = player?.getCurrentTime()
-        val url = if (player?.videoInfo?.dashUrl == null){
-            player?.videoInfo?.url!!
-        } else {
-            player?.videoInfo?.dashUrl!!
-        }
         val tpImp = player as TpStreamPlayerImpl
-        tpImp.load(url,currentPosition!!)
+        tpImp.load(player?.videoInfo?.getPlaybackURL()!!,currentPosition!!)
     }
 
     private fun addCustomPlayerControls() {

@@ -34,3 +34,7 @@ internal fun VideoInfo.asOfflineVideoInfo():OfflineVideoInfo{
         transcodingStatus = transcodingStatus!!
     )
 }
+
+internal fun VideoInfo.getPlaybackURL():String{
+    return dashUrl ?: url!!
+}

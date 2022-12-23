@@ -27,7 +27,7 @@ class OfflineVideoInfoRepository(context: Context) {
         return offlineVideoInfoDao.getOfflineVideoInfoById(videoId)
     }
 
-    fun getVideoIdByUrl(url:String):String? {
+    fun grtVideoIdByUrl(url:String):String? {
         return offlineVideoInfoDao.getOfflineVideoInfoByUrl(url)?.videoId
     }
 

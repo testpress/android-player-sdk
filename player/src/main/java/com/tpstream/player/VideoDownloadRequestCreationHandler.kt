@@ -12,6 +12,7 @@ import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.models.VideoInfo
+import com.tpstream.player.models.getPlaybackURL
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,11 +31,7 @@ class VideoDownloadRequestCreationHandler(
     private var keySetId: ByteArray? = null
 
     init {
-        val url = if (player.videoInfo?.dashUrl == null){
-            player.videoInfo?.url!!
-        } else {
-            player.videoInfo?.dashUrl!!
-        }
+        val url = player.videoInfo?.getPlaybackURL()!!
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         mediaItem = MediaItem.Builder()
             .setUri(url)

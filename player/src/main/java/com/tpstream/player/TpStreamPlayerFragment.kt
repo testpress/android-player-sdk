@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.media.MediaCodec
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -25,13 +26,13 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.models.OfflineVideoState
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
+import com.tpstream.player.views.Util.getRendererIndex
 import io.sentry.Sentry
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
@@ -289,9 +290,18 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         disableAutoFullScreenOnRotate()
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (Util.SDK_INT > 23) {
+            initializePlayer()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
-        initializePlayer()
+        if (Util.SDK_INT <= 23 || player == null) {
+            initializePlayer()
+        }
         hideSystemUi()
     }
 
@@ -326,7 +336,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     override fun onPause() {
         super.onPause()
         if (Util.SDK_INT <= 23) {
-            getStartPosition()
+            storeCurrentPlayTime()
             player?.release()
         }
         Log.d(TAG, "onPause: ")
@@ -335,13 +345,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     override fun onStop() {
         super.onStop()
         if (Util.SDK_INT > 23) {
-            getStartPosition()
+            storeCurrentPlayTime()
             player?.release()
         }
         Log.d(TAG, "onStop: ")
     }
 
-    private fun getStartPosition(){
+    private fun storeCurrentPlayTime(){
         startPosition = player?.getCurrentTime()?.div(1000L) ?: -1L
     }
 

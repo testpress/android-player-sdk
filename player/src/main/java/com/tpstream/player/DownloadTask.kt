@@ -15,7 +15,7 @@ class DownloadTask (val context: Context) {
     private val downloadManager = VideoDownloadManager(context).get()
     private val downloadIndex = downloadManager.downloadIndex
 
-    internal fun start(downloadRequest: DownloadRequest) {
+    fun start(downloadRequest: DownloadRequest) {
         DownloadService.sendAddDownload(
             context,
             VideoDownloadService::class.java,

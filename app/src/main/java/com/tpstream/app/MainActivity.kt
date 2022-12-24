@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import com.tpstream.player.StoreEncryptionKey
+import com.tpstream.player.EncryptionKeyRepository
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,16 +19,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun buttonClick2(view: View) {
-        StoreEncryptionKey(this,null,null).play()
+        val myIntent = Intent(this, PlayerActivity::class.java)
+        myIntent.putExtra("VideoParameter","AES Encrypt")
+        startActivity(myIntent)
     }
 
     fun buttonClick3(view: View) {
-//        val myIntent = Intent(this, PlayerActivity::class.java)
-//        myIntent.putExtra("VideoParameter","Clear")
-//        startActivity(myIntent)
-
-        StoreEncryptionKey(this,null,null).downloadMultipleVideo()
-
+        EncryptionKeyRepository(this).put("")
     }
 
 }

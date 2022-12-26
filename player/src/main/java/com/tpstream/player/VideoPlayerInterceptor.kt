@@ -28,5 +28,3 @@ class VideoPlayerInterceptor(
         return chain.proceed(request)
     }
 }
-
-

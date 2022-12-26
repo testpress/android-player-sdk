@@ -28,7 +28,7 @@ class VideoDownloadRequestCreationHandler(
     private lateinit var override: MutableMap<TrackGroup, TrackSelectionOverride>
     private val mediaItem: MediaItem
     private var keySetId: ByteArray? = null
-    val playbackUrl = player.videoInfo?.getPlaybackURL()!!
+    private val playbackUrl = player.videoInfo?.getPlaybackURL()!!
 
     init {
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)

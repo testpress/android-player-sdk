@@ -1,6 +1,7 @@
 package com.tpstream.player
 
 import android.net.Uri
+import android.util.Log
 import androidx.media3.exoplayer.hls.playlist.HlsMediaPlaylist
 import androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
 import androidx.media3.exoplayer.hls.playlist.HlsPlaylist
@@ -16,7 +17,7 @@ class EncryptionKeyDownloader {
 
     fun put(params: TpInitParams, playbackUrl: String) {
         getMediaPlayListUrl(playbackUrl)
-        getEncryptionKeyUrl(params)
+        getEncryptionKeyUrl()
         getEncryptionKey(params)
     }
 
@@ -34,7 +35,7 @@ class EncryptionKeyDownloader {
         mediaPlaylistUrl = mediaPlaylist.mediaPlaylistUrls[0].toString()
     }
 
-    private fun getEncryptionKeyUrl(params: TpInitParams) {
+    private fun getEncryptionKeyUrl() {
         val request = Request.Builder()
             .url(mediaPlaylistUrl)
             .build()

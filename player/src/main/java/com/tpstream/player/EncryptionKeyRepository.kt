@@ -23,9 +23,11 @@ class EncryptionKeyRepository(context: Context) {
 
     fun put(params: TpInitParams, playbackUrl: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            encryptionKeyDownloader.put(params, playbackUrl)
-            saveEncryptionUrl(params)
-            saveEncryptionKey()
+            if (playbackUrl.contains(".m3u8")){
+                encryptionKeyDownloader.put(params,playbackUrl)
+                saveEncryptionUrl(params)
+                saveEncryptionKey()
+            }
         }
     }
 

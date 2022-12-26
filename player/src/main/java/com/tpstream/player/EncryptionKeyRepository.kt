@@ -2,7 +2,6 @@ package com.tpstream.player
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.media3.exoplayer.hls.playlist.HlsMediaPlaylist
 import androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
 import androidx.media3.exoplayer.hls.playlist.HlsPlaylist
@@ -11,118 +10,109 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.ResponseBody.Companion.toResponseBody
 
-class EncryptionKeyRepository(private val context: Context) {
-    val accessToken = "143a0c71-567e-4ecd-b22d-06177228c25b"
-    val videoId = "o7pOsacWaJt"
-    val orgCode = "demoveranda"
+class EncryptionKeyRepository(context: Context) {
 
-    val sharedPreference = context.getSharedPreferences("VIDEO_ENCRYPTION_KEY", Context.MODE_PRIVATE)
+    private val sharedPreference = context.getSharedPreferences(
+        "VIDEO_ENCRYPTION_KEY",
+        Context.MODE_PRIVATE
+    )
+    private lateinit var encryptionKeyUrl: String
+    private lateinit var mediaPlaylistUrl: String
 
-    val url =
-        "https://verandademo-cdn.testpress.in/institute/demoveranda/courses/video-content/videos/transcoded/90b25dc376b9435c8528d9cf789b7b7f/video.m3u8"
-
-
-    fun put(url1: String) {
-
+    fun put(params: TpInitParams, playbackUrl: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val t1 = System.currentTimeMillis()
-            Log.d("TAG", "put: $t1")
-            val request = Request.Builder()
-                .url(url)
-                .build()
-            val response = OkHttpClient().newCall(request).execute()
+            getMediaPlayListUrl(playbackUrl)
+            saveEncryptionKeyUrl(params)
+            saveEncryptionKey(params)
+        }
+    }
 
+    private fun getMediaPlayListUrl(playbackUrl: String) {
+        val request = Request.Builder()
+            .url(playbackUrl)
+            .build()
+        val response = OkHttpClient().newCall(request).execute()
 
-            val playlist: HlsPlaylist =
-                HlsPlaylistParser().parse(Uri.parse(url), response.body?.byteStream()!!)
+        val playlist: HlsPlaylist =
+            HlsPlaylistParser().parse(Uri.parse(playbackUrl), response.body?.byteStream()!!)
 
-            val mediaPlaylist: HlsMultivariantPlaylist = playlist as HlsMultivariantPlaylist
+        val mediaPlaylist: HlsMultivariantPlaylist = playlist as HlsMultivariantPlaylist
 
-            val request1 = Request.Builder()
-                .url(mediaPlaylist.mediaPlaylistUrls[0].toString())
-                .build()
+        mediaPlaylistUrl = mediaPlaylist.mediaPlaylistUrls[0].toString()
+    }
 
-            val response1 = OkHttpClient().newCall(request1).execute()
+    private fun saveEncryptionKeyUrl(params: TpInitParams) {
+        val request = Request.Builder()
+            .url(mediaPlaylistUrl)
+            .build()
 
-            val playlist1: HlsPlaylist = HlsPlaylistParser().parse(
-                Uri.parse(mediaPlaylist.mediaPlaylistUrls[0].toString()),
-                response1.body?.byteStream()!!
-            )
-            val mediaPlaylist1: HlsMediaPlaylist = playlist1 as HlsMediaPlaylist
+        val response = OkHttpClient().newCall(request).execute()
 
-            val segments: List<HlsMediaPlaylist.Segment> = mediaPlaylist1.segments
+        val playlist: HlsPlaylist = HlsPlaylistParser().parse(
+            Uri.parse(mediaPlaylistUrl),
+            response.body?.byteStream()!!
+        )
 
-            val segment: HlsMediaPlaylist.Segment = segments[0]
-            val keyUrl = segment.fullSegmentEncryptionKeyUri.toString()
+        val mediaPlaylist: HlsMediaPlaylist = playlist as HlsMediaPlaylist
 
-            with(sharedPreference.edit()) {
-                putString(videoId, keyUrl)
-                apply()
-                Log.d("TAG", "get: done")
+        val segments: List<HlsMediaPlaylist.Segment> = mediaPlaylist.segments
 
+        val segment: HlsMediaPlaylist.Segment = segments[0]
+
+        encryptionKeyUrl = segment.fullSegmentEncryptionKeyUri.toString()
+
+        with(sharedPreference.edit()) {
+            putString(params.videoId, encryptionKeyUrl)
+            apply()
+        }
+    }
+
+    private fun saveEncryptionKey(params: TpInitParams) {
+        val request = Request.Builder()
+            .url("https://${params.orgCode}.testpress.in/api/v2.5/encryption_key/${params.videoId}/?access_token=${params.accessToken}")
+            .build()
+
+        val response = OkHttpClient().newCall(request).execute()
+
+        with(sharedPreference.edit()) {
+            putString(encryptionKeyUrl, response.body?.byteStream()?.readBytes()?.contentToString())
+            apply()
+        }
+    }
+
+    private fun getLocalKey(encryptionKeyUrl: String): ByteArray? {
+        val encryptionKey = sharedPreference.getString(encryptionKeyUrl, null)
+        if (encryptionKey != null) {
+            val split =
+                encryptionKey.substring(1, encryptionKey.length - 1).split(", ").toTypedArray()
+            val array = ByteArray(split.size)
+            for (i in split.indices) {
+                array[i] = split[i].toByte()
             }
-            val request3 = Request.Builder()
-                .url("https://${orgCode}.testpress.in/api/v2.5/encryption_key/${videoId}/?access_token=${accessToken}")
-                .build()
+            return array
+        }
+        return null
+    }
 
-            val response3 = OkHttpClient().newCall(request3).execute()
-
-            with(sharedPreference.edit()) {
-                putString(keyUrl, response3.body?.byteStream()?.readBytes()?.contentToString())
-                apply()
-                Log.d("TAG", "get: done")
-
-            }
-
-            val fetchUrl = sharedPreference.getString(videoId,null)
-            Log.d("TAG", "put: $fetchUrl")
-            if (fetchUrl != null){
-                val key = sharedPreference.getString(fetchUrl,null)
-                Log.d("TAG", "put: $key")
-            }
-            val t2 = System.currentTimeMillis()
-            Log.d("TAG", "put: ${(t2-t1)/1000L}")
-
-
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val sharedPreference = context.getSharedPreferences("VIDEO_ACCESS_KEY", Context.MODE_PRIVATE)
-//            with(sharedPreference.edit()){
-//                putString(this@EncryptionKeyRepository.request?.url.toString(),response.body?.byteStream()?.readBytes()!!.contentToString())
-//                apply()
-//                Log.d("TAG", "get: done")
-//            }
-//        }
+    fun get(encryptionKeyUrl: String): Response {
+        val request = Request.Builder()
+            .url(encryptionKeyUrl)
+            .build()
+        val responseBody = if (getLocalKey(encryptionKeyUrl) != null){
+            getLocalKey(encryptionKeyUrl)!!.toResponseBody("binary/octet-stream".toMediaType())
+        } else {
+            "".toResponseBody("binary/octet-stream".toMediaType())
         }
 
-//    private fun getLocalKey(): ByteArray? {
-//        val sharedPreference =
-//            context.getSharedPreferences("VIDEO_ACCESS_KEY", Context.MODE_PRIVATE)
-//        val encryptionKey = sharedPreference.getString(request?.url.toString(), null)
-//        if (encryptionKey != null) {
-//            val split =
-//                encryptionKey.substring(1, encryptionKey.length - 1).split(", ").toTypedArray()
-//            val array = ByteArray(split.size)
-//            for (i in split.indices) {
-//                array[i] = split[i].toByte()
-//            }
-//            return array
-//        }
-//        return null
-//    }
-//
-//    fun getResponseWithKey(): Response {
-//        val responseBody = ResponseBody.create(request?.body?.contentType(), getLocalKey()!!)
-//
-//        return Response.Builder()
-//            .code(200)
-//            .request(request!!)
-//            .message("OK")
-//            .protocol(Protocol.HTTP_1_1)
-//            .body(responseBody)
-//            .build()
-//    }
-
-
+        return Response.Builder()
+            .code(200)
+            .request(request)
+            .message("OK")
+            .protocol(Protocol.HTTP_1_1)
+            .body(responseBody)
+            .build()
     }
 }

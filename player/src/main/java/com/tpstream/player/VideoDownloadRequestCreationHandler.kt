@@ -28,12 +28,12 @@ class VideoDownloadRequestCreationHandler(
     private lateinit var override: MutableMap<TrackGroup, TrackSelectionOverride>
     private val mediaItem: MediaItem
     private var keySetId: ByteArray? = null
+    val playbackUrl = player.videoInfo?.getPlaybackURL()!!
 
     init {
-        val url = player.videoInfo?.getPlaybackURL()!!
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         mediaItem = MediaItem.Builder()
-            .setUri(url)
+            .setUri(playbackUrl)
             .setDrmConfiguration(
                 DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
@@ -48,7 +48,7 @@ class VideoDownloadRequestCreationHandler(
         val sessionManager = DefaultDrmSessionManager.Builder()
             .build(CustomHttpDrmMediaCallback(context, player.params))
         sessionManager.setMode(DefaultDrmSessionManager.MODE_DOWNLOAD, null)
-        val dataSourceFactory = VideoDownloadManager(context).build(player.params)
+        val dataSourceFactory = VideoDownloadManager(context).build(player.params,playbackUrl)
         val renderersFactory = DefaultRenderersFactory(context)
         return DownloadHelper.forMediaItem(
             mediaItem,

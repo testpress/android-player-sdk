@@ -1,8 +1,10 @@
 package com.tpstream.app
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import com.tpstream.player.EncryptionKeyRepository
 
@@ -25,7 +27,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun buttonClick3(view: View) {
-        EncryptionKeyRepository(this).put("")
+        val myIntent = Intent(this, PlayerActivity::class.java)
+        myIntent.putExtra("VideoParameter","Clear")
+        startActivity(myIntent)
     }
 
 }

@@ -2,6 +2,8 @@ package com.tpstream.player
 
 import android.content.Context
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.ResponseBody.Companion.toResponseBody
 
 class VideoPlayerInterceptor(
     val context: Context,
@@ -18,13 +20,30 @@ class VideoPlayerInterceptor(
                 request = request.newBuilder()
                     .url("https://${params.orgCode}.testpress.in/api/v2.5/encryption_key/${params.videoId}/?access_token=${params.accessToken}")
                     .build()
-                if (playbackUrl != null){
-                    EncryptionKeyRepository(context).put(params, playbackUrl)
-                }
             } else {
-                return EncryptionKeyRepository(context).get(request.url.toString())
+                return createInternalResponse(request)
             }
         }
         return chain.proceed(request)
     }
+
+        private fun createInternalResponse(request: Request): Response {
+
+            val encryptionKeyRepository = EncryptionKeyRepository(context)
+
+            val responseBody = if (encryptionKeyRepository.get(request.url.toString()) != null){
+                encryptionKeyRepository.get(request.url.toString())!!.toResponseBody("binary/octet-stream".toMediaType())
+            } else {
+                "".toResponseBody("binary/octet-stream".toMediaType())
+            }
+
+            return Response.Builder()
+                .code(200)
+                .request(request)
+                .message("OK")
+                .protocol(Protocol.HTTP_1_1)
+                .body(responseBody)
+                .build()
+        }
+
 }

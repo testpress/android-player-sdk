@@ -51,19 +51,19 @@ class VideoDownloadManager {
         return databaseProvider
     }
 
-    fun getHttpDataSourceFactory(params: TpInitParams? = null,playbackUrl:String? = null): DataSource.Factory {
+    fun getHttpDataSourceFactory(params: TpInitParams? = null): DataSource.Factory {
         val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(VideoPlayerInterceptor(context,params,playbackUrl))
+            .addInterceptor(VideoPlayerInterceptor(context,params))
             .build()
         httpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
         return httpDataSourceFactory
     }
 
-    fun build(params: TpInitParams? = null,playbackUrl:String? = null): CacheDataSource.Factory {
+    fun build(params: TpInitParams? = null): CacheDataSource.Factory {
         val cache = VideoDownloadManager(context).getDownloadCache()
         return CacheDataSource.Factory()
             .setCache(cache)
-            .setUpstreamDataSourceFactory(getHttpDataSourceFactory(params,playbackUrl))
+            .setUpstreamDataSourceFactory(getHttpDataSourceFactory(params))
             .setCacheWriteDataSinkFactory(null)
             .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
     }

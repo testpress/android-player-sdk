@@ -5,8 +5,8 @@ import okhttp3.*
 
 class VideoPlayerInterceptor(
     val context: Context,
-    private val params: TpInitParams?
-    , private val playbackUrl:String? = null
+    private val params: TpInitParams?,
+    private val playbackUrl:String? = null
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {

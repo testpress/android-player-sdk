@@ -266,7 +266,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                         "DownloadSelectionSheet"
                     )
                     downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest,offlineVideoInfo ->
-                        EncryptionKeyRepository(requireContext()).fetchAndSaveEncryptionKeyAndUrl(player?.params!!,player?.videoInfo?.getPlaybackURL()!!)
+                        EncryptionKeyRepository(requireContext()).fetchAndStore(player?.params!!,player?.videoInfo?.getPlaybackURL()!!)
                         DownloadTask(requireContext()).start(downloadRequest)
                         offlineVideoInfo?.videoId = player?.params?.videoId!!
                         offlineVideoInfoViewModel.insert(offlineVideoInfo!!)

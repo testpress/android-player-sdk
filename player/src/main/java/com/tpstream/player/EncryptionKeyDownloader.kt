@@ -11,9 +11,9 @@ import okhttp3.Request
 
 class EncryptionKeyDownloader {
 
-    fun getEncryptionKeyUrl(playbackUrl: String) :String {
+    fun run(playbackUrl: String) :String {
         val mediaPlaylistUrl = getMediaPlayListUrl(playbackUrl)
-        return getEncryptionKeyUrlWith(mediaPlaylistUrl)
+        return getEncryptionKeyUrl(mediaPlaylistUrl)
     }
 
      private fun getMediaPlayListUrl(playbackUrl: String): String {
@@ -27,7 +27,7 @@ class EncryptionKeyDownloader {
         return mediaPlaylist.mediaPlaylistUrls[0].toString()
     }
 
-     private fun getEncryptionKeyUrlWith(mediaPlaylistUrl: String): String {
+     private fun getEncryptionKeyUrl(mediaPlaylistUrl: String): String {
         val request = Request.Builder()
             .url(mediaPlaylistUrl)
             .build()

@@ -14,7 +14,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 
 class EncryptionKeyRepository(context: Context) {
-    private var encryptionKeyDownloader = EncryptionKeyDownloader()
     private val sharedPreference = context.getSharedPreferences(
         "VIDEO_ENCRYPTION_KEY",
         Context.MODE_PRIVATE
@@ -23,9 +22,9 @@ class EncryptionKeyRepository(context: Context) {
     fun fetchAndStore(params: TpInitParams, playbackUrl: String) {
         CoroutineScope(Dispatchers.IO).launch {
             if (playbackUrl.contains(".m3u8")) {
-                val encryptionKeyUrl = encryptionKeyDownloader.getEncryptionKeyUrl(playbackUrl)
+                val encryptionKeyUrl = EncryptionKeyDownloader().run(playbackUrl)
                 saveEncryptionKeyUrlWithParams(encryptionKeyUrl, params)
-                val encryptionKey = encryptionKeyDownloader.getEncryptionKey(params)
+                val encryptionKey = EncryptionKeyDownloader().getEncryptionKey(params)
                 saveEncryptionKeyWithEncryptionKeyUrl(encryptionKey, encryptionKeyUrl)
             }
         }

@@ -10,16 +10,13 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 class EncryptionKeyDownloader {
-    lateinit var encryptionKeyUrl: String
-    lateinit var encryptionKey: String
 
-    fun run(params: TpInitParams, playbackUrl: String) {
+    fun getEncryptionKeyUrl(playbackUrl: String) :String {
         val mediaPlaylistUrl = getMediaPlayListUrl(playbackUrl)
-        encryptionKeyUrl = getEncryptionKeyUrl(mediaPlaylistUrl)
-        encryptionKey = getEncryptionKey(params)
+        return getEncryptionKeyUrlWith(mediaPlaylistUrl)
     }
 
-    private fun getMediaPlayListUrl(playbackUrl: String): String {
+     private fun getMediaPlayListUrl(playbackUrl: String): String {
         val request = Request.Builder()
             .url(playbackUrl)
             .build()
@@ -30,7 +27,7 @@ class EncryptionKeyDownloader {
         return mediaPlaylist.mediaPlaylistUrls[0].toString()
     }
 
-    private fun getEncryptionKeyUrl(mediaPlaylistUrl: String): String {
+     private fun getEncryptionKeyUrlWith(mediaPlaylistUrl: String): String {
         val request = Request.Builder()
             .url(mediaPlaylistUrl)
             .build()
@@ -45,7 +42,7 @@ class EncryptionKeyDownloader {
         return segment.fullSegmentEncryptionKeyUri.toString()
     }
 
-    private fun getEncryptionKey(params: TpInitParams): String {
+     fun getEncryptionKey(params: TpInitParams): String {
         val request = Request.Builder()
             .url("https://${params.orgCode}.testpress.in/api/v2.5/encryption_key/${params.videoId}/?access_token=${params.accessToken}")
             .build()

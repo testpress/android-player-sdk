@@ -23,28 +23,32 @@ class EncryptionKeyRepository(context: Context) {
     fun fetchAndStore(params: TpInitParams, playbackUrl: String) {
         CoroutineScope(Dispatchers.IO).launch {
             if (playbackUrl.contains(".m3u8")) {
-                encryptionKeyDownloader.run(params, playbackUrl)
-                saveEncryptionUrl(params)
-                saveEncryptionKey()
+                val encryptionKeyUrl = encryptionKeyDownloader.getEncryptionKeyUrl(playbackUrl)
+                saveEncryptionKeyUrlWithParams(encryptionKeyUrl, params)
+                val encryptionKey = encryptionKeyDownloader.getEncryptionKey(params)
+                saveEncryptionKeyWithEncryptionKeyUrl(encryptionKey, encryptionKeyUrl)
             }
         }
     }
 
-    private fun saveEncryptionUrl(params: TpInitParams) {
+    private fun saveEncryptionKeyUrlWithParams(encryptionKeyUrl: String, params: TpInitParams) {
         with(sharedPreference.edit()) {
             putString(
                 params.videoId,
-                encryptionKeyDownloader.encryptionKeyUrl
+                encryptionKeyUrl
             )
             apply()
         }
     }
 
-    private fun saveEncryptionKey() {
+    private fun saveEncryptionKeyWithEncryptionKeyUrl(
+        encryptionKey: String,
+        encryptionKeyUrl: String
+    ) {
         with(sharedPreference.edit()) {
             putString(
-                encryptionKeyDownloader.encryptionKeyUrl,
-                encryptionKeyDownloader.encryptionKey
+                encryptionKeyUrl,
+                encryptionKey
             )
             apply()
         }
@@ -66,6 +70,6 @@ class EncryptionKeyRepository(context: Context) {
 
     fun hasEncryptionKey(encryptionKeyUrl: String): Boolean {
         val encryptionKey = sharedPreference.getString(encryptionKeyUrl, null)
-        return encryptionKey != null &&  encryptionKey.isNotEmpty()
+        return encryptionKey != null && encryptionKey.isNotEmpty()
     }
 }

@@ -13,11 +13,10 @@ class EncryptionKeyDownloader {
     lateinit var encryptionKeyUrl: String
     lateinit var encryptionKey: String
 
-
-    fun download(params: TpInitParams, playbackUrl: String) {
+    fun run(params: TpInitParams, playbackUrl: String) {
         val mediaPlaylistUrl = getMediaPlayListUrl(playbackUrl)
-        getEncryptionKeyUrl(mediaPlaylistUrl)
-        getEncryptionKey(params)
+        encryptionKeyUrl = getEncryptionKeyUrl(mediaPlaylistUrl)
+        encryptionKey = getEncryptionKey(params)
     }
 
     private fun getMediaPlayListUrl(playbackUrl: String): String {
@@ -25,43 +24,32 @@ class EncryptionKeyDownloader {
             .url(playbackUrl)
             .build()
         val response = OkHttpClient().newCall(request).execute()
-
         val playlist: HlsPlaylist =
             HlsPlaylistParser().parse(Uri.parse(playbackUrl), response.body?.byteStream()!!)
-
         val mediaPlaylist: HlsMultivariantPlaylist = playlist as HlsMultivariantPlaylist
-
         return mediaPlaylist.mediaPlaylistUrls[0].toString()
     }
 
-    private fun getEncryptionKeyUrl(mediaPlaylistUrl: String) {
+    private fun getEncryptionKeyUrl(mediaPlaylistUrl: String): String {
         val request = Request.Builder()
             .url(mediaPlaylistUrl)
             .build()
-
         val response = OkHttpClient().newCall(request).execute()
-
         val playlist: HlsPlaylist = HlsPlaylistParser().parse(
             Uri.parse(mediaPlaylistUrl),
             response.body?.byteStream()!!
         )
-
         val mediaPlaylist: HlsMediaPlaylist = playlist as HlsMediaPlaylist
-
         val segments: List<HlsMediaPlaylist.Segment> = mediaPlaylist.segments
-
         val segment: HlsMediaPlaylist.Segment = segments[0]
-
-        encryptionKeyUrl = segment.fullSegmentEncryptionKeyUri.toString()
+        return segment.fullSegmentEncryptionKeyUri.toString()
     }
 
-    private fun getEncryptionKey(params: TpInitParams) {
+    private fun getEncryptionKey(params: TpInitParams): String {
         val request = Request.Builder()
             .url("https://${params.orgCode}.testpress.in/api/v2.5/encryption_key/${params.videoId}/?access_token=${params.accessToken}")
             .build()
-
         val response = OkHttpClient().newCall(request).execute()
-
-        encryptionKey = response.body?.byteStream()?.readBytes()?.contentToString() ?: ""
+        return response.body?.byteStream()?.readBytes()?.contentToString() ?: ""
     }
 }

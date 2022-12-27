@@ -19,12 +19,12 @@ class EncryptionKeyRepository(context: Context) {
         "VIDEO_ENCRYPTION_KEY",
         Context.MODE_PRIVATE
     )
-    private var encryptionKeyDownloader: EncryptionKeyDownloader = EncryptionKeyDownloader()
+    private var encryptionKeyDownloader = EncryptionKeyDownloader()
 
-    fun put(params: TpInitParams, playbackUrl: String) {
+    fun fetchAndSaveEncryptionKeyAndUrl(params: TpInitParams, playbackUrl: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            if (playbackUrl.contains(".m3u8")){
-                encryptionKeyDownloader.download(params,playbackUrl)
+            if (playbackUrl.contains(".m3u8")) {
+                encryptionKeyDownloader.run(params, playbackUrl)
                 saveEncryptionUrl(params)
                 saveEncryptionKey()
             }
@@ -33,7 +33,10 @@ class EncryptionKeyRepository(context: Context) {
 
     private fun saveEncryptionUrl(params: TpInitParams) {
         with(sharedPreference.edit()) {
-            putString(params.videoId, encryptionKeyDownloader.encryptionKeyUrl)
+            putString(
+                params.videoId,
+                encryptionKeyDownloader.encryptionKeyUrl
+            )
             apply()
         }
     }
@@ -62,5 +65,8 @@ class EncryptionKeyRepository(context: Context) {
         return null
     }
 
-
+    fun hasEncryptionKey(encryptionKeyUrl: String): Boolean {
+        val encryptionKey = sharedPreference.getString(encryptionKeyUrl, null)
+        return encryptionKey != null &&  encryptionKey.isNotEmpty()
+    }
 }

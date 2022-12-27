@@ -16,22 +16,29 @@ class VideoPlayerInterceptor(private val context: Context, private val params: T
         var request = chain.request()
 
         if (request.url.toString().contains("encryption_key")) {
-            if (params != null) {
+            if (isParamsNotNull(params)) {
                 request = request.newBuilder()
-                    .url("https://${params.orgCode}.testpress.in/api/v2.5/encryption_key/${params.videoId}/?access_token=${params.accessToken}")
+                    .url("https://${params?.orgCode}.testpress.in/api/v2.5/encryption_key/${params?.videoId}/?access_token=${params?.accessToken}")
                     .build()
             } else {
-                return createInternalResponse(request)
+                return buildResponseWithDownloadedEncryptionKey(request)
             }
         }
         return chain.proceed(request)
     }
 
-    private fun createInternalResponse(request: Request): Response {
+    private fun isParamsNotNull(params: TpInitParams?): Boolean{
+        // Parameters is null when download operation called
+        if (params == null){
+            return false
+        }
+        return true
+    }
 
+    private fun buildResponseWithDownloadedEncryptionKey(request: Request): Response {
         val encryptionKeyRepository = EncryptionKeyRepository(context)
 
-        val responseBody = if (encryptionKeyRepository.get(request.url.toString()) != null) {
+        val responseBody = if (encryptionKeyRepository.hasEncryptionKey(request.url.toString())) {
             encryptionKeyRepository.get(request.url.toString())!!
                 .toResponseBody("binary/octet-stream".toMediaType())
         } else {

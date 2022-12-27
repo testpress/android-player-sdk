@@ -11,7 +11,7 @@ import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.tpstream.player.models.VideoInfo
+import com.google.common.collect.ImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -98,14 +98,22 @@ class VideoDownloadRequestCreationHandler(
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 
+    private val SUPPORTED_TRACK_TYPES: ImmutableList<Int> =
+        ImmutableList.of(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_TEXT)
+
     private fun setSelectedTracks(overrides: MutableMap<TrackGroup, TrackSelectionOverride>) {
+        val builder = trackSelectionParameters.buildUpon()
+        for (i in SUPPORTED_TRACK_TYPES.indices) {
+            val trackType: Int = SUPPORTED_TRACK_TYPES[i]
+            builder.setTrackTypeDisabled(trackType, true)
+            builder.clearOverridesOfType(trackType)
+            for (override in overrides.values) {
+                builder.addOverride(override)
+            }
+        }
         for (index in 0 until downloadHelper.periodCount) {
             downloadHelper.clearTrackSelections(index)
-            val builder = TrackSelectionParameters.Builder(context)
-            for (i in overrides.values) {
-                builder.addOverride(i)
-                downloadHelper.addTrackSelection(index, builder.build())
-            }
+            downloadHelper.addTrackSelection(index, builder.build())
         }
     }
 

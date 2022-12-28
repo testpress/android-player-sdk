@@ -13,6 +13,13 @@
         android:theme="@style/Theme.TpStreamPlayer"
         tools:targetApi="31">
         <activity
+            android:name=".DownloadListActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".PlayerActivity"
             android:configChanges="orientation|screenSize|layoutDirection"
             android:exported="false">

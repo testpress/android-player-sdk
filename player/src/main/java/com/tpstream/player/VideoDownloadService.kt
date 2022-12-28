@@ -52,6 +52,10 @@ class VideoDownloadService:DownloadService(
         notMetRequirements: Int
     ): Notification {
 
+        CoroutineScope(Dispatchers.IO).launch {
+            offlineVideoInfoRepository.refreshCurrentDownloadsStatus()
+        }
+
         return notificationHelper.buildProgressNotification(
             applicationContext,
             R.drawable.ic_baseline_download_for_offline_24,

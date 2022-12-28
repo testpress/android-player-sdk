@@ -27,6 +27,7 @@ data class VideoInfo(
     fun asOfflineVideoInfo():OfflineVideoInfo{
         return OfflineVideoInfo(
             title = title!!,
+            thumbnail = thumbnail?:"",
             url = dashUrl?:url!!,
             duration = duration!!,
             transcodingStatus = transcodingStatus!!

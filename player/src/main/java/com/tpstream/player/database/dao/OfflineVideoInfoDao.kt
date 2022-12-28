@@ -29,4 +29,8 @@ interface OfflineVideoInfoDao {
     @Query("SELECT * FROM OfflineVideoInfo WHERE videoId=:videoId")
     fun getOfflineVideoInfoById(videoId:String): LiveData<OfflineVideoInfo?>
 
+    @Query("SELECT * FROM OfflineVideoInfo")
+    fun getAllDownloadInLiveData():LiveData<List<OfflineVideoInfo>?>
+
+
 }

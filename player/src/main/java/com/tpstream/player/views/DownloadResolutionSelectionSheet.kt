@@ -29,7 +29,6 @@ typealias OnSubmitListener = (DownloadRequest,OfflineVideoInfo?) -> Unit
 class DownloadResolutionSelectionSheet(
     val player: TpStreamPlayer,
     parameters: DefaultTrackSelector.Parameters,
-    private val trackGroups: List<Tracks.Group>,
 ) : BottomSheetDialogFragment(), VideoDownloadRequestCreationHandler.Listener {
 
     private var _binding: TpDownloadTrackSelectionDialogBinding? = null
@@ -39,6 +38,8 @@ class DownloadResolutionSelectionSheet(
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()
     var isResolutionSelected = false
+    private lateinit var tracks: Tracks
+    private var trackGroups: MutableList<Tracks.Group> = mutableListOf()
     private var onSubmitListener: OnSubmitListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,9 +68,7 @@ class DownloadResolutionSelectionSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initializeTrackSelectionView()
-        setOnClickListeners()
-        configureBottomSheetBehaviour()
+
     }
 
     private fun initializeTrackSelectionView() {
@@ -173,7 +172,12 @@ class DownloadResolutionSelectionSheet(
             get() = trackGroup.getTrackFormat(trackIndex)
     }
 
-    override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean) {
+    override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, helper: DownloadHelper) {
+        tracks = helper.getTracks(0)
+        trackGroups = tracks.groups
+        initializeTrackSelectionView()
+        setOnClickListeners()
+        configureBottomSheetBehaviour()
         if (isPrepared && this.isVisible) {
             binding.loadingProgress.visibility = View.GONE
             binding.resolutionLayout.visibility = View.VISIBLE

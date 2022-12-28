@@ -126,8 +126,8 @@ class VideoDownloadRequestCreationHandler(
     }
 
     interface Listener {
-        fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, helper: DownloadHelper)
+        fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, downloadHelper: DownloadHelper)
 
-        fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException)
+        fun onDownloadRequestHandlerPrepareError(downloadHelper: DownloadHelper, e: IOException)
     }
 }

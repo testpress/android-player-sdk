@@ -66,9 +66,28 @@ class DownloadResolutionSelectionSheet(
         _binding = null
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, downloadHelper: DownloadHelper) {
+        prepareTrackGroup(downloadHelper)
+        initializeDownloadResolutionSheet()
+        if (isPrepared && this.isVisible) {
+            binding.loadingProgress.visibility = View.GONE
+            binding.resolutionLayout.visibility = View.VISIBLE
+        }
+    }
 
+    override fun onDownloadRequestHandlerPrepareError(downloadHelper: DownloadHelper, e: IOException) {
+        dismiss()
+    }
+
+    private fun prepareTrackGroup(helper: DownloadHelper){
+        tracks = helper.getTracks(0)
+        trackGroups = tracks.groups
+    }
+
+    private fun initializeDownloadResolutionSheet(){
+        initializeTrackSelectionView()
+        setOnClickListeners()
+        configureBottomSheetBehaviour()
     }
 
     private fun initializeTrackSelectionView() {
@@ -170,22 +189,6 @@ class DownloadResolutionSelectionSheet(
     inner class TrackInfo(val trackGroup: Tracks.Group, val trackIndex: Int) {
         val format: Format
             get() = trackGroup.getTrackFormat(trackIndex)
-    }
-
-    override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, helper: DownloadHelper) {
-        tracks = helper.getTracks(0)
-        trackGroups = tracks.groups
-        initializeTrackSelectionView()
-        setOnClickListeners()
-        configureBottomSheetBehaviour()
-        if (isPrepared && this.isVisible) {
-            binding.loadingProgress.visibility = View.GONE
-            binding.resolutionLayout.visibility = View.VISIBLE
-        }
-    }
-
-    override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {
-        dismiss()
     }
 
     fun setOnSubmitListener(listener: OnSubmitListener) {

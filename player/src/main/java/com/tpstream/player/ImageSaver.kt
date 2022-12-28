@@ -27,16 +27,16 @@ class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
     fun saveImage() {
         CoroutineScope(Dispatchers.IO).launch {
             val bitmap: Bitmap? = urlToBitmap(offlineVideoInfo.thumbnail)
-            saveToInternalStorage(context, bitmap, offlineVideoInfo.videoId)
+            save(context, bitmap, offlineVideoInfo.videoId)
         }
     }
 
     fun loadImage(): Bitmap? {
-        return getImageFromInternalStorage(context, offlineVideoInfo.videoId)
+        return getImage(context, offlineVideoInfo.videoId)
     }
 
     fun deleteImage() {
-        deleteImageFromInternalStorage(context, offlineVideoInfo.videoId)
+        deleteImage(context, offlineVideoInfo.videoId)
     }
 
     private fun urlToBitmap(thumbnail: String): Bitmap? {
@@ -49,7 +49,7 @@ class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
         }
     }
 
-    private fun saveToInternalStorage(
+    private fun save(
         context: Context, bitmapImage: Bitmap?, imageFileName: String
     ) {
         if (bitmapImage != null){
@@ -67,7 +67,7 @@ class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
         }
     }
 
-    private fun getImageFromInternalStorage(context: Context, imageFileName: String): Bitmap? {
+    private fun getImage(context: Context, imageFileName: String): Bitmap? {
         return try {
             val directory = context.filesDir
             val file = File(directory, "/thumbnail/$imageFileName.png")
@@ -77,7 +77,7 @@ class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
         }
     }
 
-    private fun deleteImageFromInternalStorage(context: Context, imageFileName: String): Boolean {
+    private fun deleteImage(context: Context, imageFileName: String): Boolean {
         val dir = context.filesDir
         val file = File(dir, "/thumbnail/$imageFileName.png")
         return file.delete()

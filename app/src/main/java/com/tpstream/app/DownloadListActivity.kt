@@ -25,15 +25,11 @@ class DownloadListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_download_list)
-
         viewModel = DownloadListViewModel(this)
-
         val listview = findViewById<RecyclerView>(R.id.recycleView)
-
         viewModel.getDownloadData().observe(this) {
             listview.adapter = DownloadListAdapter(it!!)
         }
-
     }
 
     inner class DownloadListAdapter(
@@ -54,7 +50,7 @@ class DownloadListActivity : AppCompatActivity() {
                 binding.downloadImage.setImageResource(getDownloadImage(offlineVideoInfo.downloadState))
                 binding.duration.text = offlineVideoInfo.duration
                 binding.percentage.text = "${offlineVideoInfo.percentageDownloaded} %"
-                updateButtonVisibility(offlineVideoInfo.downloadState)
+                showOrHideButtons(offlineVideoInfo.downloadState)
             }
 
             private fun getDownloadImage(offlineVideoState: OfflineVideoState?): Int {
@@ -65,7 +61,7 @@ class DownloadListActivity : AppCompatActivity() {
                 }
             }
 
-            private fun updateButtonVisibility(offlineVideoState: OfflineVideoState?) {
+            private fun showOrHideButtons(offlineVideoState: OfflineVideoState?) {
                 when (offlineVideoState) {
                     OfflineVideoState.DOWNLOADING -> {
                         deleteButton.visibility = View.GONE

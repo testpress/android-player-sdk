@@ -2,6 +2,7 @@ package com.tpstream.player
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.media3.exoplayer.hls.playlist.HlsMediaPlaylist
 import androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
 import androidx.media3.exoplayer.hls.playlist.HlsPlaylist
@@ -23,32 +24,25 @@ class EncryptionKeyRepository(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             if (playbackUrl.contains(".m3u8")) {
                 val encryptionKeyUrl = EncryptionKeyDownloader().getEncryptionKeyUrl(playbackUrl)
-                saveEncryptionKeyUrlWithParams(encryptionKeyUrl, params)
                 val encryptionKey = EncryptionKeyDownloader().getEncryptionKey(params)
-                saveEncryptionKeyWithEncryptionKeyUrl(encryptionKey, encryptionKeyUrl)
+                save(encryptionKey, encryptionKeyUrl)
             }
         }
     }
 
-    private fun saveEncryptionKeyUrlWithParams(encryptionKeyUrl: String, params: TpInitParams) {
-        with(sharedPreference.edit()) {
-            putString(
-                params.videoId,
-                encryptionKeyUrl
-            )
-            apply()
-        }
-    }
-
-    private fun saveEncryptionKeyWithEncryptionKeyUrl(
-        encryptionKey: String,
-        encryptionKeyUrl: String
-    ) {
+    private fun save(encryptionKey: String, encryptionKeyUrl: String) {
         with(sharedPreference.edit()) {
             putString(
                 encryptionKeyUrl,
                 encryptionKey
             )
+            apply()
+        }
+    }
+
+    fun delete(encryptionKeyUrl: String){
+        with(sharedPreference.edit()) {
+            remove(encryptionKeyUrl)
             apply()
         }
     }

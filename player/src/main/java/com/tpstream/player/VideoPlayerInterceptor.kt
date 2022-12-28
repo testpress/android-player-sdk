@@ -17,7 +17,9 @@ class VideoPlayerInterceptor(private val context: Context, private val params: T
 
         if (request.url.toString().contains("encryption_key")) {
             if (isVideoBeingDownloaded(params)) {
-                return buildResponseWithDownloadedEncryptionKey(request)
+                val response = buildResponseWithDownloadedEncryptionKey(request)
+                EncryptionKeyRepository(context).delete(request.url.toString())
+                return response
             } else {
                 request = request.newBuilder()
                     .url("https://${params?.orgCode}.testpress.in/api/v2.5/encryption_key/${params?.videoId}/?access_token=${params?.accessToken}")

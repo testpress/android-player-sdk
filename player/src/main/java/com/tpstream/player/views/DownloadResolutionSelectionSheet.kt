@@ -69,10 +69,7 @@ class DownloadResolutionSelectionSheet(
     override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, downloadHelper: DownloadHelper) {
         prepareTrackGroup(downloadHelper)
         initializeDownloadResolutionSheet()
-        if (isPrepared && this.isVisible) {
-            binding.loadingProgress.visibility = View.GONE
-            binding.resolutionLayout.visibility = View.VISIBLE
-        }
+        showResolutions(isPrepared)
     }
 
     override fun onDownloadRequestHandlerPrepareError(downloadHelper: DownloadHelper, e: IOException) {
@@ -88,6 +85,13 @@ class DownloadResolutionSelectionSheet(
         initializeTrackSelectionView()
         setOnClickListeners()
         configureBottomSheetBehaviour()
+    }
+
+    private fun showResolutions(isPrepared: Boolean){
+        if (isPrepared && this.isVisible) {
+            binding.loadingProgress.visibility = View.GONE
+            binding.resolutionLayout.visibility = View.VISIBLE
+        }
     }
 
     private fun initializeTrackSelectionView() {

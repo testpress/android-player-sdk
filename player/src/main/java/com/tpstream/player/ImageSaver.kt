@@ -32,11 +32,11 @@ class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
     }
 
     fun loadImage(): Bitmap? {
-        return getImage(context, offlineVideoInfo.videoId)
+        return get(context, offlineVideoInfo.videoId)
     }
 
     fun deleteImage() {
-        deleteImage(context, offlineVideoInfo.videoId)
+        delete(context, offlineVideoInfo.videoId)
     }
 
     private fun urlToBitmap(thumbnail: String): Bitmap? {
@@ -67,7 +67,7 @@ class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
         }
     }
 
-    private fun getImage(context: Context, imageFileName: String): Bitmap? {
+    private fun get(context: Context, imageFileName: String): Bitmap? {
         return try {
             val directory = context.filesDir
             val file = File(directory, "/thumbnail/$imageFileName.png")
@@ -77,7 +77,7 @@ class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
         }
     }
 
-    private fun deleteImage(context: Context, imageFileName: String): Boolean {
+    private fun delete(context: Context, imageFileName: String): Boolean {
         val dir = context.filesDir
         val file = File(dir, "/thumbnail/$imageFileName.png")
         return file.delete()

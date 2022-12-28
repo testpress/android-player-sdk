@@ -22,7 +22,7 @@ class EncryptionKeyRepository(context: Context) {
     fun fetchAndStore(params: TpInitParams, playbackUrl: String) {
         CoroutineScope(Dispatchers.IO).launch {
             if (playbackUrl.contains(".m3u8")) {
-                val encryptionKeyUrl = EncryptionKeyDownloader().run(playbackUrl)
+                val encryptionKeyUrl = EncryptionKeyDownloader().getEncryptionKeyUrl(playbackUrl)
                 saveEncryptionKeyUrlWithParams(encryptionKeyUrl, params)
                 val encryptionKey = EncryptionKeyDownloader().getEncryptionKey(params)
                 saveEncryptionKeyWithEncryptionKeyUrl(encryptionKey, encryptionKeyUrl)

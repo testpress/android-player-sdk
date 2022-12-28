@@ -38,7 +38,6 @@ class DownloadResolutionSelectionSheet(
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()
     var isResolutionSelected = false
-    private lateinit var tracks: Tracks
     private var trackGroups: MutableList<Tracks.Group> = mutableListOf()
     private var onSubmitListener: OnSubmitListener? = null
 
@@ -77,7 +76,7 @@ class DownloadResolutionSelectionSheet(
     }
 
     private fun prepareTrackGroup(helper: DownloadHelper){
-        tracks = helper.getTracks(0)
+         val tracks = helper.getTracks(0)
         trackGroups = tracks.groups
     }
 

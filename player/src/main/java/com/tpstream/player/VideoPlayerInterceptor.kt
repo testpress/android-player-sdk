@@ -1,7 +1,6 @@
 package com.tpstream.player
 
 import android.content.Context
-import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Protocol

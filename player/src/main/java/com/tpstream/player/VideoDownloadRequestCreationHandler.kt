@@ -25,7 +25,6 @@ class VideoDownloadRequestCreationHandler(
     private val downloadHelper: DownloadHelper
     private val trackSelectionParameters: DefaultTrackSelector.Parameters
     var listener: Listener? = null
-    private lateinit var override: MutableMap<TrackGroup, TrackSelectionOverride>
     private val mediaItem: MediaItem
     private var keySetId: ByteArray? = null
 
@@ -92,7 +91,6 @@ class VideoDownloadRequestCreationHandler(
     }
 
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
-        override = overrides
         setSelectedTracks(overrides)
         val name = player.videoInfo?.title!!
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)

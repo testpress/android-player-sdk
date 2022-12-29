@@ -54,8 +54,4 @@ class OfflineVideoInfoRepository(context: Context) {
         return offlineVideoInfoDao.getAllDownloadInLiveData()
     }
 
-    fun getAllDownloads():List<OfflineVideoInfo>?{
-        return offlineVideoInfoDao.getAllOfflineVideoInfo()
-    }
-
 }

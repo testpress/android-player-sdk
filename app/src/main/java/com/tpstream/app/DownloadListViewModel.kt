@@ -11,7 +11,7 @@ class DownloadListViewModel(context: Context): ViewModel() {
     private var tpStreamDownloadManager: TpStreamDownloadManager = TpStreamDownloadManager(context)
 
     fun getDownloadData(): LiveData<List<OfflineVideoInfo>?> {
-        return tpStreamDownloadManager.getAllDownloadsInLiveData()
+        return tpStreamDownloadManager.getAllDownloads()
     }
 
     fun pauseDownload(offlineVideoInfo: OfflineVideoInfo) {

@@ -12,14 +12,8 @@ class TpStreamDownloadManager(val context: Context) {
 
     private val offlineVideoInfoRepository = OfflineVideoInfoRepository(context)
 
-    fun getAllDownloadsInLiveData(): LiveData<List<OfflineVideoInfo>?> {
+    fun getAllDownloads(): LiveData<List<OfflineVideoInfo>?> {
         return offlineVideoInfoRepository.getAllDownloadsInLiveData()
-    }
-
-    fun getAllDownloads(): List<OfflineVideoInfo>? {
-        return runBlocking(Dispatchers.IO) {
-            offlineVideoInfoRepository.getAllDownloads()
-        }
     }
 
     fun pauseDownload(offlineVideoInfo: OfflineVideoInfo) {

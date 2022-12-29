@@ -58,5 +58,5 @@ internal fun getOfflineVideoState(int:Int):OfflineVideoState?{
 }
 
 fun OfflineVideoInfo.getLocalThumbnail(context: Context): Bitmap?{
-    return ImageSaver(context,this).loadImage()
+    return ImageSaver(context).load(videoId)
 }

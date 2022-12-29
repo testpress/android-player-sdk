@@ -31,7 +31,7 @@ class TpStreamDownloadManager(val context: Context) {
     fun deleteDownload(offlineVideoInfo: OfflineVideoInfo) {
         CoroutineScope(Dispatchers.IO).launch {
             DownloadTask(context).delete(getDownloadUrl(offlineVideoInfo))
-            ImageSaver(context,offlineVideoInfo).deleteImage()
+            ImageSaver(context).delete(offlineVideoInfo.videoId)
             offlineVideoInfoRepository.delete(offlineVideoInfo)
         }
     }

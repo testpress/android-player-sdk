@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import com.tpstream.player.models.OfflineVideoInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,7 +13,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.net.URL
 
-class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
+class ImageSaver(val context: Context) {
     private val TAG = "ImageSaver"
 
     init {
@@ -24,24 +23,16 @@ class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
         }
     }
 
-    fun saveImage() {
+    fun save(thumbnailUrl: String, name: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val bitmap: Bitmap? = urlToBitmap(offlineVideoInfo.thumbnail)
-            save(context, bitmap, offlineVideoInfo.videoId)
+            val bitmap: Bitmap? = getBitmap(thumbnailUrl)
+            save(bitmap, name)
         }
     }
 
-    fun loadImage(): Bitmap? {
-        return get(context, offlineVideoInfo.videoId)
-    }
-
-    fun deleteImage() {
-        delete(context, offlineVideoInfo.videoId)
-    }
-
-    private fun urlToBitmap(thumbnail: String): Bitmap? {
+    private fun getBitmap(thumbnailUrl: String): Bitmap? {
         return try {
-            val url = URL(thumbnail)
+            val url = URL(thumbnailUrl)
             val bitmap: Bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream())
             bitmap
         } catch (exception: Exception) {
@@ -49,13 +40,11 @@ class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
         }
     }
 
-    private fun save(
-        context: Context, bitmapImage: Bitmap?, imageFileName: String
-    ) {
-        if (bitmapImage != null){
+    private fun save(bitmapImage: Bitmap?, imageFileName: String) {
+        if (bitmapImage != null) {
             try {
                 val file = File("${context.filesDir}/thumbnail/", "$imageFileName.png")
-                if (file.exists()){
+                if (file.exists()) {
                     file.delete()
                 }
                 val fileOutputStream = FileOutputStream(file)
@@ -67,19 +56,23 @@ class ImageSaver(val context: Context, val offlineVideoInfo: OfflineVideoInfo) {
         }
     }
 
-    private fun get(context: Context, imageFileName: String): Bitmap? {
+    fun load(name: String): Bitmap? {
+        return get(name)
+    }
+
+    private fun get(imageFileName: String): Bitmap? {
         return try {
             val directory = context.filesDir
             val file = File(directory, "/thumbnail/$imageFileName.png")
             BitmapFactory.decodeStream(FileInputStream(file))
-        } catch (e: FileNotFoundException){
-            BitmapFactory.decodeResource(context.resources,R.drawable.video_placeholder)
+        } catch (e: FileNotFoundException) {
+            BitmapFactory.decodeResource(context.resources, R.drawable.tp_video_placeholder)
         }
     }
 
-    private fun delete(context: Context, imageFileName: String): Boolean {
+    fun delete(imageFileName: String) {
         val dir = context.filesDir
         val file = File(dir, "/thumbnail/$imageFileName.png")
-        return file.delete()
+        file.delete()
     }
 }

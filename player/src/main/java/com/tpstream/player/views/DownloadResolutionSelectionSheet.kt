@@ -29,7 +29,6 @@ typealias OnSubmitListener = (DownloadRequest,OfflineVideoInfo?) -> Unit
 class DownloadResolutionSelectionSheet(
     val player: TpStreamPlayer,
     parameters: DefaultTrackSelector.Parameters,
-    private val trackGroups: List<Tracks.Group>,
 ) : BottomSheetDialogFragment(), VideoDownloadRequestCreationHandler.Listener {
 
     private var _binding: TpDownloadTrackSelectionDialogBinding? = null
@@ -39,6 +38,7 @@ class DownloadResolutionSelectionSheet(
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()
     var isResolutionSelected = false
+    private var trackGroups: MutableList<Tracks.Group> = mutableListOf()
     private var onSubmitListener: OnSubmitListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,11 +65,32 @@ class DownloadResolutionSelectionSheet(
         _binding = null
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, downloadHelper: DownloadHelper) {
+        prepareTrackGroup(downloadHelper)
+        initializeDownloadResolutionSheet()
+        showResolutions(isPrepared)
+    }
+
+    override fun onDownloadRequestHandlerPrepareError(downloadHelper: DownloadHelper, e: IOException) {
+        dismiss()
+    }
+
+    private fun prepareTrackGroup(helper: DownloadHelper){
+         val tracks = helper.getTracks(0)
+        trackGroups = tracks.groups
+    }
+
+    private fun initializeDownloadResolutionSheet(){
         initializeTrackSelectionView()
         setOnClickListeners()
         configureBottomSheetBehaviour()
+    }
+
+    private fun showResolutions(isPrepared: Boolean){
+        if (isPrepared && this.isVisible) {
+            binding.loadingProgress.visibility = View.GONE
+            binding.resolutionLayout.visibility = View.VISIBLE
+        }
     }
 
     private fun initializeTrackSelectionView() {
@@ -171,17 +192,6 @@ class DownloadResolutionSelectionSheet(
     inner class TrackInfo(val trackGroup: Tracks.Group, val trackIndex: Int) {
         val format: Format
             get() = trackGroup.getTrackFormat(trackIndex)
-    }
-
-    override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean) {
-        if (isPrepared && this.isVisible) {
-            binding.loadingProgress.visibility = View.GONE
-            binding.resolutionLayout.visibility = View.VISIBLE
-        }
-    }
-
-    override fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException) {
-        dismiss()
     }
 
     fun setOnSubmitListener(listener: OnSubmitListener) {

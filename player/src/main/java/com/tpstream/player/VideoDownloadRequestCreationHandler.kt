@@ -25,7 +25,6 @@ class VideoDownloadRequestCreationHandler(
     private val downloadHelper: DownloadHelper
     private val trackSelectionParameters: DefaultTrackSelector.Parameters
     var listener: Listener? = null
-    private lateinit var override: MutableMap<TrackGroup, TrackSelectionOverride>
     private val mediaItem: MediaItem
     private var keySetId: ByteArray? = null
 
@@ -74,7 +73,7 @@ class VideoDownloadRequestCreationHandler(
             }
             return
         }
-        listener?.onDownloadRequestHandlerPrepared(true)
+        listener?.onDownloadRequestHandlerPrepared(true, helper)
     }
 
     private fun hasDRMSchemaData(drmInitData: DrmInitData): Boolean {
@@ -92,20 +91,19 @@ class VideoDownloadRequestCreationHandler(
     }
 
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
-        override = overrides
         setSelectedTracks(overrides)
         val name = player.videoInfo?.title!!
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 
     private fun setSelectedTracks(overrides: MutableMap<TrackGroup, TrackSelectionOverride>) {
+        val builder = trackSelectionParameters.buildUpon()
+        builder.clearOverrides()
+        builder.addOverride(overrides.values.first())
+
         for (index in 0 until downloadHelper.periodCount) {
             downloadHelper.clearTrackSelections(index)
-            val builder = TrackSelectionParameters.Builder(context)
-            for (i in overrides.values) {
-                builder.addOverride(i)
-                downloadHelper.addTrackSelection(index, builder.build())
-            }
+            downloadHelper.addTrackSelection(index, builder.build())
         }
     }
 
@@ -113,7 +111,7 @@ class VideoDownloadRequestCreationHandler(
         this.keySetId = keySetId
         CoroutineScope(Dispatchers.Main).launch {
             Log.d("TAG", "onLicenseFetchSuccess: Success")
-            listener?.onDownloadRequestHandlerPrepared(true)
+            listener?.onDownloadRequestHandlerPrepared(true, downloadHelper)
         }
     }
 
@@ -128,8 +126,8 @@ class VideoDownloadRequestCreationHandler(
     }
 
     interface Listener {
-        fun onDownloadRequestHandlerPrepared(isPrepared: Boolean)
+        fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, downloadHelper: DownloadHelper)
 
-        fun onDownloadRequestHandlerPrepareError(helper: DownloadHelper, e: IOException)
+        fun onDownloadRequestHandlerPrepareError(downloadHelper: DownloadHelper, e: IOException)
     }
 }

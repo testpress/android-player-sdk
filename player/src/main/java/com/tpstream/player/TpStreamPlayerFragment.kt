@@ -259,7 +259,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                     val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                         player!!,
                         trackSelector.parameters,
-                        player?.getCurrentTrackGroups()!!,
                     )
                     downloadResolutionSelectionSheet.show(
                         requireActivity().supportFragmentManager,

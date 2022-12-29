@@ -29,4 +29,9 @@ class MainActivity : AppCompatActivity() {
         startActivity(myIntent)
     }
 
+    fun downloadButton(view: View) {
+        val myIntent = Intent(this, DownloadListActivity::class.java)
+        startActivity(myIntent)
+    }
+
 }

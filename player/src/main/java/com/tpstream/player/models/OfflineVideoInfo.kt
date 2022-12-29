@@ -1,7 +1,10 @@
 package com.tpstream.player.models
 
+import android.content.Context
+import android.graphics.Bitmap
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.tpstream.player.ImageSaver
 
 @Entity
 class OfflineVideoInfo(
@@ -52,4 +55,8 @@ internal fun getOfflineVideoState(int:Int):OfflineVideoState?{
         4 -> OfflineVideoState.FAILED
         else -> null
     }
+}
+
+fun OfflineVideoInfo.getLocalThumbnail(context: Context): Bitmap?{
+    return ImageSaver(context).load(videoId)
 }

@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.media3.common.*
 import com.tpstream.player.*
 
+const val TP_OFFLINE_PARAMS = "tp_offline_params"
+
 class PlayerActivity : AppCompatActivity() {
     lateinit var playerFragment: TpStreamPlayerFragment;
     lateinit var tpStreamPlayer: TpStreamPlayer;
@@ -12,12 +14,13 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var accessToken :String
     private lateinit var videoId :String
     private lateinit var orgCode :String
-    private lateinit var parameters : TpInitParams
+    private var parameters : TpInitParams? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
-        selectVideoParams(intent.getStringExtra("VideoParameter")!!)
+        parameters = intent.getParcelableExtra(TP_OFFLINE_PARAMS)
+        selectVideoParams(intent.getStringExtra("VideoParameter"))
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
         playerFragment.enableAutoFullScreenOnRotate()
@@ -79,19 +82,20 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     fun play(){
-        parameters = TpInitParams.Builder()
-            .setVideoId(videoId)
-            .setAccessToken(accessToken)
-            .setOrgCode(orgCode)
-            .setAutoPlay(true)
-            .startAt(20L)
-            .enableDownloadSupport(true)
-            .build()
-        playerFragment.load(parameters)
+        if (parameters == null){
+            parameters = TpInitParams.Builder()
+                .setVideoId(videoId)
+                .setAccessToken(accessToken)
+                .setOrgCode(orgCode)
+                .setAutoPlay(true)
+                .enableDownloadSupport(true)
+                .build()
+        }
+        playerFragment.load(parameters!!)
 
     }
 
-    private fun selectVideoParams(videoType: String){
+    private fun selectVideoParams(videoType: String?){
         when(videoType){
             "DRM" -> {
                 accessToken = "c381512b-7337-4d8e-a8cf-880f4f08fd08"
@@ -108,6 +112,7 @@ class PlayerActivity : AppCompatActivity() {
                 videoId = "qJQlWGLJvNv"
                 orgCode = "demoveranda"
             }
+            null ->{}
         }
     }
 

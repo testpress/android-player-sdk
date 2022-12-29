@@ -90,4 +90,15 @@ data class TpInitParams (
             orgCode = orgCode
         )
     }
+
+    companion object{
+        fun createOfflineParams(videoId: String):TpInitParams{
+            return TpInitParams(
+                videoId = videoId,
+                orgCode = "",
+                isDownloadEnabled = true,
+                autoPlay = true
+            )
+        }
+    }
 }

@@ -11,6 +11,13 @@ import com.tpstream.player.models.getOfflineVideoState
 class OfflineVideoInfoRepository(context: Context) {
 
     private val offlineVideoInfoDao = TPStreamsDatabase(context).offlineVideoInfoDao()
+    private val downloadManager = VideoDownloadManager(context).get()
+
+    suspend fun refreshCurrentDownloadsStatus() {
+        for (download in downloadManager.currentDownloads) {
+            updateDownloadStatus(download)
+        }
+    }
 
     suspend fun updateDownloadStatus(download: Download) {
         val offlineVideoInfo = offlineVideoInfoDao.getOfflineVideoInfoByUrl(download.request.uri.toString())
@@ -41,6 +48,10 @@ class OfflineVideoInfoRepository(context: Context) {
 
     fun getOfflineVideoInfoByVideoId(videoID:String): OfflineVideoInfo?{
         return offlineVideoInfoDao.getOfflineVideoInfoByVideoId(videoID)
+    }
+
+    fun getAllDownloadsInLiveData():LiveData<List<OfflineVideoInfo>?>{
+        return offlineVideoInfoDao.getAllDownloadInLiveData()
     }
 
 }

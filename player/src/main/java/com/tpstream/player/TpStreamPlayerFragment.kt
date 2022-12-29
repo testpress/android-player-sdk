@@ -256,6 +256,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                     Toast.makeText(requireContext(),"Downloading",Toast.LENGTH_SHORT).show()
                 }
                 else -> {
+                    EncryptionKeyRepository(requireContext()).fetchAndStore(player?.params!!,player?.videoInfo?.getPlaybackURL()!!)
                     val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                         player!!,
                         trackSelector.parameters,
@@ -265,7 +266,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                         "DownloadSelectionSheet"
                     )
                     downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest,offlineVideoInfo ->
-                        EncryptionKeyRepository(requireContext()).fetchAndStore(player?.params!!,player?.videoInfo?.getPlaybackURL()!!)
                         DownloadTask(requireContext()).start(downloadRequest)
                         offlineVideoInfo?.videoId = player?.params?.videoId!!
                         offlineVideoInfoViewModel.insert(offlineVideoInfo!!)

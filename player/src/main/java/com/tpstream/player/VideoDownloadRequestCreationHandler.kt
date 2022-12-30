@@ -11,8 +11,9 @@ import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.tpstream.player.models.OfflineVideoInfo
+import com.google.common.collect.ImmutableList
 import com.tpstream.player.models.VideoInfo
+import com.tpstream.player.views.TrackInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,44 +24,55 @@ typealias OnDownloadRequestCreation = (DownloadRequest, VideoInfo) -> Unit
 class VideoDownloadRequestCreationHandler(
     val context: Context,
     private val player: TpStreamPlayer? = null,
-    private var params: TpInitParams? = null
+    private var params: TpInitParams? = null,
+    private val downloadResolution: Int = 0
 ) :
     DownloadHelper.Callback, DRMLicenseFetchCallback {
     private lateinit var downloadHelper: DownloadHelper
     private lateinit var trackSelectionParameters: DefaultTrackSelector.Parameters
     var listener: Listener? = null
     private var keySetId: ByteArray? = null
-    private lateinit var videoInfo:VideoInfo
+    private lateinit var videoInfo: VideoInfo
     private var url: String? = null
-    private var onDownloadRequestCreation :OnDownloadRequestCreation? = null
+    private var onDownloadRequestCreation: OnDownloadRequestCreation? = null
 
-    fun init(): VideoDownloadRequestCreationHandler{
-        if (player == null){
+    fun init(): VideoDownloadRequestCreationHandler {
+        if (player == null) {
             CoroutineScope(Dispatchers.IO).launch {
                 getVideoInfo(params!!)
             }
+        } else {
+            url = player.videoInfo?.getPlaybackURL()!!
+            params = player.params
+            videoInfo = player.videoInfo!!
+            prepareDownloadHelper()
         }
-        url = player?.videoInfo?.getPlaybackURL()!!
-        params = player.params
-        videoInfo = player.videoInfo!!
-        trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
-        downloadHelper = getDownloadHelper()
-        downloadHelper.prepare(this)
         return this
     }
 
-    private fun getVideoInfo(params: TpInitParams){
-    val url =
-        "/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
-    Network<VideoInfo>(params.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
-        override fun onSuccess(result: VideoInfo) {
-            videoInfo = result
-        }
+    private fun prepareDownloadHelper() {
+        trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
+        downloadHelper = getDownloadHelper()
+        downloadHelper.prepare(this)
+    }
 
-        override fun onFailure(exception: TPException) {
-            Toast.makeText(context,"Download Failed",Toast.LENGTH_SHORT).show()
-        }
-    })
+    private fun getVideoInfo(params: TpInitParams) {
+        val url =
+            "/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
+        Network<VideoInfo>(params.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
+            override fun onSuccess(result: VideoInfo) {
+                videoInfo = result
+                this@VideoDownloadRequestCreationHandler.url = videoInfo.getPlaybackURL()
+                EncryptionKeyRepository(context).fetchAndStore(params, this@VideoDownloadRequestCreationHandler.url!!)
+                prepareDownloadHelper()
+            }
+
+            override fun onFailure(exception: TPException) {
+                CoroutineScope(Dispatchers.Main).launch{
+                    Toast.makeText(context, "Download Failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
     }
 
     private fun getDownloadHelper(): DownloadHelper {
@@ -78,7 +90,7 @@ class VideoDownloadRequestCreationHandler(
         )
     }
 
-    private fun getMediaItem(url: String):MediaItem{
+    private fun getMediaItem(url: String): MediaItem {
         return MediaItem.Builder()
             .setUri(url)
             .setDrmConfiguration(
@@ -90,21 +102,39 @@ class VideoDownloadRequestCreationHandler(
     }
 
     override fun onPrepared(helper: DownloadHelper) {
-        val videoOrAudioData = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(helper)
-        val isDRMProtectedVideo = videoOrAudioData != null
-        if (isDRMProtectedVideo) {
-            if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
-                OfflineDRMLicenseHelper.fetchLicense(context, params!!, downloadHelper, this)
-            } else {
-                Toast.makeText(
-                    context,
-                    "Error in downloading video",
-                    Toast.LENGTH_LONG
-                ).show()
+        if (player == null) {
+            val videoOrAudioData = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(helper)
+            val isDRMProtectedVideo = videoOrAudioData != null
+            if (isDRMProtectedVideo) {
+                if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
+                    OfflineDRMLicenseHelper.fetchLicense(context, params!!, downloadHelper, this)
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Error in downloading video",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                return
             }
-            return
+            createDownloadOverrides(downloadResolution)
+        } else {
+            val videoOrAudioData = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(helper)
+            val isDRMProtectedVideo = videoOrAudioData != null
+            if (isDRMProtectedVideo) {
+                if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
+                    OfflineDRMLicenseHelper.fetchLicense(context, params!!, downloadHelper, this)
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Error in downloading video",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                return
+            }
+            listener?.onDownloadRequestHandlerPrepared(true, helper)
         }
-        listener?.onDownloadRequestHandlerPrepared(true, helper)
     }
 
     private fun hasDRMSchemaData(drmInitData: DrmInitData): Boolean {
@@ -119,6 +149,31 @@ class VideoDownloadRequestCreationHandler(
 
     override fun onPrepareError(helper: DownloadHelper, e: IOException) {
         listener?.onDownloadRequestHandlerPrepareError(helper, e)
+    }
+
+    private fun createDownloadOverrides(int: Int){
+        val trackGroup = downloadHelper.getTracks(0).groups
+        val overrides = trackSelectionParameters.overrides.toMutableMap()
+        val trackInfos = getTrackInfos(trackGroup)
+        val resolution = trackInfos[int]
+        val mediaTrackGroup: TrackGroup = resolution.trackGroup.mediaTrackGroup
+        overrides.clear()
+        overrides[mediaTrackGroup] =
+            TrackSelectionOverride(mediaTrackGroup, ImmutableList.of(resolution.trackIndex))
+        onDownloadRequestCreation?.invoke(buildDownloadRequest(overrides),videoInfo)
+    }
+
+    private fun getTrackInfos(trackGroups: List<Tracks.Group>): ArrayList<TrackInfo> {
+        val trackInfos = arrayListOf<TrackInfo>()
+        if (trackGroups.none { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }) {
+            return trackInfos
+        }
+
+        val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
+        for (trackIndex in 0 until trackGroup.length) {
+            trackInfos.add(TrackInfo(trackGroup, trackIndex))
+        }
+        return trackInfos
     }
 
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
@@ -140,6 +195,7 @@ class VideoDownloadRequestCreationHandler(
 
     override fun onLicenseFetchSuccess(keySetId: ByteArray) {
         this.keySetId = keySetId
+        createDownloadOverrides(downloadResolution)
         CoroutineScope(Dispatchers.Main).launch {
             Log.d("TAG", "onLicenseFetchSuccess: Success")
             listener?.onDownloadRequestHandlerPrepared(true, downloadHelper)

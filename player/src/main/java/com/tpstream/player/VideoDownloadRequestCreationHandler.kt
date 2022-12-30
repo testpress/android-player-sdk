@@ -11,46 +11,66 @@ import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.tpstream.player.models.OfflineVideoInfo
 import com.tpstream.player.models.VideoInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 
+typealias OnDownloadRequestCreation = (DownloadRequest, VideoInfo) -> Unit
+
 class VideoDownloadRequestCreationHandler(
     val context: Context,
-    private val player: TpStreamPlayer
+    private val player: TpStreamPlayer? = null,
+    private var params: TpInitParams? = null
 ) :
     DownloadHelper.Callback, DRMLicenseFetchCallback {
-    private val downloadHelper: DownloadHelper
-    private val trackSelectionParameters: DefaultTrackSelector.Parameters
+    private lateinit var downloadHelper: DownloadHelper
+    private lateinit var trackSelectionParameters: DefaultTrackSelector.Parameters
     var listener: Listener? = null
-    private val mediaItem: MediaItem
     private var keySetId: ByteArray? = null
+    private lateinit var videoInfo:VideoInfo
+    private var url: String? = null
+    private var onDownloadRequestCreation :OnDownloadRequestCreation? = null
 
-    init {
-        val url = player.videoInfo?.getPlaybackURL()!!
+    fun init(): VideoDownloadRequestCreationHandler{
+        if (player == null){
+            CoroutineScope(Dispatchers.IO).launch {
+                getVideoInfo(params!!)
+            }
+        }
+        url = player?.videoInfo?.getPlaybackURL()!!
+        params = player.params
+        videoInfo = player.videoInfo!!
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
-        mediaItem = MediaItem.Builder()
-            .setUri(url)
-            .setDrmConfiguration(
-                DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                    .setMultiSession(true)
-                    .build()
-            )
-            .build()
         downloadHelper = getDownloadHelper()
         downloadHelper.prepare(this)
+        return this
+    }
+
+    private fun getVideoInfo(params: TpInitParams){
+    val url =
+        "/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
+    Network<VideoInfo>(params.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
+        override fun onSuccess(result: VideoInfo) {
+            videoInfo = result
+        }
+
+        override fun onFailure(exception: TPException) {
+            Toast.makeText(context,"Download Failed",Toast.LENGTH_SHORT).show()
+        }
+    })
     }
 
     private fun getDownloadHelper(): DownloadHelper {
         val sessionManager = DefaultDrmSessionManager.Builder()
-            .build(CustomHttpDrmMediaCallback(context, player.params))
+            .build(CustomHttpDrmMediaCallback(context, params!!))
         sessionManager.setMode(DefaultDrmSessionManager.MODE_DOWNLOAD, null)
-        val dataSourceFactory = VideoDownloadManager(context).build(player.params)
+        val dataSourceFactory = VideoDownloadManager(context).build(params!!)
         val renderersFactory = DefaultRenderersFactory(context)
         return DownloadHelper.forMediaItem(
-            mediaItem,
+            getMediaItem(url!!),
             trackSelectionParameters,
             renderersFactory,
             dataSourceFactory,
@@ -58,12 +78,23 @@ class VideoDownloadRequestCreationHandler(
         )
     }
 
+    private fun getMediaItem(url: String):MediaItem{
+        return MediaItem.Builder()
+            .setUri(url)
+            .setDrmConfiguration(
+                DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setMultiSession(true)
+                    .build()
+            )
+            .build()
+    }
+
     override fun onPrepared(helper: DownloadHelper) {
         val videoOrAudioData = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(helper)
         val isDRMProtectedVideo = videoOrAudioData != null
         if (isDRMProtectedVideo) {
             if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
-                OfflineDRMLicenseHelper.fetchLicense(context, player.params, downloadHelper, this)
+                OfflineDRMLicenseHelper.fetchLicense(context, params!!, downloadHelper, this)
             } else {
                 Toast.makeText(
                     context,
@@ -92,7 +123,7 @@ class VideoDownloadRequestCreationHandler(
 
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
         setSelectedTracks(overrides)
-        val name = player.videoInfo?.title!!
+        val name = videoInfo.title!!
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 
@@ -129,5 +160,9 @@ class VideoDownloadRequestCreationHandler(
         fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, downloadHelper: DownloadHelper)
 
         fun onDownloadRequestHandlerPrepareError(downloadHelper: DownloadHelper, e: IOException)
+    }
+
+    fun setOnDownloadRequestCreation(listener: OnDownloadRequestCreation) {
+        onDownloadRequestCreation = listener
     }
 }

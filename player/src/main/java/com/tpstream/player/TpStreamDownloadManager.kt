@@ -39,4 +39,12 @@ class TpStreamDownloadManager(val context: Context) {
     private fun getDownloadUrl(offlineVideoInfo: OfflineVideoInfo): String {
         return offlineVideoInfo.url
     }
+
+    private fun startDownloads(paramsList: List<TpInitParams>,videoResolution:Int){
+
+
+
+
+
+    }
 }

@@ -39,7 +39,7 @@ class TpStreamDownloadManager(val context: Context) {
         return offlineVideoInfo.url
     }
 
-    fun startDownloads(paramsList: List<TpInitParams>,videoResolution:Int){
+    fun startDownloads(paramsList: List<TpInitParams>,resolution:OfflineDownloadResolution = OfflineDownloadResolution.VERY_LOW){
         CoroutineScope(Dispatchers.IO).launch {
             val downloadedList = offlineVideoInfoRepository.getAllDownloads()
             val paramsList1 = if (downloadedList != null){
@@ -48,7 +48,7 @@ class TpStreamDownloadManager(val context: Context) {
                 paramsList.toMutableList()
             }
             for (params in paramsList1){
-                val videoDownloadRequestCreationHandler = VideoDownloadRequestCreationHandler(context,null,params,videoResolution).init()
+                val videoDownloadRequestCreationHandler = VideoDownloadRequestCreationHandler(context,null,params,resolution.height).init()
                 videoDownloadRequestCreationHandler.setOnDownloadRequestCreation { downloadRequest, videoInfo ->
                     DownloadTask(context).start(downloadRequest)
                     saveOfflineVideoInfo(params,videoInfo)
@@ -65,4 +65,11 @@ class TpStreamDownloadManager(val context: Context) {
             OfflineVideoInfoRepository(context).insert(offlineVideoInfo)
         }
     }
+}
+
+enum class OfflineDownloadResolution(val height:Int){
+    VERY_LOW(240),
+    LOW(360),
+    MEDIUM(480),
+    HIGH(720),
 }

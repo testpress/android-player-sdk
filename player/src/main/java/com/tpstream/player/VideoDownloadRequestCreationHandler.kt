@@ -25,7 +25,7 @@ class VideoDownloadRequestCreationHandler(
     val context: Context,
     private val player: TpStreamPlayer? = null,
     private var params: TpInitParams? = null,
-    private val downloadResolution: Int = 0
+    private val downloadResolutionHeight: Int = 240
 ) :
     DownloadHelper.Callback, DRMLicenseFetchCallback {
     private lateinit var downloadHelper: DownloadHelper
@@ -117,7 +117,7 @@ class VideoDownloadRequestCreationHandler(
                 }
                 return
             }
-            createDownloadOverrides(downloadResolution)
+            createDownloadOverrides(downloadResolutionHeight)
         } else {
             val videoOrAudioData = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(helper)
             val isDRMProtectedVideo = videoOrAudioData != null
@@ -155,7 +155,7 @@ class VideoDownloadRequestCreationHandler(
         val trackGroup = downloadHelper.getTracks(0).groups
         val overrides = trackSelectionParameters.overrides.toMutableMap()
         val trackInfos = getTrackInfos(trackGroup)
-        val resolution = trackInfos[int]
+        val resolution = trackInfos[getResolutionIndex(int,trackGroup)]
         val mediaTrackGroup: TrackGroup = resolution.trackGroup.mediaTrackGroup
         overrides.clear()
         overrides[mediaTrackGroup] =
@@ -174,6 +174,23 @@ class VideoDownloadRequestCreationHandler(
             trackInfos.add(TrackInfo(trackGroup, trackIndex))
         }
         return trackInfos
+    }
+
+    private fun getResolutionIndex(resolutionHeight:Int,trackGroups: List<Tracks.Group>):Int{
+        val track = trackGroups[0]
+        for (index in 0 until  track.mediaTrackGroup.length){
+            if (resolutionHeight == track.mediaTrackGroup.getFormat(index).height){
+                val format = track.mediaTrackGroup.getFormat(index)
+                return track.mediaTrackGroup.indexOf(format)
+            }
+        }
+        for (index in 0 until  track.mediaTrackGroup.length){
+            if (240 == track.mediaTrackGroup.getFormat(index).height){
+                val format = track.mediaTrackGroup.getFormat(index)
+                return track.mediaTrackGroup.indexOf(format)
+            }
+        }
+        return 0
     }
 
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
@@ -195,7 +212,7 @@ class VideoDownloadRequestCreationHandler(
 
     override fun onLicenseFetchSuccess(keySetId: ByteArray) {
         this.keySetId = keySetId
-        createDownloadOverrides(downloadResolution)
+        createDownloadOverrides(downloadResolutionHeight)
         CoroutineScope(Dispatchers.Main).launch {
             Log.d("TAG", "onLicenseFetchSuccess: Success")
             listener?.onDownloadRequestHandlerPrepared(true, downloadHelper)

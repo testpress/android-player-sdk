@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.tpstream.player.OfflineDownloadResolution
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.TpStreamDownloadManager
 
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
             .setOrgCode("demoveranda")
             .build()
 
-        TpStreamDownloadManager(this).startDownloads(listOf(drmVideo,aesEncryptedVideo,clearVideo),2)
+        TpStreamDownloadManager(this).startDownloads(listOf(drmVideo,aesEncryptedVideo,clearVideo),OfflineDownloadResolution.HIGH)
     }
 
 }

@@ -25,14 +25,17 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.tpstream.player.views.Util.getRendererIndex
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.models.OfflineVideoState
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
+import com.tpstream.player.views.Util.getRendererIndex
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
@@ -60,6 +63,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private var downloadState :OfflineVideoState? = null
     private var showDownloadButton = false
     private var startPosition : Long = -1L
+    private var drmLicenseRetries = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -387,20 +391,36 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
             viewBinding.errorMessage.visibility = View.VISIBLE
-            viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
             Sentry.captureException(error)
             if (isDRMException(error.cause!!)) {
-                onDownloadsSuccess(player?.videoInfo?.getPlaybackURL())
+                val url = player?.videoInfo?.getPlaybackURL()
+                val downloadTask = DownloadTask(requireContext())
+                drmLicenseRetries += 1
+                if (drmLicenseRetries < 2 && downloadTask.isDownloaded(url!!)) {
+                    if (!InternetConnectivityChecker.isConnected(requireContext())) {
+                        viewBinding.errorMessage.text = "Please turn on internet to fetch video license"
+                        return
+                    }
+                    OfflineDRMLicenseHelper.renewLicense(url, player?.params!!, activity!!, this)
+                    viewBinding.errorMessage.text = "Please wait... We are syncing video"
+                } else {
+                    viewBinding.errorMessage.text = "Couldn't fetch decryption key. Please try again"
+                }
+            } else {
+                viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
             }
             playbackStateListener?.onPlayerError(error)
         }
 
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {
-            Log.d("TAG", "onLicenseFetchSuccess: ")
+            CoroutineScope(Dispatchers.Main).launch {
+                reloadVideo()
+            }
         }
 
         override fun onLicenseFetchFailure() {
-            Log.d("TAG", "onLicenseFetchFailure: ")
+            viewBinding.errorMessage.visibility = View.VISIBLE
+            viewBinding.errorMessage.text = "Error in fetching video license. Please try again"
         }
 
         override fun onTracksChanged(tracks: Tracks) {

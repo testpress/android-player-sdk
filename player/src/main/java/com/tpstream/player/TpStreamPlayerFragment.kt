@@ -395,16 +395,16 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             if (isDRMException(error.cause!!)) {
                 val url = player?.videoInfo?.getPlaybackURL()
                 val downloadTask = DownloadTask(requireContext())
+                if (!InternetConnectivityChecker.isConnected(requireContext())) {
+                    viewBinding.errorMessage.text = getString(R.string.no_internet_to_sync_license)
+                    return
+                }
                 drmLicenseRetries += 1
                 if (drmLicenseRetries < 2 && downloadTask.isDownloaded(url!!)) {
-                    if (!InternetConnectivityChecker.isConnected(requireContext())) {
-                        viewBinding.errorMessage.text = "Please turn on internet to fetch video license"
-                        return
-                    }
                     OfflineDRMLicenseHelper.renewLicense(url, player?.params!!, activity!!, this)
-                    viewBinding.errorMessage.text = "Please wait... We are syncing video"
+                    viewBinding.errorMessage.text = getString(R.string.syncing_video)
                 } else {
-                    viewBinding.errorMessage.text = "Couldn't fetch decryption key. Please try again"
+                    viewBinding.errorMessage.text = getString(R.string.license_request_failed)
                 }
             } else {
                 viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
@@ -420,7 +420,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onLicenseFetchFailure() {
             viewBinding.errorMessage.visibility = View.VISIBLE
-            viewBinding.errorMessage.text = "Error in fetching video license. Please try again"
+            viewBinding.errorMessage.text = getString(R.string.license_error)
         }
 
         override fun onTracksChanged(tracks: Tracks) {

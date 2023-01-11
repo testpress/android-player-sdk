@@ -159,7 +159,7 @@ interface DRMLicenseFetchCallback {
 }
 
 object InternetConnectivityChecker {
-    fun isConnected(context: Context): Boolean {
+    fun isNetworkAvailable(context: Context): Boolean {
         val connectivity =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (connectivity != null) {

@@ -393,23 +393,27 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             viewBinding.errorMessage.visibility = View.VISIBLE
             Sentry.captureException(error)
             if (isDRMException(error.cause!!)) {
-                val url = player?.videoInfo?.getPlaybackURL()
-                val downloadTask = DownloadTask(requireContext())
-                if (!InternetConnectivityChecker.isConnected(requireContext())) {
-                    viewBinding.errorMessage.text = getString(R.string.no_internet_to_sync_license)
-                    return
-                }
-                drmLicenseRetries += 1
-                if (drmLicenseRetries < 2 && downloadTask.isDownloaded(url!!)) {
-                    OfflineDRMLicenseHelper.renewLicense(url, player?.params!!, activity!!, this)
-                    viewBinding.errorMessage.text = getString(R.string.syncing_video)
-                } else {
-                    viewBinding.errorMessage.text = getString(R.string.license_request_failed)
-                }
+                fetchDRMLicence()
             } else {
                 viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
             }
             playbackStateListener?.onPlayerError(error)
+        }
+
+        private fun fetchDRMLicence(){
+            val url = player?.videoInfo?.getPlaybackURL()
+            val downloadTask = DownloadTask(requireContext())
+            if (!InternetConnectivityChecker.isNetworkAvailable(requireContext())) {
+                viewBinding.errorMessage.text = getString(R.string.no_internet_to_sync_license)
+                return
+            }
+            drmLicenseRetries += 1
+            if (drmLicenseRetries < 2 && downloadTask.isDownloaded(url!!)) {
+                OfflineDRMLicenseHelper.renewLicense(url, player?.params!!, activity!!, this)
+                viewBinding.errorMessage.text = getString(R.string.syncing_video)
+            } else {
+                viewBinding.errorMessage.text = getString(R.string.license_request_failed)
+            }
         }
 
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {

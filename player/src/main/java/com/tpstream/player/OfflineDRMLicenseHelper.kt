@@ -1,6 +1,9 @@
 package com.tpstream.player
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkInfo
 import android.net.Uri
 import androidx.media3.common.Format
 import androidx.media3.exoplayer.dash.DashUtil
@@ -153,4 +156,20 @@ object VideoPlayerUtil {
 interface DRMLicenseFetchCallback {
     fun onLicenseFetchSuccess(keySetId: ByteArray)
     fun onLicenseFetchFailure()
+}
+
+object InternetConnectivityChecker {
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivity =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivity != null) {
+            val infos = connectivity.allNetworkInfo
+            if (infos != null) {
+                for (info in infos) {
+                    if (info.state == NetworkInfo.State.CONNECTED) return true
+                }
+            }
+        }
+        return false
+    }
 }

@@ -393,10 +393,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             super.onPlayerError(error)
             viewBinding.errorMessage.visibility = View.VISIBLE
             Sentry.captureException(error)
-            if (isDRMLicenseExpiredException(error)) {
+            if (isDRMException(error.cause!!)) {
                 fetchDRMLicence()
             } else {
-                viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
+                viewBinding.errorMessage.text = "Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName}"
             }
             playbackStateListener?.onPlayerError(error)
         }
@@ -497,8 +497,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             playbackStateListener?.onTimelineChanged(timeline, reason)
         }
 
-        private fun isDRMLicenseExpiredException(error: PlaybackException): Boolean {
-            return error.errorCode == ERROR_CODE_DRM_LICENSE_EXPIRED
+        private fun isDRMException(cause: Throwable): Boolean {
+            return cause is DrmSession.DrmSessionException || cause is MediaCodec.CryptoException || cause is MediaDrmCallbackException
         }
 
     }

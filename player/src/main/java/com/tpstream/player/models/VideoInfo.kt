@@ -29,7 +29,7 @@ data class VideoInfo(
             title = title!!,
             thumbnail = thumbnail?:"",
             url = dashUrl?:url!!,
-            duration = duration!!,
+            duration = duration?:"",
             transcodingStatus = transcodingStatus!!
         )
     }

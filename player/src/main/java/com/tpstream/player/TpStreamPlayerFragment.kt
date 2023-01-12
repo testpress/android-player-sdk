@@ -420,6 +420,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {
             CoroutineScope(Dispatchers.Main).launch {
                 reloadVideo()
+                drmLicenseRetries = 0
             }
         }
 

@@ -10,7 +10,7 @@ class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
         inline operator fun <reified T : Any>invoke(subdomain: String) = Network(T::class.java, subdomain)
     }
 
-    private val BASE_URL = "https://dfe0-183-82-25-139.in.ngrok.io"
+    private val BASE_URL = "https://${subdomain}.testpress.in"
     private var client: OkHttpClient = OkHttpClient();
     private val gson = Gson()
 

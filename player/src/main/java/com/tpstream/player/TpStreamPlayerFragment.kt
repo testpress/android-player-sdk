@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
+import androidx.media3.common.PlaybackException.ERROR_CODE_DRM_LICENSE_EXPIRED
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -392,7 +393,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             super.onPlayerError(error)
             viewBinding.errorMessage.visibility = View.VISIBLE
             Sentry.captureException(error)
-            if (isDRMException(error.cause!!)) {
+            if (isDRMLicenseExpiredException(error)) {
                 fetchDRMLicence()
             } else {
                 viewBinding.errorMessage.text = "Error occurred while playing video. \n ${error.errorCode} ${error.errorCodeName}"
@@ -401,12 +402,12 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         private fun fetchDRMLicence(){
-            val url = player?.videoInfo?.getPlaybackURL()
-            val downloadTask = DownloadTask(requireContext())
             if (!InternetConnectivityChecker.isNetworkAvailable(requireContext())) {
                 viewBinding.errorMessage.text = getString(R.string.no_internet_to_sync_license)
                 return
             }
+            val url = player?.videoInfo?.getPlaybackURL()
+            val downloadTask = DownloadTask(requireContext())
             drmLicenseRetries += 1
             if (drmLicenseRetries < 2 && downloadTask.isDownloaded(url!!)) {
                 OfflineDRMLicenseHelper.renewLicense(url, player?.params!!, activity!!, this)
@@ -496,8 +497,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             playbackStateListener?.onTimelineChanged(timeline, reason)
         }
 
-        private fun isDRMException(cause: Throwable): Boolean {
-            return cause is DrmSession.DrmSessionException || cause is MediaCodec.CryptoException || cause is MediaDrmCallbackException
+        private fun isDRMLicenseExpiredException(error: PlaybackException): Boolean {
+            return error.errorCode == ERROR_CODE_DRM_LICENSE_EXPIRED
         }
 
     }

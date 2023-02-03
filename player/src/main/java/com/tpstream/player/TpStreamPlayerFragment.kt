@@ -26,6 +26,7 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.models.OfflineVideoState
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
@@ -329,7 +330,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun initializeExoplayer(): ExoPlayer {
+        val defaultBandwidthMeter = DefaultBandwidthMeter.Builder(requireContext())
+            .setInitialBitrateEstimate(100_000L)
+            .build()
         return ExoPlayer.Builder(requireActivity())
+            .setBandwidthMeter(defaultBandwidthMeter)
             .setTrackSelector(trackSelector)
             .build()
             .also { exoPlayer ->

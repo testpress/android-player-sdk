@@ -47,7 +47,7 @@ class DownloadResolutionSelectionSheet(
             VideoDownloadRequestCreationHandler(
                 requireContext(),
                 player
-            )
+            ).init()
         videoDownloadRequestCreateHandler.listener = this
     }
 
@@ -189,13 +189,13 @@ class DownloadResolutionSelectionSheet(
         }
     }
 
-    inner class TrackInfo(val trackGroup: Tracks.Group, val trackIndex: Int) {
-        val format: Format
-            get() = trackGroup.getTrackFormat(trackIndex)
-    }
-
     fun setOnSubmitListener(listener: OnSubmitListener) {
         onSubmitListener = listener
     }
 
+}
+
+class TrackInfo(val trackGroup: Tracks.Group, val trackIndex: Int) {
+    val format: Format
+        get() = trackGroup.getTrackFormat(trackIndex)
 }

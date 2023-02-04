@@ -66,6 +66,7 @@ class DownloadResolutionSelectionSheet(
     }
 
     override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, downloadHelper: DownloadHelper) {
+        if (!this.isVisible) return
         prepareTrackGroup(downloadHelper)
         initializeDownloadResolutionSheet()
         showResolutions(isPrepared)
@@ -87,7 +88,7 @@ class DownloadResolutionSelectionSheet(
     }
 
     private fun showResolutions(isPrepared: Boolean){
-        if (isPrepared && this.isVisible) {
+        if (isPrepared) {
             binding.loadingProgress.visibility = View.GONE
             binding.resolutionLayout.visibility = View.VISIBLE
         }

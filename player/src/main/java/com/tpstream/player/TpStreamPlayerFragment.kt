@@ -19,7 +19,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
-import androidx.media3.common.PlaybackException.ERROR_CODE_DRM_LICENSE_EXPIRED
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -372,31 +371,12 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             requireActivity().runOnUiThread {
                 viewBinding.errorMessage.visibility = View.VISIBLE
                 viewBinding.errorMessage.text = "Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}"
-                sentryAPIErrorCapture(exception)
+                SentryLogger.logAPIException(exception,parameters)
             }
         }
         player?.setPlayWhenReady(parameters.autoPlay==true)
         showDownloadButton = parameters.isDownloadEnabled
         updateDownloadButtonImage(parameters)
-    }
-
-    private fun sentryAPIErrorCapture(exception: TPException){
-        Sentry.captureMessage("TPStreams server error" +
-                " Code: ${exception.response?.code}" +
-                " Message: ${exception.response?.message}" +
-                " Video ID: ${player?.params?.videoId}" +
-                " AccessToken: ${player?.params?.accessToken}" +
-                " Org Code: ${player?.params?.orgCode}")
-    }
-
-    private fun sentryPlayerErrorCapture(error: PlaybackException){
-        Sentry.captureMessage("Player error" +
-                " Code: ${error.errorCode}" +
-                " Code name: ${error.errorCodeName}" +
-                " Message: ${error.message}" +
-                " Video ID: ${player?.params?.videoId}" +
-                " AccessToken: ${player?.params?.accessToken}" +
-                " Org Code: ${player?.params?.orgCode}")
     }
 
     inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {
@@ -417,7 +397,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 fetchDRMLicence(error)
             } else {
                 viewBinding.errorMessage.text = "Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName}"
-                sentryPlayerErrorCapture(error)
+                SentryLogger.logPlaybackException(error,player?.params)
             }
             playbackStateListener?.onPlayerError(error)
         }
@@ -435,7 +415,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 viewBinding.errorMessage.text = getString(R.string.syncing_video)
             } else {
                 viewBinding.errorMessage.text = getString(R.string.license_request_failed)
-                sentryPlayerErrorCapture(error)
+                SentryLogger.logPlaybackException(error,player?.params)
             }
         }
 

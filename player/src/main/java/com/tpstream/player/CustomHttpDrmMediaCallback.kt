@@ -5,7 +5,6 @@ import androidx.media3.exoplayer.drm.ExoMediaDrm
 import androidx.media3.exoplayer.drm.HttpMediaDrmCallback
 import androidx.media3.exoplayer.drm.MediaDrmCallback
 import com.tpstream.player.models.DRMLicenseURL
-import io.sentry.Sentry
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -21,18 +20,9 @@ class CustomHttpDrmMediaCallback(context: Context, private val tpInitParams: TpI
             val result = Network<DRMLicenseURL>(tpInitParams.orgCode).post(url, body)
             result?.licenseUrl ?: ""
         } catch (exception:TPException){
-            sentryAPIErrorCapture(exception,tpInitParams)
+            SentryLogger.logAPIException(exception,tpInitParams)
             ""
         }
-    }
-
-    private fun sentryAPIErrorCapture(exception: TPException,params: TpInitParams){
-        Sentry.captureMessage("TPStreams server error" +
-                " Code: ${exception.response?.code}" +
-                " Message: ${exception.response?.message}" +
-                " Video ID: ${params.videoId}" +
-                " AccessToken: ${params.accessToken}" +
-                " Org Code: ${params.orgCode}")
     }
 
     override fun executeProvisionRequest(

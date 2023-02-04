@@ -393,17 +393,16 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
             viewBinding.errorMessage.visibility = View.VISIBLE
-            Sentry.captureException(error)
+            SentryLogger.logPlaybackException(error,player?.params)
             if (isDRMException(error.cause!!)) {
-                fetchDRMLicence(error)
+                fetchDRMLicence()
             } else {
                 viewBinding.errorMessage.text = "Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName}"
-                SentryLogger.logPlaybackException(error,player?.params)
             }
             playbackStateListener?.onPlayerError(error)
         }
 
-        private fun fetchDRMLicence(error: PlaybackException){
+        private fun fetchDRMLicence(){
             if (!InternetConnectivityChecker.isNetworkAvailable(requireContext())) {
                 viewBinding.errorMessage.text = getString(R.string.no_internet_to_sync_license)
                 return
@@ -416,7 +415,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 viewBinding.errorMessage.text = getString(R.string.syncing_video)
             } else {
                 viewBinding.errorMessage.text = getString(R.string.license_request_failed)
-                SentryLogger.logPlaybackException(error,player?.params)
             }
         }
 

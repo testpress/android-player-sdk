@@ -1,6 +1,7 @@
 package com.tpstream.player
 
 import android.app.Notification
+import android.content.Context
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.offline.*
@@ -116,6 +117,16 @@ class VideoDownloadService:DownloadService(
     private fun updateDownloadStatus(download:Download){
         CoroutineScope(Dispatchers.IO).launch{
             offlineVideoInfoRepository.updateDownloadStatus(download)
+        }
+    }
+
+    companion object {
+        fun start(context: Context) {
+            try {
+                start(context, VideoDownloadService::class.java)
+            } catch (e: IllegalStateException) {
+                startForeground(context, VideoDownloadService::class.java)
+            }
         }
     }
 

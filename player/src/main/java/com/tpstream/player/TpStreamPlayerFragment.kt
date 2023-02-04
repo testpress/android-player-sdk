@@ -80,6 +80,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 return OfflineVideoInfoViewModel(OfflineVideoInfoRepository(requireContext())) as T
             }
         }).get(OfflineVideoInfoViewModel::class.java)
+        VideoDownloadService.start(requireContext())
     }
 
     fun enableAutoFullScreenOnRotate() {

@@ -15,6 +15,10 @@
             </intent-filter>
         </service>
 
+        <service android:name="androidx.media3.exoplayer.scheduler.PlatformScheduler$PlatformSchedulerService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
+
         <meta-data android:name="io.sentry.dsn" android:value="https://d384a4c918c947a3b68a1af0c8d59343@sentry.testpress.in/10" />
 
         <meta-data android:name="io.sentry.traces.sample-rate" android:value="1.0" />

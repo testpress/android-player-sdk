@@ -20,6 +20,7 @@ class CustomHttpDrmMediaCallback(context: Context, private val tpInitParams: TpI
             val result = Network<DRMLicenseURL>(tpInitParams.orgCode).post(url, body)
             result?.licenseUrl ?: ""
         } catch (exception:TPException){
+            SentryLogger.logAPIException(exception,tpInitParams)
             ""
         }
     }

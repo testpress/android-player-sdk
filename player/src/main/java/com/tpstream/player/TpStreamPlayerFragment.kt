@@ -372,6 +372,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             requireActivity().runOnUiThread {
                 viewBinding.errorMessage.visibility = View.VISIBLE
                 viewBinding.errorMessage.text = "Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}"
+                SentryLogger.logAPIException(exception,parameters)
             }
         }
         player?.setPlayWhenReady(parameters.autoPlay==true)
@@ -392,7 +393,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
             viewBinding.errorMessage.visibility = View.VISIBLE
-            Sentry.captureException(error)
+            SentryLogger.logPlaybackException(error,player?.params)
             if (isDRMException(error.cause!!)) {
                 fetchDRMLicence()
             } else {

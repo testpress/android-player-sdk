@@ -372,11 +372,31 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             requireActivity().runOnUiThread {
                 viewBinding.errorMessage.visibility = View.VISIBLE
                 viewBinding.errorMessage.text = "Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}"
+                sentryAPIErrorCapture(exception)
             }
         }
         player?.setPlayWhenReady(parameters.autoPlay==true)
         showDownloadButton = parameters.isDownloadEnabled
         updateDownloadButtonImage(parameters)
+    }
+
+    private fun sentryAPIErrorCapture(exception: TPException){
+        Sentry.captureMessage("TPStreams server error" +
+                " Code: ${exception.response?.code}" +
+                " Message: ${exception.response?.message}" +
+                " Video ID: ${player?.params?.videoId}" +
+                " AccessToken: ${player?.params?.accessToken}" +
+                " Org Code: ${player?.params?.orgCode}")
+    }
+
+    private fun sentryPlayerErrorCapture(error: PlaybackException){
+        Sentry.captureMessage("Player error" +
+                " Code: ${error.errorCode}" +
+                " Code name: ${error.errorCodeName}" +
+                " Message: ${error.message}" +
+                " Video ID: ${player?.params?.videoId}" +
+                " AccessToken: ${player?.params?.accessToken}" +
+                " Org Code: ${player?.params?.orgCode}")
     }
 
     inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {
@@ -394,14 +414,15 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             viewBinding.errorMessage.visibility = View.VISIBLE
             Sentry.captureException(error)
             if (isDRMException(error.cause!!)) {
-                fetchDRMLicence()
+                fetchDRMLicence(error)
             } else {
                 viewBinding.errorMessage.text = "Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName}"
+                sentryPlayerErrorCapture(error)
             }
             playbackStateListener?.onPlayerError(error)
         }
 
-        private fun fetchDRMLicence(){
+        private fun fetchDRMLicence(error: PlaybackException){
             if (!InternetConnectivityChecker.isNetworkAvailable(requireContext())) {
                 viewBinding.errorMessage.text = getString(R.string.no_internet_to_sync_license)
                 return
@@ -414,6 +435,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 viewBinding.errorMessage.text = getString(R.string.syncing_video)
             } else {
                 viewBinding.errorMessage.text = getString(R.string.license_request_failed)
+                sentryPlayerErrorCapture(error)
             }
         }
 

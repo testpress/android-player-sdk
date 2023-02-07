@@ -17,11 +17,11 @@ class TpStreamDownloadManager(val context: Context) {
     }
 
     fun pauseDownload(offlineVideoInfo: OfflineVideoInfo) {
-        DownloadTask(context).pause(getDownloadUrl(offlineVideoInfo))
+        DownloadTask(context).pause(offlineVideoInfo)
     }
 
     fun resumeDownload(offlineVideoInfo: OfflineVideoInfo) {
-        DownloadTask(context).resume(getDownloadUrl(offlineVideoInfo))
+        DownloadTask(context).resume(offlineVideoInfo)
     }
 
     fun cancelDownload(offlineVideoInfo: OfflineVideoInfo) {
@@ -30,13 +30,9 @@ class TpStreamDownloadManager(val context: Context) {
 
     fun deleteDownload(offlineVideoInfo: OfflineVideoInfo) {
         CoroutineScope(Dispatchers.IO).launch {
-            DownloadTask(context).delete(getDownloadUrl(offlineVideoInfo))
+            DownloadTask(context).delete(offlineVideoInfo)
             ImageSaver(context).delete(offlineVideoInfo.videoId)
             offlineVideoInfoRepository.delete(offlineVideoInfo)
         }
-    }
-
-    private fun getDownloadUrl(offlineVideoInfo: OfflineVideoInfo): String {
-        return offlineVideoInfo.url
     }
 }

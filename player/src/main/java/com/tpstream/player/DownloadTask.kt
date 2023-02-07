@@ -24,8 +24,8 @@ class DownloadTask (val context: Context) {
         )
     }
 
-    internal fun pause(url:String) {
-        val download = downloadIndex.getDownload(url)
+    internal fun pause(info:OfflineVideoInfo) {
+        val download = downloadIndex.getDownload(info.url)
         val STOP_REASON_PAUSED = 1
         download?.let {
             DownloadService.sendSetStopReason(
@@ -38,8 +38,8 @@ class DownloadTask (val context: Context) {
         }
     }
 
-    internal fun resume(url:String) {
-        val download = downloadIndex.getDownload(url)
+    internal fun resume(info:OfflineVideoInfo) {
+        val download = downloadIndex.getDownload(info.url)
         download?.let {
             DownloadService.sendSetStopReason(
                 context,
@@ -51,8 +51,8 @@ class DownloadTask (val context: Context) {
         }
     }
 
-    internal fun delete(url:String) {
-        val download = downloadIndex.getDownload(url)
+    internal fun delete(info:OfflineVideoInfo) {
+        val download = downloadIndex.getDownload(info.url)
         download?.let {
             DownloadService.sendRemoveDownload(
                 context,

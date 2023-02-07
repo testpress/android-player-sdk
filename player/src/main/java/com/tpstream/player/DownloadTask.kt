@@ -67,18 +67,6 @@ internal class DownloadTask (val context: Context) {
         val download = downloadIndex.getDownload(url)
         return download != null && download.state == Download.STATE_COMPLETED
     }
-
-    fun isBeingDownloaded(url:String): Boolean {
-        val download = downloadIndex.getDownload(url)
-        return download != null && download.state == Download.STATE_DOWNLOADING
-    }
-
-    fun getAllDownloads():List<OfflineVideoInfo>?{
-        return runBlocking(Dispatchers.IO) {
-            TPStreamsDatabase.invoke(context).offlineVideoInfoDao().getAllOfflineVideoInfo()
-        }
-    }
-
 }
 
 object VideoDownload {

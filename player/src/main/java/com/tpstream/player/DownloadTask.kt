@@ -10,12 +10,12 @@ import com.tpstream.player.models.OfflineVideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
-class DownloadTask (val context: Context) {
+internal class DownloadTask (val context: Context) {
 
     private val downloadManager = VideoDownloadManager(context).get()
     private val downloadIndex = downloadManager.downloadIndex
 
-    internal fun start(downloadRequest: DownloadRequest) {
+    fun start(downloadRequest: DownloadRequest) {
         DownloadService.sendAddDownload(
             context,
             VideoDownloadService::class.java,
@@ -24,7 +24,7 @@ class DownloadTask (val context: Context) {
         )
     }
 
-    internal fun pause(info:OfflineVideoInfo) {
+    fun pause(info:OfflineVideoInfo) {
         val download = downloadIndex.getDownload(info.url)
         val STOP_REASON_PAUSED = 1
         download?.let {
@@ -38,7 +38,7 @@ class DownloadTask (val context: Context) {
         }
     }
 
-    internal fun resume(info:OfflineVideoInfo) {
+    fun resume(info:OfflineVideoInfo) {
         val download = downloadIndex.getDownload(info.url)
         download?.let {
             DownloadService.sendSetStopReason(
@@ -51,7 +51,7 @@ class DownloadTask (val context: Context) {
         }
     }
 
-    internal fun delete(info:OfflineVideoInfo) {
+    fun delete(info:OfflineVideoInfo) {
         val download = downloadIndex.getDownload(info.url)
         download?.let {
             DownloadService.sendRemoveDownload(
@@ -63,12 +63,12 @@ class DownloadTask (val context: Context) {
         }
     }
 
-    internal fun isDownloaded(url:String): Boolean {
+    fun isDownloaded(url:String): Boolean {
         val download = downloadIndex.getDownload(url)
         return download != null && download.state == Download.STATE_COMPLETED
     }
 
-    internal fun isBeingDownloaded(url:String): Boolean {
+    fun isBeingDownloaded(url:String): Boolean {
         val download = downloadIndex.getDownload(url)
         return download != null && download.state == Download.STATE_DOWNLOADING
     }

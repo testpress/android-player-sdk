@@ -17,9 +17,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-class VideoDownloadRequestCreationHandler(
+internal class VideoDownloadRequestCreationHandler(
     val context: Context,
-    private val player: TpStreamPlayer
+    private val player: TpStreamPlayerImpl
 ) :
     DownloadHelper.Callback, DRMLicenseFetchCallback {
     private val downloadHelper: DownloadHelper

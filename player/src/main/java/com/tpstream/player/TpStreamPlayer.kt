@@ -23,25 +23,19 @@ public interface TpStreamPlayer {
         val STATE_READY = 3
         val STATE_ENDED = 4
     }
-    abstract val params: TpInitParams
-    abstract val videoInfo: VideoInfo?
-    fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit)
-    fun setPlayWhenReady(canPlay: Boolean)
-    fun getPlayWhenReady(): Boolean
     fun getPlaybackState(): Int
     fun getCurrentTime(): Long
     fun getBufferedTime(): Long
     fun setPlaybackSpeed(speed: Float)
     fun seekTo(seconds: Long)
-    fun release()
     fun getVideoFormat(): Format?
     fun getCurrentTrackGroups(): ImmutableList<Tracks.Group>
     fun getDuration(): Long
 }
 
-class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStreamPlayer {
-    override lateinit var params: TpInitParams
-    override lateinit var videoInfo: VideoInfo
+internal class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStreamPlayer {
+    lateinit var params: TpInitParams
+    lateinit var videoInfo: VideoInfo
     var offlineVideoInfo: OfflineVideoInfo? = null
 
     internal fun load(url: String,startPosition: Long = 0) {
@@ -97,7 +91,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         return builder.build()
     }
 
-    override fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
+    fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
         params = parameters
         populateOfflineVideoInfo(parameters)
         if (checkIsVideoDownloaded()){
@@ -137,11 +131,11 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         return false
     }
 
-    override fun setPlayWhenReady(canPlay: Boolean) {
+    fun setPlayWhenReady(canPlay: Boolean) {
         player.playWhenReady = canPlay
     }
 
-    override fun getPlayWhenReady() = player.playWhenReady
+    fun getPlayWhenReady() = player.playWhenReady
     override fun getPlaybackState(): Int = player.playbackState
     override fun getCurrentTime(): Long = player.currentPosition
     override fun getBufferedTime(): Long = player.bufferedPosition
@@ -154,7 +148,7 @@ class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStream
         player.seekTo(seconds)
     }
 
-    override fun release() {
+    fun release() {
         player.release()
     }
 

@@ -47,7 +47,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private lateinit var viewModel: TpStreamPlayerViewModel
     var playbackStateListener: TPPlayerListener? = null
     private val _playbackStateListener: Player.Listener = PlayerListener()
-    private var player: TpStreamPlayer? = null
+    private var player: TpStreamPlayerImpl? = null
     private var _player: ExoPlayer? = null
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
     val viewBinding get() = _viewBinding!!

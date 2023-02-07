@@ -26,8 +26,8 @@ import kotlin.math.roundToInt
 
 typealias OnSubmitListener = (DownloadRequest,OfflineVideoInfo?) -> Unit
 
-class DownloadResolutionSelectionSheet(
-    val player: TpStreamPlayer,
+internal class DownloadResolutionSelectionSheet(
+    val player: TpStreamPlayerImpl,
     parameters: DefaultTrackSelector.Parameters,
 ) : BottomSheetDialogFragment(), VideoDownloadRequestCreationHandler.Listener {
 

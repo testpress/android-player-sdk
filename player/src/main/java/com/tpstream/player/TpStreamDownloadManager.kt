@@ -10,9 +10,6 @@ import kotlinx.coroutines.runBlocking
 
 class TpStreamDownloadManager(val context: Context) {
 
-    init {
-        VideoDownloadService.startInBackground(context)
-    }
     private val offlineVideoInfoRepository = OfflineVideoInfoRepository(context)
 
     fun getAllDownloads(): LiveData<List<OfflineVideoInfo>?> {

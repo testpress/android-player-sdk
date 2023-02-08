@@ -120,14 +120,6 @@ class VideoDownloadService:DownloadService(
         }
     }
 
-    companion object {
-        // This will start download service in background.
-        // This will resume downloads which were stopped if app is killed.
-        // We are not starting in foreground because they causes notification flicker
-        fun startInBackground(context: Context) {
-            start(context, VideoDownloadService::class.java)
-        }
-    }
 }
 
 class DownloadCallback private constructor(){

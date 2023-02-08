@@ -121,10 +121,10 @@ class VideoDownloadService:DownloadService(
     }
 
     companion object {
-        // We need to start download service if there is no scheduled action.
-        // We are starting our download service in background by calling this start().
-        // If we call in foreground they causes notification flicker
-        fun start(context: Context) {
+        // This will start download service in background.
+        // This will resume downloads which were stopped if app is killed.
+        // We are not starting in foreground because they causes notification flicker
+        fun startInBackground(context: Context) {
             start(context, VideoDownloadService::class.java)
         }
     }

@@ -41,6 +41,7 @@ internal class VideoDownloadRequestCreationHandler(
             .build()
         downloadHelper = getDownloadHelper()
         downloadHelper.prepare(this)
+        VideoDownloadService.start(context)
     }
 
     private fun getDownloadHelper(): DownloadHelper {

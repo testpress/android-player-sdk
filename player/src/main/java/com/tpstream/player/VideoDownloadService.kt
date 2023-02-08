@@ -121,15 +121,12 @@ class VideoDownloadService:DownloadService(
     }
 
     companion object {
+        // We need to start download service if there is no scheduled action.
+        // We are starting our download service in background by calling this start().
         fun start(context: Context) {
-            try {
-                start(context, VideoDownloadService::class.java)
-            } catch (e: IllegalStateException) {
-                startForeground(context, VideoDownloadService::class.java)
-            }
+            start(context, VideoDownloadService::class.java)
         }
     }
-
 }
 
 class DownloadCallback private constructor(){

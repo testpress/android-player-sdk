@@ -334,6 +334,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             .build()
             .also { exoPlayer ->
                 viewBinding.videoView.player = exoPlayer
+                exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
                 exoPlayer.addListener(_playbackStateListener)
             }
     }

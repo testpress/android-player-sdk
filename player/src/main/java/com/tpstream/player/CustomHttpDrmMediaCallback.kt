@@ -14,10 +14,10 @@ internal class CustomHttpDrmMediaCallback(context: Context, private val tpInitPa
     private val httpMediaDrmCallback = HttpMediaDrmCallback("", VideoDownloadManager(context).getHttpDataSourceFactory())
 
     private fun fetchDRMLicenseURL(): String {
-        val url = "/api/v2.5/drm_license/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}"
+        val url = "https://${tpInitParams.orgCode}.testpress.in/api/v2.5/drm_license/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}"
         val body: RequestBody = ("{\"download\":true}").toRequestBody("application/json".toMediaTypeOrNull())
         return try {
-            val result = Network<DRMLicenseURL>(tpInitParams.orgCode).post(url, body)
+            val result = Network<DRMLicenseURL>().post(url, body)
             result?.licenseUrl ?: ""
         } catch (exception:TPException){
             SentryLogger.logAPIException(exception,tpInitParams)

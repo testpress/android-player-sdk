@@ -139,7 +139,6 @@ internal class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) :
     override fun getPlaybackState(): Int = player.playbackState
     override fun getCurrentTime(): Long = player.currentPosition
     override fun getBufferedTime(): Long = player.bufferedPosition
-    override fun getDuration(): Long = player.duration
 
     override fun setPlaybackSpeed(speed: Float) {
         player.setPlaybackSpeed(speed)

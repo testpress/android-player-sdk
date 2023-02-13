@@ -102,8 +102,8 @@ internal class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) :
             return
         }
         val url =
-            "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
-        Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
+            "https://${parameters.orgCode}.testpress.in/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
+        Network<VideoInfo>().get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
                 Handler(Looper.getMainLooper()).post {

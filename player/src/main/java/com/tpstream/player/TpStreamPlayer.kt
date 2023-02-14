@@ -63,6 +63,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     lateinit var exoPlayer: ExoPlayer
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
     private var videoRepository: VideoRepository = VideoRepository(context)
+    private var tpStreamPlayerImplCallBack : TpStreamPlayerImplCallBack? = null
 
     init {
         initializeExoplayer()
@@ -197,4 +198,13 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     override fun pause() {
         exoPlayer.pause()
     }
+
+    fun setTpStreamPlayerImplCallBack(tpStreamPlayerImplCallBack: TpStreamPlayerImplCallBack){
+        this.tpStreamPlayerImplCallBack = tpStreamPlayerImplCallBack
+    }
+}
+
+internal interface TpStreamPlayerImplCallBack {
+
+    fun updateDownloadButtons(parameters: TpInitParams)
 }

@@ -93,7 +93,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
-        addCustomPlayerControls()
+        registerResolutionChangeListener()
+        registerFullScreenListener()
         DownloadCallback.invoke().callback = this
     }
 
@@ -110,11 +111,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             initializePlayer()
         }
         hideSystemUi()
-    }
-
-    private fun addCustomPlayerControls() {
-        registerResolutionChangeListener()
-        registerFullScreenListener()
     }
 
     private fun registerResolutionChangeListener() {

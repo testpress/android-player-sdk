@@ -113,11 +113,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun addCustomPlayerControls() {
-        addResolutionChangeControl()
-        addFullScreenControl()
+        registerResolutionChangeListener()
+        registerFullScreenListener()
     }
 
-    private fun addResolutionChangeControl() {
+    private fun registerResolutionChangeListener() {
         resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
         resolutionButton.setOnClickListener {
             if (downloadState == OfflineVideoState.COMPLETE){
@@ -129,7 +129,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
     }
 
-    private fun addFullScreenControl() {
+    private fun registerFullScreenListener () {
         viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setOnClickListener {
             if(isFullScreen) {
                 exitFullScreen()
@@ -263,7 +263,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun updateDownloadButtonImage(params: TpInitParams){
         downloadButton = viewBinding.videoView.findViewById(R.id.exo_download)
-        addDownloadControls()
+        registerDownloadListener ()
         if (showDownloadButton){
             downloadButton.visibility = View.VISIBLE
         } else {
@@ -287,7 +287,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
     }
 
-    private fun addDownloadControls() {
+    private fun registerDownloadListener () {
         downloadButton.setOnClickListener {
             when (downloadState) {
                 OfflineVideoState.COMPLETE -> {

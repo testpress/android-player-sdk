@@ -95,6 +95,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         //viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
         registerResolutionChangeListener()
         registerFullScreenListener()
+        registerDownloadListener ()
         DownloadCallback.invoke().callback = this
     }
 
@@ -131,6 +132,37 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 exitFullScreen()
             } else {
                 showFullScreen()
+            }
+        }
+    }
+
+    private fun registerDownloadListener () {
+        downloadButton = viewBinding.videoView.findViewById(R.id.exo_download)
+        downloadButton.setOnClickListener {
+            when (downloadState) {
+                OfflineVideoState.COMPLETE -> {
+                    Toast.makeText(requireContext(),"Download complete",Toast.LENGTH_SHORT).show()
+                }
+                OfflineVideoState.DOWNLOADING -> {
+                    Toast.makeText(requireContext(),"Downloading",Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    EncryptionKeyRepository(requireContext()).fetchAndStore(player?.params!!,player?.videoInfo?.getPlaybackURL()!!)
+                    val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
+                        player!!,
+                        trackSelector.parameters,
+                    )
+                    downloadResolutionSelectionSheet.show(
+                        requireActivity().supportFragmentManager,
+                        "DownloadSelectionSheet"
+                    )
+                    downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest,offlineVideoInfo ->
+                        DownloadTask(requireContext()).start(downloadRequest)
+                        offlineVideoInfo?.videoId = player?.params?.videoId!!
+                        ImageSaver(requireContext()).save(offlineVideoInfo?.thumbnail!!,offlineVideoInfo.videoId)
+                        offlineVideoInfoViewModel.insert(offlineVideoInfo)
+                    }
+                }
             }
         }
     }
@@ -258,8 +290,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun updateDownloadButtonImage(params: TpInitParams){
-        downloadButton = viewBinding.videoView.findViewById(R.id.exo_download)
-        registerDownloadListener ()
         if (showDownloadButton){
             downloadButton.visibility = View.VISIBLE
         } else {
@@ -278,36 +308,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 else -> {
                     downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
                     null
-                }
-            }
-        }
-    }
-
-    private fun registerDownloadListener () {
-        downloadButton.setOnClickListener {
-            when (downloadState) {
-                OfflineVideoState.COMPLETE -> {
-                    Toast.makeText(requireContext(),"Download complete",Toast.LENGTH_SHORT).show()
-                }
-                OfflineVideoState.DOWNLOADING -> {
-                    Toast.makeText(requireContext(),"Downloading",Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    EncryptionKeyRepository(requireContext()).fetchAndStore(player?.params!!,player?.videoInfo?.getPlaybackURL()!!)
-                    val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
-                        player!!,
-                        trackSelector.parameters,
-                    )
-                    downloadResolutionSelectionSheet.show(
-                        requireActivity().supportFragmentManager,
-                        "DownloadSelectionSheet"
-                    )
-                    downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest,offlineVideoInfo ->
-                        DownloadTask(requireContext()).start(downloadRequest)
-                        offlineVideoInfo?.videoId = player?.params?.videoId!!
-                        ImageSaver(requireContext()).save(offlineVideoInfo?.thumbnail!!,offlineVideoInfo.videoId)
-                        offlineVideoInfoViewModel.insert(offlineVideoInfo)
-                    }
                 }
             }
         }

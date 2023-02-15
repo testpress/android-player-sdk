@@ -21,7 +21,7 @@ import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
 
 class AdvancedResolutionSelectionSheet(
     private val player: TpStreamPlayer,
-    parameters: DefaultTrackSelector.Parameters,
+    parameters: TrackSelectionParameters,
 ): BottomSheetDialogFragment() {
 
     private var _binding: TpTrackSelectionDialogBinding? = null

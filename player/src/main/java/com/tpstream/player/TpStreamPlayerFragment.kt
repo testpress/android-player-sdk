@@ -53,7 +53,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
     private var initializationListener: InitializationListener? = null
-    lateinit var trackSelector: DefaultTrackSelector
     var selectedResolution = ResolutionOptions.AUTO
     lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
@@ -68,7 +67,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        trackSelector = DefaultTrackSelector(requireContext())
         fullScreenDialog = object :Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
             override fun onBackPressed() {
                 super.onBackPressed()
@@ -150,7 +148,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                     EncryptionKeyRepository(requireContext()).fetchAndStore(player?.params!!,player?.videoInfo?.getPlaybackURL()!!)
                     val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                         player!!,
-                        trackSelector.parameters,
+                        _player!!.trackSelectionParameters,
                     )
                     downloadResolutionSelectionSheet.show(
                         requireActivity().supportFragmentManager,
@@ -183,7 +181,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         val simpleVideoResolutionSelector =
             SimpleVideoResolutionSelectionSheet(player!!, selectedResolution)
         val advancedVideoResolutionSelector =
-            AdvancedResolutionSelectionSheet(player!!, trackSelector.parameters)
+            AdvancedResolutionSelectionSheet(player!!, _player!!.trackSelectionParameters)
         advancedVideoResolutionSelector.onClickListener =
             onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector)
         simpleVideoResolutionSelector.onClickListener =
@@ -212,20 +210,20 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             requireContext(),
             null
         )
-        trackSelector.setParameters(parameters)
+        _player?.trackSelectionParameters = parameters
     }
 
     private fun onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector: AdvancedResolutionSelectionSheet) =
         DialogInterface.OnClickListener { p0, p1 ->
-            val mappedTrackInfo = trackSelector.currentMappedTrackInfo
+            val mappedTrackInfo = (_player?.trackSelector as DefaultTrackSelector).currentMappedTrackInfo
             mappedTrackInfo?.let {
-                val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-                if (advancedVideoResolutionSelector.overrides.isNotEmpty()) {
-                    val params = TrackSelectionParameters.Builder(requireContext())
-                        .clearOverridesOfType(rendererIndex)
-                        .addOverride(advancedVideoResolutionSelector.overrides.values.elementAt(0))
-                        .build()
-                    trackSelector.setParameters(params)
+            val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
+            if (advancedVideoResolutionSelector.overrides.isNotEmpty()) {
+                val params = TrackSelectionParameters.Builder(requireContext())
+                    .clearOverridesOfType(rendererIndex)
+                    .addOverride(advancedVideoResolutionSelector.overrides.values.elementAt(0))
+                    .build()
+                _player?.trackSelectionParameters = params
                 }
             }
         }
@@ -256,7 +254,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun initializeExoplayer(): ExoPlayer {
         return ExoPlayer.Builder(requireActivity())
-            .setTrackSelector(trackSelector)
             .build()
             .also { exoPlayer ->
                 viewBinding.videoView.player = exoPlayer

@@ -28,7 +28,7 @@ typealias OnSubmitListener = (DownloadRequest,OfflineVideoInfo?) -> Unit
 
 internal class DownloadResolutionSelectionSheet(
     val player: TpStreamPlayerImpl,
-    parameters: DefaultTrackSelector.Parameters,
+    parameters: TrackSelectionParameters,
 ) : BottomSheetDialogFragment(), VideoDownloadRequestCreationHandler.Listener {
 
     private var _binding: TpDownloadTrackSelectionDialogBinding? = null

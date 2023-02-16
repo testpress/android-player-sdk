@@ -148,7 +148,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                     EncryptionKeyRepository(requireContext()).fetchAndStore(player?.params!!,player?.videoInfo?.getPlaybackURL()!!)
                     val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                         player!!,
-                        _player!!.trackSelectionParameters,
+                        player!!.getTrackSelectionParameters(),
                     )
                     downloadResolutionSelectionSheet.show(
                         requireActivity().supportFragmentManager,
@@ -181,7 +181,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         val simpleVideoResolutionSelector =
             SimpleVideoResolutionSelectionSheet(player!!, selectedResolution)
         val advancedVideoResolutionSelector =
-            AdvancedResolutionSelectionSheet(player!!, _player!!.trackSelectionParameters)
+            AdvancedResolutionSelectionSheet(player!!, player!!.getTrackSelectionParameters())
         advancedVideoResolutionSelector.onClickListener =
             onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector)
         simpleVideoResolutionSelector.onClickListener =
@@ -210,12 +210,12 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             requireContext(),
             null
         )
-        _player?.trackSelectionParameters = parameters
+        player?.setTrackSelectionParameters(parameters)
     }
 
     private fun onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector: AdvancedResolutionSelectionSheet) =
         DialogInterface.OnClickListener { p0, p1 ->
-            val mappedTrackInfo = (_player?.trackSelector as DefaultTrackSelector).currentMappedTrackInfo
+            val mappedTrackInfo = (player?.getTrackSelector() as DefaultTrackSelector).currentMappedTrackInfo
             mappedTrackInfo?.let {
             val rendererIndex = getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
             if (advancedVideoResolutionSelector.overrides.isNotEmpty()) {
@@ -223,7 +223,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                     .clearOverridesOfType(rendererIndex)
                     .addOverride(advancedVideoResolutionSelector.overrides.values.elementAt(0))
                     .build()
-                _player?.trackSelectionParameters = params
+                player?.setTrackSelectionParameters(params)
                 }
             }
         }

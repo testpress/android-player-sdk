@@ -123,7 +123,7 @@ internal object OfflineDRMLicenseHelper {
                 val keySetId = offlineLicenseHelper.downloadLicense(format!!)
                 callback.onLicenseFetchSuccess(keySetId)
             } catch (e: DrmSession.DrmSessionException) {
-                callback.onLicenseFetchFailure()
+                callback.onLicenseFetchFailure(e)
             } finally {
                 offlineLicenseHelper.release()
             }
@@ -155,7 +155,7 @@ internal object VideoPlayerUtil {
 
 internal interface DRMLicenseFetchCallback {
     fun onLicenseFetchSuccess(keySetId: ByteArray)
-    fun onLicenseFetchFailure()
+    fun onLicenseFetchFailure(exception: Exception)
 }
 
 internal object InternetConnectivityChecker {

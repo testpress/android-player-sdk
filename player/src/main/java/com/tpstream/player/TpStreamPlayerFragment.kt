@@ -25,6 +25,7 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.models.OfflineVideoState
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
@@ -424,7 +425,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
-        override fun onLicenseFetchFailure() {
+        override fun onLicenseFetchFailure(exception: Exception) {
             viewBinding.errorMessage.visibility = View.VISIBLE
             viewBinding.errorMessage.text = getString(R.string.license_error)
         }

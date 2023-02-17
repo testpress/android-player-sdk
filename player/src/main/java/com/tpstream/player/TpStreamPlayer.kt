@@ -84,7 +84,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private fun getMediaSourceFactory(): MediaSource.Factory {
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build(params))
-        if (offlineVideoInfo == null) {
+        if (offlineVideoInfo == null && params.videoId?.length!! < 30) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(
                     CustomHttpDrmMediaCallback(context, params)
@@ -99,14 +99,29 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         if (DownloadTask(context).isDownloaded(url) && downloadRequest != null) {
             return buildDownloadedMediaItem(downloadRequest)
         }
-        return buildMediaItem(url)
+        return if (params.videoId?.length!! < 30){
+            buildTestPressMediaItem(url)
+        } else {
+            buildTpStreamMediaItem(url)
+        }
     }
 
-    private fun buildMediaItem(url: String): MediaItem {
+    private fun buildTestPressMediaItem(url: String): MediaItem {
         return MediaItem.Builder()
             .setUri(url)
             .setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setMultiSession(true)
+                    .build()
+            ).build()
+    }
+
+    private fun buildTpStreamMediaItem(url: String): MediaItem {
+        return MediaItem.Builder()
+            .setUri(url)
+            .setDrmConfiguration(
+                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setLicenseUri("https://app.tpstreams.com/api/v1/${params.orgCode}/assets/${params.videoId}/drm_license/?access_token=${params.accessToken}&drm_type=widevine")
                     .setMultiSession(true)
                     .build()
             ).build()

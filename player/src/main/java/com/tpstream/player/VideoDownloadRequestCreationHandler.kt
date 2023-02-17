@@ -115,13 +115,14 @@ internal class VideoDownloadRequestCreationHandler(
         }
     }
 
-    override fun onLicenseFetchFailure() {
+    override fun onLicenseFetchFailure(exception: Exception) {
         CoroutineScope(Dispatchers.Main).launch {
             Toast.makeText(
                 context,
                 "Error in starting video download (License fetch error)",
                 Toast.LENGTH_LONG
             ).show()
+            listener?.onDownloadRequestHandlerPrepareError(downloadHelper, exception as IOException)
         }
     }
 

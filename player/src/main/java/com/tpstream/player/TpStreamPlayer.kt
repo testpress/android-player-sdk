@@ -138,9 +138,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             }
             return
         }
-        val url =
-            "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
-        Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
+        NetworkClass(parameters,"testpress").fetch(object :NetworkClass.VideoInfoCallback{
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
                 Handler(Looper.getMainLooper()).post {

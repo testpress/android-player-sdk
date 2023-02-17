@@ -5,22 +5,21 @@ import okhttp3.*
 import java.io.IOException
 import java.net.URL
 
-internal class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
+class Network<T : Any>(val klass: Class<T>) {
     companion object {
-        inline operator fun <reified T : Any>invoke(subdomain: String) = Network(T::class.java, subdomain)
+        inline operator fun <reified T : Any>invoke() = Network(T::class.java)
     }
 
-    private val BASE_URL = "https://${subdomain}.testpress.in"
     private var client: OkHttpClient = OkHttpClient();
     private val gson = Gson()
 
     fun get(url: String, callback: TPResponse<T>? = null): T? {
-        val request = Request.Builder().url(URL("$BASE_URL$url")).build()
+        val request = Request.Builder().url(URL(url)).build()
         return makeRequest(callback, request)
     }
 
     fun post(url: String, body: RequestBody, callback: TPResponse<T>? = null): T? {
-        val request = Request.Builder().url(URL("$BASE_URL$url")).post(body).build()
+        val request = Request.Builder().url(URL(url)).post(body).build()
         return makeRequest(callback, request)
     }
 

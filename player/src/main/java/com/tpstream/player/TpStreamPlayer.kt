@@ -9,6 +9,7 @@ import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.trackselection.TrackSelector
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.models.OfflineVideoInfo
 import com.tpstream.player.models.VideoInfo
@@ -155,4 +156,12 @@ internal class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) :
     override fun getVideoFormat(): Format? = player.videoFormat
     override fun getCurrentTrackGroups(): ImmutableList<Tracks.Group> = player.currentTracks.groups
     override fun getDuration(): Long = player.duration
+
+    fun getTrackSelectionParameters(): TrackSelectionParameters = player.trackSelectionParameters
+
+    fun setTrackSelectionParameters(parameters: TrackSelectionParameters){
+        player.trackSelectionParameters = parameters
+    }
+
+    fun getTrackSelector(): TrackSelector? = player.trackSelector
 }

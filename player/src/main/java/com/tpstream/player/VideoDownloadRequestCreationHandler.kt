@@ -8,6 +8,9 @@ import androidx.media3.common.MediaItem.DrmConfiguration
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
+import androidx.media3.exoplayer.drm.DrmSessionManager
+import androidx.media3.exoplayer.drm.ExoMediaDrm
+import androidx.media3.exoplayer.drm.MediaDrmCallback
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
@@ -16,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.util.*
 
 internal class VideoDownloadRequestCreationHandler(
     val context: Context,
@@ -35,6 +39,7 @@ internal class VideoDownloadRequestCreationHandler(
             .setUri(url)
             .setDrmConfiguration(
                 DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setLicenseUri("https://app.tpstreams.com/api/v1/${player.params.orgCode}/assets/${player.params.videoId}/drm_license/?access_token=${player.params.accessToken}&drm_type=widevine&download=true")
                     .setMultiSession(true)
                     .build()
             )
@@ -54,7 +59,7 @@ internal class VideoDownloadRequestCreationHandler(
             trackSelectionParameters,
             renderersFactory,
             dataSourceFactory,
-            sessionManager
+            null
         )
     }
 

@@ -131,7 +131,7 @@ internal object OfflineDRMLicenseHelper {
     }
 }
 
-internal object VideoPlayerUtil {
+object VideoPlayerUtil {
     @JvmStatic
     fun getAudioOrVideoInfoWithDrmInitData(helper: DownloadHelper): Format? {
         for (periodIndex in 0 until helper.periodCount) {
@@ -153,12 +153,12 @@ internal object VideoPlayerUtil {
     }
 }
 
-internal interface DRMLicenseFetchCallback {
+interface DRMLicenseFetchCallback {
     fun onLicenseFetchSuccess(keySetId: ByteArray)
     fun onLicenseFetchFailure(exception: Exception)
 }
 
-internal object InternetConnectivityChecker {
+object InternetConnectivityChecker {
     fun isNetworkAvailable(context: Context): Boolean {
         val connectivity =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

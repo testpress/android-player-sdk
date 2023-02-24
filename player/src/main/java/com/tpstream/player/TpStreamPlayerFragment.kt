@@ -37,7 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
-    var playbackStateListener: TPPlayerListener? = null
+    var playbackStateListener: TPStreamPlayerListener? = null
     private val _playbackStateListener: Player.Listener = PlayerListener()
     private lateinit var player: TpStreamPlayerImpl
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
@@ -541,22 +541,4 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
 interface InitializationListener {
     fun onInitializationSuccess(player: TpStreamPlayer)
-}
-
-interface TPPlayerListener {
-    fun onTracksChanged(tracks: Tracks)
-    fun onMetadata(metadata: Metadata)
-    fun onIsPlayingChanged(playing: Boolean)
-    fun onIsLoadingChanged(loading: Boolean)
-    fun onDeviceInfoChanged(deviceInfo: DeviceInfo)
-    fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int)
-    fun onEvents(player: TpStreamPlayer?, events: Player.Events)
-    fun onSeekBackIncrementChanged(seekBackIncrementMs: Long)
-    fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long)
-    fun onVideoSizeChanged(videoSize: VideoSize)
-    fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int)
-    fun onPlayerErrorChanged(error: PlaybackException?)
-    fun onTimelineChanged(timeline: Timeline, reason: Int)
-    fun onPlaybackStateChanged(playbackState: Int)
-    fun onPlayerError(error: PlaybackException)
 }

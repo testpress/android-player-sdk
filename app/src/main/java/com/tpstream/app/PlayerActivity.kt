@@ -29,7 +29,7 @@ class PlayerActivity : AppCompatActivity() {
                 play()
             }
         });
-        playerFragment.playbackStateListener = object : TPPlayerListener {
+        playerFragment.playbackStateListener = object : TPStreamPlayerListener {
             override fun onTracksChanged(tracks: Tracks) {
             }
 

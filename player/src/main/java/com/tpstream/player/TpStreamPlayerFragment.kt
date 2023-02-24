@@ -19,7 +19,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.*
-import androidx.media3.common.PlaybackException.ERROR_CODE_DRM_LICENSE_EXPIRED
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -33,7 +32,6 @@ import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
 import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
 import com.tpstream.player.views.Util.getRendererIndex
-import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,17 +65,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fullScreenDialog = object :Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
-            override fun onBackPressed() {
-                super.onBackPressed()
-                exitFullScreen()
-            }
-        }
-        offlineVideoInfoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return OfflineVideoInfoViewModel(OfflineVideoInfoRepository(requireContext())) as T
-            }
-        }).get(OfflineVideoInfoViewModel::class.java)
+        initializeFullScreenDialog()
+        initializeViewModel()
     }
 
     override fun onCreateView(
@@ -110,6 +99,24 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             initializePlayer()
         }
         hideSystemUi()
+    }
+
+    private fun initializeFullScreenDialog() {
+        fullScreenDialog =
+            object : Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+                override fun onBackPressed() {
+                    super.onBackPressed()
+                    exitFullScreen()
+                }
+            }
+    }
+
+    private fun initializeViewModel() {
+        offlineVideoInfoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return OfflineVideoInfoViewModel(OfflineVideoInfoRepository(requireContext())) as T
+            }
+        }).get(OfflineVideoInfoViewModel::class.java)
     }
 
     private fun registerResolutionChangeListener() {

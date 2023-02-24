@@ -37,12 +37,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
-
-//    companion object {
-//        fun newInstance() = TpStreamPlayerFragment()
-//    }
-
-    private lateinit var viewModel: TpStreamPlayerViewModel
     var playbackStateListener: TPPlayerListener? = null
     private val _playbackStateListener: Player.Listener = PlayerListener()
     private var player: TpStreamPlayerImpl? = null
@@ -144,29 +138,39 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun registerDownloadListener () {
         downloadButton = viewBinding.videoView.findViewById(R.id.exo_download)
         downloadButton.setOnClickListener {
-            when (downloadState) {
-                OfflineVideoState.COMPLETE -> {
-                    Toast.makeText(requireContext(),"Download complete",Toast.LENGTH_SHORT).show()
-                }
-                OfflineVideoState.DOWNLOADING -> {
-                    Toast.makeText(requireContext(),"Downloading",Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    EncryptionKeyRepository(requireContext()).fetchAndStore(player?.params!!,player?.videoInfo?.getPlaybackURL()!!)
-                    val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
-                        player!!,
-                        player!!.getTrackSelectionParameters(),
+            onDownloadButtonClick()
+        }
+    }
+
+    private fun onDownloadButtonClick() {
+        when (downloadState) {
+            OfflineVideoState.COMPLETE -> {
+                Toast.makeText(requireContext(), "Download complete", Toast.LENGTH_SHORT).show()
+            }
+            OfflineVideoState.DOWNLOADING -> {
+                Toast.makeText(requireContext(), "Downloading", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                EncryptionKeyRepository(requireContext()).fetchAndStore(
+                    player?.params!!,
+                    player?.videoInfo?.getPlaybackURL()!!
+                )
+                val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
+                    player!!,
+                    player!!.getTrackSelectionParameters(),
+                )
+                downloadResolutionSelectionSheet.show(
+                    requireActivity().supportFragmentManager,
+                    "DownloadSelectionSheet"
+                )
+                downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, offlineVideoInfo ->
+                    DownloadTask(requireContext()).start(downloadRequest)
+                    offlineVideoInfo?.videoId = player?.params?.videoId!!
+                    ImageSaver(requireContext()).save(
+                        offlineVideoInfo?.thumbnail!!,
+                        offlineVideoInfo.videoId
                     )
-                    downloadResolutionSelectionSheet.show(
-                        requireActivity().supportFragmentManager,
-                        "DownloadSelectionSheet"
-                    )
-                    downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest,offlineVideoInfo ->
-                        DownloadTask(requireContext()).start(downloadRequest)
-                        offlineVideoInfo?.videoId = player?.params?.videoId!!
-                        ImageSaver(requireContext()).save(offlineVideoInfo?.thumbnail!!,offlineVideoInfo.videoId)
-                        offlineVideoInfoViewModel.insert(offlineVideoInfo)
-                    }
+                    offlineVideoInfoViewModel.insert(offlineVideoInfo)
                 }
             }
         }

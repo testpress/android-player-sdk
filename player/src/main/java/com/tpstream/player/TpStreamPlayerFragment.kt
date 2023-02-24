@@ -37,7 +37,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
-    var playbackStateListener: TPStreamPlayerListener? = null
     private val _playbackStateListener: Player.Listener = PlayerListener()
     private lateinit var player: TpStreamPlayerImpl
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
@@ -389,7 +388,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             if (playbackState == ExoPlayer.STATE_READY) {
                 viewBinding.errorMessage.visibility = View.GONE
             }
-            playbackStateListener?.onPlaybackStateChanged(playbackState)
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -401,7 +399,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             } else {
                 viewBinding.errorMessage.text = "Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName}"
             }
-            playbackStateListener?.onPlayerError(error)
         }
 
         private fun fetchDRMLicence(){
@@ -430,75 +427,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onLicenseFetchFailure() {
             viewBinding.errorMessage.visibility = View.VISIBLE
             viewBinding.errorMessage.text = getString(R.string.license_error)
-        }
-
-        override fun onTracksChanged(tracks: Tracks) {
-            super.onTracksChanged(tracks)
-            playbackStateListener?.onTracksChanged(tracks)
-        }
-
-        override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-            super.onPlayWhenReadyChanged(playWhenReady, reason)
-            playbackStateListener?.onPlayWhenReadyChanged(playWhenReady, reason)
-        }
-
-        override fun onDeviceInfoChanged(deviceInfo: DeviceInfo) {
-            super.onDeviceInfoChanged(deviceInfo)
-            playbackStateListener?.onDeviceInfoChanged(deviceInfo)
-        }
-
-        override fun onIsLoadingChanged(isLoading: Boolean) {
-            super.onIsLoadingChanged(isLoading)
-            playbackStateListener?.onIsLoadingChanged(isLoading)
-        }
-
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            super.onIsPlayingChanged(isPlaying)
-            playbackStateListener?.onIsPlayingChanged(isPlaying)
-        }
-
-        override fun onMetadata(metadata: Metadata) {
-            super.onMetadata(metadata)
-            playbackStateListener?.onMetadata(metadata)
-        }
-
-        override fun onEvents(exoplayer: Player, events: Player.Events) {
-            super.onEvents(exoplayer, events)
-            playbackStateListener?.onEvents(player, events)
-        }
-
-        override fun onSeekBackIncrementChanged(seekBackIncrementMs: Long) {
-            super.onSeekBackIncrementChanged(seekBackIncrementMs)
-            playbackStateListener?.onSeekBackIncrementChanged(seekBackIncrementMs)
-        }
-
-        override fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long) {
-            super.onSeekForwardIncrementChanged(seekForwardIncrementMs)
-            playbackStateListener?.onSeekForwardIncrementChanged(seekForwardIncrementMs)
-        }
-
-        override fun onVideoSizeChanged(videoSize: VideoSize) {
-            super.onVideoSizeChanged(videoSize)
-            playbackStateListener?.onVideoSizeChanged(videoSize)
-        }
-
-        override fun onPositionDiscontinuity(
-            oldPosition: Player.PositionInfo,
-            newPosition: Player.PositionInfo,
-            reason: Int
-        ) {
-            super.onPositionDiscontinuity(oldPosition, newPosition, reason)
-            playbackStateListener?.onPositionDiscontinuity(oldPosition, newPosition, reason)
-        }
-
-        override fun onPlayerErrorChanged(error: PlaybackException?) {
-            super.onPlayerErrorChanged(error)
-            playbackStateListener?.onPlayerErrorChanged(error)
-        }
-
-        override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-            super.onTimelineChanged(timeline, reason)
-            playbackStateListener?.onTimelineChanged(timeline, reason)
         }
 
         private fun isDRMException(cause: Throwable): Boolean {

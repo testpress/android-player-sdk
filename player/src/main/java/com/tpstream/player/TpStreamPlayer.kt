@@ -3,6 +3,7 @@ package com.tpstream.player
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
@@ -18,21 +19,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 interface TPStreamPlayerListener {
-    fun onTracksChanged(tracks: Tracks)
-    fun onMetadata(metadata: Metadata)
-    fun onIsPlayingChanged(playing: Boolean)
-    fun onIsLoadingChanged(loading: Boolean)
-    fun onDeviceInfoChanged(deviceInfo: DeviceInfo)
-    fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int)
-    fun onEvents(player: TpStreamPlayer?, events: Player.Events)
-    fun onSeekBackIncrementChanged(seekBackIncrementMs: Long)
-    fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long)
-    fun onVideoSizeChanged(videoSize: VideoSize)
-    fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int)
-    fun onPlayerErrorChanged(error: PlaybackException?)
-    fun onTimelineChanged(timeline: Timeline, reason: Int)
-    fun onPlaybackStateChanged(playbackState: Int)
-    fun onPlayerError(error: PlaybackException)
+    fun onTracksChanged(tracks: Tracks) {}
+    fun onMetadata(metadata: Metadata) {}
+    fun onIsPlayingChanged(playing: Boolean) {}
+    fun onIsLoadingChanged(loading: Boolean) {}
+    fun onDeviceInfoChanged(deviceInfo: DeviceInfo) {}
+    fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {}
+    fun onEvents(player: TpStreamPlayer?, events: Player.Events) {}
+    fun onSeekBackIncrementChanged(seekBackIncrementMs: Long) {}
+    fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long) {}
+    fun onVideoSizeChanged(videoSize: VideoSize) {}
+    fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {}
+    fun onPlayerErrorChanged(error: PlaybackException?) {}
+    fun onTimelineChanged(timeline: Timeline, reason: Int) {}
+    fun onPlaybackStateChanged(playbackState: Int) {}
+    fun onPlayerError(error: PlaybackException) {}
 }
 
 public interface TpStreamPlayer {
@@ -42,6 +43,7 @@ public interface TpStreamPlayer {
         val STATE_READY = 3
         val STATE_ENDED = 4
     }
+
     fun getPlaybackState(): Int
     fun getCurrentTime(): Long
     fun getBufferedTime(): Long
@@ -50,13 +52,16 @@ public interface TpStreamPlayer {
     fun getVideoFormat(): Format?
     fun getCurrentTrackGroups(): ImmutableList<Tracks.Group>
     fun getDuration(): Long
+    fun setListener(listener: TPStreamPlayerListener?)
 }
 
 internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     lateinit var params: TpInitParams
     lateinit var videoInfo: VideoInfo
     var offlineVideoInfo: OfflineVideoInfo? = null
+    var _listener: TPStreamPlayerListener? = null
     lateinit var exoPlayer: ExoPlayer
+    private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
 
     init {
         initializeExoplayer()
@@ -187,6 +192,15 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     override fun getVideoFormat(): Format? = exoPlayer.videoFormat
     override fun getCurrentTrackGroups(): ImmutableList<Tracks.Group> = exoPlayer.currentTracks.groups
     override fun getDuration(): Long = exoPlayer.duration
+    override fun setListener(listener: TPStreamPlayerListener?) {
+        this._listener = listener
+        this.exoPlayerListener.listener = listener
+        if (listener != null) {
+            exoPlayer.addListener(exoPlayerListener)
+        } else {
+            exoPlayer.removeListener(exoPlayerListener)
+        }
+    }
 
     fun getTrackSelectionParameters(): TrackSelectionParameters = exoPlayer.trackSelectionParameters
 

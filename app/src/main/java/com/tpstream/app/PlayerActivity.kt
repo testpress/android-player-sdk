@@ -2,6 +2,7 @@ package com.tpstream.app
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.media3.common.*
 import com.tpstream.player.*
 
@@ -27,58 +28,13 @@ class PlayerActivity : AppCompatActivity() {
         playerFragment.setOnInitializationListener(object: InitializationListener {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
                 play()
+                player.setListener( object : TPStreamPlayerListener {
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        Log.d(TAG, "onPlaybackStateChanged: ${playbackState}")
+                    }
+                })
             }
         });
-        playerFragment.playbackStateListener = object : TPStreamPlayerListener {
-            override fun onTracksChanged(tracks: Tracks) {
-            }
-
-            override fun onMetadata(metadata: Metadata) {
-            }
-
-            override fun onIsPlayingChanged(playing: Boolean) {
-            }
-
-            override fun onIsLoadingChanged(loading: Boolean) {
-            }
-
-            override fun onDeviceInfoChanged(deviceInfo: DeviceInfo) {
-            }
-
-            override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-            }
-
-            override fun onEvents(player: TpStreamPlayer?, events: Player.Events) {
-            }
-
-            override fun onSeekBackIncrementChanged(seekBackIncrementMs: Long) {
-            }
-
-            override fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long) {
-            }
-
-            override fun onVideoSizeChanged(videoSize: VideoSize) {
-            }
-
-            override fun onPositionDiscontinuity(
-                oldPosition: Player.PositionInfo,
-                newPosition: Player.PositionInfo,
-                reason: Int
-            ) {
-            }
-
-            override fun onPlayerErrorChanged(error: PlaybackException?) {
-            }
-
-            override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-            }
-
-            override fun onPlaybackStateChanged(playbackState: Int) {
-            }
-
-            override fun onPlayerError(error: PlaybackException) {
-            }
-        }
     }
 
     fun play(){

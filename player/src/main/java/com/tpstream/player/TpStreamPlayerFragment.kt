@@ -116,12 +116,19 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun registerResolutionChangeListener() {
         resolutionButton = viewBinding.videoView.findViewById<ImageButton>(R.id.exo_resolution)
         resolutionButton.setOnClickListener {
-            if (downloadState == OfflineVideoState.COMPLETE){
-                Toast.makeText(requireContext(),"Quality Unavailable",Toast.LENGTH_SHORT).show()
-            } else {
-                val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
-                simpleVideoResolutionSelector.show(requireActivity().supportFragmentManager, SimpleVideoResolutionSelectionSheet.TAG)
-            }
+            onResolutionButtonClick()
+        }
+    }
+
+    private fun onResolutionButtonClick() {
+        if (downloadState == OfflineVideoState.COMPLETE) {
+            Toast.makeText(requireContext(), "Quality Unavailable", Toast.LENGTH_SHORT).show()
+        } else {
+            val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
+            simpleVideoResolutionSelector.show(
+                requireActivity().supportFragmentManager,
+                SimpleVideoResolutionSelectionSheet.TAG
+            )
         }
     }
 

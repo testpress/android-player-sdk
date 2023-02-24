@@ -39,8 +39,7 @@ import kotlinx.coroutines.launch
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     var playbackStateListener: TPPlayerListener? = null
     private val _playbackStateListener: Player.Listener = PlayerListener()
-    private var player: TpStreamPlayerImpl? = null
-    private var _player: ExoPlayer? = null
+    private lateinit var player: TpStreamPlayerImpl
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
     val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
@@ -265,19 +264,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun initializePlayer() {
-        _player = initializeExoplayer()
-        player = TpStreamPlayerImpl(_player!!, requireContext())
+        player = TpStreamPlayerImpl(requireContext())
+        viewBinding.videoView.player = player.exoPlayer
+        player.exoPlayer.addListener(_playbackStateListener)
         this.initializationListener?.onInitializationSuccess(player!!)
-    }
-
-    private fun initializeExoplayer(): ExoPlayer {
-        return ExoPlayer.Builder(requireActivity())
-            .build()
-            .also { exoPlayer ->
-                viewBinding.videoView.player = exoPlayer
-                exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
-                exoPlayer.addListener(_playbackStateListener)
-            }
     }
 
     fun setOnInitializationListener(listener: InitializationListener) {

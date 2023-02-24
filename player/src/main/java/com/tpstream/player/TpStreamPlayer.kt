@@ -34,15 +34,28 @@ public interface TpStreamPlayer {
     fun getDuration(): Long
 }
 
-internal class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) : TpStreamPlayer {
+internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     lateinit var params: TpInitParams
     lateinit var videoInfo: VideoInfo
     var offlineVideoInfo: OfflineVideoInfo? = null
+    lateinit var exoPlayer: ExoPlayer
+
+    init {
+        initializeExoplayer()
+    }
+
+    private fun initializeExoplayer() {
+        exoPlayer = ExoPlayer.Builder(context)
+            .build()
+            .also { exoPlayer ->
+                exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
+            }
+    }
 
     internal fun load(url: String,startPosition: Long = 0) {
-        player.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
-        player.seekTo(startPosition)
-        player.prepare()
+        exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
+        exoPlayer.seekTo(startPosition)
+        exoPlayer.prepare()
     }
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
@@ -133,35 +146,35 @@ internal class TpStreamPlayerImpl(val player: ExoPlayer, val context: Context) :
     }
 
     fun setPlayWhenReady(canPlay: Boolean) {
-        player.playWhenReady = canPlay
+        exoPlayer.playWhenReady = canPlay
     }
 
-    fun getPlayWhenReady() = player.playWhenReady
-    override fun getPlaybackState(): Int = player.playbackState
-    override fun getCurrentTime(): Long = player.currentPosition
-    override fun getBufferedTime(): Long = player.bufferedPosition
+    fun getPlayWhenReady() = exoPlayer.playWhenReady
+    override fun getPlaybackState(): Int = exoPlayer.playbackState
+    override fun getCurrentTime(): Long = exoPlayer.currentPosition
+    override fun getBufferedTime(): Long = exoPlayer.bufferedPosition
 
     override fun setPlaybackSpeed(speed: Float) {
-        player.setPlaybackSpeed(speed)
+        exoPlayer.setPlaybackSpeed(speed)
     }
 
     override fun seekTo(seconds: Long) {
-        player.seekTo(seconds)
+        exoPlayer.seekTo(seconds)
     }
 
     fun release() {
-        player.release()
+        exoPlayer.release()
     }
 
-    override fun getVideoFormat(): Format? = player.videoFormat
-    override fun getCurrentTrackGroups(): ImmutableList<Tracks.Group> = player.currentTracks.groups
-    override fun getDuration(): Long = player.duration
+    override fun getVideoFormat(): Format? = exoPlayer.videoFormat
+    override fun getCurrentTrackGroups(): ImmutableList<Tracks.Group> = exoPlayer.currentTracks.groups
+    override fun getDuration(): Long = exoPlayer.duration
 
-    fun getTrackSelectionParameters(): TrackSelectionParameters = player.trackSelectionParameters
+    fun getTrackSelectionParameters(): TrackSelectionParameters = exoPlayer.trackSelectionParameters
 
     fun setTrackSelectionParameters(parameters: TrackSelectionParameters){
-        player.trackSelectionParameters = parameters
+        exoPlayer.trackSelectionParameters = parameters
     }
 
-    fun getTrackSelector(): TrackSelector? = player.trackSelector
+    fun getTrackSelector(): TrackSelector? = exoPlayer.trackSelector
 }

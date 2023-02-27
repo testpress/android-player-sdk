@@ -138,7 +138,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             }
             return
         }
-        NetworkClass(parameters,"testpress").fetch(object :NetworkClass.VideoInfoCallback{
+        NetworkClass(parameters).fetch(object :NetworkClass.VideoInfoCallback{
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
                 Handler(Looper.getMainLooper()).post {

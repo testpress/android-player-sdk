@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.NetworkInfo
 import android.net.Uri
+import androidx.media3.datasource.DataSource
 import androidx.media3.common.Format
 import androidx.media3.exoplayer.dash.DashUtil
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
@@ -48,12 +49,22 @@ internal object OfflineDRMLicenseHelper {
         )
         val drmInitData =
             DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
-        return OfflineLicenseHelper(
-            sessionManager,
-            DrmSessionEventListener.EventDispatcher()
-        ).downloadLicense(
-            drmInitData!!
-        )
+
+        return if (tpInitParams.isTPStreams){
+            OfflineLicenseHelper.newWidevineInstance(
+                "https://app.tpstreams.com/api/v1/${tpInitParams.orgCode}/assets/${tpInitParams.videoId}/drm_license/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+                VideoDownloadManager.invoke(context).getHttpDataSourceFactory(tpInitParams),
+                DrmSessionEventListener.EventDispatcher()
+            ).downloadLicense(drmInitData!!)
+
+        } else {
+            OfflineLicenseHelper(
+                sessionManager,
+                DrmSessionEventListener.EventDispatcher()
+            ).downloadLicense(
+                drmInitData!!
+            )
+        }
     }
 
     private fun replaceKeysInExistingDownloadedVideo(
@@ -110,22 +121,32 @@ internal object OfflineDRMLicenseHelper {
         downloadHelper: DownloadHelper,
         callback: DRMLicenseFetchCallback
     ) {
-        val sessionManager = DefaultDrmSessionManager.Builder()
-            .build(
-                CustomHttpDrmMediaCallback(context, tpInitParams)
+        var offlineLicenseHelper : OfflineLicenseHelper? = null
+        if (tpInitParams.isTPStreams){
+            offlineLicenseHelper = OfflineLicenseHelper.newWidevineInstance(
+                "https://app.tpstreams.com/api/v1/${tpInitParams.orgCode}/assets/${tpInitParams.videoId}/drm_license/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+                VideoDownloadManager.invoke(context).getHttpDataSourceFactory(tpInitParams),
+                DrmSessionEventListener.EventDispatcher()
             )
-        val offlineLicenseHelper = OfflineLicenseHelper(
-            sessionManager, DrmSessionEventListener.EventDispatcher()
-        )
+        } else {
+            val sessionManager = DefaultDrmSessionManager.Builder()
+                .build(
+                    CustomHttpDrmMediaCallback(context, tpInitParams)
+                )
+            offlineLicenseHelper = OfflineLicenseHelper(
+                sessionManager, DrmSessionEventListener.EventDispatcher()
+            )
+        }
+
         val format = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val keySetId = offlineLicenseHelper.downloadLicense(format!!)
-                callback.onLicenseFetchSuccess(keySetId)
+                val keySetId = offlineLicenseHelper?.downloadLicense(format!!)
+                callback.onLicenseFetchSuccess(keySetId!!)
             } catch (e: DrmSession.DrmSessionException) {
                 callback.onLicenseFetchFailure(e)
             } finally {
-                offlineLicenseHelper.release()
+                offlineLicenseHelper?.release()
             }
         }
     }

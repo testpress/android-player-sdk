@@ -99,10 +99,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         if (DownloadTask(context).isDownloaded(url) && downloadRequest != null) {
             return buildDownloadedMediaItem(downloadRequest)
         }
-        return if (params.videoId?.length!! < 30){
-            buildTestPressMediaItem(url)
-        } else {
+        return if (params.isTPStreams){
             buildTpStreamMediaItem(url)
+        } else {
+            buildTestPressMediaItem(url)
         }
     }
 

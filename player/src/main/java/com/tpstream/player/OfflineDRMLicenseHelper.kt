@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-object OfflineDRMLicenseHelper {
+internal object OfflineDRMLicenseHelper {
 
     fun renewLicense(
         url: String,
@@ -131,7 +131,7 @@ object OfflineDRMLicenseHelper {
     }
 }
 
-object VideoPlayerUtil {
+internal object VideoPlayerUtil {
     @JvmStatic
     fun getAudioOrVideoInfoWithDrmInitData(helper: DownloadHelper): Format? {
         for (periodIndex in 0 until helper.periodCount) {
@@ -153,12 +153,12 @@ object VideoPlayerUtil {
     }
 }
 
-interface DRMLicenseFetchCallback {
+internal interface DRMLicenseFetchCallback {
     fun onLicenseFetchSuccess(keySetId: ByteArray)
     fun onLicenseFetchFailure()
 }
 
-object InternetConnectivityChecker {
+internal object InternetConnectivityChecker {
     fun isNetworkAvailable(context: Context): Boolean {
         val connectivity =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

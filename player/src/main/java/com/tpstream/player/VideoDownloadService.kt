@@ -17,7 +17,7 @@ private const val FOREGROUND_NOTIFICATION_ID = 1
 private const val CHANNEL_ID = "download_channel"
 private var nextNotificationId = FOREGROUND_NOTIFICATION_ID + 1
 
-class VideoDownloadService:DownloadService(
+internal class VideoDownloadService:DownloadService(
     FOREGROUND_NOTIFICATION_ID,
     DEFAULT_FOREGROUND_NOTIFICATION_UPDATE_INTERVAL,
     CHANNEL_ID,
@@ -121,7 +121,7 @@ class VideoDownloadService:DownloadService(
 
 }
 
-class DownloadCallback private constructor(){
+internal class DownloadCallback private constructor(){
 
     var callback: Listener? = null
 

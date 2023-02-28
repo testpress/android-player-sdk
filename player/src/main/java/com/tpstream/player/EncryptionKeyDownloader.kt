@@ -9,7 +9,7 @@ import androidx.media3.exoplayer.hls.playlist.HlsPlaylistParser
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-class EncryptionKeyDownloader {
+internal class EncryptionKeyDownloader {
 
     fun getEncryptionKeyUrl(playbackUrl: String) :String {
         val mediaPlaylistUrl = getMediaPlayListUrl(playbackUrl)

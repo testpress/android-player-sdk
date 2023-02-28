@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class OfflineVideoInfoViewModel(private val offlineVideoInfoRepository: OfflineVideoInfoRepository):ViewModel() {
+internal class OfflineVideoInfoViewModel(private val offlineVideoInfoRepository: OfflineVideoInfoRepository):ViewModel() {
 
     fun get(videoId: String): LiveData<OfflineVideoInfo?> {
         return Transformations.map(offlineVideoInfoRepository.get(videoId)) {

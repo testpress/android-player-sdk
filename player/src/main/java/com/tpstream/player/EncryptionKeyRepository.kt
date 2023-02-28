@@ -14,7 +14,7 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 
-class EncryptionKeyRepository(context: Context) {
+internal class EncryptionKeyRepository(context: Context) {
     private val sharedPreference = context.getSharedPreferences(
         "VIDEO_ENCRYPTION_KEY",
         Context.MODE_PRIVATE

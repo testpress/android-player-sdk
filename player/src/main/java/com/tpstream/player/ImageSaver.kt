@@ -13,7 +13,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.net.URL
 
-class ImageSaver(val context: Context) {
+internal class ImageSaver(val context: Context) {
     private val TAG = "ImageSaver"
 
     init {

@@ -5,7 +5,7 @@ import android.content.DialogInterface
 import android.provider.Settings
 import android.view.OrientationEventListener
 
-class OrientationListener(val context: Context): OrientationEventListener(context) {
+internal class OrientationListener(val context: Context): OrientationEventListener(context) {
     private var isLandscape = false
     private val isAutoRotationIsON: Boolean
         get() = Settings.System.getInt(
@@ -48,6 +48,6 @@ class OrientationListener(val context: Context): OrientationEventListener(contex
     }
 }
 
-fun interface OnOrientationChangeListener {
+internal fun interface OnOrientationChangeListener {
     fun onChange(isLandscape: Boolean)
 }

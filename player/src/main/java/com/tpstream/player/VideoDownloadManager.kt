@@ -16,7 +16,7 @@ import okhttp3.OkHttpClient
 import java.io.File
 import java.util.concurrent.Executors
 
-class VideoDownloadManager {
+internal class VideoDownloadManager {
 
     private lateinit var downloadCache: Cache
     private lateinit var context: Context

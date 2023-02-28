@@ -69,7 +69,7 @@ internal class DownloadTask (val context: Context) {
     }
 }
 
-object VideoDownload {
+internal object VideoDownload {
     @JvmStatic
     fun getDownloadRequest(url: String, context: Context): DownloadRequest? {
         val downloadManager = VideoDownloadManager(context).get()

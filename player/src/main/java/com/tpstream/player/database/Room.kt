@@ -11,7 +11,7 @@ import com.tpstream.player.models.OfflineVideoInfo
     entities = [OfflineVideoInfo::class],
     exportSchema = true
 )
-abstract class TPStreamsDatabase : RoomDatabase() {
+internal abstract class TPStreamsDatabase : RoomDatabase() {
 
     abstract fun offlineVideoInfoDao(): OfflineVideoInfoDao
 

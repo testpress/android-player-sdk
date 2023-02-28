@@ -9,7 +9,7 @@ import androidx.room.Query
 import com.tpstream.player.models.OfflineVideoInfo
 
 @Dao
-interface OfflineVideoInfoDao {
+internal interface OfflineVideoInfoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(offlineVideoInfo: OfflineVideoInfo)

@@ -3,7 +3,7 @@ package com.tpstream.player.database.roomMigration
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-object RoomMigration1To2 {
+internal object RoomMigration1To2 {
 
     val MIGRATION_1_2: Migration = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {

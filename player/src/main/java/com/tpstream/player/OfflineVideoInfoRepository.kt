@@ -8,7 +8,7 @@ import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.OfflineVideoInfo
 import com.tpstream.player.models.getOfflineVideoState
 
-class OfflineVideoInfoRepository(context: Context) {
+internal class OfflineVideoInfoRepository(context: Context) {
 
     private val offlineVideoInfoDao = TPStreamsDatabase(context).offlineVideoInfoDao()
     private val downloadManager = VideoDownloadManager(context).get()

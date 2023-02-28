@@ -10,7 +10,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
 
-class CustomHttpDrmMediaCallback(context: Context, private val tpInitParams: TpInitParams):MediaDrmCallback {
+internal class CustomHttpDrmMediaCallback(context: Context, private val tpInitParams: TpInitParams):MediaDrmCallback {
     private val httpMediaDrmCallback = HttpMediaDrmCallback("", VideoDownloadManager(context).getHttpDataSourceFactory())
 
     private fun fetchDRMLicenseURL(): String {

@@ -3,7 +3,7 @@ package com.tpstream.player
 import androidx.media3.common.PlaybackException
 import io.sentry.Sentry
 
-object SentryLogger {
+internal object SentryLogger {
     fun logAPIException(exception: TPException,params: TpInitParams?){
         Sentry.captureMessage("Server error" +
                 " Code: ${exception.response?.code}" +

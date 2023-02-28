@@ -5,7 +5,7 @@ import okhttp3.*
 import java.io.IOException
 import java.net.URL
 
-class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
+internal class Network<T : Any>(val klass: Class<T>, val subdomain: String) {
     companion object {
         inline operator fun <reified T : Any>invoke(subdomain: String) = Network(T::class.java, subdomain)
     }

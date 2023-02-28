@@ -75,7 +75,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             }
     }
 
-    internal fun load(url: String,startPosition: Long = 0) {
+    internal fun playVideo(url: String,startPosition: Long = 0) {
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.seekTo(startPosition)
         exoPlayer.prepare()
@@ -134,7 +134,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         if (checkIsVideoDownloaded()){
             videoInfo = offlineVideoInfo?.asVideoInfo()!!
             Handler(Looper.getMainLooper()).post {
-                load(offlineVideoInfo?.url!!, parameters.startAt * 1000L)
+                playVideo(offlineVideoInfo?.url!!, parameters.startAt * 1000L)
             }
             return
         }
@@ -144,7 +144,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
                 Handler(Looper.getMainLooper()).post {
-                    load(result.getPlaybackURL(), parameters.startAt * 1000L)
+                    playVideo(result.getPlaybackURL(), parameters.startAt * 1000L)
                 }
             }
 

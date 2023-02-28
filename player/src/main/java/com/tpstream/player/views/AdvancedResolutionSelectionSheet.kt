@@ -19,7 +19,7 @@ import com.tpstream.player.R
 import com.tpstream.player.TpStreamPlayer
 import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
 
-class AdvancedResolutionSelectionSheet(
+internal class AdvancedResolutionSelectionSheet(
     private val player: TpStreamPlayer,
     parameters: TrackSelectionParameters,
 ): BottomSheetDialogFragment() {

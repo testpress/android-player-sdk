@@ -24,7 +24,7 @@ import com.tpstream.player.models.OfflineVideoInfo
 import okio.IOException
 import kotlin.math.roundToInt
 
-typealias OnSubmitListener = (DownloadRequest,OfflineVideoInfo?) -> Unit
+internal typealias OnSubmitListener = (DownloadRequest,OfflineVideoInfo?) -> Unit
 
 internal class DownloadResolutionSelectionSheet(
     val player: TpStreamPlayerImpl,

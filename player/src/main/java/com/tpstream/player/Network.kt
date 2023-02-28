@@ -14,7 +14,7 @@ class Network<T : Any>(val klass: Class<T>) {
     private val gson = Gson()
 
     fun get(url: String, callback: TPResponse<T>? = null): T? {
-        val request = Request.Builder().url(URL(url)).header("Authorization","Token 9fe2d68fd3b1e2449b4b6fb758add94f5210b221b9ecfac490ab124f751293b4").build()
+        val request = Request.Builder().url(URL(url)).build()
         return makeRequest(callback, request)
     }
 

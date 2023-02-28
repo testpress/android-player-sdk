@@ -56,9 +56,9 @@ class PlayerActivity : AppCompatActivity() {
     private fun selectVideoParams(videoType: String?){
         when(videoType){
             "DRM" -> {
-                accessToken = "565a5b8c-310a-444b-956e-bbd6c7c74d7b"
-                videoId = "d19729f0-8823-4805-9034-2a7ea9429195"
-                orgCode = "edee9b"
+                accessToken = "187f826f-bf17-46aa-87ce-3c40f98e0d2f"
+                videoId = "18089594-bd6d-46cb-97a5-898a92b2d104"
+                orgCode = "gs25dm"
                 product = "tpstreams"
             }
             "AES Encrypt" -> {
@@ -70,6 +70,12 @@ class PlayerActivity : AppCompatActivity() {
                 accessToken = "4b11bf9e-d6b7-4b1f-80b8-19d92b26e966"
                 videoId = "73633fa3-61c6-443c-b625-ac4e85b28cfc"
                 orgCode = "edee9b"
+                product = "tpstreams"
+            }
+            "TPStreams DRM" -> {
+                accessToken = "187f826f-bf17-46aa-87ce-3c40f98e0d2f"
+                videoId = "18089594-bd6d-46cb-97a5-898a92b2d104"
+                orgCode = "gs25dm"
                 product = "tpstreams"
             }
             null ->{}

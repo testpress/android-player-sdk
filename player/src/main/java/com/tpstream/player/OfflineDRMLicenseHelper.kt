@@ -52,7 +52,7 @@ internal object OfflineDRMLicenseHelper {
 
         return if (tpInitParams.isTPStreams){
             OfflineLicenseHelper.newWidevineInstance(
-                "https://app.tpstreams.com/api/v1/${tpInitParams.orgCode}/assets/${tpInitParams.videoId}/drm_license/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+                "https://2ba7-183-82-206-250.ngrok.io/api/v1/${tpInitParams.orgCode}/assets/${tpInitParams.videoId}/drm_license/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
                 VideoDownloadManager.invoke(context).getHttpDataSourceFactory(tpInitParams),
                 DrmSessionEventListener.EventDispatcher()
             ).downloadLicense(drmInitData!!)
@@ -121,11 +121,10 @@ internal object OfflineDRMLicenseHelper {
         downloadHelper: DownloadHelper,
         callback: DRMLicenseFetchCallback
     ) {
-        var offlineLicenseHelper : OfflineLicenseHelper? = null
-        if (tpInitParams.isTPStreams){
-            offlineLicenseHelper = OfflineLicenseHelper.newWidevineInstance(
-                "https://app.tpstreams.com/api/v1/${tpInitParams.orgCode}/assets/${tpInitParams.videoId}/drm_license/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
-                VideoDownloadManager.invoke(context).getHttpDataSourceFactory(tpInitParams),
+        val offlineLicenseHelper = if (tpInitParams.isTPStreams){
+            OfflineLicenseHelper.newWidevineInstance(
+                "https://2ba7-183-82-206-250.ngrok.io/api/v1/${tpInitParams.orgCode}/assets/${tpInitParams.videoId}/drm_license/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+                VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
                 DrmSessionEventListener.EventDispatcher()
             )
         } else {
@@ -133,7 +132,7 @@ internal object OfflineDRMLicenseHelper {
                 .build(
                     CustomHttpDrmMediaCallback(context, tpInitParams)
                 )
-            offlineLicenseHelper = OfflineLicenseHelper(
+            OfflineLicenseHelper(
                 sessionManager, DrmSessionEventListener.EventDispatcher()
             )
         }
@@ -141,12 +140,12 @@ internal object OfflineDRMLicenseHelper {
         val format = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val keySetId = offlineLicenseHelper?.downloadLicense(format!!)
-                callback.onLicenseFetchSuccess(keySetId!!)
+                val keySetId = offlineLicenseHelper.downloadLicense(format!!)
+                callback.onLicenseFetchSuccess(keySetId)
             } catch (e: DrmSession.DrmSessionException) {
                 callback.onLicenseFetchFailure(e)
             } finally {
-                offlineLicenseHelper?.release()
+                offlineLicenseHelper.release()
             }
         }
     }

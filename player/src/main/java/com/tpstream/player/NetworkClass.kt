@@ -31,7 +31,7 @@ internal class NetworkClass(private val params: TpInitParams) {
     }
 
     private fun fetchTpStreamVideoInfo() {
-        val url = "https://app.tpstreams.com/api/v1/${params.orgCode}/assets/${params.videoId}/?access_token=${params.accessToken}"
+        val url = "https://2ba7-183-82-206-250.ngrok.io/api/v1/${params.orgCode}/assets/${params.videoId}/?access_token=${params.accessToken}"
         Network<TpStreamVideoInfo>().get(
             url,
             object : Network.TPResponse<TpStreamVideoInfo> {

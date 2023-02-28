@@ -22,7 +22,7 @@ import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
 
 
 @UnstableApi
-class SimpleVideoResolutionSelectionSheet(
+internal class SimpleVideoResolutionSelectionSheet(
     private val player: TpStreamPlayer,
     var selectedResolution: ResolutionOptions
 ) : BottomSheetDialogFragment(){
@@ -96,7 +96,7 @@ class SimpleVideoResolutionSelectionSheet(
     }
 }
 
-object Util{
+internal object Util{
     fun getRendererIndex(trackType: Int, mappedTrackInfo: MappingTrackSelector.MappedTrackInfo): Int {
         for (i in 0 until mappedTrackInfo.rendererCount) {
             if (mappedTrackInfo.getRendererType(i) == trackType) {
@@ -107,13 +107,13 @@ object Util{
     }
 }
 
-data class Resolution(
+internal data class Resolution(
     val title: String,
     val description: String,
     val option: ResolutionOptions
 )
 
-class ResolutionAdapter(context1: Context, dataSource: ArrayList<Resolution>, private val selectedResolution: ResolutionOptions): ArrayAdapter<Resolution>(context1,
+internal class ResolutionAdapter(context1: Context, dataSource: ArrayList<Resolution>, private val selectedResolution: ResolutionOptions): ArrayAdapter<Resolution>(context1,
     R.layout.tp_resolution_data, dataSource) {
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -139,7 +139,7 @@ class ResolutionAdapter(context1: Context, dataSource: ArrayList<Resolution>, pr
     }
 }
 
-enum class ResolutionOptions {
+internal enum class ResolutionOptions {
     AUTO {
         override fun getTrackSelectionParameter(
             context: Context,

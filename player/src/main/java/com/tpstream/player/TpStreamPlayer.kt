@@ -49,7 +49,7 @@ public interface TpStreamPlayer {
     fun setListener(listener: TPStreamPlayerListener?)
 }
 
-internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
+internal class TpStreamPlayerImpl(val context: Context, private val testPlayer: ExoPlayer? = null) : TpStreamPlayer {
     lateinit var params: TpInitParams
     var video: Video? = null
     var _listener: TPStreamPlayerListener? = null
@@ -62,11 +62,12 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun initializeExoplayer() {
-        exoPlayer = ExoPlayer.Builder(context)
-            .build()
-            .also { exoPlayer ->
-                exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
-            }
+        exoPlayer = testPlayer
+            ?: ExoPlayer.Builder(context)
+                .build()
+                .also { exoPlayer ->
+                    exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
+                }
     }
 
     fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
@@ -177,8 +178,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         this._listener = listener
         this.exoPlayerListener.listener = listener
         if (listener != null) {
+            println(true)
             exoPlayer.addListener(exoPlayerListener)
         } else {
+            println(false)
             exoPlayer.removeListener(exoPlayerListener)
         }
     }

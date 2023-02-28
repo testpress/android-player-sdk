@@ -1,8 +1,21 @@
 package com.tpstream.player
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import androidx.media3.common.*
 import androidx.media3.exoplayer.*
+import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
+import androidx.media3.exoplayer.offline.DownloadRequest
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.trackselection.TrackSelector
+import com.google.common.collect.ImmutableList
+import com.tpstream.player.models.VideoInfo
+import com.tpstream.player.models.asVideoInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import okhttp3.internal.immutableListOf
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -26,16 +39,23 @@ class TpStreamPlayerImplTest {
 
     @Mock
     private lateinit var player: ExoPlayer
-
     @Mock
     private lateinit var context: Context
+    @Mock
+    private lateinit var trackSelectionParameters :TrackSelectionParameters
+    @Mock
+    private lateinit var trackSelector: TrackSelector
+    @Mock
+    private lateinit var exoPlayerListener : Player.Listener
+    @Mock
+    private lateinit var tpStreamPlayerListener : TPStreamPlayerListener
     private lateinit var tpStreamPlayerImpl: TpStreamPlayerImpl
 
     private var called = false
 
     @Before
     fun createPlayer() {
-        tpStreamPlayerImpl = TpStreamPlayerImpl(player, context)
+        tpStreamPlayerImpl = TpStreamPlayerImpl(context,player)
     }
 
     @Test
@@ -111,4 +131,50 @@ class TpStreamPlayerImplTest {
         called = true
     }
 
+//    @Test
+//    fun testSetListener(){
+//        called = false
+//        `when`(player.addListener(exoPlayerListener)).then { isCalled() }
+//        tpStreamPlayerImpl.setListener(tpStreamPlayerListener)
+//        assertEquals(true, called)
+//    }
+
+    @Test
+    fun testSetTrackSelectionParameters(){
+        called = false
+        `when`(player.setTrackSelectionParameters(trackSelectionParameters)).then { isCalled() }
+        tpStreamPlayerImpl.setTrackSelectionParameters(trackSelectionParameters)
+        assertEquals(true, called)
+    }
+
+    @Test
+    fun testGetTrackSelectionParameters(){
+        called = false
+        `when`(player.trackSelectionParameters).thenReturn(trackSelectionParameters)
+        assertEquals(
+            trackSelectionParameters.hashCode(),
+            tpStreamPlayerImpl.getTrackSelectionParameters().hashCode()
+        )
+    }
+
+//    @Test
+//    fun testGetCurrentTrackGroups(){
+//        called = false
+//        val list = ImmutableList.of<Tracks.Group>()
+//        `when`(player.currentTracks.groups).thenReturn(list).then { isCalled() }
+//        assertEquals(
+//            list.hashCode(),
+//            tpStreamPlayerImpl.getCurrentTrackGroups().hashCode()
+//        )
+//    }
+
+    @Test
+    fun testGetTrackSelector(){
+        called = false
+        `when`(player.trackSelector).thenReturn(trackSelector)
+        assertEquals(
+            trackSelector.hashCode(),
+            tpStreamPlayerImpl.getTrackSelector().hashCode()
+        )
+    }
 }

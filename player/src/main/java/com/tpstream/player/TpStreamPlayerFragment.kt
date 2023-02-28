@@ -40,13 +40,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val _playbackStateListener: Player.Listener = PlayerListener()
     private lateinit var player: TpStreamPlayerImpl
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
-    val viewBinding get() = _viewBinding!!
+    private val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
     private var initializationListener: InitializationListener? = null
-    var selectedResolution = ResolutionOptions.AUTO
-    lateinit var fullScreenDialog: Dialog
+    private var selectedResolution = ResolutionOptions.AUTO
+    private lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
-    lateinit var orientationEventListener: OrientationListener
+    private lateinit var orientationEventListener: OrientationListener
     private lateinit var offlineVideoInfoViewModel: OfflineVideoInfoViewModel
     private lateinit var downloadButton : ImageButton
     private lateinit var resolutionButton : ImageButton
@@ -244,7 +244,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
-    fun exitFullScreen() {
+    private fun exitFullScreen() {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         (viewBinding.videoView.parent as ViewGroup).removeView(viewBinding.videoView)
         viewBinding.mainFrameLayout.addView(viewBinding.videoView)
@@ -253,7 +253,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         isFullScreen = false
     }
 
-    fun showFullScreen() {
+    private fun showFullScreen() {
         (viewBinding.videoView.parent as ViewGroup).removeView(viewBinding.videoView)
         fullScreenDialog.addContentView(viewBinding.videoView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_fullscreen_exit_24));
@@ -381,7 +381,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
     }
 
-    inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {
+    private inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {
         private val TAG = "PlayerListener"
 
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -435,7 +435,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     }
 
-    class PlayerAnalyticsListener : AnalyticsListener {
+    private class PlayerAnalyticsListener : AnalyticsListener {
         private val TAG = "AnalyticsListener"
         override fun onRenderedFirstFrame(
             eventTime: AnalyticsListener.EventTime,

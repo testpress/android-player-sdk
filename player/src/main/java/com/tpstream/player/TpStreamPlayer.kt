@@ -11,6 +11,7 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.TrackSelector
+import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.models.OfflineVideoInfo
 import com.tpstream.player.models.VideoInfo
@@ -69,10 +70,17 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     private fun initializeExoplayer() {
         exoPlayer = ExoPlayer.Builder(context)
+            .setBandwidthMeter(getDefaultBandwidth())
             .build()
             .also { exoPlayer ->
                 exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
             }
+    }
+
+    private fun getDefaultBandwidth(): DefaultBandwidthMeter {
+        return DefaultBandwidthMeter.Builder(context)
+            .setInitialBitrateEstimate(100_000L)
+            .build()
     }
 
     internal fun playVideo(url: String,startPosition: Long = 0) {

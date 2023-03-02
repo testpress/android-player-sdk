@@ -24,7 +24,9 @@ internal class EncryptionKeyRepository(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             if (playbackUrl.contains(".m3u8")) {
                 val encryptionKeyUrl = EncryptionKeyDownloader().getEncryptionKeyUrl(playbackUrl)
-                val encryptionKey = EncryptionKeyDownloader().getEncryptionKey(params)
+                val encryptionKey = EncryptionKeyDownloader().getEncryptionKey(
+                    "https://${params.orgCode}.testpress.in/api/v2.5/encryption_key/${params.videoId}/?access_token=${params.accessToken}"
+                )
                 save(encryptionKey, encryptionKeyUrl)
             }
         }

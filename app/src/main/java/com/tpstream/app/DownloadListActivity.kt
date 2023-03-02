@@ -130,7 +130,7 @@ class DownloadListActivity : AppCompatActivity() {
             val intent = Intent(this@DownloadListActivity, PlayerActivity::class.java)
             intent.putExtra(
                 TP_OFFLINE_PARAMS,
-                TpInitParams.createOfflineParams(offlineVideoInfo.videoId)
+                TpInitParams.createOfflineParams(offlineVideoInfo)
             )
             startActivity(intent)
         }

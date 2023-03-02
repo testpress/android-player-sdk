@@ -172,6 +172,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, offlineVideoInfo ->
                     DownloadTask(requireContext()).start(downloadRequest)
                     offlineVideoInfo?.videoId = player?.params?.videoId!!
+                    offlineVideoInfo?.params = "${player?.params?.orgCode}/${player?.params?.accessToken}"
                     ImageSaver(requireContext()).save(
                         offlineVideoInfo?.thumbnail!!,
                         offlineVideoInfo.videoId

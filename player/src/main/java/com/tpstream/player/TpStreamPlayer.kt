@@ -121,7 +121,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             .setUri(url)
             .setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                    .setLicenseUri("https://2ba7-183-82-206-250.ngrok.io/api/v1/${params.orgCode}/assets/${params.videoId}/drm_license/?access_token=${params.accessToken}&drm_type=widevine&download=true")
+                    .setLicenseUri("https://app.tpstreams.com/api/v1/${params.orgCode}/assets/${params.videoId}/drm_license/?access_token=${params.accessToken}&drm_type=widevine&download=true")
                     .setMultiSession(true)
                     .build()
             ).build()

@@ -70,9 +70,9 @@ internal class ImageSaver(val context: Context) {
         }
     }
 
-    fun delete(imageFileName: String) {
+    fun delete(imageFileName: String): Boolean {
         val dir = context.filesDir
         val file = File(dir, "/thumbnail/$imageFileName.png")
-        file.delete()
+        return file.delete()
     }
 }

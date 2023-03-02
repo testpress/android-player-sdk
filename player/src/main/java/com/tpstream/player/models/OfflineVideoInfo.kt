@@ -22,7 +22,8 @@ class OfflineVideoInfo(
     var totalSize: Long = 0,
     var downloadState: OfflineVideoState? = null,
     var videoWidth: Int = 0,
-    var videoHeight: Int = 0
+    var videoHeight: Int = 0,
+    internal var params: String = ""
 )
 
 internal fun OfflineVideoInfo.asVideoInfo():VideoInfo{

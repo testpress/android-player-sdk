@@ -79,6 +79,9 @@ data class TpInitParams (
         }
     }
 
+    val startPositionInMilliSecs: Long
+        get() = startAt * 1000L
+
     fun createParamsWithOtp(
         orgCode: String,
         accessToken: String?,

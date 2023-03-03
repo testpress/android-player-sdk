@@ -133,25 +133,34 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         populateOfflineVideoInfo(parameters)
         if (checkIsVideoDownloaded()){
             videoInfo = offlineVideoInfo?.asVideoInfo()!!
-            Handler(Looper.getMainLooper()).post {
-                playVideo(offlineVideoInfo?.url!!, parameters.startAt * 1000L)
-            }
+            playVideoInUIThread(offlineVideoInfo?.url!!, parameters.startPositionInMilliSecs)
             return
         }
+        fetchVideoInfoAndPlay(parameters, onError)
+    }
+
+    private fun fetchVideoInfoAndPlay(
+        parameters: TpInitParams,
+        onError: (exception: TPException) -> Unit
+    ) {
         val url =
             "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
         Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
-                Handler(Looper.getMainLooper()).post {
-                    playVideo(result.getPlaybackURL(), parameters.startAt * 1000L)
-                }
+                playVideoInUIThread(result.getPlaybackURL(), parameters.startPositionInMilliSecs)
             }
 
             override fun onFailure(exception: TPException) {
                 onError(exception)
             }
         })
+    }
+
+    private fun playVideoInUIThread(url: String,startPosition: Long = 0) {
+        Handler(Looper.getMainLooper()).post {
+            playVideo(url, startPosition)
+        }
     }
 
     private fun populateOfflineVideoInfo(parameters: TpInitParams){

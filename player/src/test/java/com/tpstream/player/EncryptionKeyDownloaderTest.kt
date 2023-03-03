@@ -14,7 +14,6 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 internal class EncryptionKeyDownloaderTest {
 
-
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
@@ -44,11 +43,11 @@ internal class EncryptionKeyDownloaderTest {
 
     @Test
     fun getEncryptionKey() {
+        // foo -> [102, 111, 111]
         val successResponse = MockResponse().setResponseCode(200).setBody("foo")
         mockWebServer.enqueue(successResponse)
         val response = encryptionKeyDownloader.getEncryptionKey(mockWebServer.url("/").toString())
         mockWebServer.takeRequest()
-        assertEquals(response, "foo".toByteArray().contentToString())
+        assertEquals(response, "[102, 111, 111]")
     }
-
 }

@@ -1,21 +1,16 @@
 package com.tpstream.player
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import junit.framework.TestCase.assertEquals
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 internal class EncryptionKeyDownloaderTest {
-
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var mockWebServer: MockWebServer
     private lateinit var encryptionKeyDownloader: EncryptionKeyDownloader

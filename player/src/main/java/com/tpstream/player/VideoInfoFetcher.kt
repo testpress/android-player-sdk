@@ -1,14 +1,16 @@
 package com.tpstream.player
 
+import android.util.Log
 import com.tpstream.player.models.TpStreamVideoInfo
 import com.tpstream.player.models.VideoInfo
 
-internal class NetworkClass(private val params: TpInitParams) {
+internal class VideoInfoFetcher(private val params: TpInitParams) {
 
     private var videoInfoCallback: VideoInfoCallback? = null
 
     fun fetch(videoInfoCallback: VideoInfoCallback) {
         this.videoInfoCallback = videoInfoCallback
+        Log.d("TAG", "fetch: ${params.isTPStreams}")
         if (params.isTPStreams) {
             fetchTpStreamVideoInfo()
         } else {

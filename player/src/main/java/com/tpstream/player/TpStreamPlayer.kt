@@ -143,7 +143,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         parameters: TpInitParams,
         onError: (exception: TPException) -> Unit
     ) {
-        NetworkClass(parameters,"testpress").fetch(object :NetworkClass.VideoInfoCallback{
+        VideoInfoFetcher(parameters).fetch(object :VideoInfoFetcher.VideoInfoCallback{
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
                 playVideoInUIThread(result.getPlaybackURL(), parameters.startPositionInMilliSecs)

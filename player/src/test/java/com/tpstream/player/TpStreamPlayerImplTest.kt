@@ -1,23 +1,9 @@
 package com.tpstream.player
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import androidx.media3.common.*
-import androidx.media3.common.Tracks.Group
 import androidx.media3.exoplayer.*
-import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.TrackSelector
-import androidx.media3.extractor.mp4.Track
-import com.google.common.collect.ImmutableList
-import com.tpstream.player.models.VideoInfo
-import com.tpstream.player.models.asVideoInfo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import okhttp3.internal.immutableListOf
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

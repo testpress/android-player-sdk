@@ -179,10 +179,8 @@ internal class TpStreamPlayerImpl(val context: Context, private val testPlayer: 
         this._listener = listener
         this.exoPlayerListener.listener = listener
         if (listener != null) {
-            println(true)
             exoPlayer.addListener(exoPlayerListener)
         } else {
-            println(false)
             exoPlayer.removeListener(exoPlayerListener)
         }
     }

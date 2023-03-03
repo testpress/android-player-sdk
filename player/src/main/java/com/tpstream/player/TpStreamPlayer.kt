@@ -9,6 +9,7 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.TrackSelector
+import androidx.media3.extractor.mp4.Track
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.models.*
 
@@ -62,6 +63,7 @@ internal class TpStreamPlayerImpl(val context: Context, private val testPlayer: 
     }
 
     private fun initializeExoplayer() {
+        // testPlayer is available for test cases only otherwise null
         exoPlayer = testPlayer
             ?: ExoPlayer.Builder(context)
                 .build()

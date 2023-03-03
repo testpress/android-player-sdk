@@ -23,7 +23,7 @@ internal class EncryptionKeyDownloaderTest {
 
     @Test
     fun testGetMediaPlayListUrl() {
-        val result = encryptionKeyDownloader.getMediaPlayListUrl(
+        val result = encryptionKeyDownloader.getSingleResolutionTrackUrl(
             "123456/video.m3u8",
             getMainResponse()
         )
@@ -32,7 +32,7 @@ internal class EncryptionKeyDownloaderTest {
 
     @Test
     fun getEncryptionKeyUrlUsingMediaPlaylistUrl() {
-        val result = encryptionKeyDownloader.getEncryptionKeyUrlUsingMediaPlaylistUrl(
+        val result = encryptionKeyDownloader.getEncryptionKeyUrlUsingSingleResolutionTrackUrl(
             "123456/video.m3u8",
             getPathResponse()
         )
@@ -72,9 +72,6 @@ internal class EncryptionKeyDownloaderTest {
                 "#EXTINF:12.766667,\n" +
                 "video_0.ts\n" +
                 "#EXTINF:7.366667,\n" +
-                "video_1.ts\n" +
-                "#EXTINF:15.633333,\n" +
-                "video_2.ts\n" +
                 "#EXT-X-ENDLIST\n"
         val responseBody = Util.getUtf8Bytes(playlistString).toResponseBody()
         return Response.Builder()

@@ -12,17 +12,10 @@ import okhttp3.Response
 internal class EncryptionKeyDownloader {
 
     fun getEncryptionKeyUrl(playbackUrl: String): String {
-        val response = getResponse(playbackUrl)
-        val mediaPlaylistUrl = getMediaPlayListUrl(playbackUrl, response)
-        val mediaPlaylistUrlResponse = getResponse(mediaPlaylistUrl)
-        return getEncryptionKeyUrlUsingMediaPlaylistUrl(mediaPlaylistUrl, mediaPlaylistUrlResponse)
-    }
-
-    fun getMediaPlayListUrl(playbackUrl: String,response: Response): String {
-        val playlist: HlsPlaylist =
-            HlsPlaylistParser().parse(Uri.parse(playbackUrl), response.body?.byteStream()!!)
-        val mediaPlaylist: HlsMultivariantPlaylist = playlist as HlsMultivariantPlaylist
-        return mediaPlaylist.mediaPlaylistUrls[0].toString()
+        val manifestResponse = getResponse(playbackUrl)
+        val singleResolutionTrackUrl = getSingleResolutionTrackUrl(playbackUrl, manifestResponse)
+        val singleResolutionTrackResponse = getResponse(singleResolutionTrackUrl)
+        return getEncryptionKeyUrlUsingSingleResolutionTrackUrl(singleResolutionTrackUrl, singleResolutionTrackResponse)
     }
 
     fun getResponse(url:String):Response{
@@ -32,7 +25,14 @@ internal class EncryptionKeyDownloader {
         return OkHttpClient().newCall(request).execute()
     }
 
-    fun getEncryptionKeyUrlUsingMediaPlaylistUrl(mediaPlaylistUrl: String,response: Response): String {
+    fun getSingleResolutionTrackUrl(playbackUrl: String,response: Response): String {
+        val playlist: HlsPlaylist =
+            HlsPlaylistParser().parse(Uri.parse(playbackUrl), response.body?.byteStream()!!)
+        val mediaPlaylist: HlsMultivariantPlaylist = playlist as HlsMultivariantPlaylist
+        return mediaPlaylist.mediaPlaylistUrls[0].toString()
+    }
+
+    fun getEncryptionKeyUrlUsingSingleResolutionTrackUrl(mediaPlaylistUrl: String,response: Response): String {
         val playlist: HlsPlaylist = HlsPlaylistParser().parse(
             Uri.parse(mediaPlaylistUrl),
             response.body?.byteStream()!!

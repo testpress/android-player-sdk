@@ -17,8 +17,6 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          arch: x86
-          profile: Nexus 5
           script: ./gradlew connectedCheck
 
       - name: Wait for emulator to start

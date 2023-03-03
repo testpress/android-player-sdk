@@ -52,7 +52,7 @@ internal object OfflineDRMLicenseHelper {
 
         return if (tpInitParams.isTPStreams){
             OfflineLicenseHelper.newWidevineInstance(
-                "https://app.tpstreams.com/api/v1/${tpInitParams.orgCode}/assets/${tpInitParams.videoId}/drm_license/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+                "$TPSTREAMS_BASE_URL${tpInitParams.orgCode}/assets/${tpInitParams.videoId}/drm_license/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
                 VideoDownloadManager.invoke(context).getHttpDataSourceFactory(tpInitParams),
                 DrmSessionEventListener.EventDispatcher()
             ).downloadLicense(drmInitData!!)
@@ -123,7 +123,7 @@ internal object OfflineDRMLicenseHelper {
     ) {
         val offlineLicenseHelper = if (tpInitParams.isTPStreams){
             OfflineLicenseHelper.newWidevineInstance(
-                "https://app.tpstreams.com/api/v1/${tpInitParams.orgCode}/assets/${tpInitParams.videoId}/drm_license/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+                "$TPSTREAMS_BASE_URL${tpInitParams.orgCode}/assets/${tpInitParams.videoId}/drm_license/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
                 VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
                 DrmSessionEventListener.EventDispatcher()
             )

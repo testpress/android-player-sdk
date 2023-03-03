@@ -56,9 +56,9 @@ class PlayerActivity : AppCompatActivity() {
     private fun selectVideoParams(videoType: String?){
         when(videoType){
             "DRM" -> {
-                accessToken = "187f826f-bf17-46aa-87ce-3c40f98e0d2f"
-                videoId = "18089594-bd6d-46cb-97a5-898a92b2d104"
-                orgCode = "gs25dm"
+                accessToken = "8278187d-f990-4fbb-be84-e3ceb4f28a08"
+                videoId = "aba16a13-cd03-4b80-a159-7d007cc7c598"
+                orgCode = "6c25r7"
                 product = "tpstreams"
             }
             "AES Encrypt" -> {

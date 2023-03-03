@@ -3,6 +3,8 @@ package com.tpstream.player
 import com.tpstream.player.models.TpStreamVideoInfo
 import com.tpstream.player.models.VideoInfo
 
+internal const val TPSTREAMS_BASE_URL = "https://app.tpstreams.com/api/v1/"
+
 internal class NetworkClass(private val params: TpInitParams) {
 
     private var videoInfoCallback: VideoInfoCallback? = null
@@ -31,7 +33,7 @@ internal class NetworkClass(private val params: TpInitParams) {
     }
 
     private fun fetchTpStreamVideoInfo() {
-        val url = "https://app.tpstreams.com/api/v1/${params.orgCode}/assets/${params.videoId}/?access_token=${params.accessToken}"
+        val url = "$TPSTREAMS_BASE_URL${params.orgCode}/assets/${params.videoId}/?access_token=${params.accessToken}"
         Network<TpStreamVideoInfo>().get(
             url,
             object : Network.TPResponse<TpStreamVideoInfo> {

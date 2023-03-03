@@ -39,7 +39,7 @@ internal class VideoDownloadRequestCreationHandler(
             .setUri(url)
             .setDrmConfiguration(
                 DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                    .setLicenseUri("https://app.tpstreams.com/api/v1/${player.params.orgCode}/assets/${player.params.videoId}/drm_license/?access_token=${player.params.accessToken}&drm_type=widevine&download=true")
+                    .setLicenseUri("$TPSTREAMS_BASE_URL${player.params.orgCode}/assets/${player.params.videoId}/drm_license/?access_token=${player.params.accessToken}&drm_type=widevine&download=true")
                     .setMultiSession(true)
                     .build()
             )

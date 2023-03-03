@@ -63,7 +63,7 @@ internal class TpStreamPlayerImpl(val context: Context, private val testPlayer: 
     }
 
     private fun initializeExoplayer() {
-        // testPlayer is available for test cases only otherwise null
+        // The testPlayer is only available for use in test cases, otherwise it is null.
         exoPlayer = testPlayer
             ?: ExoPlayer.Builder(context)
                 .build()

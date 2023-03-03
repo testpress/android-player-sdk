@@ -16,7 +16,7 @@ jobs:
       - name: Set up Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: 29
           arch: x86
           profile: Nexus 5
           script: ./gradlew connectedCheck
@@ -24,8 +24,8 @@ jobs:
       - name: Wait for emulator to start
         run: adb wait-for-device
 
-      - name: Run Test
+      - name: Run unit tests
         run: ./gradlew test
 
-      - name: Build and run tests
+      - name: Run instrumented tests
         run: ./gradlew connectedAndroidTest

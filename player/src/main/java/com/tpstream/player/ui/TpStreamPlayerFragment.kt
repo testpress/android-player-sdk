@@ -475,11 +475,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener,TpStreamPla
         }
     }
 
-    override fun updateDownloadButtons(isDownloadEnabled: Boolean, videoId: String) {
+    override fun updateDownloadButtons(parameters: TpInitParams) {
         requireActivity().runOnUiThread{
-            if (isDownloadEnabled){
+            if (parameters.isDownloadEnabled){
                 downloadButton.visibility = View.VISIBLE
-                updateDownloadButtonImage(videoId)
+                updateDownloadButtonImage(parameters.videoId!!)
             }
         }
     }

@@ -15,6 +15,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var accessToken :String
     private lateinit var videoId :String
     private lateinit var orgCode :String
+    private var product :String = "testpress"
     private var parameters : TpInitParams? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +41,7 @@ class PlayerActivity : AppCompatActivity() {
     fun play(){
         if (parameters == null){
             parameters = TpInitParams.Builder()
+                .setProduct(product)
                 .setVideoId(videoId)
                 .setAccessToken(accessToken)
                 .setOrgCode(orgCode)
@@ -64,9 +66,10 @@ class PlayerActivity : AppCompatActivity() {
                 orgCode = "demoveranda"
             }
             "Clear" -> {
-                accessToken = "70f61402-3724-4ed8-99de-5473b2310efe"
-                videoId = "qJQlWGLJvNv"
-                orgCode = "demoveranda"
+                accessToken = "4b11bf9e-d6b7-4b1f-80b8-19d92b26e966"
+                videoId = "73633fa3-61c6-443c-b625-ac4e85b28cfc"
+                orgCode = "edee9b"
+                product = "tpstreams"
             }
             null ->{}
         }

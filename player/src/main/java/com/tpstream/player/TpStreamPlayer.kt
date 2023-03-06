@@ -143,9 +143,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         parameters: TpInitParams,
         onError: (exception: TPException) -> Unit
     ) {
-        val url =
-            "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
-        Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
+        VideoInfoFetcher(parameters).fetch(object :VideoInfoFetcher.VideoInfoCallback{
             override fun onSuccess(result: VideoInfo) {
                 videoInfo = result
                 playVideoInUIThread(result.getPlaybackURL(), parameters.startPositionInMilliSecs)

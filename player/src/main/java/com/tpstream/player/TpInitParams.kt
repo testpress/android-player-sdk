@@ -19,10 +19,14 @@ data class TpInitParams (
     var signature: String? = null,
     var techOverride: Array<String>? = null,
     var isDownloadEnabled: Boolean = false,
-    var startAt: Long = 0L
+    var startAt: Long = 0L,
+    internal var product: String? = null, // The product should be Testpress or TpStreams
+    internal var isTPStreams: Boolean = false
 ): Parcelable {
     
     class Builder {
+        private val testpress = "testpress"
+        private var tpstreams = "tpstreams"
         private var autoPlay: Boolean? = null
         private var bufferingGoalMs: Int? = null
         private var forceHighestSupportedBitrate: Boolean? = null
@@ -38,6 +42,8 @@ data class TpInitParams (
         private var techOverride: Array<String>? = null
         private var isDownloadEnabled: Boolean = false
         private var startAt: Long = 0L
+        private var product: String = testpress // The product default value as testpress
+        private var isTPStreams: Boolean = false
 
         fun setAutoPlay(autoPlay: Boolean) = apply { this.autoPlay = autoPlay }
         fun startAt(timeInSeconds: Long) = apply { this.startAt = timeInSeconds }
@@ -53,11 +59,15 @@ data class TpInitParams (
         fun setSignature(signature: String) = apply { this.signature = signature }
         fun setTechOverride(techOverride: Array<String>) = apply { this.techOverride = techOverride }
         fun enableDownloadSupport(isDownloadEnabled: Boolean) = apply { this.isDownloadEnabled = isDownloadEnabled }
+        fun setProduct(product: String) = apply {
+            this.product = if (product.lowercase() == tpstreams) tpstreams else testpress
+        }
 
         fun build(): TpInitParams {
             if (orgCode == null) {
                 throw Exception("orgCode should be provided")
             }
+            validateProduct()
 
             return TpInitParams(
                 autoPlay,
@@ -74,8 +84,14 @@ data class TpInitParams (
                 signature,
                 techOverride,
                 isDownloadEnabled,
-                startAt
+                startAt,
+                product,
+                isTPStreams
             )
+        }
+
+        private fun validateProduct(){
+            isTPStreams = product == tpstreams
         }
     }
 

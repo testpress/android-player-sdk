@@ -35,7 +35,7 @@ class TpStreamPlayerImplTest {
 
     @Before
     fun createPlayer() {
-        tpStreamPlayerImpl = TpStreamPlayerImpl(context)
+        tpStreamPlayerImpl = TpStreamPlayerImpl(player, context)
     }
 
     @Test

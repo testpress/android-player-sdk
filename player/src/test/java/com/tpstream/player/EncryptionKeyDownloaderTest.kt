@@ -31,7 +31,7 @@ internal class EncryptionKeyDownloaderTest {
     }
 
     @Test
-    fun getResponse() {
+    fun testGetResponse() {
         val successResponse = MockResponse().setResponseCode(200).setBody("foo")
         mockWebServer.enqueue(successResponse)
         val response = encryptionKeyDownloader.getResponse(mockWebServer.url("/").toString())
@@ -40,7 +40,7 @@ internal class EncryptionKeyDownloaderTest {
     }
 
     @Test
-    fun getEncryptionKey() {
+    fun testGetEncryptionKey() {
         // foo -> [102, 111, 111]
         val successResponse = MockResponse().setResponseCode(200).setBody("foo")
         mockWebServer.enqueue(successResponse)
@@ -59,7 +59,7 @@ internal class EncryptionKeyDownloaderTest {
     }
 
     @Test
-    fun getEncryptionKeyUrlUsingMediaPlaylistUrl() {
+    fun testGetEncryptionKeyUrlUsingMediaPlaylistUrl() {
         val result = encryptionKeyDownloader.getEncryptionKeyUrlUsingSingleResolutionTrackUrl(
             "123456/video.m3u8",
             getPathResponse()

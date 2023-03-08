@@ -15,16 +15,11 @@ jobs:
 
       - name: Run Test
         run: ./gradlew test
-
-  notify:
-    needs: run_test
-    if: ${{ failure() }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Store Test result artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: Test result
-          path: |
-              player/build/reports/tests/testDebugUnitTest/index.html
+        if: ${{ failure() }}
+        steps:
+          - name: Store Test result artifacts
+            uses: actions/upload-artifact@v2
+            with:
+              name: Test result
+              path: |
+                player/build/reports/tests/testDebugUnitTest/index.html

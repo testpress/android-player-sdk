@@ -17,7 +17,7 @@ jobs:
         run: ./gradlew test
 
   notify:
-    needs: test
+    needs: run_test
     if: ${{ failure() }}
 
     steps:

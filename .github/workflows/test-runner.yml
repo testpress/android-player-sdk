@@ -19,6 +19,7 @@ jobs:
   notify:
     needs: run_test
     if: ${{ failure() }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Store Test result artifacts

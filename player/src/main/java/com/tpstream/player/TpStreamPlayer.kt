@@ -61,6 +61,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     var _listener: TPStreamPlayerListener? = null
     lateinit var exoPlayer: ExoPlayer
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
+    private var videoRepository: VideoRepository = VideoRepository(context)
 
     init {
         initializeExoplayer()
@@ -76,43 +77,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
         params = parameters
-        populateVideo(parameters)
-        if (checkIsVideoDownloaded()){
-            videoInfo = video?.asVideoInfo()!!
-            playVideoInUIThread(video?.url!!, parameters.startPositionInMilliSecs)
-            return
-        }
-        fetchVideoInfoAndPlay(parameters, onError)
-    }
-
-    private fun populateVideo(parameters: TpInitParams){
-        runBlocking(Dispatchers.IO) {
-            video = VideoRepository(context)
-                .getVideoByVideoId(parameters.videoId!!)
-        }
-    }
-
-    private fun checkIsVideoDownloaded():Boolean{
-        if (video != null && DownloadTask(context).isDownloaded(video?.url!!)){
-            return true
-        }
-        return false
-    }
-
-    private fun fetchVideoInfoAndPlay(
-        parameters: TpInitParams,
-        onError: (exception: TPException) -> Unit
-    ) {
-        val url =
-            "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
-        Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
-            override fun onSuccess(result: VideoInfo) {
-                videoInfo = result
-                playVideoInUIThread(result.getPlaybackURL(), parameters.startPositionInMilliSecs)
-            }
-
-            override fun onFailure(exception: TPException) {
-                onError(exception)
+        videoRepository.fetchVideo(parameters, onError, object :OnSuccess {
+            override fun onSuccess(video: Video) {
+                videoInfo = video.asVideoInfo()
+                playVideoInUIThread(video.url, params.startPositionInMilliSecs)
             }
         })
     }
@@ -175,7 +143,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             )
         return builder.build()
     }
-
     fun getPlayWhenReady() = exoPlayer.playWhenReady
 
     fun setPlayWhenReady(canPlay: Boolean) {

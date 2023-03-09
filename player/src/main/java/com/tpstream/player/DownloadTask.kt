@@ -6,7 +6,7 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import com.tpstream.player.database.TPStreamsDatabase
-import com.tpstream.player.models.OfflineVideoInfo
+import com.tpstream.player.models.Video
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -24,8 +24,8 @@ internal class DownloadTask (val context: Context) {
         )
     }
 
-    fun pause(info:OfflineVideoInfo) {
-        val download = downloadIndex.getDownload(info.url)
+    fun pause(video: Video) {
+        val download = downloadIndex.getDownload(video.url)
         val STOP_REASON_PAUSED = 1
         download?.let {
             DownloadService.sendSetStopReason(
@@ -38,8 +38,8 @@ internal class DownloadTask (val context: Context) {
         }
     }
 
-    fun resume(info:OfflineVideoInfo) {
-        val download = downloadIndex.getDownload(info.url)
+    fun resume(video: Video) {
+        val download = downloadIndex.getDownload(video.url)
         download?.let {
             DownloadService.sendSetStopReason(
                 context,
@@ -51,8 +51,8 @@ internal class DownloadTask (val context: Context) {
         }
     }
 
-    fun delete(info:OfflineVideoInfo) {
-        val download = downloadIndex.getDownload(info.url)
+    fun delete(video: Video) {
+        val download = downloadIndex.getDownload(video.url)
         download?.let {
             DownloadService.sendRemoveDownload(
                 context,

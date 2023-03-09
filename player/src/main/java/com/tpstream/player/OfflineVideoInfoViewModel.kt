@@ -4,32 +4,32 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tpstream.player.models.OfflineVideoInfo
+import com.tpstream.player.models.Video
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-internal class OfflineVideoInfoViewModel(private val offlineVideoInfoRepository: OfflineVideoInfoRepository):ViewModel() {
+internal class VideoViewModel(private val videoRepository: VideoRepository):ViewModel() {
 
-    fun get(videoId: String): LiveData<OfflineVideoInfo?> {
-        return Transformations.map(offlineVideoInfoRepository.get(videoId)) {
+    fun get(videoId: String): LiveData<Video?> {
+        return Transformations.map(videoRepository.get(videoId)) {
             it
         }
     }
 
-    fun insert(offlineVideoInfo: OfflineVideoInfo){
+    fun insert(video: Video){
         viewModelScope.launch{
-            offlineVideoInfoRepository.insert(offlineVideoInfo)
+            videoRepository.insert(video)
         }
     }
 
     fun delete(videoId: String){
         viewModelScope.launch {
-            var offlineVideoInfo : OfflineVideoInfo? = null
+            var video : Video? = null
             runBlocking(Dispatchers.IO) {
-                offlineVideoInfo = offlineVideoInfoRepository.getOfflineVideoInfoByVideoId(videoId)
+                video = videoRepository.getVideoByVideoId(videoId)
             }
-            offlineVideoInfoRepository.delete(offlineVideoInfo!!)
+            videoRepository.delete(video!!)
         }
     }
 }

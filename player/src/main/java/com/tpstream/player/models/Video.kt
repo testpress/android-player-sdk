@@ -6,8 +6,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.tpstream.player.ImageSaver
 
-@Entity
-class OfflineVideoInfo(
+@Entity(tableName = "OfflineVideoInfo")
+class Video(
     @PrimaryKey(autoGenerate = true)
     val id : Long = 0L,
     var videoId: String = "",
@@ -20,12 +20,12 @@ class OfflineVideoInfo(
     var percentageDownloaded: Int = 0,
     var bytesDownloaded: Long = 0,
     var totalSize: Long = 0,
-    var downloadState: OfflineVideoState? = null,
+    var downloadState: VideoState? = null,
     var videoWidth: Int = 0,
     var videoHeight: Int = 0
 )
 
-internal fun OfflineVideoInfo.asVideoInfo():VideoInfo{
+internal fun Video.asVideoInfo():VideoInfo{
 return VideoInfo(
     title,
     thumbnail,
@@ -40,23 +40,23 @@ return VideoInfo(
 )
 }
 
-enum class OfflineVideoState {
+enum class VideoState {
     PAUSE,
     DOWNLOADING,
     COMPLETE,
     FAILED
 }
 
-internal fun getOfflineVideoState(int:Int):OfflineVideoState?{
+internal fun getVideoState(int:Int):VideoState?{
     return when(int){
-        1 -> OfflineVideoState.PAUSE
-        2 -> OfflineVideoState.DOWNLOADING
-        3 -> OfflineVideoState.COMPLETE
-        4 -> OfflineVideoState.FAILED
+        1 -> VideoState.PAUSE
+        2 -> VideoState.DOWNLOADING
+        3 -> VideoState.COMPLETE
+        4 -> VideoState.FAILED
         else -> null
     }
 }
 
-fun OfflineVideoInfo.getLocalThumbnail(context: Context): Bitmap?{
+fun Video.getLocalThumbnail(context: Context): Bitmap?{
     return ImageSaver(context).load(videoId)
 }

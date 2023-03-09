@@ -43,9 +43,9 @@ class RoomMigrationTest {
         )
             .build()
 
-        val offlineVideoInfo = versionDB.offlineVideoInfoDao().getOfflineVideoInfoByUrl("url")
-        assertEquals("videoID",offlineVideoInfo?.videoId)
-        assertEquals(1L,offlineVideoInfo?.id)
+        val video = versionDB.videoDao().getVideoByUrl("url")
+        assertEquals("videoID",video?.videoId)
+        assertEquals(1L,video?.id)
     }
 
 }

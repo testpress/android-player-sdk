@@ -3,7 +3,6 @@ package com.tpstream.player
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
@@ -12,7 +11,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.TrackSelector
 import com.google.common.collect.ImmutableList
-import com.tpstream.player.models.OfflineVideoInfo
+import com.tpstream.player.models.Video
 import com.tpstream.player.models.VideoInfo
 import com.tpstream.player.models.asVideoInfo
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +57,7 @@ public interface TpStreamPlayer {
 internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     lateinit var params: TpInitParams
     lateinit var videoInfo: VideoInfo
-    var offlineVideoInfo: OfflineVideoInfo? = null
+    var video: Video? = null
     var _listener: TPStreamPlayerListener? = null
     lateinit var exoPlayer: ExoPlayer
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
@@ -84,7 +83,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private fun getMediaSourceFactory(): MediaSource.Factory {
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build(params))
-        if (offlineVideoInfo == null) {
+        if (video == null) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(
                     CustomHttpDrmMediaCallback(context, params)
@@ -130,10 +129,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
         params = parameters
-        populateOfflineVideoInfo(parameters)
+        populateVideo(parameters)
         if (checkIsVideoDownloaded()){
-            videoInfo = offlineVideoInfo?.asVideoInfo()!!
-            playVideoInUIThread(offlineVideoInfo?.url!!, parameters.startPositionInMilliSecs)
+            videoInfo = video?.asVideoInfo()!!
+            playVideoInUIThread(video?.url!!, parameters.startPositionInMilliSecs)
             return
         }
         fetchVideoInfoAndPlay(parameters, onError)
@@ -163,15 +162,15 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         }
     }
 
-    private fun populateOfflineVideoInfo(parameters: TpInitParams){
+    private fun populateVideo(parameters: TpInitParams){
         runBlocking(Dispatchers.IO) {
-            offlineVideoInfo = OfflineVideoInfoRepository(context)
-                .getOfflineVideoInfoByVideoId(parameters.videoId!!)
+            video = VideoRepository(context)
+                .getVideoByVideoId(parameters.videoId!!)
         }
     }
 
     private fun checkIsVideoDownloaded():Boolean{
-        if (offlineVideoInfo != null && DownloadTask(context).isDownloaded(offlineVideoInfo?.url!!)){
+        if (video != null && DownloadTask(context).isDownloaded(video?.url!!)){
             return true
         }
         return false

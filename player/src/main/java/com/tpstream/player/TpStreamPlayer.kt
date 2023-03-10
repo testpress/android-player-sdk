@@ -74,6 +74,55 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             }
     }
 
+    fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
+        params = parameters
+        populateVideo(parameters)
+        if (checkIsVideoDownloaded()){
+            videoInfo = video?.asVideoInfo()!!
+            playVideoInUIThread(video?.url!!, parameters.startPositionInMilliSecs)
+            return
+        }
+        fetchVideoInfoAndPlay(parameters, onError)
+    }
+
+    private fun populateVideo(parameters: TpInitParams){
+        runBlocking(Dispatchers.IO) {
+            video = VideoRepository(context)
+                .getVideoByVideoId(parameters.videoId!!)
+        }
+    }
+
+    private fun checkIsVideoDownloaded():Boolean{
+        if (video != null && DownloadTask(context).isDownloaded(video?.url!!)){
+            return true
+        }
+        return false
+    }
+
+    private fun fetchVideoInfoAndPlay(
+        parameters: TpInitParams,
+        onError: (exception: TPException) -> Unit
+    ) {
+        val url =
+            "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
+        Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
+            override fun onSuccess(result: VideoInfo) {
+                videoInfo = result
+                playVideoInUIThread(result.getPlaybackURL(), parameters.startPositionInMilliSecs)
+            }
+
+            override fun onFailure(exception: TPException) {
+                onError(exception)
+            }
+        })
+    }
+
+    private fun playVideoInUIThread(url: String,startPosition: Long = 0) {
+        Handler(Looper.getMainLooper()).post {
+            playVideo(url, startPosition)
+        }
+    }
+
     internal fun playVideo(url: String,startPosition: Long = 0) {
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.seekTo(startPosition)
@@ -127,62 +176,28 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         return builder.build()
     }
 
-    fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
-        params = parameters
-        populateVideo(parameters)
-        if (checkIsVideoDownloaded()){
-            videoInfo = video?.asVideoInfo()!!
-            playVideoInUIThread(video?.url!!, parameters.startPositionInMilliSecs)
-            return
-        }
-        fetchVideoInfoAndPlay(parameters, onError)
-    }
-
-    private fun fetchVideoInfoAndPlay(
-        parameters: TpInitParams,
-        onError: (exception: TPException) -> Unit
-    ) {
-        val url =
-            "/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
-        Network<VideoInfo>(parameters.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
-            override fun onSuccess(result: VideoInfo) {
-                videoInfo = result
-                playVideoInUIThread(result.getPlaybackURL(), parameters.startPositionInMilliSecs)
-            }
-
-            override fun onFailure(exception: TPException) {
-                onError(exception)
-            }
-        })
-    }
-
-    private fun playVideoInUIThread(url: String,startPosition: Long = 0) {
-        Handler(Looper.getMainLooper()).post {
-            playVideo(url, startPosition)
-        }
-    }
-
-    private fun populateVideo(parameters: TpInitParams){
-        runBlocking(Dispatchers.IO) {
-            video = VideoRepository(context)
-                .getVideoByVideoId(parameters.videoId!!)
-        }
-    }
-
-    private fun checkIsVideoDownloaded():Boolean{
-        if (video != null && DownloadTask(context).isDownloaded(video?.url!!)){
-            return true
-        }
-        return false
-    }
+    fun getPlayWhenReady() = exoPlayer.playWhenReady
 
     fun setPlayWhenReady(canPlay: Boolean) {
         exoPlayer.playWhenReady = canPlay
     }
 
-    fun getPlayWhenReady() = exoPlayer.playWhenReady
+    fun getTrackSelectionParameters(): TrackSelectionParameters = exoPlayer.trackSelectionParameters
+
+    fun setTrackSelectionParameters(parameters: TrackSelectionParameters){
+        exoPlayer.trackSelectionParameters = parameters
+    }
+
+    fun getTrackSelector(): TrackSelector? = exoPlayer.trackSelector
+
+    fun release() {
+        exoPlayer.release()
+    }
+
     override fun getPlaybackState(): Int = exoPlayer.playbackState
+
     override fun getCurrentTime(): Long = exoPlayer.currentPosition
+
     override fun getBufferedTime(): Long = exoPlayer.bufferedPosition
 
     override fun setPlaybackSpeed(speed: Float) {
@@ -193,13 +208,12 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.seekTo(seconds)
     }
 
-    fun release() {
-        exoPlayer.release()
-    }
-
     override fun getVideoFormat(): Format? = exoPlayer.videoFormat
+
     override fun getCurrentTrackGroups(): ImmutableList<Tracks.Group> = exoPlayer.currentTracks.groups
+
     override fun getDuration(): Long = exoPlayer.duration
+
     override fun setListener(listener: TPStreamPlayerListener?) {
         this._listener = listener
         this.exoPlayerListener.listener = listener
@@ -209,12 +223,4 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             exoPlayer.removeListener(exoPlayerListener)
         }
     }
-
-    fun getTrackSelectionParameters(): TrackSelectionParameters = exoPlayer.trackSelectionParameters
-
-    fun setTrackSelectionParameters(parameters: TrackSelectionParameters){
-        exoPlayer.trackSelectionParameters = parameters
-    }
-
-    fun getTrackSelector(): TrackSelector? = exoPlayer.trackSelector
 }

@@ -54,11 +54,11 @@ class RoomMigrationTest {
     fun testMigration2To3() {
         db = helper.createDatabase(TEST_DB, 2).apply {
             execSQL(
-                """INSERT INTO OfflineVideoInfo VALUES ('1', 'videoID', 'title', 'thumbnail', 'url', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
+                """INSERT INTO OfflineVideoInfo VALUES ('1', 'videoID1', 'title1', 'thumbnail1', 'url1', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
             execSQL(
-                """INSERT INTO OfflineVideoInfo VALUES ('2', 'videoID2', 'title', 'thumbnail', 'url', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
+                """INSERT INTO OfflineVideoInfo VALUES ('2', 'videoID2', 'title2', 'thumbnail2', 'url2', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
             execSQL(
-                """INSERT INTO OfflineVideoInfo VALUES ('3', 'videoID3', 'title', 'thumbnail', 'url', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
+                """INSERT INTO OfflineVideoInfo VALUES ('3', 'videoID3', 'title3', 'thumbnail3', 'url3', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
             close()
         }
         db = helper.runMigrationsAndValidate(TEST_DB, 3, true, MIGRATION_1_2, MIGRATION_2_3)
@@ -70,10 +70,10 @@ class RoomMigrationTest {
         )
             .build()
 
-        val video = versionDB.videoDao().getVideoByUrl("url")
+        val video = versionDB.videoDao().getVideoByUrl("url2")
         val allVideos = versionDB.videoDao().getAllVideo()
-        assertEquals("videoID",video?.videoId)
-        assertEquals(1L,video?.id)
+        assertEquals("videoID2",video?.videoId)
+        assertEquals(2L,video?.id)
         assertEquals(3,allVideos?.size)
     }
 }

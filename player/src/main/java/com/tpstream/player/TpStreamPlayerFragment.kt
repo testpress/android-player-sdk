@@ -26,7 +26,7 @@ import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
-import com.tpstream.player.models.OfflineVideoState
+import com.tpstream.player.models.DownloadStatus
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
@@ -47,10 +47,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
     private lateinit var orientationEventListener: OrientationListener
-    private lateinit var offlineVideoInfoViewModel: OfflineVideoInfoViewModel
+    private lateinit var videoViewModel: VideoViewModel
     private lateinit var downloadButton : ImageButton
     private lateinit var resolutionButton : ImageButton
-    private var downloadState :OfflineVideoState? = null
+    private var downloadState : DownloadStatus? = null
     private var showDownloadButton = false
     private var startPosition : Long = -1L
     private var drmLicenseRetries = 0
@@ -104,11 +104,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun initializeViewModel() {
-        offlineVideoInfoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+        videoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return OfflineVideoInfoViewModel(OfflineVideoInfoRepository(requireContext())) as T
+                return VideoViewModel(VideoRepository(requireContext())) as T
             }
-        }).get(OfflineVideoInfoViewModel::class.java)
+        }).get(VideoViewModel::class.java)
     }
 
     private fun registerResolutionChangeListener() {
@@ -119,7 +119,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun onResolutionButtonClick() {
-        if (downloadState == OfflineVideoState.COMPLETE) {
+        if (downloadState == DownloadStatus.COMPLETE) {
             Toast.makeText(requireContext(), "Quality Unavailable", Toast.LENGTH_SHORT).show()
         } else {
             val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
@@ -149,10 +149,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun onDownloadButtonClick() {
         when (downloadState) {
-            OfflineVideoState.COMPLETE -> {
+            DownloadStatus.COMPLETE -> {
                 Toast.makeText(requireContext(), "Download complete", Toast.LENGTH_SHORT).show()
             }
-            OfflineVideoState.DOWNLOADING -> {
+            DownloadStatus.DOWNLOADING -> {
                 Toast.makeText(requireContext(), "Downloading", Toast.LENGTH_SHORT).show()
             }
             else -> {
@@ -168,14 +168,14 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                     requireActivity().supportFragmentManager,
                     "DownloadSelectionSheet"
                 )
-                downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, offlineVideoInfo ->
+                downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, video ->
                     DownloadTask(requireContext()).start(downloadRequest)
-                    offlineVideoInfo?.videoId = player?.params?.videoId!!
+                    video?.videoId = player?.params?.videoId!!
                     ImageSaver(requireContext()).save(
-                        offlineVideoInfo?.thumbnail!!,
-                        offlineVideoInfo.videoId
+                        video?.thumbnail!!,
+                        video.videoId
                     )
-                    offlineVideoInfoViewModel.insert(offlineVideoInfo)
+                    videoViewModel.insert(video)
                 }
             }
         }
@@ -299,15 +299,15 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         } else {
             downloadButton.visibility = View.GONE
         }
-        offlineVideoInfoViewModel.get(params.videoId!!).observe(viewLifecycleOwner) { offlineVideoInfo ->
-            downloadState = when (offlineVideoInfo?.downloadState) {
-                OfflineVideoState.DOWNLOADING ->{
+        videoViewModel.get(params.videoId!!).observe(viewLifecycleOwner) { video ->
+            downloadState = when (video?.downloadState) {
+                DownloadStatus.DOWNLOADING ->{
                     downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
-                    OfflineVideoState.DOWNLOADING
+                    DownloadStatus.DOWNLOADING
                 }
-                OfflineVideoState.COMPLETE ->{
+                DownloadStatus.COMPLETE ->{
                     downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-                    OfflineVideoState.COMPLETE
+                    DownloadStatus.COMPLETE
                 }
                 else -> {
                     downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)

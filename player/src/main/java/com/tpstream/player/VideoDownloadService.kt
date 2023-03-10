@@ -26,12 +26,12 @@ internal class VideoDownloadService:DownloadService(
 ) , DownloadManager.Listener{
 
     private lateinit var notificationHelper: DownloadNotificationHelper
-    private lateinit var offlineVideoInfoRepository: OfflineVideoInfoRepository
+    private lateinit var videoRepository: VideoRepository
     private lateinit var downloadCallback : DownloadCallback
 
     override fun onCreate() {
         super.onCreate()
-        offlineVideoInfoRepository = OfflineVideoInfoRepository(this)
+        videoRepository = VideoRepository(this)
         notificationHelper = DownloadNotificationHelper(this, CHANNEL_ID)
         downloadCallback = DownloadCallback.invoke()
     }
@@ -53,7 +53,7 @@ internal class VideoDownloadService:DownloadService(
     ): Notification {
 
         CoroutineScope(Dispatchers.IO).launch {
-            offlineVideoInfoRepository.refreshCurrentDownloadsStatus()
+            videoRepository.refreshCurrentDownloadsStatus()
         }
 
         return notificationHelper.buildProgressNotification(
@@ -75,7 +75,7 @@ internal class VideoDownloadService:DownloadService(
         var videoId : String?
 
         runBlocking(Dispatchers.IO) {
-            videoId = offlineVideoInfoRepository.grtVideoIdByUrl(download.request.uri.toString())
+            videoId = videoRepository.grtVideoIdByUrl(download.request.uri.toString())
         }
 
         when (download.state) {
@@ -115,7 +115,7 @@ internal class VideoDownloadService:DownloadService(
 
     private fun updateDownloadStatus(download:Download){
         CoroutineScope(Dispatchers.IO).launch{
-            offlineVideoInfoRepository.updateDownloadStatus(download)
+            videoRepository.updateDownloadStatus(download)
         }
     }
 

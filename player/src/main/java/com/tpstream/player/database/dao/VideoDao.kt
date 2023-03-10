@@ -6,31 +6,31 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.tpstream.player.models.OfflineVideoInfo
+import com.tpstream.player.models.Video
 
 @Dao
-internal interface OfflineVideoInfoDao {
+internal interface VideoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(offlineVideoInfo: OfflineVideoInfo)
+    suspend fun insert(video: Video)
 
     @Delete
-    suspend fun delete(offlineVideoInfo: OfflineVideoInfo)
+    suspend fun delete(video: Video)
 
     @Query("SELECT * FROM OfflineVideoInfo")
-    fun getAllOfflineVideoInfo():List<OfflineVideoInfo>?
+    fun getAllVideo():List<Video>?
 
     @Query("SELECT * FROM OfflineVideoInfo WHERE videoId=:videoID")
-    fun getOfflineVideoInfoByVideoId(videoID:String): OfflineVideoInfo?
+    fun getVideoByVideoId(videoID:String): Video?
 
     @Query("SELECT * FROM OfflineVideoInfo WHERE url=:url")
-    fun getOfflineVideoInfoByUrl(url:String): OfflineVideoInfo?
+    fun getVideoByUrl(url:String): Video?
 
     @Query("SELECT * FROM OfflineVideoInfo WHERE videoId=:videoId")
-    fun getOfflineVideoInfoById(videoId:String): LiveData<OfflineVideoInfo?>
+    fun getVideoById(videoId:String): LiveData<Video?>
 
     @Query("SELECT * FROM OfflineVideoInfo")
-    fun getAllDownloadInLiveData():LiveData<List<OfflineVideoInfo>?>
+    fun getAllDownloadInLiveData():LiveData<List<Video>?>
 
 
 }

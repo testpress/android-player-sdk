@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.media3.common.*
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -20,11 +19,11 @@ import com.google.common.collect.ImmutableList
 import com.tpstream.player.*
 import com.tpstream.player.R
 import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
-import com.tpstream.player.models.OfflineVideoInfo
+import com.tpstream.player.models.Video
 import okio.IOException
 import kotlin.math.roundToInt
 
-internal typealias OnSubmitListener = (DownloadRequest,OfflineVideoInfo?) -> Unit
+internal typealias OnSubmitListener = (DownloadRequest,Video?) -> Unit
 
 internal class DownloadResolutionSelectionSheet(
     val player: TpStreamPlayerImpl,
@@ -33,7 +32,7 @@ internal class DownloadResolutionSelectionSheet(
 
     private var _binding: TpDownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
-    private val offlineVideoInfo = player.videoInfo?.asOfflineVideoInfo()
+    private val video = player.videoInfo?.asVideo()
     private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()
@@ -116,7 +115,7 @@ internal class DownloadResolutionSelectionSheet(
             if (isResolutionSelected){
                 val downloadRequest =
                     videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
-                onSubmitListener?.invoke(downloadRequest,offlineVideoInfo)
+                onSubmitListener?.invoke(downloadRequest,video)
                 Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
                 dismiss()
             } else {

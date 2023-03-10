@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tpstream.app.databinding.ActivityDownloadListBinding
 import com.tpstream.app.databinding.DownloadItemBinding
 import com.tpstream.player.TpInitParams
-import com.tpstream.player.models.OfflineVideoInfo
-import com.tpstream.player.models.OfflineVideoState
+import com.tpstream.player.models.Video
+import com.tpstream.player.models.DownloadStatus
 import com.tpstream.player.models.getLocalThumbnail
 
 class DownloadListActivity : AppCompatActivity() {
@@ -44,8 +44,8 @@ class DownloadListActivity : AppCompatActivity() {
     }
 
     inner class DownloadListAdapter(
-        private val data: List<OfflineVideoInfo>
-    ) : ListAdapter<OfflineVideoInfo, DownloadListAdapter.DownloadListViewHolder>(
+        private val data: List<Video>
+    ) : ListAdapter<Video, DownloadListAdapter.DownloadListViewHolder>(
         DOWNLOAD_COMPARATOR
     ) {
 
@@ -58,38 +58,38 @@ class DownloadListActivity : AppCompatActivity() {
             val resumeButton: Button = binding.resumeButton
             val thumbnail: ImageView = binding.thumbnail
 
-            fun bind(offlineVideoInfo: OfflineVideoInfo) {
-                binding.title.text = offlineVideoInfo.title
-                thumbnail.setImageBitmap(offlineVideoInfo.getLocalThumbnail(applicationContext))
-                binding.downloadImage.setImageResource(getDownloadImage(offlineVideoInfo.downloadState))
-                binding.duration.text = offlineVideoInfo.duration
-                binding.percentage.text = "${offlineVideoInfo.percentageDownloaded} %"
-                showOrHideButtons(offlineVideoInfo.downloadState)
+            fun bind(video: Video) {
+                binding.title.text = video.title
+                thumbnail.setImageBitmap(video.getLocalThumbnail(applicationContext))
+                binding.downloadImage.setImageResource(getDownloadImage(video.downloadState))
+                binding.duration.text = video.duration
+                binding.percentage.text = "${video.percentageDownloaded} %"
+                showOrHideButtons(video.downloadState)
             }
 
-            private fun getDownloadImage(offlineVideoState: OfflineVideoState?): Int {
-                return when (offlineVideoState) {
-                    OfflineVideoState.DOWNLOADING -> com.tpstream.player.R.drawable.ic_baseline_downloading_24
-                    OfflineVideoState.PAUSE -> com.tpstream.player.R.drawable.ic_baseline_pause_circle_filled_24
+            private fun getDownloadImage(videoState: DownloadStatus?): Int {
+                return when (videoState) {
+                    DownloadStatus.DOWNLOADING -> com.tpstream.player.R.drawable.ic_baseline_downloading_24
+                    DownloadStatus.PAUSE -> com.tpstream.player.R.drawable.ic_baseline_pause_circle_filled_24
                     else -> com.tpstream.player.R.drawable.ic_baseline_file_download_done_24
                 }
             }
 
-            private fun showOrHideButtons(offlineVideoState: OfflineVideoState?) {
-                when (offlineVideoState) {
-                    OfflineVideoState.DOWNLOADING -> {
+            private fun showOrHideButtons(videoState: DownloadStatus?) {
+                when (videoState) {
+                    DownloadStatus.DOWNLOADING -> {
                         deleteButton.visibility = View.GONE
                         cancelButton.visibility = View.VISIBLE
                         pauseButton.visibility = View.VISIBLE
                         resumeButton.visibility = View.GONE
                     }
-                    OfflineVideoState.PAUSE -> {
+                    DownloadStatus.PAUSE -> {
                         deleteButton.visibility = View.GONE
                         cancelButton.visibility = View.VISIBLE
                         pauseButton.visibility = View.GONE
                         resumeButton.visibility = View.VISIBLE
                     }
-                    OfflineVideoState.COMPLETE -> {
+                    DownloadStatus.COMPLETE -> {
                         deleteButton.visibility = View.VISIBLE
                         cancelButton.visibility = View.GONE
                         pauseButton.visibility = View.GONE
@@ -111,26 +111,26 @@ class DownloadListActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: DownloadListViewHolder, position: Int) {
-            val offlineVideoInfo = data[position]
-            holder.bind(offlineVideoInfo)
-            holder.deleteButton.setOnClickListener { downloadListViewModel.deleteDownload(offlineVideoInfo) }
-            holder.cancelButton.setOnClickListener { downloadListViewModel.cancelDownload(offlineVideoInfo) }
-            holder.pauseButton.setOnClickListener { downloadListViewModel.pauseDownload(offlineVideoInfo) }
-            holder.resumeButton.setOnClickListener { downloadListViewModel.resumeDownload(offlineVideoInfo) }
+            val video = data[position]
+            holder.bind(video)
+            holder.deleteButton.setOnClickListener { downloadListViewModel.deleteDownload(video) }
+            holder.cancelButton.setOnClickListener { downloadListViewModel.cancelDownload(video) }
+            holder.pauseButton.setOnClickListener { downloadListViewModel.pauseDownload(video) }
+            holder.resumeButton.setOnClickListener { downloadListViewModel.resumeDownload(video) }
             holder.thumbnail.setOnClickListener {
-                if (offlineVideoInfo.downloadState == OfflineVideoState.COMPLETE) {
-                    playVideo(offlineVideoInfo)
+                if (video.downloadState == DownloadStatus.COMPLETE) {
+                    playVideo(video)
                 } else {
                     Toast.makeText(applicationContext, "Downloading", Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
-        private fun playVideo(offlineVideoInfo: OfflineVideoInfo) {
+        private fun playVideo(video: Video) {
             val intent = Intent(this@DownloadListActivity, PlayerActivity::class.java)
             intent.putExtra(
                 TP_OFFLINE_PARAMS,
-                TpInitParams.createOfflineParams(offlineVideoInfo.videoId)
+                TpInitParams.createOfflineParams(video.videoId)
             )
             startActivity(intent)
         }
@@ -140,15 +140,15 @@ class DownloadListActivity : AppCompatActivity() {
 
     companion object {
 
-        private val DOWNLOAD_COMPARATOR = object : DiffUtil.ItemCallback<OfflineVideoInfo>() {
+        private val DOWNLOAD_COMPARATOR = object : DiffUtil.ItemCallback<Video>() {
             override fun areItemsTheSame(
-                oldItem: OfflineVideoInfo,
-                newItem: OfflineVideoInfo
+                oldItem: Video,
+                newItem: Video
             ): Boolean = oldItem == newItem
 
             override fun areContentsTheSame(
-                oldItem: OfflineVideoInfo,
-                newItem: OfflineVideoInfo
+                oldItem: Video,
+                newItem: Video
             ): Boolean = oldItem.videoId == newItem.videoId
         }
     }

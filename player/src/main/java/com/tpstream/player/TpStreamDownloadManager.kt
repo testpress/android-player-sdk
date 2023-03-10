@@ -2,7 +2,7 @@ package com.tpstream.player
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.tpstream.player.models.OfflineVideoInfo
+import com.tpstream.player.models.Video
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -10,29 +10,29 @@ import kotlinx.coroutines.runBlocking
 
 class TpStreamDownloadManager(val context: Context) {
 
-    private val offlineVideoInfoRepository = OfflineVideoInfoRepository(context)
+    private val videoRepository = VideoRepository(context)
 
-    fun getAllDownloads(): LiveData<List<OfflineVideoInfo>?> {
-        return offlineVideoInfoRepository.getAllDownloadsInLiveData()
+    fun getAllDownloads(): LiveData<List<Video>?> {
+        return videoRepository.getAllDownloadsInLiveData()
     }
 
-    fun pauseDownload(offlineVideoInfo: OfflineVideoInfo) {
-        DownloadTask(context).pause(offlineVideoInfo)
+    fun pauseDownload(video: Video) {
+        DownloadTask(context).pause(video)
     }
 
-    fun resumeDownload(offlineVideoInfo: OfflineVideoInfo) {
-        DownloadTask(context).resume(offlineVideoInfo)
+    fun resumeDownload(video: Video) {
+        DownloadTask(context).resume(video)
     }
 
-    fun cancelDownload(offlineVideoInfo: OfflineVideoInfo) {
-        deleteDownload(offlineVideoInfo)
+    fun cancelDownload(video: Video) {
+        deleteDownload(video)
     }
 
-    fun deleteDownload(offlineVideoInfo: OfflineVideoInfo) {
+    fun deleteDownload(video: Video) {
         CoroutineScope(Dispatchers.IO).launch {
-            DownloadTask(context).delete(offlineVideoInfo)
-            ImageSaver(context).delete(offlineVideoInfo.videoId)
-            offlineVideoInfoRepository.delete(offlineVideoInfo)
+            DownloadTask(context).delete(video)
+            ImageSaver(context).delete(video.videoId)
+            videoRepository.delete(video)
         }
     }
 }

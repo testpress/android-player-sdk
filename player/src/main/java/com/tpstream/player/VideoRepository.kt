@@ -9,7 +9,9 @@ import com.tpstream.player.models.Video
 import com.tpstream.player.models.VideoInfo
 import com.tpstream.player.models.asVideoInfo
 import com.tpstream.player.models.getVideoState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 internal class VideoRepository(val context: Context) {
@@ -89,12 +91,27 @@ internal class VideoRepository(val context: Context) {
             "/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
         Network<VideoInfo>(params.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
-                callback.onSuccess(result.asVideo())
+                val video = result.asVideo()
+                video.videoId = params.videoId!!
+                storeVideo(video)
+                callback.onSuccess(video)
             }
 
             override fun onFailure(exception: TPException) {
                 callback.onFailure(exception)
             }
         })
+    }
+
+    private fun storeVideo(video: Video){
+        CoroutineScope(Dispatchers.IO).launch {
+            videoDao.insert(video)
+        }
+    }
+
+    fun removeNotDownloadedVideo(){
+        CoroutineScope(Dispatchers.IO).launch {
+            videoDao.removeNotDownloaded()
+        }
     }
 }

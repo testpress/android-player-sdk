@@ -105,7 +105,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private fun getMediaSourceFactory(): MediaSource.Factory {
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build(params))
-        if (video == null) {
+        if (video?.downloadState == null) {
             mediaSourceFactory.setDrmSessionManagerProvider {
                 DefaultDrmSessionManager.Builder().build(
                     CustomHttpDrmMediaCallback(context, params)

@@ -3,10 +3,11 @@ package com.tpstream.player.models
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.tpstream.player.ImageSaver
 
-@Entity(tableName = "OfflineVideoInfo")
+@Entity(indices = [Index(value = ["videoId"], unique = true)])
 class Video(
     @PrimaryKey(autoGenerate = true)
     val id : Long = 0L,

@@ -24,7 +24,11 @@ class Video(
     var downloadState: DownloadStatus? = null,
     var videoWidth: Int = 0,
     var videoHeight: Int = 0
-)
+) {
+
+    internal val isNotDownloaded get() = this.downloadState != DownloadStatus.COMPLETE
+
+}
 
 internal fun Video.asVideoInfo():VideoInfo{
 return VideoInfo(

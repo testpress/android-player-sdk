@@ -64,21 +64,20 @@ internal class VideoRepository(context: Context) {
         params: TpInitParams,
         callback : Network.TPResponse<Video>
     ){
-        if (isVideoAvailable(params, callback)) return
-        fetchVideo(params, callback)
+        val video = getVideoFromDB(params)
+        if (video != null) {
+            callback.onSuccess(video)
+        } else {
+            fetchVideo(params, callback)
+        }
     }
 
-    private fun isVideoAvailable(params: TpInitParams, callback : Network.TPResponse<Video>):Boolean{
+    private fun getVideoFromDB(params: TpInitParams): Video?{
         var video : Video? = null
         runBlocking(Dispatchers.IO) {
             video = videoDao.getVideoByVideoId(params.videoId!!)
         }
-        return if (video != null){
-            callback.onSuccess(video!!)
-            true
-        } else {
-            false
-        }
+        return video
     }
 
     private fun fetchVideo(

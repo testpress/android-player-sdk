@@ -29,11 +29,7 @@ internal interface VideoDao {
     @Query("SELECT * FROM Video WHERE videoId=:videoId")
     fun getVideoById(videoId:String): LiveData<Video?>
 
-    @Query("SELECT * FROM Video")
+    @Query("SELECT * FROM Video WHERE downloadState NOT null")
     fun getAllDownloadInLiveData():LiveData<List<Video>?>
-
-    @Query("DELETE FROM Video WHERE downloadState IS null")
-    suspend fun removeNotDownloaded()
-
 
 }

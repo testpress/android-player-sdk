@@ -64,18 +64,16 @@ internal class VideoRepository(val context: Context) {
         params: TpInitParams,
         callback : Network.TPResponse<Video>
     ){
-        if (isVideoDownloadComplete(params, callback)) return
+        if (isVideoAvailable(params, callback)) return
         fetchVideo(params, callback)
     }
 
-    private fun isVideoDownloadComplete(params: TpInitParams,callback : Network.TPResponse<Video>):Boolean{
+    private fun isVideoAvailable(params: TpInitParams, callback : Network.TPResponse<Video>):Boolean{
         var video : Video? = null
-        var isDownloadComplete = false
         runBlocking(Dispatchers.IO) {
             video = videoDao.getVideoByVideoId(params.videoId!!)
-            if (video != null) isDownloadComplete = DownloadTask(context).isDownloaded(video?.url!!)
         }
-        return if (isDownloadComplete){
+        return if (video != null){
             callback.onSuccess(video!!)
             true
         } else {
@@ -109,9 +107,4 @@ internal class VideoRepository(val context: Context) {
         }
     }
 
-    fun removeNotDownloadedVideo(){
-        CoroutineScope(Dispatchers.IO).launch {
-            videoDao.removeNotDownloaded()
-        }
-    }
 }

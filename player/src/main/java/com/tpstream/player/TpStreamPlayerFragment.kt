@@ -358,7 +358,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onDestroy() {
         super.onDestroy()
-        player.removeNotDownloadedVideo()
         disableAutoFullScreenOnRotate()
     }
 

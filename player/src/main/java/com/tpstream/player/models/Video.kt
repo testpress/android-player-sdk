@@ -3,10 +3,11 @@ package com.tpstream.player.models
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.tpstream.player.ImageSaver
 
-@Entity(tableName = "OfflineVideoInfo")
+@Entity(indices = [Index(value = ["videoId"], unique = true)])
 class Video(
     @PrimaryKey(autoGenerate = true)
     val id : Long = 0L,
@@ -23,7 +24,11 @@ class Video(
     var downloadState: DownloadStatus? = null,
     var videoWidth: Int = 0,
     var videoHeight: Int = 0
-)
+) {
+
+    internal val isNotDownloaded get() = this.downloadState != DownloadStatus.COMPLETE
+
+}
 
 internal fun Video.asVideoInfo():VideoInfo{
 return VideoInfo(

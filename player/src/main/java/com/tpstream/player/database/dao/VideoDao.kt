@@ -17,20 +17,19 @@ internal interface VideoDao {
     @Delete
     suspend fun delete(video: Video)
 
-    @Query("SELECT * FROM OfflineVideoInfo")
+    @Query("SELECT * FROM Video")
     fun getAllVideo():List<Video>?
 
-    @Query("SELECT * FROM OfflineVideoInfo WHERE videoId=:videoID")
+    @Query("SELECT * FROM Video WHERE videoId=:videoID")
     fun getVideoByVideoId(videoID:String): Video?
 
-    @Query("SELECT * FROM OfflineVideoInfo WHERE url=:url")
+    @Query("SELECT * FROM Video WHERE url=:url")
     fun getVideoByUrl(url:String): Video?
 
-    @Query("SELECT * FROM OfflineVideoInfo WHERE videoId=:videoId")
+    @Query("SELECT * FROM Video WHERE videoId=:videoId")
     fun getVideoById(videoId:String): LiveData<Video?>
 
-    @Query("SELECT * FROM OfflineVideoInfo")
+    @Query("SELECT * FROM Video WHERE downloadState NOT null")
     fun getAllDownloadInLiveData():LiveData<List<Video>?>
-
 
 }

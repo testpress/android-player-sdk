@@ -77,10 +77,11 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
         params = parameters
-        videoRepository.fetchVideo(parameters, object :Network.TPResponse<VideoInfo> {
-            override fun onSuccess(result: VideoInfo) {
-                videoInfo = result
-                playVideoInUIThread(result.getPlaybackURL(), parameters.startPositionInMilliSecs)
+        videoRepository.getVideo(parameters, object :Network.TPResponse<Video> {
+            override fun onSuccess(result: Video) {
+                videoInfo = result.asVideoInfo()
+                video = result
+                playVideoInUIThread(result.url, parameters.startPositionInMilliSecs)
             }
 
             override fun onFailure(exception: TPException) {

@@ -7,9 +7,12 @@ import androidx.media3.exoplayer.offline.Download
 import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.Video
 import com.tpstream.player.models.VideoInfo
+import com.tpstream.player.models.asVideoInfo
 import com.tpstream.player.models.getVideoState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
-internal class VideoRepository(context: Context) {
+internal class VideoRepository(val context: Context) {
 
     private val videoDao = TPStreamsDatabase(context).videoDao()
     private val downloadManager = VideoDownloadManager(context).get()
@@ -55,15 +58,38 @@ internal class VideoRepository(context: Context) {
         return videoDao.getAllDownloadInLiveData()
     }
 
-    fun fetchVideo(
+    fun getVideo(
         params: TpInitParams,
-        callback : Network.TPResponse<VideoInfo>
+        callback : Network.TPResponse<Video>
     ){
+        if (isVideoDownloadComplete(params, callback)) return
+        fetchVideo(params, callback)
+    }
+
+    private fun isVideoDownloadComplete(params: TpInitParams,callback : Network.TPResponse<Video>):Boolean{
+        var video : Video? = null
+        var isDownloadComplete = false
+        runBlocking(Dispatchers.IO) {
+            video = videoDao.getVideoByVideoId(params.videoId!!)
+            if (video != null) isDownloadComplete = DownloadTask(context).isDownloaded(video?.url!!)
+        }
+        return if (isDownloadComplete){
+            callback.onSuccess(video!!)
+            true
+        } else {
+            false
+        }
+    }
+
+    private fun fetchVideo(
+        params: TpInitParams,
+        callback : Network.TPResponse<Video>
+    ) {
         val url =
             "/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
         Network<VideoInfo>(params.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
-                callback.onSuccess(result)
+                callback.onSuccess(result.asVideo())
             }
 
             override fun onFailure(exception: TPException) {

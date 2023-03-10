@@ -51,7 +51,7 @@ class RoomMigrationTest {
 
     @Test
     @Throws(IOException::class)
-    fun migrate2To3() {
+    fun testMigration2To3() {
         db = helper.createDatabase(TEST_DB, 2).apply {
             execSQL(
                 """INSERT INTO OfflineVideoInfo VALUES ('1', 'videoID', 'title', 'thumbnail', 'url', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())

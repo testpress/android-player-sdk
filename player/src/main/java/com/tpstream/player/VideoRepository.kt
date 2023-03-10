@@ -14,7 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-internal class VideoRepository(val context: Context) {
+internal class VideoRepository(context: Context) {
 
     private val videoDao = TPStreamsDatabase(context).videoDao()
     private val downloadManager = VideoDownloadManager(context).get()

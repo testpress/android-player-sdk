@@ -57,23 +57,18 @@ internal class VideoRepository(context: Context) {
 
     fun fetchVideo(
         params: TpInitParams,
-        onError:(exception: TPException) -> Unit,
-        onSuccess: OnSuccess
+        callback : Network.TPResponse<VideoInfo>
     ){
         val url =
             "/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
         Network<VideoInfo>(params.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
-                onSuccess.onSuccess(result.asVideo())
+                callback.onSuccess(result)
             }
 
             override fun onFailure(exception: TPException) {
-                onError(exception)
+                callback.onFailure(exception)
             }
         })
     }
-}
-
-internal interface OnSuccess {
-    fun onSuccess(video: Video)
 }

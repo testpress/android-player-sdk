@@ -46,7 +46,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener,TpStreamPlayerImplCallBack {
+class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val _playbackStateListener: Player.Listener = PlayerListener()
     private lateinit var player: TpStreamPlayerImpl
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
@@ -305,10 +305,23 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener,TpStreamPla
 
     private fun initializePlayer() {
         player = TpStreamPlayerImpl(requireContext())
-        player.setTpStreamPlayerImplCallBack(this)
+        setTpStreamPlayerImplCallBack()
         viewBinding.videoView.player = player.exoPlayer
         player.exoPlayer.addListener(_playbackStateListener)
         this.initializationListener?.onInitializationSuccess(player!!)
+    }
+
+    private fun setTpStreamPlayerImplCallBack(){
+        player.setTpStreamPlayerImplCallBack(object : TpStreamPlayerImplCallBack{
+            override fun updateDownloadButtons(parameters: TpInitParams) {
+                requireActivity().runOnUiThread{
+                    if (parameters.isDownloadEnabled){
+                        downloadButton.visibility = View.VISIBLE
+                        updateDownloadButtonImage(parameters.videoId!!)
+                    }
+                }
+            }
+        })
     }
 
     fun setOnInitializationListener(listener: InitializationListener) {
@@ -472,15 +485,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener,TpStreamPla
         ) {
             Log.d(TAG, "onDroppedVideoFrames: ")
             super.onDroppedVideoFrames(eventTime, droppedFrames, elapsedMs)
-        }
-    }
-
-    override fun updateDownloadButtons(parameters: TpInitParams) {
-        requireActivity().runOnUiThread{
-            if (parameters.isDownloadEnabled){
-                downloadButton.visibility = View.VISIBLE
-                updateDownloadButtonImage(parameters.videoId!!)
-            }
         }
     }
 }

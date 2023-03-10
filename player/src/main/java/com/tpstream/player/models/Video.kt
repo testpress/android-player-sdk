@@ -20,7 +20,7 @@ class Video(
     var percentageDownloaded: Int = 0,
     var bytesDownloaded: Long = 0,
     var totalSize: Long = 0,
-    var downloadState: VideoState? = null,
+    var downloadState: DownloadStatus? = null,
     var videoWidth: Int = 0,
     var videoHeight: Int = 0
 )
@@ -40,19 +40,19 @@ return VideoInfo(
 )
 }
 
-enum class VideoState {
+enum class DownloadStatus {
     PAUSE,
     DOWNLOADING,
     COMPLETE,
     FAILED
 }
 
-internal fun getVideoState(int:Int):VideoState?{
+internal fun getVideoState(int:Int):DownloadStatus?{
     return when(int){
-        1 -> VideoState.PAUSE
-        2 -> VideoState.DOWNLOADING
-        3 -> VideoState.COMPLETE
-        4 -> VideoState.FAILED
+        1 -> DownloadStatus.PAUSE
+        2 -> DownloadStatus.DOWNLOADING
+        3 -> DownloadStatus.COMPLETE
+        4 -> DownloadStatus.FAILED
         else -> null
     }
 }

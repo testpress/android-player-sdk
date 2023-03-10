@@ -18,7 +18,7 @@ import com.tpstream.app.databinding.ActivityDownloadListBinding
 import com.tpstream.app.databinding.DownloadItemBinding
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.models.Video
-import com.tpstream.player.models.VideoState
+import com.tpstream.player.models.DownloadStatus
 import com.tpstream.player.models.getLocalThumbnail
 
 class DownloadListActivity : AppCompatActivity() {
@@ -67,29 +67,29 @@ class DownloadListActivity : AppCompatActivity() {
                 showOrHideButtons(video.downloadState)
             }
 
-            private fun getDownloadImage(videoState: VideoState?): Int {
+            private fun getDownloadImage(videoState: DownloadStatus?): Int {
                 return when (videoState) {
-                    VideoState.DOWNLOADING -> com.tpstream.player.R.drawable.ic_baseline_downloading_24
-                    VideoState.PAUSE -> com.tpstream.player.R.drawable.ic_baseline_pause_circle_filled_24
+                    DownloadStatus.DOWNLOADING -> com.tpstream.player.R.drawable.ic_baseline_downloading_24
+                    DownloadStatus.PAUSE -> com.tpstream.player.R.drawable.ic_baseline_pause_circle_filled_24
                     else -> com.tpstream.player.R.drawable.ic_baseline_file_download_done_24
                 }
             }
 
-            private fun showOrHideButtons(videoState: VideoState?) {
+            private fun showOrHideButtons(videoState: DownloadStatus?) {
                 when (videoState) {
-                    VideoState.DOWNLOADING -> {
+                    DownloadStatus.DOWNLOADING -> {
                         deleteButton.visibility = View.GONE
                         cancelButton.visibility = View.VISIBLE
                         pauseButton.visibility = View.VISIBLE
                         resumeButton.visibility = View.GONE
                     }
-                    VideoState.PAUSE -> {
+                    DownloadStatus.PAUSE -> {
                         deleteButton.visibility = View.GONE
                         cancelButton.visibility = View.VISIBLE
                         pauseButton.visibility = View.GONE
                         resumeButton.visibility = View.VISIBLE
                     }
-                    VideoState.COMPLETE -> {
+                    DownloadStatus.COMPLETE -> {
                         deleteButton.visibility = View.VISIBLE
                         cancelButton.visibility = View.GONE
                         pauseButton.visibility = View.GONE
@@ -118,7 +118,7 @@ class DownloadListActivity : AppCompatActivity() {
             holder.pauseButton.setOnClickListener { downloadListViewModel.pauseDownload(video) }
             holder.resumeButton.setOnClickListener { downloadListViewModel.resumeDownload(video) }
             holder.thumbnail.setOnClickListener {
-                if (video.downloadState == VideoState.COMPLETE) {
+                if (video.downloadState == DownloadStatus.COMPLETE) {
                     playVideo(video)
                 } else {
                     Toast.makeText(applicationContext, "Downloading", Toast.LENGTH_SHORT).show()

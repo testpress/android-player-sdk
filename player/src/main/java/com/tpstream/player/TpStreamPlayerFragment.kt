@@ -26,7 +26,7 @@ import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
-import com.tpstream.player.models.VideoState
+import com.tpstream.player.models.DownloadStatus
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet
 import com.tpstream.player.views.DownloadResolutionSelectionSheet
 import com.tpstream.player.views.ResolutionOptions
@@ -50,7 +50,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private lateinit var videoViewModel: VideoViewModel
     private lateinit var downloadButton : ImageButton
     private lateinit var resolutionButton : ImageButton
-    private var downloadState : VideoState? = null
+    private var downloadState : DownloadStatus? = null
     private var showDownloadButton = false
     private var startPosition : Long = -1L
     private var drmLicenseRetries = 0
@@ -119,7 +119,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun onResolutionButtonClick() {
-        if (downloadState == VideoState.COMPLETE) {
+        if (downloadState == DownloadStatus.COMPLETE) {
             Toast.makeText(requireContext(), "Quality Unavailable", Toast.LENGTH_SHORT).show()
         } else {
             val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
@@ -149,10 +149,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun onDownloadButtonClick() {
         when (downloadState) {
-            VideoState.COMPLETE -> {
+            DownloadStatus.COMPLETE -> {
                 Toast.makeText(requireContext(), "Download complete", Toast.LENGTH_SHORT).show()
             }
-            VideoState.DOWNLOADING -> {
+            DownloadStatus.DOWNLOADING -> {
                 Toast.makeText(requireContext(), "Downloading", Toast.LENGTH_SHORT).show()
             }
             else -> {
@@ -301,13 +301,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
         videoViewModel.get(params.videoId!!).observe(viewLifecycleOwner) { video ->
             downloadState = when (video?.downloadState) {
-                VideoState.DOWNLOADING ->{
+                DownloadStatus.DOWNLOADING ->{
                     downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
-                    VideoState.DOWNLOADING
+                    DownloadStatus.DOWNLOADING
                 }
-                VideoState.COMPLETE ->{
+                DownloadStatus.COMPLETE ->{
                     downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-                    VideoState.COMPLETE
+                    DownloadStatus.COMPLETE
                 }
                 else -> {
                     downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)

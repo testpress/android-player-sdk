@@ -84,9 +84,10 @@ internal class VideoRepository(context: Context) {
         params: TpInitParams,
         callback : Network.TPResponse<Video>
     ) {
-        val url =
-            "/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
-        Network<VideoInfo>(params.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
+        val url =BuildConfig.VIDEO_FETCH_URL.format(params.orgCode,params.videoId,params.accessToken)
+        Log.d("TAG", "fetchVideo: $url")
+            //"/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
+        Network<VideoInfo>().get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
                 val video = result.asVideo()
                 video.videoId = params.videoId!!

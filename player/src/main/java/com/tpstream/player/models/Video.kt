@@ -41,7 +41,8 @@ return VideoInfo(
     null,
     duration,
     description,
-    transcodingStatus
+    transcodingStatus,
+    null
 )
 }
 

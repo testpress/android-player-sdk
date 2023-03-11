@@ -147,7 +147,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             .setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
-                    .setLicenseUri("https://c55b-183-82-177-247.in.ngrok.io/api/v2.5/drm_license_key/${params.videoId}/?access_token=${params.accessToken}")
+                    .setLicenseUri(BuildConfig.DRM_LICENSE_URL.format(params.orgCode,params.videoId,params.accessToken))
                     .build()
             ).build()
     }

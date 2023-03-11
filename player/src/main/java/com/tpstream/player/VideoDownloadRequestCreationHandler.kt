@@ -36,6 +36,7 @@ internal class VideoDownloadRequestCreationHandler(
             .setDrmConfiguration(
                 DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
+                    .setLicenseUri("https://c55b-183-82-177-247.in.ngrok.io/api/v2.5/drm_license_key/${player.params.videoId}/?access_token=${player.params.accessToken}&drm_type=widevine&download=true")
                     .build()
             )
             .build()
@@ -54,7 +55,7 @@ internal class VideoDownloadRequestCreationHandler(
             trackSelectionParameters,
             renderersFactory,
             dataSourceFactory,
-            sessionManager
+            null
         )
     }
 

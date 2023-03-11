@@ -104,15 +104,34 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private fun getMediaSourceFactory(): MediaSource.Factory {
         val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build(params))
-        if (video?.isNotDownloaded!!) {
-            mediaSourceFactory.setDrmSessionManagerProvider {
-                DefaultDrmSessionManager.Builder().build(
-                    CustomHttpDrmMediaCallback(context, params)
-                )
-            }
-        }
+//        if (video?.isNotDownloaded!!) {
+//            mediaSourceFactory.setDrmSessionManagerProvider {
+//                DefaultDrmSessionManager.Builder().build(
+//                    CustomHttpDrmMediaCallback(context, params)
+//                )
+//            }
+//        }
         return mediaSourceFactory
     }
+
+//    object URLUtil {
+//
+//        fun getDRMLicenseUrl(parameters: TpInitParams):String{
+//            return if (BuildConfig.ISTPSTREAMS){
+//                "https://app.tpstreams.com/api/v1/${parameters.orgCode}/assets/${parameters.videoId}/drm_license/?access_token=${parameters.accessToken}&drm_type=widevine&download=true"
+//            } else {
+//                "https://${parameters.orgCode}.testpress.in/api/v2.5/drm_license_key/${parameters.videoId}/?access_token=${parameters.accessToken}&drm_type=widevine&download=true"
+//            }
+//        }
+//
+//        fun getVideoFetchUrl(parameters: TpInitParams):String{
+//            return if (BuildConfig.ISTPSTREAMS){
+//                "https://app.tpstreams.com/api/v1/${parameters.orgCode}/assets/${parameters.videoId}/?access_token=${parameters.accessToken}"
+//            } else {
+//                "https://${parameters.orgCode}.testpress.in/api/v2.5/video_info/${parameters.videoId}/?access_token=${parameters.accessToken}"
+//            }
+//        }
+//    }
 
     private fun getMediaItem(url: String): MediaItem {
         val downloadRequest: DownloadRequest? = VideoDownload.getDownloadRequest(url, context)
@@ -128,6 +147,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             .setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
+                    .setLicenseUri("https://c55b-183-82-177-247.in.ngrok.io/api/v2.5/drm_license_key/${params.videoId}/?access_token=${params.accessToken}")
                     .build()
             ).build()
     }

@@ -48,12 +48,11 @@ internal object OfflineDRMLicenseHelper {
         )
         val drmInitData =
             DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
-        return OfflineLicenseHelper(
-            sessionManager,
+        return OfflineLicenseHelper.newWidevineInstance(
+            "https://c55b-183-82-177-247.in.ngrok.io/api/v2.5/drm_license_key/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+            VideoDownloadManager.invoke(context).getHttpDataSourceFactory(tpInitParams),
             DrmSessionEventListener.EventDispatcher()
-        ).downloadLicense(
-            drmInitData!!
-        )
+        ).downloadLicense(drmInitData!!)
     }
 
     private fun replaceKeysInExistingDownloadedVideo(
@@ -110,13 +109,12 @@ internal object OfflineDRMLicenseHelper {
         downloadHelper: DownloadHelper,
         callback: DRMLicenseFetchCallback
     ) {
-        val sessionManager = DefaultDrmSessionManager.Builder()
-            .build(
-                CustomHttpDrmMediaCallback(context, tpInitParams)
+
+        val offlineLicenseHelper =OfflineLicenseHelper.newWidevineInstance(
+                "https://c55b-183-82-177-247.in.ngrok.io/api/v2.5/drm_license_key/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+                VideoDownloadManager.invoke(context).getHttpDataSourceFactory(tpInitParams),
+                DrmSessionEventListener.EventDispatcher()
             )
-        val offlineLicenseHelper = OfflineLicenseHelper(
-            sessionManager, DrmSessionEventListener.EventDispatcher()
-        )
         val format = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
         CoroutineScope(Dispatchers.IO).launch {
             try {

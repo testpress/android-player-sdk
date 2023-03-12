@@ -55,7 +55,7 @@ public interface TpStreamPlayer {
 
 internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     lateinit var params: TpInitParams
-    lateinit var videoInfo: VideoInfo
+    lateinit var videoInfo: NetworkVideo
     var video: Video? = null
     var _listener: TPStreamPlayerListener? = null
     lateinit var exoPlayer: ExoPlayer

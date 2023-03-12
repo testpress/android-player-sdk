@@ -30,8 +30,8 @@ class Video(
 
 }
 
-internal fun Video.asVideoInfo():VideoInfo{
-return VideoInfo(
+internal fun Video.asVideoInfo():NetworkVideo{
+return NetworkVideo(
     title,
     thumbnail,
     null,
@@ -41,7 +41,11 @@ return VideoInfo(
     null,
     duration,
     description,
-    transcodingStatus
+    transcodingStatus,
+    videoId,
+    null,
+    null,
+    null
 )
 }
 

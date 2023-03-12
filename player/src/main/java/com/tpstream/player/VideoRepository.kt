@@ -85,6 +85,7 @@ internal class VideoRepository(context: Context) {
         callback : Network.TPResponse<Video>
     ) {
         val url =BuildConfig.VIDEO_FETCH_URL.format(params.orgCode,params.videoId,params.accessToken)
+        //val drmUrl = BuildConfig.DRM_LICENSE_URL.format(params.orgCode,params.videoId,params.accessToken)
         Log.d("TAG", "fetchVideo: $url")
             //"/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
         Network<VideoInfo>().get(url, object : Network.TPResponse<VideoInfo> {

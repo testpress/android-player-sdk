@@ -1,11 +1,10 @@
 {
   "product" : "tpStreams",
-  "testpress_base_url" : "\"https://%s.testpress.in",
-  "tpStreams_base_url" : "\"https://app.tpstreams.com",
-  "testpress_video_fetch_path" : "/api/v2.5/video_info/%s/?access_token=%s\"",
-  "tpStreams_video_fetch_path" : "/api/v1/%s/assets/%s/?access_token=%s\"",
-  "testpress_drm_license_path" : "/api/v2.5/drm_license_key/%s/?access_token=%s\"",
-  "tpStreams_drm_license_path" : "/api/v1/%s/assets/%s/drm_license/?access_token=%s\"",
-  "testpress_download_drm_license_path" : "/api/v2.5/drm_license_key/${parameters.videoId}/?access_token=${parameters.accessToken}&drm_type=widevine&download=true\"",
-  "tpStreams_download_drm_license_path" : "/api/v1/${parameters.orgCode}/assets/${parameters.videoId}/drm_license/?access_token=${parameters.accessToken}&drm_type=widevine&download=true\""
+  "testpress_base_url" : "https://%s.testpress.in",
+  "tpStreams_base_url" : "https://app.tpstreams.com",
+  "testpress_video_fetch_path" : "/api/v2.5/video_info/%s/?access_token=%s",
+  "tpStreams_video_fetch_path" : "/api/v1/%s/assets/%s/?access_token=%s",
+  "testpress_drm_license_path" : "/api/v2.5/drm_license_key/%s/?access_token=%s",
+  "tpStreams_drm_license_path" : "/api/v1/%s/assets/%s/drm_license/?access_token=%s",
+  "drm_license_download_params" : "&drm_type=widevine&download=true"
 }

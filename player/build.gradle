@@ -27,13 +27,14 @@ android {
             }
         }
 
-        //buildConfigField "String", "VIDEO_FETCH_URL", json.
         if (json.product == "testpress") {
-            buildConfigField "String", "VIDEO_FETCH_URL", json.testpress_base_url+json.testpress_video_fetch_path
+            buildConfigField "String", "VIDEO_FETCH_URL", "\"" +json.testpress_base_url+json.testpress_video_fetch_path + "\""
             buildConfigField "String", "DRM_LICENSE_URL", json.testpress_base_url+json.testpress_drm_license_path
+            buildConfigField "String", "DOWNLOAD_DRM_LICENSE_URL", "\"" + json.testpress_base_url+json.testpress_video_fetch_path+json.drm_license_download_params + "\""
         } else {
-            buildConfigField "String", "VIDEO_FETCH_URL", json.tpStreams_base_url+json.tpStreams_video_fetch_path
-            buildConfigField "String", "DRM_LICENSE_URL", json.tpStreams_base_url+json.tpStreams_drm_license_path
+            buildConfigField "String", "VIDEO_FETCH_URL", "\"" + json.tpStreams_base_url+json.tpStreams_video_fetch_path + "\""
+            buildConfigField "String", "DRM_LICENSE_URL", "\"" + json.tpStreams_base_url+json.tpStreams_drm_license_path + "\""
+            buildConfigField "String", "DOWNLOAD_DRM_LICENSE_URL", "\"" + json.tpStreams_base_url+json.tpStreams_drm_license_path+json.drm_license_download_params + "\""
         }
     }
 

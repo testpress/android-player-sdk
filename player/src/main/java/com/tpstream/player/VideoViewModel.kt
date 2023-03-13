@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tpstream.player.models.DatabaseVideo
 import com.tpstream.player.models.Video
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,19 +14,19 @@ internal class VideoViewModel(private val videoRepository: VideoRepository):View
 
     fun get(videoId: String): LiveData<Video?> {
         return Transformations.map(videoRepository.get(videoId)) {
-            it
+            it?.asDomainVideo()
         }
     }
 
     fun insert(video: Video){
         viewModelScope.launch{
-            videoRepository.insert(video)
+            videoRepository.insert(video.asDatabaseVideo())
         }
     }
 
     fun delete(videoId: String){
         viewModelScope.launch {
-            var video : Video? = null
+            var video : DatabaseVideo? = null
             runBlocking(Dispatchers.IO) {
                 video = videoRepository.getVideoByVideoId(videoId)
             }

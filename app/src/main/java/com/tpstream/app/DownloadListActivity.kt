@@ -19,7 +19,6 @@ import com.tpstream.app.databinding.DownloadItemBinding
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.models.Video
 import com.tpstream.player.models.DownloadStatus
-import com.tpstream.player.models.getLocalThumbnail
 
 class DownloadListActivity : AppCompatActivity() {
 

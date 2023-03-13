@@ -32,7 +32,7 @@ internal class DownloadResolutionSelectionSheet(
 
     private var _binding: TpDownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
-    private val video = player.videoInfo?.asVideo()
+    private val video = player.video
     private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()

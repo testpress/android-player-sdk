@@ -7,7 +7,6 @@ import android.net.NetworkInfo
 import android.net.Uri
 import androidx.media3.common.Format
 import androidx.media3.exoplayer.dash.DashUtil
-import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.DrmSessionEventListener
 import androidx.media3.exoplayer.drm.OfflineLicenseHelper
@@ -43,17 +42,13 @@ internal object OfflineDRMLicenseHelper {
         val dataSource =
             VideoDownloadManager(context).getHttpDataSourceFactory().createDataSource()
         val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
-        val sessionManager = DefaultDrmSessionManager.Builder().build(
-            CustomHttpDrmMediaCallback(context, tpInitParams)
-        )
         val drmInitData =
             DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
-        return OfflineLicenseHelper(
-            sessionManager,
+        return OfflineLicenseHelper.newWidevineInstance(
+            "https://${tpInitParams.orgCode}.testpress.in/api/v2.5/drm_license_key/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+            VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
             DrmSessionEventListener.EventDispatcher()
-        ).downloadLicense(
-            drmInitData!!
-        )
+        ).downloadLicense(drmInitData!!)
     }
 
     private fun replaceKeysInExistingDownloadedVideo(
@@ -110,12 +105,10 @@ internal object OfflineDRMLicenseHelper {
         downloadHelper: DownloadHelper,
         callback: DRMLicenseFetchCallback
     ) {
-        val sessionManager = DefaultDrmSessionManager.Builder()
-            .build(
-                CustomHttpDrmMediaCallback(context, tpInitParams)
-            )
-        val offlineLicenseHelper = OfflineLicenseHelper(
-            sessionManager, DrmSessionEventListener.EventDispatcher()
+        val offlineLicenseHelper = OfflineLicenseHelper.newWidevineInstance(
+            "https://${tpInitParams.orgCode}.testpress.in/api/v2.5/drm_license_key/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+            VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
+            DrmSessionEventListener.EventDispatcher()
         )
         val format = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
         CoroutineScope(Dispatchers.IO).launch {

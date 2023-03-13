@@ -5,7 +5,6 @@ import android.os.Handler
 import android.os.Looper
 import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
@@ -97,16 +96,8 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
-        val mediaSourceFactory = DefaultMediaSourceFactory(context)
+        return DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build(params))
-        if (video?.isNotDownloaded!!) {
-            mediaSourceFactory.setDrmSessionManagerProvider {
-                DefaultDrmSessionManager.Builder().build(
-                    CustomHttpDrmMediaCallback(context, params)
-                )
-            }
-        }
-        return mediaSourceFactory
     }
 
     private fun getMediaItem(url: String): MediaItem {
@@ -123,6 +114,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             .setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
+                    .setLicenseUri("https://${params.orgCode}.testpress.in/api/v2.5/drm_license_key/${params.videoId}/?access_token=${params.accessToken}&drm_type=widevine")
                     .build()
             ).build()
     }

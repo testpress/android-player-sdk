@@ -109,12 +109,13 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun buildMediaItem(url: String): MediaItem {
+        val drmLicenseURL = BuildConfig.DRM_LICENSE_URL.format(params.orgCode,params.videoId,params.accessToken)
         return MediaItem.Builder()
             .setUri(url)
             .setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
-                    .setLicenseUri("https://${params.orgCode}.testpress.in/api/v2.5/drm_license_key/${params.videoId}/?access_token=${params.accessToken}&drm_type=widevine")
+                    .setLicenseUri(drmLicenseURL)
                     .build()
             ).build()
     }

@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+internal const val OFFLINE_DRM_LICENSE_PARAMS = "&drm_type=widevine&download=true"
 
 internal object OfflineDRMLicenseHelper {
 
@@ -44,8 +45,9 @@ internal object OfflineDRMLicenseHelper {
         val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
         val drmInitData =
             DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
+        val drmLicenseURL = "${BuildConfig.DRM_LICENSE_URL.format(tpInitParams.orgCode,tpInitParams.videoId,tpInitParams.accessToken)}$OFFLINE_DRM_LICENSE_PARAMS"
         return OfflineLicenseHelper.newWidevineInstance(
-            "https://${tpInitParams.orgCode}.testpress.in/api/v2.5/drm_license_key/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+            drmLicenseURL,
             VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
             DrmSessionEventListener.EventDispatcher()
         ).downloadLicense(drmInitData!!)
@@ -105,8 +107,9 @@ internal object OfflineDRMLicenseHelper {
         downloadHelper: DownloadHelper,
         callback: DRMLicenseFetchCallback
     ) {
+        val drmLicenseURL = "${BuildConfig.DRM_LICENSE_URL.format(tpInitParams.orgCode,tpInitParams.videoId,tpInitParams.accessToken)}$OFFLINE_DRM_LICENSE_PARAMS"
         val offlineLicenseHelper = OfflineLicenseHelper.newWidevineInstance(
-            "https://${tpInitParams.orgCode}.testpress.in/api/v2.5/drm_license_key/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}&drm_type=widevine&download=true",
+            drmLicenseURL,
             VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
             DrmSessionEventListener.EventDispatcher()
         )

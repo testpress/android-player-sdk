@@ -1,0 +1,9 @@
+{
+  "provider" : "tpstreams",
+  "testpress_base_url" : "https://%s.testpress.in",
+  "tpStreams_base_url" : "https://app.tpstreams.com",
+  "testpress_video_path" : "/api/v2.5/video_info/%s/?access_token=%s",
+  "tpStreams_video_path" : "/api/v1/%s/assets/%s/?access_token=%s",
+  "testpress_drm_license_path" : "/api/v2.5/drm_license_key/%s/?access_token=%s",
+  "tpStreams_drm_license_path" : "/api/v1/%s/assets/%s/drm_license/?access_token=%s"
+}

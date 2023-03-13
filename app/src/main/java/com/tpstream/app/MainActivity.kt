@@ -13,19 +13,31 @@ class MainActivity : AppCompatActivity() {
 
     fun buttonClick(view: View) {
         val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter","DRM")
+        myIntent.putExtra("VideoParameter","TP_DRM")
         startActivity(myIntent)
     }
 
     fun buttonClick2(view: View) {
         val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter","AES Encrypt")
+        myIntent.putExtra("VideoParameter","TP_AES_Encrypt")
         startActivity(myIntent)
     }
 
     fun buttonClick3(view: View) {
         val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter","Clear")
+        myIntent.putExtra("VideoParameter","TP_NON_DRM")
+        startActivity(myIntent)
+    }
+
+    fun buttonClick4(view: View) {
+        val myIntent = Intent(this, PlayerActivity::class.java)
+        myIntent.putExtra("VideoParameter","TPS_DRM")
+        startActivity(myIntent)
+    }
+
+    fun buttonClick5(view: View) {
+        val myIntent = Intent(this, PlayerActivity::class.java)
+        myIntent.putExtra("VideoParameter","TPS_NON_DRM")
         startActivity(myIntent)
     }
 

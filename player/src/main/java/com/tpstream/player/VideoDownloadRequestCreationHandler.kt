@@ -31,12 +31,13 @@ internal class VideoDownloadRequestCreationHandler(
     init {
         val url = player.video?.url!!
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
+        val drmLicenseURL = "${BuildConfig.DRM_LICENSE_URL.format(player.params.orgCode,player.params.videoId,player.params.accessToken)}$OFFLINE_DRM_LICENSE_PARAMS"
         mediaItem = MediaItem.Builder()
             .setUri(url)
             .setDrmConfiguration(
                 DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
-                    .setLicenseUri("https://${player.params.orgCode}.testpress.in/api/v2.5/drm_license_key/${player.params.videoId}/?access_token=${player.params.accessToken}&drm_type=widevine&download=true")
+                    .setLicenseUri(drmLicenseURL)
                     .build()
             )
             .build()

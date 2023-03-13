@@ -5,7 +5,10 @@ import android.content.Context
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
+import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.Video
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 internal class DownloadTask (val context: Context) {
 

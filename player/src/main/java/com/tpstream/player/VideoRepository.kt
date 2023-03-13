@@ -60,11 +60,11 @@ internal class VideoRepository(context: Context) {
 
     fun getVideo(
         params: TpInitParams,
-        callback : Network.TPResponse<NetworkVideo>
+        callback : Network.TPResponse<DomainVideo>
     ){
         val video = getVideoFromDB(params)
         if (video != null) {
-            callback.onSuccess(video.asNetworkVideo())
+            callback.onSuccess(video.asDomainVideo())
         } else {
             fetchVideo(params, callback)
         }
@@ -80,7 +80,7 @@ internal class VideoRepository(context: Context) {
 
     private fun fetchVideo(
         params: TpInitParams,
-        callback : Network.TPResponse<NetworkVideo>
+        callback : Network.TPResponse<DomainVideo>
     ) {
         val url = "https://${params.orgCode}.testpress.in/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
         Network<NetworkVideo>().get(url, object : Network.TPResponse<NetworkVideo> {
@@ -88,7 +88,7 @@ internal class VideoRepository(context: Context) {
                 val video = result.asDomainVideo()
                 video.videoId = params.videoId!!
                 storeVideo(video)
-                callback.onSuccess(video.asNetworkVideo())
+                callback.onSuccess(video)
             }
 
             override fun onFailure(exception: TPException) {

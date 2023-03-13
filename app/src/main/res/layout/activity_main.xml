@@ -24,6 +24,14 @@
             android:textColor="#000000"
             android:textSize="24sp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Testpress"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
         <Button
             android:id="@+id/button"
             android:layout_width="wrap_content"
@@ -49,7 +57,33 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:onClick="buttonClick3"
-            android:text="Clear Video" />
+            android:text="Non DRM" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="TP Streams"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:onClick="buttonClick4"
+            android:text="DRM" />
+
+        <Button
+            android:id="@+id/button6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:onClick="buttonClick5"
+            android:text="Non DRM" />
 
     </LinearLayout>
 

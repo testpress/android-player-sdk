@@ -85,8 +85,8 @@ internal class VideoRepository(context: Context) {
         callback : Network.TPResponse<Video>
     ) {
         val url =
-            "/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
-        Network<VideoInfo>(params.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
+            "https://${params.orgCode}.testpress.in/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
+        Network<VideoInfo>().get(url, object : Network.TPResponse<VideoInfo> {
             override fun onSuccess(result: VideoInfo) {
                 val video = result.asVideo()
                 video.videoId = params.videoId!!

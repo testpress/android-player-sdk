@@ -1,12 +1,10 @@
 package com.tpstream.player
 
-import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
 import okhttp3.*
 import java.io.IOException
 import java.net.URL
 
-@VisibleForTesting
 internal class Network<T : Any>(val klass: Class<T>) {
     companion object {
         inline operator fun <reified T : Any>invoke() = Network(T::class.java)

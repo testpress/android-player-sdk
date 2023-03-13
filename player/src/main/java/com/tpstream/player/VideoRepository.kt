@@ -1,5 +1,6 @@
 package com.tpstream.player
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -84,19 +85,9 @@ internal class VideoRepository(context: Context) {
         params: TpInitParams,
         callback : Network.TPResponse<Video>
     ) {
-        val testpressUrl = "https://${params.orgCode}.testpress.in/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
-        val tpstreamsUrl = "https://app.tpstreams.com/api/v1/${params.orgCode}/assets/${params.videoId}/?access_token=${params.accessToken}"
-
-        val url = if (params.videoId?.length!! >20) {
-            tpstreamsUrl
-        } else {
-            testpressUrl
-        }
-
+        val url = "https://${params.orgCode}.testpress.in/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
         Network<NetworkVideo>().get(url, object : Network.TPResponse<NetworkVideo> {
             override fun onSuccess(result: NetworkVideo) {
-                Log.d("TAG", "onSuccess: $result")
-                Log.d("TAG", "onSuccess: ${result.video.toString()?:"Null"}")
                 val video = result.asVideo()
                 video.videoId = params.videoId!!
                 storeVideo(video)

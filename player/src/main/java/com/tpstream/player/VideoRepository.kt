@@ -1,12 +1,13 @@
 package com.tpstream.player
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.media3.exoplayer.offline.Download
 import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.Video
-import com.tpstream.player.models.VideoInfo
+import com.tpstream.player.models.NetworkVideo
 import com.tpstream.player.models.asVideoInfo
 import com.tpstream.player.models.getVideoState
 import kotlinx.coroutines.CoroutineScope
@@ -84,10 +85,9 @@ internal class VideoRepository(context: Context) {
         params: TpInitParams,
         callback : Network.TPResponse<Video>
     ) {
-        val url =
-            "/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
-        Network<VideoInfo>(params.orgCode).get(url, object : Network.TPResponse<VideoInfo> {
-            override fun onSuccess(result: VideoInfo) {
+        val url = "https://${params.orgCode}.testpress.in/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
+        Network<NetworkVideo>().get(url, object : Network.TPResponse<NetworkVideo> {
+            override fun onSuccess(result: NetworkVideo) {
                 val video = result.asVideo()
                 video.videoId = params.videoId!!
                 storeVideo(video)

@@ -17,7 +17,7 @@ internal class CustomHttpDrmMediaCallback(context: Context, private val tpInitPa
         val url = "/api/v2.5/drm_license/${tpInitParams.videoId}/?access_token=${tpInitParams.accessToken}"
         val body: RequestBody = ("{\"download\":true}").toRequestBody("application/json".toMediaTypeOrNull())
         return try {
-            val result = Network<DRMLicenseURL>(tpInitParams.orgCode).post(url, body)
+            val result = Network<DRMLicenseURL>().post(url, body)
             result?.licenseUrl ?: ""
         } catch (exception:TPException){
             SentryLogger.logAPIException(exception,tpInitParams)

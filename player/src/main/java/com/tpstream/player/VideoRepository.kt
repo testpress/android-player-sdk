@@ -60,7 +60,7 @@ internal class VideoRepository(context: Context) {
 
     fun getVideo(
         params: TpInitParams,
-        callback : Network.TPResponse<DomainVideo>
+        callback : Network.TPResponse<Video>
     ){
         val video = getVideoFromDB(params)
         if (video != null) {
@@ -80,7 +80,7 @@ internal class VideoRepository(context: Context) {
 
     private fun fetchVideo(
         params: TpInitParams,
-        callback : Network.TPResponse<DomainVideo>
+        callback : Network.TPResponse<Video>
     ) {
         val url = "https://${params.orgCode}.testpress.in/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
         Network<NetworkVideo>().get(url, object : Network.TPResponse<NetworkVideo> {
@@ -97,7 +97,7 @@ internal class VideoRepository(context: Context) {
         })
     }
 
-    private fun storeVideo(video: DomainVideo){
+    private fun storeVideo(video: Video){
         CoroutineScope(Dispatchers.IO).launch {
             videoDao.insert(video.asDatabaseVideo())
         }

@@ -23,8 +23,8 @@ internal class DatabaseVideo(
     var videoHeight: Int = 0
 ) {
 
-    fun asDomainVideo():DomainVideo {
-        return DomainVideo(
+    fun asDomainVideo():Video {
+        return Video(
             id = this.id,
             videoId = this.videoId,
             title = this.title,
@@ -43,7 +43,7 @@ internal class DatabaseVideo(
     }
 }
 
-internal fun List<DatabaseVideo>.asDomainVideos(): List<DomainVideo> {
+internal fun List<DatabaseVideo>.asDomainVideos(): List<Video> {
     return map {
         it.asDomainVideo()
     }

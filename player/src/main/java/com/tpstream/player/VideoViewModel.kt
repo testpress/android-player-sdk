@@ -5,20 +5,20 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tpstream.player.models.DatabaseVideo
-import com.tpstream.player.models.DomainVideo
+import com.tpstream.player.models.Video
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 internal class VideoViewModel(private val videoRepository: VideoRepository):ViewModel() {
 
-    fun get(videoId: String): LiveData<DomainVideo?> {
+    fun get(videoId: String): LiveData<Video?> {
         return Transformations.map(videoRepository.get(videoId)) {
             it?.asDomainVideo()
         }
     }
 
-    fun insert(video: DomainVideo){
+    fun insert(video: Video){
         viewModelScope.launch{
             videoRepository.insert(video.asDatabaseVideo())
         }

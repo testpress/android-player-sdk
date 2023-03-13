@@ -26,10 +26,11 @@ internal data class NetworkVideo(
     val id: String?,
     val bytes: Long?,
     val type: String?,
-    val video: Video?
+    @SerializedName("video")
+    val videoDetails: VideoDetails?
 ) {
 
-    inner class Video(
+    inner class VideoDetails(
         val progress: Int?,
         val thumbnails: Array<String>?,
         val status: String?,
@@ -43,36 +44,14 @@ internal data class NetworkVideo(
         val enable_drm: Boolean?
     )
 
-    fun getPlaybackURL():String{
-        return dashUrl ?: url ?: ""
-    }
-
-    fun asDatabaseVideo():DatabaseVideo {
-        val thumbnailUrl = if (video != null) video.preview_thumbnail_url?:"" else thumbnail?:""
-        val url = if (video != null){
-            if (video.enable_drm == true) video.dash_url?:"" else video.playback_url?:""
+    fun asDomainVideo():Video {
+        val thumbnailUrl = if (videoDetails != null) videoDetails.preview_thumbnail_url?:"" else thumbnail?:""
+        val url = if (videoDetails != null){
+            if (videoDetails.enable_drm == true) videoDetails.dash_url?:"" else videoDetails.playback_url?:""
         } else {
             dashUrl?:url?:""
         }
-        return DatabaseVideo(
-            videoId = this.id?:"",
-            title = this.title?:"",
-            thumbnail = thumbnailUrl,
-            url = url,
-            duration = duration?:"",
-            description = description?:"",
-            transcodingStatus = transcodingStatus?:""
-        )
-    }
-
-    fun asDomainVideo():DomainVideo {
-        val thumbnailUrl = if (video != null) video.preview_thumbnail_url?:"" else thumbnail?:""
-        val url = if (video != null){
-            if (video.enable_drm == true) video.dash_url?:"" else video.playback_url?:""
-        } else {
-            dashUrl?:url?:""
-        }
-        return DomainVideo(
+        return Video(
             videoId = this.id?:"",
             title = this.title?:"",
             thumbnail = thumbnailUrl,

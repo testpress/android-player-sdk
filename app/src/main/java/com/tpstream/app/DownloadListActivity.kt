@@ -129,7 +129,7 @@ class DownloadListActivity : AppCompatActivity() {
             val intent = Intent(this@DownloadListActivity, PlayerActivity::class.java)
             intent.putExtra(
                 TP_OFFLINE_PARAMS,
-                TpInitParams.createOfflineParams(video.videoId)
+                TpInitParams.createOfflineParams(video.videoId,"demoveranda")
             )
             startActivity(intent)
         }

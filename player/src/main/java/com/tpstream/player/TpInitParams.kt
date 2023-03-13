@@ -55,9 +55,6 @@ data class TpInitParams (
         fun enableDownloadSupport(isDownloadEnabled: Boolean) = apply { this.isDownloadEnabled = isDownloadEnabled }
 
         fun build(): TpInitParams {
-            if (orgCode == null) {
-                throw Exception("orgCode should be provided")
-            }
 
             return TpInitParams(
                 autoPlay,
@@ -67,9 +64,9 @@ data class TpInitParams (
                 maxVideoBitrateKbps,
                 mediaId,
                 offlinePlayback,
-                accessToken,
-                videoId,
-                orgCode!!,
+                checkNotNull(accessToken) { "accessToken should be provided" },
+                checkNotNull(videoId) { "videoId should be provided" },
+                checkNotNull(orgCode) { "orgCode should be provided" },
                 preferredCaptionsLanguage,
                 signature,
                 techOverride,
@@ -95,10 +92,11 @@ data class TpInitParams (
     }
 
     companion object{
-        fun createOfflineParams(videoId: String):TpInitParams{
+        fun createOfflineParams(videoId: String,orgCode: String):TpInitParams{
             return TpInitParams(
                 videoId = videoId,
-                orgCode = "",
+                orgCode = orgCode,
+                accessToken = "",
                 isDownloadEnabled = true,
                 autoPlay = true
             )

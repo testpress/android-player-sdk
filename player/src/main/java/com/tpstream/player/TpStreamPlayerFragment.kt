@@ -425,8 +425,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         override fun onLicenseFetchFailure() {
-            viewBinding.errorMessage.visibility = View.VISIBLE
-            viewBinding.errorMessage.text = getString(R.string.license_error)
+            CoroutineScope(Dispatchers.Main).launch {
+                viewBinding.errorMessage.visibility = View.VISIBLE
+                viewBinding.errorMessage.text = getString(R.string.license_error)
+            }
         }
 
         private fun isDRMException(cause: Throwable): Boolean {

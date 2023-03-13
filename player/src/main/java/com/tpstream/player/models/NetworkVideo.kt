@@ -47,10 +47,6 @@ data class NetworkVideo(
         return dashUrl ?: url ?: ""
     }
 
-    fun asDomainVideo() {
-
-    }
-
     fun asVideo():com.tpstream.player.models.Video {
         val thumbnailUrl = if (video != null) video.preview_thumbnail_url?:"" else thumbnail?:""
         val url = if (video != null){

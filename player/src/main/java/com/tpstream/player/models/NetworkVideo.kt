@@ -27,10 +27,10 @@ internal data class NetworkVideo(
     val bytes: Long?,
     val type: String?,
     @SerializedName("video")
-    val asset: Asset?
+    val networkVideoContent: NetworkVideoContent?
 ) {
 
-    inner class Asset(
+    inner class NetworkVideoContent(
         val progress: Int?,
         val thumbnails: Array<String>?,
         val status: String?,
@@ -45,9 +45,9 @@ internal data class NetworkVideo(
     )
 
     fun asDomainVideo():Video {
-        val thumbnailUrl = if (asset != null) asset.preview_thumbnail_url?:"" else thumbnail?:""
-        val url = if (asset != null){
-            if (asset.enable_drm == true) asset.dash_url?:"" else asset.playback_url?:""
+        val thumbnailUrl = if (networkVideoContent != null) networkVideoContent.preview_thumbnail_url?:"" else thumbnail?:""
+        val url = if (networkVideoContent != null){
+            if (networkVideoContent.enable_drm == true) networkVideoContent.dash_url?:"" else networkVideoContent.playback_url?:""
         } else {
             dashUrl?:url?:""
         }

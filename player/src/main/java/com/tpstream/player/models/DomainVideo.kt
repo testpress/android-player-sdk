@@ -43,23 +43,4 @@ data class DomainVideo(
             videoHeight = this.videoHeight
         )
     }
-
-    internal fun asNetworkVideo():NetworkVideo {
-        return NetworkVideo(
-            title,
-            thumbnail,
-            null,
-            null,
-            url,
-            null,
-            null,
-            duration,
-            description,
-            transcodingStatus,
-            videoId,
-            null,
-            null,
-            null
-        )
-    }
 }

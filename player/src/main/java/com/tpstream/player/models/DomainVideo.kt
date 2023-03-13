@@ -1,17 +1,14 @@
 package com.tpstream.player.models
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import android.content.Context
+import android.graphics.Bitmap
+import com.tpstream.player.ImageSaver
 
-@Entity(tableName = "Video", indices = [Index(value = ["videoId"], unique = true)])
-internal class DatabaseVideo(
-    @PrimaryKey(autoGenerate = true)
-    val id : Long = 0L,
+data class DomainVideo(
     var videoId: String = "",
     var title: String = "",
     var thumbnail: String = "",
-    var url: String = "",
+    internal var url: String = "",
     var duration: String = "",
     var description: String = "",
     var transcodingStatus: String = "",
@@ -22,9 +19,14 @@ internal class DatabaseVideo(
     var videoWidth: Int = 0,
     var videoHeight: Int = 0
 ) {
+    internal val isNotDownloaded get() = this.downloadState != DownloadStatus.COMPLETE
 
-    fun asDomainVideo():DomainVideo {
-        return DomainVideo(
+    fun getLocalThumbnail(context: Context): Bitmap?{
+        return ImageSaver(context).load(videoId)
+    }
+
+    internal fun asDatabaseVideo():DatabaseVideo {
+        return DatabaseVideo(
             videoId = this.videoId,
             title = this.title,
             thumbnail = this.thumbnail,
@@ -41,7 +43,7 @@ internal class DatabaseVideo(
         )
     }
 
-    fun asNetworkVideo():NetworkVideo {
+    internal fun asNetworkVideo():NetworkVideo {
         return NetworkVideo(
             title,
             thumbnail,
@@ -58,22 +60,5 @@ internal class DatabaseVideo(
             null,
             null
         )
-    }
-}
-
-enum class DownloadStatus {
-    PAUSE,
-    DOWNLOADING,
-    COMPLETE,
-    FAILED
-}
-
-internal fun getVideoState(int:Int):DownloadStatus?{
-    return when(int){
-        1 -> DownloadStatus.PAUSE
-        2 -> DownloadStatus.DOWNLOADING
-        3 -> DownloadStatus.COMPLETE
-        4 -> DownloadStatus.FAILED
-        else -> null
     }
 }

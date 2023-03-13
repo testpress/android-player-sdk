@@ -12,7 +12,6 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.TrackSelector
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.models.*
-import com.tpstream.player.models.asVideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -55,7 +54,7 @@ public interface TpStreamPlayer {
 
 internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     lateinit var params: TpInitParams
-    var video: Video? = null
+    var video: DomainVideo? = null
     var _listener: TPStreamPlayerListener? = null
     lateinit var exoPlayer: ExoPlayer
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
@@ -75,10 +74,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
         params = parameters
-        videoRepository.getVideo(parameters, object :Network.TPResponse<Video> {
-            override fun onSuccess(result: Video) {
-                video = result
-                playVideoInUIThread(result.url, parameters.startPositionInMilliSecs)
+        videoRepository.getVideo(parameters, object :Network.TPResponse<NetworkVideo> {
+            override fun onSuccess(result: NetworkVideo) {
+                video = result.asDomainVideo()
+                playVideoInUIThread(result.url!!, parameters.startPositionInMilliSecs)
             }
 
             override fun onFailure(exception: TPException) {

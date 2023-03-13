@@ -6,30 +6,30 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.tpstream.player.models.Video
+import com.tpstream.player.models.DatabaseVideo
 
 @Dao
 internal interface VideoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(video: Video)
+    suspend fun insert(video: DatabaseVideo)
 
     @Delete
-    suspend fun delete(video: Video)
+    suspend fun delete(video: DatabaseVideo)
 
     @Query("SELECT * FROM Video")
-    fun getAllVideo():List<Video>?
+    fun getAllVideo():List<DatabaseVideo>?
 
     @Query("SELECT * FROM Video WHERE videoId=:videoID")
-    fun getVideoByVideoId(videoID:String): Video?
+    fun getVideoByVideoId(videoID:String): DatabaseVideo?
 
     @Query("SELECT * FROM Video WHERE url=:url")
-    fun getVideoByUrl(url:String): Video?
+    fun getVideoByUrl(url:String): DatabaseVideo?
 
     @Query("SELECT * FROM Video WHERE videoId=:videoId")
-    fun getVideoById(videoId:String): LiveData<Video?>
+    fun getVideoById(videoId:String): LiveData<DatabaseVideo?>
 
     @Query("SELECT * FROM Video WHERE downloadState NOT null")
-    fun getAllDownloadInLiveData():LiveData<List<Video>?>
+    fun getAllDownloadInLiveData():LiveData<List<DatabaseVideo>?>
 
 }

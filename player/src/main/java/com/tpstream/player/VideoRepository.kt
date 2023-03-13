@@ -1,14 +1,11 @@
 package com.tpstream.player
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.media3.exoplayer.offline.Download
 import com.tpstream.player.database.TPStreamsDatabase
-import com.tpstream.player.models.Video
+import com.tpstream.player.models.*
 import com.tpstream.player.models.NetworkVideo
-import com.tpstream.player.models.asVideoInfo
 import com.tpstream.player.models.getVideoState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +34,7 @@ internal class VideoRepository(context: Context) {
         }
     }
 
-    fun get(videoId: String): LiveData<Video?> {
+    fun get(videoId: String): LiveData<DatabaseVideo?> {
         return videoDao.getVideoById(videoId)
     }
 
@@ -45,36 +42,36 @@ internal class VideoRepository(context: Context) {
         return videoDao.getVideoByUrl(url)?.videoId
     }
 
-    suspend fun insert(video: Video){
+    suspend fun insert(video: DatabaseVideo){
         videoDao.insert(video)
     }
 
-    suspend fun delete(video: Video){
+    suspend fun delete(video: DatabaseVideo){
         videoDao.delete(video)
     }
 
-    fun getVideoByVideoId(videoID:String): Video?{
+    fun getVideoByVideoId(videoID:String): DatabaseVideo?{
         return videoDao.getVideoByVideoId(videoID)
     }
 
-    fun getAllDownloadsInLiveData():LiveData<List<Video>?>{
+    fun getAllDownloadsInLiveData():LiveData<List<DatabaseVideo>?>{
         return videoDao.getAllDownloadInLiveData()
     }
 
     fun getVideo(
         params: TpInitParams,
-        callback : Network.TPResponse<Video>
+        callback : Network.TPResponse<NetworkVideo>
     ){
         val video = getVideoFromDB(params)
         if (video != null) {
-            callback.onSuccess(video)
+            callback.onSuccess(video.asNetworkVideo())
         } else {
             fetchVideo(params, callback)
         }
     }
 
-    private fun getVideoFromDB(params: TpInitParams): Video?{
-        var video : Video? = null
+    private fun getVideoFromDB(params: TpInitParams): DatabaseVideo?{
+        var video : DatabaseVideo? = null
         runBlocking(Dispatchers.IO) {
             video = videoDao.getVideoByVideoId(params.videoId!!)
         }
@@ -83,15 +80,15 @@ internal class VideoRepository(context: Context) {
 
     private fun fetchVideo(
         params: TpInitParams,
-        callback : Network.TPResponse<Video>
+        callback : Network.TPResponse<NetworkVideo>
     ) {
         val url = "https://${params.orgCode}.testpress.in/api/v2.5/video_info/${params.videoId}/?access_token=${params.accessToken}"
         Network<NetworkVideo>().get(url, object : Network.TPResponse<NetworkVideo> {
             override fun onSuccess(result: NetworkVideo) {
-                val video = result.asVideo()
+                val video = result.asDomainVideo()
                 video.videoId = params.videoId!!
                 storeVideo(video)
-                callback.onSuccess(video)
+                callback.onSuccess(video.asNetworkVideo())
             }
 
             override fun onFailure(exception: TPException) {
@@ -100,9 +97,9 @@ internal class VideoRepository(context: Context) {
         })
     }
 
-    private fun storeVideo(video: Video){
+    private fun storeVideo(video: DomainVideo){
         CoroutineScope(Dispatchers.IO).launch {
-            videoDao.insert(video)
+            videoDao.insert(video.asDatabaseVideo())
         }
     }
 

@@ -2,7 +2,7 @@ package com.tpstream.player.models
 
 import com.google.gson.annotations.SerializedName
 
-data class NetworkVideo(
+internal data class NetworkVideo(
     val title: String?,
     val thumbnail: String?,
 
@@ -47,14 +47,32 @@ data class NetworkVideo(
         return dashUrl ?: url ?: ""
     }
 
-    fun asVideo():com.tpstream.player.models.Video {
+    fun asDatabaseVideo():DatabaseVideo {
         val thumbnailUrl = if (video != null) video.preview_thumbnail_url?:"" else thumbnail?:""
         val url = if (video != null){
             if (video.enable_drm == true) video.dash_url?:"" else video.playback_url?:""
         } else {
             dashUrl?:url?:""
         }
-        return Video(
+        return DatabaseVideo(
+            videoId = this.id?:"",
+            title = this.title?:"",
+            thumbnail = thumbnailUrl,
+            url = url,
+            duration = duration?:"",
+            description = description?:"",
+            transcodingStatus = transcodingStatus?:""
+        )
+    }
+
+    fun asDomainVideo():DomainVideo {
+        val thumbnailUrl = if (video != null) video.preview_thumbnail_url?:"" else thumbnail?:""
+        val url = if (video != null){
+            if (video.enable_drm == true) video.dash_url?:"" else video.playback_url?:""
+        } else {
+            dashUrl?:url?:""
+        }
+        return DomainVideo(
             videoId = this.id?:"",
             title = this.title?:"",
             thumbnail = thumbnailUrl,

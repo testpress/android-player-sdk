@@ -29,7 +29,7 @@ internal class VideoDownloadRequestCreationHandler(
     private var keySetId: ByteArray? = null
 
     init {
-        val url = player.videoInfo?.getPlaybackURL()!!
+        val url = player.video?.url!!
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         mediaItem = MediaItem.Builder()
             .setUri(url)
@@ -92,7 +92,7 @@ internal class VideoDownloadRequestCreationHandler(
 
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
         setSelectedTracks(overrides)
-        val name = player.videoInfo?.title!!
+        val name = player.video?.title!!
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 

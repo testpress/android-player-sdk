@@ -158,7 +158,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             else -> {
                 EncryptionKeyRepository(requireContext()).fetchAndStore(
                     player?.params!!,
-                    player?.videoInfo?.getPlaybackURL()!!
+                    player?.video?.url!!
                 )
                 val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                     player!!,
@@ -326,7 +326,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun reloadVideo(){
         val currentPosition = player?.getCurrentTime()
         val tpImp = player as TpStreamPlayerImpl
-        tpImp.playVideo(player?.videoInfo?.getPlaybackURL()!!,currentPosition!!)
+        tpImp.playVideo(player?.video?.url!!,currentPosition!!)
     }
 
     private fun storeCurrentPlayTime(){
@@ -406,7 +406,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 viewBinding.errorMessage.text = getString(R.string.no_internet_to_sync_license)
                 return
             }
-            val url = player?.videoInfo?.getPlaybackURL()
+            val url = player?.video?.url
             val downloadTask = DownloadTask(requireContext())
             drmLicenseRetries += 1
             if (drmLicenseRetries < 2 && downloadTask.isDownloaded(url!!)) {

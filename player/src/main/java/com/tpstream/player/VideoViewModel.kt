@@ -4,28 +4,29 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tpstream.player.models.Video
+import com.tpstream.player.models.DatabaseVideo
+import com.tpstream.player.models.DomainVideo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 internal class VideoViewModel(private val videoRepository: VideoRepository):ViewModel() {
 
-    fun get(videoId: String): LiveData<Video?> {
+    fun get(videoId: String): LiveData<DomainVideo?> {
         return Transformations.map(videoRepository.get(videoId)) {
-            it
+            it?.asDomainVideo()
         }
     }
 
-    fun insert(video: Video){
+    fun insert(video: DomainVideo){
         viewModelScope.launch{
-            videoRepository.insert(video)
+            videoRepository.insert(video.asDatabaseVideo())
         }
     }
 
     fun delete(videoId: String){
         viewModelScope.launch {
-            var video : Video? = null
+            var video : DatabaseVideo? = null
             runBlocking(Dispatchers.IO) {
                 video = videoRepository.getVideoByVideoId(videoId)
             }

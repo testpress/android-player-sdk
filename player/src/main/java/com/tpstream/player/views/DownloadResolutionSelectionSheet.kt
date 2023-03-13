@@ -19,11 +19,12 @@ import com.google.common.collect.ImmutableList
 import com.tpstream.player.*
 import com.tpstream.player.R
 import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
-import com.tpstream.player.models.Video
+import com.tpstream.player.models.DatabaseVideo
+import com.tpstream.player.models.DomainVideo
 import okio.IOException
 import kotlin.math.roundToInt
 
-internal typealias OnSubmitListener = (DownloadRequest,Video?) -> Unit
+internal typealias OnSubmitListener = (DownloadRequest,DomainVideo?) -> Unit
 
 internal class DownloadResolutionSelectionSheet(
     val player: TpStreamPlayerImpl,

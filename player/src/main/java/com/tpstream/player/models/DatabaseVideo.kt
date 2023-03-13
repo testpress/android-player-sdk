@@ -25,6 +25,7 @@ internal class DatabaseVideo(
 
     fun asDomainVideo():DomainVideo {
         return DomainVideo(
+            id = this.id,
             videoId = this.videoId,
             title = this.title,
             thumbnail = this.thumbnail,
@@ -58,6 +59,12 @@ internal class DatabaseVideo(
             null,
             null
         )
+    }
+}
+
+internal fun List<DatabaseVideo>.asDomainVideos(): List<DomainVideo> {
+    return map {
+        it.asDomainVideo()
     }
 }
 

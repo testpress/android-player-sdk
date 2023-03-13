@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import com.tpstream.player.ImageSaver
 
 data class DomainVideo(
+    internal var id:Long? = null,
     var videoId: String = "",
     var title: String = "",
     var thumbnail: String = "",

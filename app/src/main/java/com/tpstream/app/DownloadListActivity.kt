@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tpstream.app.databinding.ActivityDownloadListBinding
 import com.tpstream.app.databinding.DownloadItemBinding
 import com.tpstream.player.TpInitParams
-import com.tpstream.player.models.Video
+import com.tpstream.player.models.DomainVideo
 import com.tpstream.player.models.DownloadStatus
 
 class DownloadListActivity : AppCompatActivity() {
@@ -43,8 +43,8 @@ class DownloadListActivity : AppCompatActivity() {
     }
 
     inner class DownloadListAdapter(
-        private val data: List<Video>
-    ) : ListAdapter<Video, DownloadListAdapter.DownloadListViewHolder>(
+        private val data: List<DomainVideo>
+    ) : ListAdapter<DomainVideo, DownloadListAdapter.DownloadListViewHolder>(
         DOWNLOAD_COMPARATOR
     ) {
 
@@ -57,7 +57,7 @@ class DownloadListActivity : AppCompatActivity() {
             val resumeButton: Button = binding.resumeButton
             val thumbnail: ImageView = binding.thumbnail
 
-            fun bind(video: Video) {
+            fun bind(video: DomainVideo) {
                 binding.title.text = video.title
                 thumbnail.setImageBitmap(video.getLocalThumbnail(applicationContext))
                 binding.downloadImage.setImageResource(getDownloadImage(video.downloadState))
@@ -125,7 +125,7 @@ class DownloadListActivity : AppCompatActivity() {
             }
         }
 
-        private fun playVideo(video: Video) {
+        private fun playVideo(video: DomainVideo) {
             val intent = Intent(this@DownloadListActivity, PlayerActivity::class.java)
             intent.putExtra(
                 TP_OFFLINE_PARAMS,
@@ -139,15 +139,15 @@ class DownloadListActivity : AppCompatActivity() {
 
     companion object {
 
-        private val DOWNLOAD_COMPARATOR = object : DiffUtil.ItemCallback<Video>() {
+        private val DOWNLOAD_COMPARATOR = object : DiffUtil.ItemCallback<DomainVideo>() {
             override fun areItemsTheSame(
-                oldItem: Video,
-                newItem: Video
+                oldItem: DomainVideo,
+                newItem: DomainVideo
             ): Boolean = oldItem == newItem
 
             override fun areContentsTheSame(
-                oldItem: Video,
-                newItem: Video
+                oldItem: DomainVideo,
+                newItem: DomainVideo
             ): Boolean = oldItem.videoId == newItem.videoId
         }
     }

@@ -4,29 +4,29 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.tpstream.player.TpStreamDownloadManager
-import com.tpstream.player.models.Video
+import com.tpstream.player.models.DomainVideo
 
 class DownloadListViewModel(context: Context): ViewModel() {
 
     private var tpStreamDownloadManager: TpStreamDownloadManager = TpStreamDownloadManager(context)
 
-    fun getDownloadData(): LiveData<List<Video>?> {
+    fun getDownloadData(): LiveData<List<DomainVideo>?> {
         return tpStreamDownloadManager.getAllDownloads()
     }
 
-    fun pauseDownload(video: Video) {
+    fun pauseDownload(video: DomainVideo) {
         tpStreamDownloadManager.pauseDownload(video)
     }
 
-    fun resumeDownload(video: Video) {
+    fun resumeDownload(video: DomainVideo) {
         tpStreamDownloadManager.resumeDownload(video)
     }
 
-    fun cancelDownload(video: Video) {
+    fun cancelDownload(video: DomainVideo) {
         tpStreamDownloadManager.cancelDownload(video)
     }
 
-    fun deleteDownload(video: Video) {
+    fun deleteDownload(video: DomainVideo) {
         tpStreamDownloadManager.deleteDownload(video)
     }
 }

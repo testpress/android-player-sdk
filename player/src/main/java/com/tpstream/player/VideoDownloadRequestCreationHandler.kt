@@ -36,6 +36,7 @@ internal class VideoDownloadRequestCreationHandler(
             .setDrmConfiguration(
                 DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
+                    .setLicenseUri("https://${player.params.orgCode}.testpress.in/api/v2.5/drm_license_key/${player.params.videoId}/?access_token=${player.params.accessToken}&drm_type=widevine&download=true")
                     .build()
             )
             .build()
@@ -44,9 +45,6 @@ internal class VideoDownloadRequestCreationHandler(
     }
 
     private fun getDownloadHelper(): DownloadHelper {
-        val sessionManager = DefaultDrmSessionManager.Builder()
-            .build(CustomHttpDrmMediaCallback(context, player.params))
-        sessionManager.setMode(DefaultDrmSessionManager.MODE_DOWNLOAD, null)
         val dataSourceFactory = VideoDownloadManager(context).build(player.params)
         val renderersFactory = DefaultRenderersFactory(context)
         return DownloadHelper.forMediaItem(
@@ -54,7 +52,7 @@ internal class VideoDownloadRequestCreationHandler(
             trackSelectionParameters,
             renderersFactory,
             dataSourceFactory,
-            sessionManager
+            null
         )
     }
 

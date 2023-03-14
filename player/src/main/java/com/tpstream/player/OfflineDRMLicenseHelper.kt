@@ -30,8 +30,12 @@ internal object OfflineDRMLicenseHelper {
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             val keySetId = downloadDRMKeySetId(context, tpInitParams, url)
-            replaceKeysInExistingDownloadedVideo(url, context, keySetId)
-            callback.onLicenseFetchSuccess(keySetId)
+            if (keySetId != null){
+                replaceKeysInExistingDownloadedVideo(url, context, keySetId)
+                callback.onLicenseFetchSuccess(keySetId)
+            } else {
+                callback.onLicenseFetchFailure()
+            }
         }
     }
 
@@ -39,18 +43,22 @@ internal object OfflineDRMLicenseHelper {
         context: Context,
         tpInitParams: TpInitParams,
         url: String
-    ): ByteArray {
+    ): ByteArray? {
         val dataSource =
             VideoDownloadManager(context).getHttpDataSourceFactory().createDataSource()
         val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
         val drmInitData =
             DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
         val drmLicenseURL = "${BuildConfig.DRM_LICENSE_URL.format(tpInitParams.orgCode,tpInitParams.videoId,tpInitParams.accessToken)}$OFFLINE_DRM_LICENSE_PARAMS"
-        return OfflineLicenseHelper.newWidevineInstance(
-            drmLicenseURL,
-            VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
-            DrmSessionEventListener.EventDispatcher()
-        ).downloadLicense(drmInitData!!)
+        return try {
+            OfflineLicenseHelper.newWidevineInstance(
+                drmLicenseURL,
+                VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
+                DrmSessionEventListener.EventDispatcher()
+            ).downloadLicense(drmInitData!!)
+        } catch (e : Exception){
+            null
+        }
     }
 
     private fun replaceKeysInExistingDownloadedVideo(

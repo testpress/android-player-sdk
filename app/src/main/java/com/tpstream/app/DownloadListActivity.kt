@@ -126,10 +126,21 @@ class DownloadListActivity : AppCompatActivity() {
         }
 
         private fun playVideo(video: Video) {
+            val params = hashMapOf<String,String>(
+                "C3XLe1CCcOq" to "demoveranda/c381512b-7337-4d8e-a8cf-880f4f08fd08",
+                "o7pOsacWaJt" to "demoveranda/143a0c71-567e-4ecd-b22d-06177228c25b",
+                "qJQlWGLJvNv" to "demoveranda/70f61402-3724-4ed8-99de-5473b2310efe",
+                "d19729f0-8823-4805-9034-2a7ea9429195" to "edee9b/565a5b8c-310a-444b-956e-bbd6c7c74d7b",
+                "73633fa3-61c6-443c-b625-ac4e85b28cfc" to "edee9b/4b11bf9e-d6b7-4b1f-80b8-19d92b26e966"
+            )
+            val orgCodeAndAccessToken = params[video.videoId]!!.split("/")
             val intent = Intent(this@DownloadListActivity, PlayerActivity::class.java)
             intent.putExtra(
                 TP_OFFLINE_PARAMS,
-                TpInitParams.createOfflineParams(video.videoId,"demoveranda")
+                TpInitParams.createOfflineParams(
+                    videoId = video.videoId,
+                    orgCode = orgCodeAndAccessToken[0],
+                    accessToken = orgCodeAndAccessToken[1])
             )
             startActivity(intent)
         }

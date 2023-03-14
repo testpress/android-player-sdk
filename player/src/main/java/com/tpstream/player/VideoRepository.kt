@@ -82,7 +82,7 @@ internal class VideoRepository(context: Context) {
         params: TpInitParams,
         callback : Network.TPResponse<Video>
     ) {
-        val url =BuildConfig.VIDEO_URL.format(params.videoId,params.accessToken)
+        val url =BuildConfig.VIDEO_URL.format(params.orgCode,params.videoId,params.accessToken)
         Network<NetworkVideo>().get(url, object : Network.TPResponse<NetworkVideo> {
             override fun onSuccess(result: NetworkVideo) {
                 val video = result.asDomainVideo()

@@ -47,7 +47,7 @@ internal class VideoRepository(context: Context) {
     }
 
     suspend fun delete(video: DatabaseVideo){
-        videoDao.delete(video)
+        videoDao.delete(video.videoId)
     }
 
     fun getVideoByVideoId(videoID:String): DatabaseVideo?{

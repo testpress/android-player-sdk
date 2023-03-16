@@ -14,8 +14,8 @@ internal interface VideoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(video: DatabaseVideo)
 
-    @Delete
-    suspend fun delete(video: DatabaseVideo)
+    @Query("DELETE FROM Video WHERE videoId=:videoID")
+    suspend fun delete(videoID:String)
 
     @Query("SELECT * FROM Video")
     fun getAllVideo():List<DatabaseVideo>?

@@ -3,6 +3,7 @@ package com.tpstream.player
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.VisibleForTesting
 import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.DownloadRequest
@@ -49,28 +50,32 @@ public interface TpStreamPlayer {
     fun setListener(listener: TPStreamPlayerListener?)
 }
 
-internal class TpStreamPlayerImpl(val context: Context, private val testPlayer: ExoPlayer? = null) : TpStreamPlayer {
+internal class TpStreamPlayerImpl private constructor(): TpStreamPlayer {
     lateinit var params: TpInitParams
     var video: Video? = null
     var _listener: TPStreamPlayerListener? = null
+    lateinit var context: Context
     lateinit var exoPlayer: ExoPlayer
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
     private lateinit var videoRepository: VideoRepository
 
-    init {
+    constructor(context: Context):this(){
+        this.context = context
         initializeExoplayer()
-        // Initializing VideoRepository for real-time, not for test cases
-        if (testPlayer == null) videoRepository = VideoRepository(context)
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    constructor(context: Context,testExoPlayer: ExoPlayer):this(){
+        this.context = context
+        exoPlayer = testExoPlayer
     }
 
     private fun initializeExoplayer() {
-        // The testPlayer is only available in test cases otherwise, it's always null.
-        exoPlayer = testPlayer
-            ?: ExoPlayer.Builder(context)
-                .build()
-                .also { exoPlayer ->
-                    exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
-                }
+        exoPlayer = ExoPlayer.Builder(context)
+            .build()
+            .also { exoPlayer ->
+                exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
+            }
     }
 
     fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {

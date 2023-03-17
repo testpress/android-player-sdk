@@ -55,10 +55,11 @@ internal class TpStreamPlayerImpl(val context: Context, private val testPlayer: 
     var _listener: TPStreamPlayerListener? = null
     lateinit var exoPlayer: ExoPlayer
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
-    private var videoRepository: VideoRepository = VideoRepository(context)
+    private lateinit var videoRepository: VideoRepository
 
     init {
         initializeExoplayer()
+        if (testPlayer == null) videoRepository = VideoRepository(context)
     }
 
     private fun initializeExoplayer() {

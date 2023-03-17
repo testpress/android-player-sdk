@@ -23,8 +23,8 @@ class NetworkTest {
     private val network: Network<NetworkVideo> = Network(NetworkVideo::class.java)
 
     private lateinit var callbackResponse: Network.TPResponse<NetworkVideo>
-    lateinit var callbackResult: NetworkVideo
-    lateinit var callbackException: TPException
+    private lateinit var callbackResult: NetworkVideo
+    private lateinit var callbackException: TPException
 
     @Before
     fun createService() {
@@ -68,7 +68,7 @@ class NetworkTest {
         mockWebServer.takeRequest()
         assertEquals(response?.title, "BigBuckBunny.mp4")
         assertEquals(
-            response?.video?.dash_url,
+            response?.networkVideoContent?.dash_url,
             "https://d3cydmgt9q030i.cloudfront.net/transcoded/73633fa3-61c6-443c-b625-ac4e85b28cfc/video.mpd"
         )
     }

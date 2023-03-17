@@ -59,11 +59,12 @@ internal class TpStreamPlayerImpl(val context: Context, private val testPlayer: 
 
     init {
         initializeExoplayer()
+        // Initializing VideoRepository for real-time, not for test cases
         if (testPlayer == null) videoRepository = VideoRepository(context)
     }
 
     private fun initializeExoplayer() {
-        // The testPlayer is only available for use in test cases, otherwise it is null.
+        // The testPlayer is only available in test cases otherwise, it's always null.
         exoPlayer = testPlayer
             ?: ExoPlayer.Builder(context)
                 .build()

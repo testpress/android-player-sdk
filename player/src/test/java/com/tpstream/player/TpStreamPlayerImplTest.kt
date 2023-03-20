@@ -3,11 +3,13 @@ package com.tpstream.player
 import android.content.Context
 import androidx.media3.common.*
 import androidx.media3.exoplayer.*
+import androidx.media3.exoplayer.trackselection.TrackSelector
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -26,16 +28,20 @@ class TpStreamPlayerImplTest {
 
     @Mock
     private lateinit var player: ExoPlayer
-
     @Mock
     private lateinit var context: Context
+    @Mock
+    private lateinit var trackSelectionParameters :TrackSelectionParameters
+    @Mock
+    private lateinit var trackSelector: TrackSelector
     private lateinit var tpStreamPlayerImpl: TpStreamPlayerImpl
-
     private var called = false
 
     @Before
     fun createPlayer() {
-        tpStreamPlayerImpl = TpStreamPlayerImpl(player, context)
+        tpStreamPlayerImpl = TpStreamPlayerImpl(context)
+        tpStreamPlayerImpl.exoPlayer = player
+
     }
 
     @Test
@@ -111,4 +117,31 @@ class TpStreamPlayerImplTest {
         called = true
     }
 
+    @Test
+    fun testSetTrackSelectionParameters(){
+        called = false
+        `when`(player.setTrackSelectionParameters(trackSelectionParameters)).then { isCalled() }
+        tpStreamPlayerImpl.setTrackSelectionParameters(trackSelectionParameters)
+        assertEquals(true, called)
+    }
+
+    @Test
+    fun testGetTrackSelectionParameters(){
+        called = false
+        `when`(player.trackSelectionParameters).thenReturn(trackSelectionParameters)
+        assertEquals(
+            trackSelectionParameters.hashCode(),
+            tpStreamPlayerImpl.getTrackSelectionParameters().hashCode()
+        )
+    }
+
+    @Test
+    fun testGetTrackSelector(){
+        called = false
+        `when`(player.trackSelector).thenReturn(trackSelector)
+        assertEquals(
+            trackSelector.hashCode(),
+            tpStreamPlayerImpl.getTrackSelector().hashCode()
+        )
+    }
 }

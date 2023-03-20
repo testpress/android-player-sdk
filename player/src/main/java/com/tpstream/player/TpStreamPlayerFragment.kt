@@ -263,7 +263,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun initializePlayer() {
-        player = TpStreamPlayerImpl(requireContext())
+        player = TpStreamPlayerImpl(requireContext()).init()
         viewBinding.videoView.player = player.exoPlayer
         player.exoPlayer.addListener(_playbackStateListener)
         this.initializationListener?.onInitializationSuccess(player!!)

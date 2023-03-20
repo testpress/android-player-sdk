@@ -3,6 +3,7 @@ package com.tpstream.player
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.VisibleForTesting
 import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.DownloadRequest
@@ -49,16 +50,18 @@ public interface TpStreamPlayer {
     fun setListener(listener: TPStreamPlayerListener?)
 }
 
-internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
+internal class TpStreamPlayerImpl(val context: Context): TpStreamPlayer {
     lateinit var params: TpInitParams
     var video: Video? = null
     var _listener: TPStreamPlayerListener? = null
     lateinit var exoPlayer: ExoPlayer
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
-    private var videoRepository: VideoRepository = VideoRepository(context)
+    private lateinit var videoRepository: VideoRepository
 
-    init {
+    fun init():TpStreamPlayerImpl {
         initializeExoplayer()
+        videoRepository = VideoRepository(this.context)
+        return this
     }
 
     private fun initializeExoplayer() {

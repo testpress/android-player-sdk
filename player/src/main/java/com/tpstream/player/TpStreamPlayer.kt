@@ -50,24 +50,18 @@ public interface TpStreamPlayer {
     fun setListener(listener: TPStreamPlayerListener?)
 }
 
-internal class TpStreamPlayerImpl private constructor(): TpStreamPlayer {
+internal class TpStreamPlayerImpl(val context: Context): TpStreamPlayer {
     lateinit var params: TpInitParams
     var video: Video? = null
     var _listener: TPStreamPlayerListener? = null
-    lateinit var context: Context
     lateinit var exoPlayer: ExoPlayer
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
     private lateinit var videoRepository: VideoRepository
 
-    constructor(context: Context):this(){
-        this.context = context
+    fun init():TpStreamPlayerImpl {
         initializeExoplayer()
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    constructor(context: Context,testExoPlayer: ExoPlayer):this(){
-        this.context = context
-        exoPlayer = testExoPlayer
+        videoRepository = VideoRepository(this.context)
+        return this
     }
 
     private fun initializeExoplayer() {

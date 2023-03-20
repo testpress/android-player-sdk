@@ -9,6 +9,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -38,7 +39,9 @@ class TpStreamPlayerImplTest {
 
     @Before
     fun createPlayer() {
-        tpStreamPlayerImpl = TpStreamPlayerImpl(context,player)
+        tpStreamPlayerImpl = TpStreamPlayerImpl(context)
+        tpStreamPlayerImpl.exoPlayer = player
+
     }
 
     @Test

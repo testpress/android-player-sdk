@@ -442,8 +442,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
-        override fun onAccessTokenFiler(videoID: String): String {
-            return this@TpStreamPlayerFragment.initializationListener?.onAccessTokenFiler(videoID)!!
+        override fun onOfflineLicenseExpire(videoID: String): HashMap<String, String> {
+            return this@TpStreamPlayerFragment.initializationListener?.onOfflineLicenseExpire(videoID)!!
         }
 
         private fun isDRMException(cause: Throwable): Boolean {
@@ -491,5 +491,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
 interface InitializationListener {
     fun onInitializationSuccess(player: TpStreamPlayer)
-    fun onAccessTokenFiler(videoID: String):String
+    fun onOfflineLicenseExpire(videoID: String): HashMap<String, String> = hashMapOf(
+        "orgCode" to "",
+        "accessToken" to ""
+    )
 }

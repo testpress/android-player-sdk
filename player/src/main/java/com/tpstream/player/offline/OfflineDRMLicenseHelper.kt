@@ -23,8 +23,6 @@ internal const val OFFLINE_DRM_LICENSE_PARAMS = "&drm_type=widevine&download=tru
 
 internal object OfflineDRMLicenseHelper {
 
-    private var offlineDRMAPICallCount = 0
-
     fun renewLicense(
         url: String,
         tpInitParams: TpInitParams,
@@ -33,19 +31,14 @@ internal object OfflineDRMLicenseHelper {
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                val accessToken = callback.onOfflineLicenseExpire(tpInitParams.videoId!!)
+                tpInitParams.orgCode = accessToken["orgCode"]!!
+                tpInitParams.accessToken = accessToken["accessToken"]
                 val keySetId = downloadDRMKeySetId(context, tpInitParams, url)
                 replaceKeysInExistingDownloadedVideo(url, context, keySetId)
                 callback.onLicenseFetchSuccess(keySetId)
             } catch (e: Exception) {
-                offlineDRMAPICallCount += 1
-                if (offlineDRMAPICallCount > 1){
-                    callback.onLicenseFetchFailure()
-                    offlineDRMAPICallCount = 0
-                    return@launch
-                }
-                val accessToken = callback.onAccessTokenFiler(tpInitParams.videoId!!)
-                tpInitParams.accessToken = accessToken
-                renewLicense(url, tpInitParams, context, callback)
+                callback.onLicenseFetchFailure()
             }
         }
     }
@@ -167,7 +160,10 @@ internal object VideoPlayerUtil {
 internal interface DRMLicenseFetchCallback {
     fun onLicenseFetchSuccess(keySetId: ByteArray)
     fun onLicenseFetchFailure()
-    fun onAccessTokenFiler(videoID: String): String
+    fun onOfflineLicenseExpire(videoID: String): HashMap<String,String> = hashMapOf(
+        "orgCode" to "",
+        "accessToken" to ""
+    )
 }
 
 internal object InternetConnectivityChecker {

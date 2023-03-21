@@ -124,6 +124,9 @@ internal class VideoDownloadRequestCreationHandler(
         }
     }
 
+    // This function never called
+    override fun onAccessTokenFiler(videoID: String): String = ""
+
     interface Listener {
         fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, downloadHelper: DownloadHelper)
 

@@ -437,7 +437,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         override fun onLicenseFetchFailure() {
-            showErrorMessage(getString(R.string.license_error))
+            CoroutineScope(Dispatchers.Main).launch {
+                showErrorMessage(getString(R.string.license_error))
+            }
+        }
+
+        override fun onAccessTokenFiler(videoID: String): String {
+            return this@TpStreamPlayerFragment.initializationListener?.onAccessTokenFiler(videoID)!!
         }
 
         private fun isDRMException(cause: Throwable): Boolean {
@@ -485,4 +491,5 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
 interface InitializationListener {
     fun onInitializationSuccess(player: TpStreamPlayer)
+    fun onAccessTokenFiler(videoID: String):String
 }

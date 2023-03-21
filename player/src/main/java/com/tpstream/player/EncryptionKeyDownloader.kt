@@ -1,37 +1,38 @@
 package com.tpstream.player
 
 import android.net.Uri
-import android.util.Log
 import androidx.media3.exoplayer.hls.playlist.HlsMediaPlaylist
 import androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
 import androidx.media3.exoplayer.hls.playlist.HlsPlaylist
 import androidx.media3.exoplayer.hls.playlist.HlsPlaylistParser
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 
 internal class EncryptionKeyDownloader {
 
-    fun getEncryptionKeyUrl(playbackUrl: String) :String {
-        val mediaPlaylistUrl = getMediaPlayListUrl(playbackUrl)
-        return getEncryptionKeyUrlUsingMediaPlaylistUrl(mediaPlaylistUrl)
+    fun getEncryptionKeyUrl(playbackUrl: String): String {
+        val manifestResponse = getResponse(playbackUrl)
+        val singleResolutionTrackUrl = getSingleResolutionTrackUrl(playbackUrl, manifestResponse)
+        val singleResolutionTrackResponse = getResponse(singleResolutionTrackUrl)
+        return getEncryptionKeyUrlUsingSingleResolutionTrackUrl(singleResolutionTrackUrl, singleResolutionTrackResponse)
     }
 
-     private fun getMediaPlayListUrl(playbackUrl: String): String {
+    fun getResponse(url:String):Response{
         val request = Request.Builder()
-            .url(playbackUrl)
+            .url(url)
             .build()
-        val response = OkHttpClient().newCall(request).execute()
+        return OkHttpClient().newCall(request).execute()
+    }
+
+    fun getSingleResolutionTrackUrl(playbackUrl: String,response: Response): String {
         val playlist: HlsPlaylist =
             HlsPlaylistParser().parse(Uri.parse(playbackUrl), response.body?.byteStream()!!)
         val mediaPlaylist: HlsMultivariantPlaylist = playlist as HlsMultivariantPlaylist
         return mediaPlaylist.mediaPlaylistUrls[0].toString()
     }
 
-     private fun getEncryptionKeyUrlUsingMediaPlaylistUrl(mediaPlaylistUrl: String): String {
-        val request = Request.Builder()
-            .url(mediaPlaylistUrl)
-            .build()
-        val response = OkHttpClient().newCall(request).execute()
+    fun getEncryptionKeyUrlUsingSingleResolutionTrackUrl(mediaPlaylistUrl: String,response: Response): String {
         val playlist: HlsPlaylist = HlsPlaylistParser().parse(
             Uri.parse(mediaPlaylistUrl),
             response.body?.byteStream()!!
@@ -42,11 +43,8 @@ internal class EncryptionKeyDownloader {
         return segment.fullSegmentEncryptionKeyUri.toString()
     }
 
-     fun getEncryptionKey(params: TpInitParams): String {
-        val request = Request.Builder()
-            .url("https://${params.orgCode}.testpress.in/api/v2.5/encryption_key/${params.videoId}/?access_token=${params.accessToken}")
-            .build()
-        val response = OkHttpClient().newCall(request).execute()
+     fun getEncryptionKey(url : String): String {
+        val response = getResponse(url)
         return response.body?.byteStream()?.readBytes()?.contentToString() ?: ""
     }
 }

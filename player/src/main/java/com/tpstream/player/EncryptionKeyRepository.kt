@@ -30,7 +30,7 @@ internal class EncryptionKeyRepository(context: Context) {
         }
     }
 
-    private fun save(encryptionKey: String, encryptionKeyUrl: String) {
+    fun save(encryptionKey: String, encryptionKeyUrl: String) {
         with(sharedPreference.edit()) {
             putString(
                 encryptionKeyUrl,

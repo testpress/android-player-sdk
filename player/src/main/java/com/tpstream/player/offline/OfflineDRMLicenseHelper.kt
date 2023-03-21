@@ -160,10 +160,7 @@ internal object VideoPlayerUtil {
 internal interface DRMLicenseFetchCallback {
     fun onLicenseFetchSuccess(keySetId: ByteArray)
     fun onLicenseFetchFailure()
-    fun onOfflineLicenseExpire(videoID: String): HashMap<String,String> = hashMapOf(
-        "orgCode" to "",
-        "accessToken" to ""
-    )
+    fun onOfflineLicenseExpire(videoID: String): HashMap<String,String> = hashMapOf()
 }
 
 internal object InternetConnectivityChecker {

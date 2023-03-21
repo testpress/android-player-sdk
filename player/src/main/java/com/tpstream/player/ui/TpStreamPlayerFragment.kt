@@ -491,8 +491,5 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
 interface InitializationListener {
     fun onInitializationSuccess(player: TpStreamPlayer)
-    fun onOfflineLicenseExpire(videoID: String): HashMap<String, String> = hashMapOf(
-        "orgCode" to "",
-        "accessToken" to ""
-    )
+    fun onOfflineLicenseExpire(videoID: String): HashMap<String, String> = hashMapOf()
 }

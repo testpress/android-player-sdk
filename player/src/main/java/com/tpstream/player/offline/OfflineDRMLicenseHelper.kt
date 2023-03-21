@@ -31,9 +31,9 @@ internal object OfflineDRMLicenseHelper {
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val accessToken = callback.onOfflineLicenseExpire(tpInitParams.videoId!!)
-                tpInitParams.orgCode = accessToken["orgCode"]!!
-                tpInitParams.accessToken = accessToken["accessToken"]
+                val orgCodeAndAccessToken = callback.onOfflineLicenseExpire(tpInitParams.videoId!!)
+                tpInitParams.orgCode = orgCodeAndAccessToken["orgCode"]!!
+                tpInitParams.accessToken = orgCodeAndAccessToken["accessToken"]
                 val keySetId = downloadDRMKeySetId(context, tpInitParams, url)
                 replaceKeysInExistingDownloadedVideo(url, context, keySetId)
                 callback.onLicenseFetchSuccess(keySetId)

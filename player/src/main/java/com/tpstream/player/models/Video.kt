@@ -26,8 +26,8 @@ data class Video(
         return ImageSaver(context).load(videoId)
     }
 
-    internal fun asDatabaseVideo():DatabaseVideo {
-        return DatabaseVideo(
+    internal fun asLocalVideo():LocalVideo {
+        return LocalVideo(
             videoId = this.videoId,
             title = this.title,
             thumbnail = this.thumbnail,

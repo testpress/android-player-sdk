@@ -70,7 +70,7 @@ class VideoDaoTest {
     fun testDelete() = runBlocking {
         insertData()
         val video4 = Video(id = 4L, videoId = "VideoID_4")
-        videoDao.insert(video4.asDatabaseVideo())
+        videoDao.insert(video4.asLocalVideo())
         // Check data added
         val beforeResult = videoDao.getAllVideo()
         assertThat(beforeResult?.size, equalTo(4))
@@ -123,9 +123,9 @@ class VideoDaoTest {
         val video2 = Video(id = 2L, videoId = "VideoID_2", url = "url_2")
         val video3 = Video(id = 3L, videoId = "VideoID_3", url = "url_3")
         // Add data to db
-        videoDao.insert(video1.asDatabaseVideo())
-        videoDao.insert(video2.asDatabaseVideo())
-        videoDao.insert(video3.asDatabaseVideo())
+        videoDao.insert(video1.asLocalVideo())
+        videoDao.insert(video2.asLocalVideo())
+        videoDao.insert(video3.asLocalVideo())
     }
 
 }

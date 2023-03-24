@@ -5,11 +5,11 @@ import androidx.room.*
 import com.tpstream.player.database.dao.VideoDao
 import com.tpstream.player.database.roomMigration.RoomMigration1To2.MIGRATION_1_2
 import com.tpstream.player.database.roomMigration.RoomMigration2To3.MIGRATION_2_3
-import com.tpstream.player.models.DatabaseVideo
+import com.tpstream.player.models.LocalVideo
 
 @Database(
     version = 3,
-    entities = [DatabaseVideo::class],
+    entities = [LocalVideo::class],
     exportSchema = true
 )
 internal abstract class TPStreamsDatabase : RoomDatabase() {

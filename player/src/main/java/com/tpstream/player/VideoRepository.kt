@@ -34,7 +34,7 @@ internal class VideoRepository(context: Context) {
         }
     }
 
-    fun get(videoId: String): LiveData<DatabaseVideo?> {
+    fun get(videoId: String): LiveData<LocalVideo?> {
         return videoDao.getVideoById(videoId)
     }
 
@@ -42,19 +42,19 @@ internal class VideoRepository(context: Context) {
         return videoDao.getVideoByUrl(url)?.videoId
     }
 
-    suspend fun insert(video: DatabaseVideo){
+    suspend fun insert(video: LocalVideo){
         videoDao.insert(video)
     }
 
-    suspend fun delete(video: DatabaseVideo){
+    suspend fun delete(video: LocalVideo){
         videoDao.delete(video.videoId)
     }
 
-    fun getVideoByVideoId(videoID:String): DatabaseVideo?{
+    fun getVideoByVideoId(videoID:String): LocalVideo?{
         return videoDao.getVideoByVideoId(videoID)
     }
 
-    fun getAllDownloadsInLiveData():LiveData<List<DatabaseVideo>?>{
+    fun getAllDownloadsInLiveData():LiveData<List<LocalVideo>?>{
         return videoDao.getAllDownloadInLiveData()
     }
 
@@ -70,8 +70,8 @@ internal class VideoRepository(context: Context) {
         }
     }
 
-    private fun getVideoFromDB(params: TpInitParams): DatabaseVideo?{
-        var video : DatabaseVideo? = null
+    private fun getVideoFromDB(params: TpInitParams): LocalVideo?{
+        var video : LocalVideo? = null
         runBlocking(Dispatchers.IO) {
             video = videoDao.getVideoByVideoId(params.videoId!!)
         }
@@ -99,7 +99,7 @@ internal class VideoRepository(context: Context) {
 
     private fun storeVideo(video: Video){
         CoroutineScope(Dispatchers.IO).launch {
-            videoDao.insert(video.asDatabaseVideo())
+            videoDao.insert(video.asLocalVideo())
         }
     }
 

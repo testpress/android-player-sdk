@@ -5,7 +5,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "Video", indices = [Index(value = ["videoId"], unique = true)])
-internal class DatabaseVideo(
+internal class LocalVideo(
     @PrimaryKey(autoGenerate = true)
     val id : Long = 0L,
     var videoId: String = "",
@@ -43,7 +43,7 @@ internal class DatabaseVideo(
     }
 }
 
-internal fun List<DatabaseVideo>.asDomainVideos(): List<Video> {
+internal fun List<LocalVideo>.asDomainVideos(): List<Video> {
     return map {
         it.asDomainVideo()
     }

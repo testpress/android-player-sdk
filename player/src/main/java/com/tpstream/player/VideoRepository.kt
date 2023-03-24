@@ -3,10 +3,11 @@ package com.tpstream.player
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.media3.exoplayer.offline.Download
+import com.tpstream.player.data.source.local.LocalVideo
 import com.tpstream.player.database.TPStreamsDatabase
 import com.tpstream.player.models.*
 import com.tpstream.player.models.NetworkVideo
-import com.tpstream.player.models.getVideoState
+import com.tpstream.player.data.source.local.getVideoState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

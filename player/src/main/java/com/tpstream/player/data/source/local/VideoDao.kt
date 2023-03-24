@@ -1,12 +1,10 @@
-package com.tpstream.player.database.dao
+package com.tpstream.player.data.source.local
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.tpstream.player.models.LocalVideo
 
 @Dao
 internal interface VideoDao {

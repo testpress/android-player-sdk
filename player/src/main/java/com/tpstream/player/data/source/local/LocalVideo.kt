@@ -1,8 +1,9 @@
-package com.tpstream.player.models
+package com.tpstream.player.data.source.local
 
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.tpstream.player.models.Video
 
 @Entity(tableName = "Video", indices = [Index(value = ["videoId"], unique = true)])
 internal class LocalVideo(
@@ -23,7 +24,7 @@ internal class LocalVideo(
     var videoHeight: Int = 0
 ) {
 
-    fun asDomainVideo():Video {
+    fun asDomainVideo(): Video {
         return Video(
             id = this.id,
             videoId = this.videoId,
@@ -56,7 +57,7 @@ enum class DownloadStatus {
     FAILED
 }
 
-internal fun getVideoState(int:Int):DownloadStatus?{
+internal fun getVideoState(int:Int): DownloadStatus?{
     return when(int){
         1 -> DownloadStatus.PAUSE
         2 -> DownloadStatus.DOWNLOADING

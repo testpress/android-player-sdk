@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.tpstream.player.models.Video
-import com.tpstream.player.models.asDomainVideos
+import com.tpstream.player.data.source.local.asDomainVideos
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -93,6 +93,34 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         hideSystemUi()
     }
 
+    override fun onPause() {
+        super.onPause()
+        if (Util.SDK_INT <= 23) {
+            storeCurrentPlayTime()
+            player?.release()
+        }
+        Log.d(TAG, "onPause: ")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (Util.SDK_INT > 23) {
+            storeCurrentPlayTime()
+            player?.release()
+        }
+        Log.d(TAG, "onStop: ")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _viewBinding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disableAutoFullScreenOnRotate()
+    }
+
     private fun initializeFullScreenDialog() {
         fullScreenDialog =
             object : Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
@@ -331,34 +359,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun storeCurrentPlayTime(){
         startPosition = player?.getCurrentTime()?.div(1000L) ?: -1L
-    }
-
-    override fun onPause() {
-        super.onPause()
-        if (Util.SDK_INT <= 23) {
-            storeCurrentPlayTime()
-            player?.release()
-        }
-        Log.d(TAG, "onPause: ")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if (Util.SDK_INT > 23) {
-            storeCurrentPlayTime()
-            player?.release()
-        }
-        Log.d(TAG, "onStop: ")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _viewBinding = null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        disableAutoFullScreenOnRotate()
     }
 
     fun enableAutoFullScreenOnRotate() {

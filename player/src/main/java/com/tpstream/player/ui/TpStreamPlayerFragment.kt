@@ -316,6 +316,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         this.initializationListener = listener
     }
 
+    @Deprecated("Deprecated",ReplaceWith("TpStreamPlayer.load()"),DeprecationLevel.WARNING)
     fun load(parameters: TpInitParams) {
         if (player == null) {
             throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
@@ -323,14 +324,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         if (startPosition != -1L){
             parameters.startAt = startPosition
         }
-
-        player?.load(parameters) { exception ->
-            requireActivity().runOnUiThread {
-                showErrorMessage("Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}")
-                SentryLogger.logAPIException(exception, parameters)
-            }
-        }
-        player?.setPlayWhenReady(parameters.autoPlay==true)
+        player?.load(parameters)
     }
 
     private fun updateDownloadButtonImage(videoId: String){
@@ -487,6 +481,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
+        override fun updateError(parameters: TpInitParams, exception: TPException) {
+            requireActivity().runOnUiThread{
+                viewBinding.errorMessage.text = "Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}"
+                viewBinding.errorMessage.visibility = View.VISIBLE
+                SentryLogger.logAPIException(exception,parameters)
+            }
+        }
     }
 }
 

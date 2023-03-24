@@ -77,8 +77,9 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             }
     }
 
-    fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
+    override fun load(parameters: TpInitParams) {
         params = parameters
+        exoPlayer.playWhenReady = parameters.autoPlay?:true
         videoRepository.getVideo(parameters, object : VideoNetworkDataSource.TPResponse<Video> {
             override fun onSuccess(result: Video) {
                 video = result
@@ -87,7 +88,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             }
 
             override fun onFailure(exception: TPException) {
-                onError(exception)
+                tpStreamPlayerImplCallBack?.updateError(parameters,exception)
             }
         })
     }
@@ -212,4 +213,5 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 internal interface TpStreamPlayerImplCallBack {
 
     fun updateDownloadButton(showDownloadButton: Boolean,videoId: String)
+    fun updateError(parameters: TpInitParams,exception: TPException)
 }

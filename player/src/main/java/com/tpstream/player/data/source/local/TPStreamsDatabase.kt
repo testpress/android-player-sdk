@@ -21,7 +21,7 @@ internal abstract class TPStreamsDatabase : RoomDatabase() {
 
         operator fun invoke(context: Context): TPStreamsDatabase {
             synchronized(TPStreamsDatabase::class.java) {
-                if (!Companion::INSTANCE.isInitialized) {
+                if (!::INSTANCE.isInitialized) {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
                         TPStreamsDatabase::class.java, "tpStreams-database"

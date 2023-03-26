@@ -18,9 +18,9 @@ class NetworkTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var mockWebServer: MockWebServer
-    private val network: Network<NetworkVideo> = Network(NetworkVideo::class.java)
+    private val network: VideoNetworkDataSource<NetworkVideo> = VideoNetworkDataSource(NetworkVideo::class.java)
 
-    private lateinit var callbackResponse: Network.TPResponse<NetworkVideo>
+    private lateinit var callbackResponse: VideoNetworkDataSource.TPResponse<NetworkVideo>
     lateinit var callbackResult: NetworkVideo
     lateinit var callbackException: TPException
 
@@ -28,7 +28,7 @@ class NetworkTest {
     fun createService() {
         mockWebServer = MockWebServer()
         runBlocking {
-            callbackResponse = object : Network.TPResponse<NetworkVideo> {
+            callbackResponse = object : VideoNetworkDataSource.TPResponse<NetworkVideo> {
                 override fun onSuccess(result: NetworkVideo) {
                     callbackResult = result
                 }

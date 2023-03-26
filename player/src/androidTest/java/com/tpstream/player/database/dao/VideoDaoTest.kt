@@ -7,7 +7,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tpstream.player.data.source.local.VideoDao
-import com.tpstream.player.database.TPStreamsDatabase
+import com.tpstream.player.data.source.local.TPStreamsDatabase
 import com.tpstream.player.models.Video
 import com.tpstream.player.data.source.local.asDomainVideos
 import junit.framework.TestCase.assertEquals

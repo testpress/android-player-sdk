@@ -2,6 +2,7 @@ package com.tpstream.player
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.tpstream.player.data.source.network.NetworkVideo
+import com.tpstream.player.data.source.network.VideoNetworkDataSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse

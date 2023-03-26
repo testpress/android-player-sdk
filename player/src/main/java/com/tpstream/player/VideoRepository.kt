@@ -8,6 +8,7 @@ import com.tpstream.player.data.source.local.TPStreamsDatabase
 import com.tpstream.player.models.*
 import com.tpstream.player.data.source.network.NetworkVideo
 import com.tpstream.player.data.source.local.getVideoState
+import com.tpstream.player.data.source.network.VideoNetworkDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

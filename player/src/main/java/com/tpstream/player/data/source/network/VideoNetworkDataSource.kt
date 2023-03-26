@@ -1,6 +1,7 @@
-package com.tpstream.player
+package com.tpstream.player.data.source.network
 
 import com.google.gson.Gson
+import com.tpstream.player.TPException
 import okhttp3.*
 import java.io.IOException
 import java.net.URL

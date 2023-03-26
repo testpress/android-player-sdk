@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tpstream.app.databinding.ActivityDownloadListBinding
 import com.tpstream.app.databinding.DownloadItemBinding
 import com.tpstream.player.TpInitParams
-import com.tpstream.player.models.Video
+import com.tpstream.player.data.Video
 import com.tpstream.player.data.source.local.DownloadStatus
 
 class DownloadListActivity : AppCompatActivity() {

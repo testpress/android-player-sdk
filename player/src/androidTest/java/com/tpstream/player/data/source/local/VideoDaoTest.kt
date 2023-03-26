@@ -6,7 +6,7 @@ import androidx.lifecycle.Transformations
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.tpstream.player.models.Video
+import com.tpstream.player.data.Video
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.*

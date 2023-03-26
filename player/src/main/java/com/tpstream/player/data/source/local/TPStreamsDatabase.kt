@@ -1,11 +1,9 @@
-package com.tpstream.player.database
+package com.tpstream.player.data.source.local
 
 import android.content.Context
 import androidx.room.*
-import com.tpstream.player.data.source.local.VideoDao
-import com.tpstream.player.database.roomMigration.RoomMigration1To2.MIGRATION_1_2
-import com.tpstream.player.database.roomMigration.RoomMigration2To3.MIGRATION_2_3
-import com.tpstream.player.data.source.local.LocalVideo
+import com.tpstream.player.data.source.local.migration.RoomMigration1To2.MIGRATION_1_2
+import com.tpstream.player.data.source.local.migration.RoomMigration2To3.MIGRATION_2_3
 
 @Database(
     version = 3,

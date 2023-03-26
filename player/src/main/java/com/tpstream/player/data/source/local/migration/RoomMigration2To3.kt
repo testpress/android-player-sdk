@@ -1,4 +1,4 @@
-package com.tpstream.player.database.roomMigration
+package com.tpstream.player.data.source.local.migration
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase

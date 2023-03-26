@@ -2,13 +2,14 @@ package com.tpstream.player.data
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import androidx.media3.exoplayer.offline.Download
 import com.tpstream.player.BuildConfig
 import com.tpstream.player.TPException
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.VideoDownloadManager
-import com.tpstream.player.data.source.local.LocalVideo
 import com.tpstream.player.data.source.local.TPStreamsDatabase
+import com.tpstream.player.data.source.local.asDomainVideos
 import com.tpstream.player.data.source.network.NetworkVideo
 import com.tpstream.player.data.source.local.getVideoState
 import com.tpstream.player.data.source.network.VideoNetworkDataSource
@@ -39,28 +40,32 @@ internal class VideoRepository(context: Context) {
         }
     }
 
-    fun get(videoId: String): LiveData<LocalVideo?> {
-        return videoDao.getVideoById(videoId)
+    fun get(videoId: String): LiveData<Video?> {
+        return Transformations.map(videoDao.getVideoById(videoId)) {
+            it?.asDomainVideo()
+        }
     }
 
     fun grtVideoIdByUrl(url:String):String? {
         return videoDao.getVideoByUrl(url)?.videoId
     }
 
-    suspend fun insert(video: LocalVideo){
-        videoDao.insert(video)
+    suspend fun insert(video: Video){
+        videoDao.insert(video.asLocalVideo())
     }
 
-    suspend fun delete(video: LocalVideo){
+    suspend fun delete(video: Video){
         videoDao.delete(video.videoId)
     }
 
-    fun getVideoByVideoId(videoID:String): LocalVideo?{
-        return videoDao.getVideoByVideoId(videoID)
+    fun getVideoByVideoId(videoID:String): Video?{
+        return videoDao.getVideoByVideoId(videoID)?.asDomainVideo()
     }
 
-    fun getAllDownloadsInLiveData():LiveData<List<LocalVideo>?>{
-        return videoDao.getAllDownloadInLiveData()
+    fun getAllDownloadsInLiveData():LiveData<List<Video>?>{
+        return Transformations.map(videoDao.getAllDownloadInLiveData()) {
+            it?.asDomainVideos()
+        }
     }
 
     fun getVideo(
@@ -69,16 +74,16 @@ internal class VideoRepository(context: Context) {
     ){
         val video = getVideoFromDB(params)
         if (video != null) {
-            callback.onSuccess(video.asDomainVideo())
+            callback.onSuccess(video)
         } else {
             fetchVideo(params, callback)
         }
     }
 
-    private fun getVideoFromDB(params: TpInitParams): LocalVideo?{
-        var video : LocalVideo? = null
+    private fun getVideoFromDB(params: TpInitParams): Video?{
+        var video : Video? = null
         runBlocking(Dispatchers.IO) {
-            video = videoDao.getVideoByVideoId(params.videoId!!)
+            video = videoDao.getVideoByVideoId(params.videoId!!)?.asDomainVideo()
         }
         return video
     }

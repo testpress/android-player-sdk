@@ -10,6 +10,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.trackselection.TrackSelector
 import com.google.common.collect.ImmutableList
+import com.tpstream.player.data.source.network.VideoNetworkDataSource
 import com.tpstream.player.models.*
 
 interface TPStreamPlayerListener {
@@ -71,7 +72,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
         params = parameters
-        videoRepository.getVideo(parameters, object :VideoNetworkDataSource.TPResponse<Video> {
+        videoRepository.getVideo(parameters, object : VideoNetworkDataSource.TPResponse<Video> {
             override fun onSuccess(result: Video) {
                 video = result
                 playVideoInUIThread(result.url, parameters.startPositionInMilliSecs)

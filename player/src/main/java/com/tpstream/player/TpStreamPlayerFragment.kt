@@ -25,6 +25,7 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.views.AdvancedResolutionSelectionSheet

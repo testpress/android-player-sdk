@@ -1,4 +1,4 @@
-package com.tpstream.player.models
+package com.tpstream.player.data
 
 import android.content.Context
 import android.graphics.Bitmap

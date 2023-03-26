@@ -1,7 +1,7 @@
 package com.tpstream.player.data.source.network
 
 import com.google.gson.annotations.SerializedName
-import com.tpstream.player.models.Video
+import com.tpstream.player.data.Video
 
 internal data class NetworkVideo(
     val title: String?,

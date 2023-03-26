@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableList
 import com.tpstream.player.*
 import com.tpstream.player.R
 import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
-import com.tpstream.player.models.Video
+import com.tpstream.player.data.Video
 import okio.IOException
 import kotlin.math.roundToInt
 

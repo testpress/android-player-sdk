@@ -3,7 +3,7 @@ package com.tpstream.player.data.source.local
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.tpstream.player.models.Video
+import com.tpstream.player.data.Video
 
 @Entity(tableName = "Video", indices = [Index(value = ["videoId"], unique = true)])
 internal class LocalVideo(

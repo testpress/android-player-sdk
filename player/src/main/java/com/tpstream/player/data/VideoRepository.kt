@@ -1,12 +1,14 @@
-package com.tpstream.player
+package com.tpstream.player.data
 
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.media3.exoplayer.offline.Download
-import com.tpstream.player.data.Video
+import com.tpstream.player.BuildConfig
+import com.tpstream.player.TPException
+import com.tpstream.player.TpInitParams
+import com.tpstream.player.VideoDownloadManager
 import com.tpstream.player.data.source.local.LocalVideo
 import com.tpstream.player.data.source.local.TPStreamsDatabase
-import com.tpstream.player.models.*
 import com.tpstream.player.data.source.network.NetworkVideo
 import com.tpstream.player.data.source.local.getVideoState
 import com.tpstream.player.data.source.network.VideoNetworkDataSource

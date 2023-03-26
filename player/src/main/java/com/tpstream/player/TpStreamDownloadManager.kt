@@ -2,10 +2,8 @@ package com.tpstream.player
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.VideoRepository
-import com.tpstream.player.data.source.local.asDomainVideos
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,9 +13,7 @@ class TpStreamDownloadManager(val context: Context) {
     private val videoRepository = VideoRepository(context)
 
     fun getAllDownloads(): LiveData<List<Video>?> {
-        return Transformations.map(videoRepository.getAllDownloadsInLiveData()) {
-            it?.asDomainVideos()
-        }
+        return videoRepository.getAllDownloadsInLiveData()
     }
 
     fun pauseDownload(video: Video) {
@@ -36,7 +32,7 @@ class TpStreamDownloadManager(val context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             DownloadTask(context).delete(video)
             ImageSaver(context).delete(video.videoId)
-            videoRepository.delete(video.asLocalVideo())
+            videoRepository.delete(video)
         }
     }
 }

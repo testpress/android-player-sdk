@@ -1,10 +1,8 @@
 package com.tpstream.player
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tpstream.player.data.source.local.LocalVideo
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.VideoRepository
 import kotlinx.coroutines.Dispatchers
@@ -14,20 +12,18 @@ import kotlinx.coroutines.runBlocking
 internal class VideoViewModel(private val videoRepository: VideoRepository):ViewModel() {
 
     fun get(videoId: String): LiveData<Video?> {
-        return Transformations.map(videoRepository.get(videoId)) {
-            it?.asDomainVideo()
-        }
+        return videoRepository.get(videoId)
     }
 
     fun insert(video: Video){
         viewModelScope.launch{
-            videoRepository.insert(video.asLocalVideo())
+            videoRepository.insert(video)
         }
     }
 
     fun delete(videoId: String){
         viewModelScope.launch {
-            var video : LocalVideo? = null
+            var video : Video? = null
             runBlocking(Dispatchers.IO) {
                 video = videoRepository.getVideoByVideoId(videoId)
             }

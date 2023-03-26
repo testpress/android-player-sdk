@@ -1,11 +1,9 @@
 package com.tpstream.player
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.gson.annotations.SerializedName
-import com.tpstream.player.models.NetworkVideo
+import com.tpstream.player.data.source.network.NetworkVideo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import okhttp3.internal.EMPTY_REQUEST
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.*

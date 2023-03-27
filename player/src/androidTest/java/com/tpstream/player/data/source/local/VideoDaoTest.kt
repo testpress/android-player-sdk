@@ -7,6 +7,9 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.tpstream.player.data.Video
+import com.tpstream.player.data.asDomainVideo
+import com.tpstream.player.data.asDomainVideos
+import com.tpstream.player.data.asLocalVideo
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.*

@@ -9,7 +9,6 @@ import com.tpstream.player.TPException
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.VideoDownloadManager
 import com.tpstream.player.data.source.local.TPStreamsDatabase
-import com.tpstream.player.data.source.local.asDomainVideos
 import com.tpstream.player.data.source.network.NetworkVideo
 import com.tpstream.player.data.source.local.getVideoState
 import com.tpstream.player.data.source.network.VideoNetworkDataSource

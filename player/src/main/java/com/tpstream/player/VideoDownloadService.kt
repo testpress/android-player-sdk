@@ -7,6 +7,7 @@ import androidx.media3.exoplayer.offline.*
 import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
 import com.tpstream.player.data.VideoRepository
+import com.tpstream.player.data.source.local.getVideoState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,9 +54,7 @@ internal class VideoDownloadService:DownloadService(
         notMetRequirements: Int
     ): Notification {
 
-        CoroutineScope(Dispatchers.IO).launch {
-            videoRepository.refreshCurrentDownloadsStatus()
-        }
+        refreshCurrentDownloadsStatus()
 
         return notificationHelper.buildProgressNotification(
             applicationContext,
@@ -76,7 +75,7 @@ internal class VideoDownloadService:DownloadService(
         var videoId : String?
 
         runBlocking(Dispatchers.IO) {
-            videoId = videoRepository.grtVideoIdByUrl(download.request.uri.toString())
+            videoId = videoRepository.getVideoByUrl(download.request.uri.toString())?.videoId
         }
 
         when (download.state) {
@@ -114,9 +113,22 @@ internal class VideoDownloadService:DownloadService(
         )
     }
 
+    private fun refreshCurrentDownloadsStatus() {
+        for (download in downloadManager.currentDownloads) {
+            updateDownloadStatus(download)
+        }
+    }
+
     private fun updateDownloadStatus(download:Download){
         CoroutineScope(Dispatchers.IO).launch{
-            videoRepository.updateDownloadStatus(download)
+            val video = videoRepository.getVideoByUrl(download.request.uri.toString())
+            video?.let {
+                video.percentageDownloaded = download.percentDownloaded.toInt()
+                video.bytesDownloaded = download.bytesDownloaded
+                video.totalSize = download.contentLength
+                video.downloadState = getVideoState(download.state)
+                videoRepository.update(video)
+            }
         }
     }
 

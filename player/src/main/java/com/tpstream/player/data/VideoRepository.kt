@@ -21,23 +21,9 @@ import kotlinx.coroutines.runBlocking
 internal class VideoRepository(context: Context) {
 
     private val videoDao = TPStreamsDatabase(context).videoDao()
-    private val downloadManager = VideoDownloadManager(context).get()
 
-    suspend fun refreshCurrentDownloadsStatus() {
-        for (download in downloadManager.currentDownloads) {
-            updateDownloadStatus(download)
-        }
-    }
-
-    suspend fun updateDownloadStatus(download: Download) {
-        val video = videoDao.getVideoByUrl(download.request.uri.toString())
-        video?.let {
-            video.percentageDownloaded = download.percentDownloaded.toInt()
-            video.bytesDownloaded = download.bytesDownloaded
-            video.totalSize = download.contentLength
-            video.downloadState = getVideoState(download.state)
-            videoDao.insert(video)
-        }
+    suspend fun update(video: Video){
+        videoDao.insert(video.asLocalVideo())
     }
 
     fun get(videoId: String): LiveData<Video?> {
@@ -46,8 +32,8 @@ internal class VideoRepository(context: Context) {
         }
     }
 
-    fun grtVideoIdByUrl(url:String):String? {
-        return videoDao.getVideoByUrl(url)?.videoId
+    fun getVideoByUrl(url:String):Video? {
+        return videoDao.getVideoByUrl(url)?.asDomainVideo()
     }
 
     suspend fun insert(video: Video){

@@ -1,7 +1,6 @@
 package com.tpstream.player.data.source.network
 
 import com.google.gson.annotations.SerializedName
-import com.tpstream.player.data.Video
 
 internal data class NetworkVideo(
     val title: String?,
@@ -44,22 +43,4 @@ internal data class NetworkVideo(
         val audio_codec: String?,
         val enable_drm: Boolean?
     )
-
-    fun asDomainVideo():Video {
-        val thumbnailUrl = if (networkVideoContent != null) networkVideoContent.preview_thumbnail_url?:"" else thumbnail?:""
-        val url = if (networkVideoContent != null){
-            if (networkVideoContent.enable_drm == true) networkVideoContent.dash_url?:"" else networkVideoContent.playback_url?:""
-        } else {
-            dashUrl?:url?:""
-        }
-        return Video(
-            videoId = this.id?:"",
-            title = this.title?:"",
-            thumbnail = thumbnailUrl,
-            url = url,
-            duration = duration?:"",
-            description = description?:"",
-            transcodingStatus = transcodingStatus?:""
-        )
-    }
 }

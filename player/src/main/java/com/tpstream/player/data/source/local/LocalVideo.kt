@@ -3,7 +3,6 @@ package com.tpstream.player.data.source.local
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.tpstream.player.data.Video
 
 @Entity(tableName = "Video", indices = [Index(value = ["videoId"], unique = true)])
 internal class LocalVideo(
@@ -22,33 +21,7 @@ internal class LocalVideo(
     var downloadState: DownloadStatus? = null,
     var videoWidth: Int = 0,
     var videoHeight: Int = 0
-) {
-
-    fun asDomainVideo(): Video {
-        return Video(
-            id = this.id,
-            videoId = this.videoId,
-            title = this.title,
-            thumbnail = this.thumbnail,
-            url = this.url,
-            duration = this.duration,
-            description = this.description,
-            transcodingStatus = this.transcodingStatus,
-            percentageDownloaded = this.percentageDownloaded,
-            bytesDownloaded = this.bytesDownloaded,
-            totalSize = this.totalSize,
-            downloadState = this.downloadState,
-            videoWidth = this.videoWidth,
-            videoHeight = this.videoHeight
-        )
-    }
-}
-
-internal fun List<LocalVideo>.asDomainVideos(): List<Video> {
-    return map {
-        it.asDomainVideo()
-    }
-}
+)
 
 enum class DownloadStatus {
     PAUSE,

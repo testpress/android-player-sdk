@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.tpstream.player.ImageSaver
 import com.tpstream.player.data.source.local.DownloadStatus
-import com.tpstream.player.data.source.local.LocalVideo
 
 data class Video(
     internal var id:Long? = null,
@@ -28,21 +27,4 @@ data class Video(
         return ImageSaver(context).load(videoId)
     }
 
-    internal fun asLocalVideo(): LocalVideo {
-        return LocalVideo(
-            videoId = this.videoId,
-            title = this.title,
-            thumbnail = this.thumbnail,
-            url = this.url,
-            duration = this.duration,
-            description = this.description,
-            transcodingStatus = this.transcodingStatus,
-            percentageDownloaded = this.percentageDownloaded,
-            bytesDownloaded = this.bytesDownloaded,
-            totalSize = this.totalSize,
-            downloadState = this.downloadState,
-            videoWidth = this.videoWidth,
-            videoHeight = this.videoHeight
-        )
-    }
 }

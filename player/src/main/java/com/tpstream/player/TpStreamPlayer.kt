@@ -13,7 +13,6 @@ import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.data.source.network.VideoNetworkDataSource
-import com.tpstream.player.models.*
 
 interface TPStreamPlayerListener {
     fun onTracksChanged(tracks: Tracks) {}

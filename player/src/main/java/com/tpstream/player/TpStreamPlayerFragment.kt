@@ -28,11 +28,11 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.data.source.local.DownloadStatus
-import com.tpstream.player.views.AdvancedResolutionSelectionSheet
-import com.tpstream.player.views.DownloadResolutionSelectionSheet
-import com.tpstream.player.views.ResolutionOptions
-import com.tpstream.player.views.SimpleVideoResolutionSelectionSheet
-import com.tpstream.player.views.Util.getRendererIndex
+import com.tpstream.player.ui.AdvancedResolutionSelectionSheet
+import com.tpstream.player.ui.DownloadResolutionSelectionSheet
+import com.tpstream.player.ui.ResolutionOptions
+import com.tpstream.player.ui.SimpleVideoResolutionSelectionSheet
+import com.tpstream.player.ui.Util.getRendererIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -1,8 +1,7 @@
-package com.tpstream.player
+package com.tpstream.player.offline
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.NetworkInfo
 import android.net.Uri
 import androidx.media3.common.Format
@@ -13,7 +12,11 @@ import androidx.media3.exoplayer.drm.OfflineLicenseHelper
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
+import com.tpstream.player.BuildConfig
+import com.tpstream.player.TpInitParams
+import com.tpstream.player.VideoDownload
 import com.tpstream.player.VideoDownload.getDownloadRequest
+import com.tpstream.player.VideoDownloadManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

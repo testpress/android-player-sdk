@@ -26,13 +26,13 @@ import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.*
-import com.tpstream.player.DRMLicenseFetchCallback
+import com.tpstream.player.offline.DRMLicenseFetchCallback
 import com.tpstream.player.DownloadCallback
 import com.tpstream.player.DownloadTask
 import com.tpstream.player.EncryptionKeyRepository
 import com.tpstream.player.ImageSaver
-import com.tpstream.player.InternetConnectivityChecker
-import com.tpstream.player.OfflineDRMLicenseHelper
+import com.tpstream.player.offline.InternetConnectivityChecker
+import com.tpstream.player.offline.OfflineDRMLicenseHelper
 import com.tpstream.player.OrientationListener
 import com.tpstream.player.R
 import com.tpstream.player.SentryLogger

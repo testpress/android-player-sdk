@@ -10,6 +10,10 @@ import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.tpstream.player.offline.DRMLicenseFetchCallback
+import com.tpstream.player.offline.OFFLINE_DRM_LICENSE_PARAMS
+import com.tpstream.player.offline.OfflineDRMLicenseHelper
+import com.tpstream.player.offline.VideoPlayerUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

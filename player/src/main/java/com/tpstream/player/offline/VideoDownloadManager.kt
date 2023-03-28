@@ -1,4 +1,4 @@
-package com.tpstream.player
+package com.tpstream.player.offline
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -12,6 +12,8 @@ import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.offline.DefaultDownloadIndex
 import androidx.media3.exoplayer.offline.DownloadManager
+import com.tpstream.player.TpInitParams
+import com.tpstream.player.VideoPlayerInterceptor
 import okhttp3.OkHttpClient
 import java.io.File
 import java.util.concurrent.Executors

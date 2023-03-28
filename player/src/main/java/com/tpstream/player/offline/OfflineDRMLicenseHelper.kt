@@ -16,7 +16,6 @@ import com.tpstream.player.BuildConfig
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.VideoDownload
 import com.tpstream.player.VideoDownload.getDownloadRequest
-import com.tpstream.player.VideoDownloadManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

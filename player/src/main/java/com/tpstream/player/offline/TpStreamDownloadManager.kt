@@ -1,7 +1,9 @@
-package com.tpstream.player
+package com.tpstream.player.offline
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import com.tpstream.player.DownloadTask
+import com.tpstream.player.ImageSaver
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.VideoRepository
 import kotlinx.coroutines.CoroutineScope

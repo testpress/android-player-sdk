@@ -7,7 +7,6 @@ import androidx.media3.exoplayer.offline.*
 import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
 import com.tpstream.player.R
-import com.tpstream.player.VideoDownloadManager
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.data.source.local.getVideoState
 import kotlinx.coroutines.CoroutineScope

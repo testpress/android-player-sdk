@@ -12,7 +12,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/tpstream_player_fragment"
-            android:name="com.tpstream.player.TpStreamPlayerFragment"
+            android:name="com.tpstream.player.ui.TpStreamPlayerFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:keepScreenOn="true"

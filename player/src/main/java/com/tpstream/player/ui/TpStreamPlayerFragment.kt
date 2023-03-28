@@ -1,4 +1,4 @@
-package com.tpstream.player
+package com.tpstream.player.ui
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -25,13 +25,22 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import com.tpstream.player.*
+import com.tpstream.player.DRMLicenseFetchCallback
+import com.tpstream.player.DownloadCallback
+import com.tpstream.player.DownloadTask
+import com.tpstream.player.EncryptionKeyRepository
+import com.tpstream.player.ImageSaver
+import com.tpstream.player.InternetConnectivityChecker
+import com.tpstream.player.OfflineDRMLicenseHelper
+import com.tpstream.player.OrientationListener
+import com.tpstream.player.R
+import com.tpstream.player.SentryLogger
+import com.tpstream.player.TpStreamPlayerImpl
+import com.tpstream.player.VideoViewModel
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.data.source.local.DownloadStatus
-import com.tpstream.player.ui.AdvancedResolutionSelectionSheet
-import com.tpstream.player.ui.DownloadResolutionSelectionSheet
-import com.tpstream.player.ui.ResolutionOptions
-import com.tpstream.player.ui.SimpleVideoResolutionSelectionSheet
 import com.tpstream.player.ui.Util.getRendererIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -277,7 +286,9 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         (viewBinding.videoView.parent as ViewGroup).removeView(viewBinding.videoView)
         viewBinding.mainFrameLayout.addView(viewBinding.videoView)
-        viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_fullscreen_24));
+        viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(),
+            R.drawable.ic_baseline_fullscreen_24
+        ));
         fullScreenDialog.dismiss()
         isFullScreen = false
     }
@@ -285,7 +296,9 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun showFullScreen() {
         (viewBinding.videoView.parent as ViewGroup).removeView(viewBinding.videoView)
         fullScreenDialog.addContentView(viewBinding.videoView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-        viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_fullscreen_exit_24));
+        viewBinding.videoView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(),
+            R.drawable.ic_baseline_fullscreen_exit_24
+        ));
         fullScreenDialog.show()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         isFullScreen = true
@@ -314,7 +327,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             requireActivity().runOnUiThread {
                 viewBinding.errorMessage.visibility = View.VISIBLE
                 viewBinding.errorMessage.text = "Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}"
-                SentryLogger.logAPIException(exception,parameters)
+                SentryLogger.logAPIException(exception, parameters)
             }
         }
         player?.setPlayWhenReady(parameters.autoPlay==true)
@@ -394,7 +407,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
             viewBinding.errorMessage.visibility = View.VISIBLE
-            SentryLogger.logPlaybackException(error,player?.params)
+            SentryLogger.logPlaybackException(error, player?.params)
             if (isDRMException(error.cause!!)) {
                 fetchDRMLicence()
             } else {

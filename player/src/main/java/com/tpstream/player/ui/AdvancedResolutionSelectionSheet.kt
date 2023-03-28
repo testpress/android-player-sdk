@@ -1,4 +1,4 @@
-package com.tpstream.player.views
+package com.tpstream.player.ui
 
 import android.content.Context
 import android.content.DialogInterface
@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.media3.common.*
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment

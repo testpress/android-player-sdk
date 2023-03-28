@@ -1,4 +1,4 @@
-package com.tpstream.player.views
+package com.tpstream.player.ui
 
 import android.content.Context
 import android.os.Bundle

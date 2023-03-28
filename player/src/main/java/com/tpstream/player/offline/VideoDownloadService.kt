@@ -1,4 +1,4 @@
-package com.tpstream.player
+package com.tpstream.player.offline
 
 import android.app.Notification
 import androidx.media3.common.util.NotificationUtil
@@ -6,6 +6,8 @@ import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.offline.*
 import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
+import com.tpstream.player.R
+import com.tpstream.player.VideoDownloadManager
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.data.source.local.getVideoState
 import kotlinx.coroutines.CoroutineScope

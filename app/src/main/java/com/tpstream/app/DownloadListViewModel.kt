@@ -3,7 +3,7 @@ package com.tpstream.app
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.tpstream.player.TpStreamDownloadManager
+import com.tpstream.player.offline.TpStreamDownloadManager
 import com.tpstream.player.data.Video
 
 class DownloadListViewModel(context: Context): ViewModel() {

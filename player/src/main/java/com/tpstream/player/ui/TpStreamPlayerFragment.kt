@@ -28,7 +28,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.*
 import com.tpstream.player.offline.DRMLicenseFetchCallback
 import com.tpstream.player.offline.DownloadCallback
-import com.tpstream.player.DownloadTask
+import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.EncryptionKeyRepository
 import com.tpstream.player.ImageSaver
 import com.tpstream.player.offline.InternetConnectivityChecker

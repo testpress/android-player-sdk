@@ -14,8 +14,7 @@ import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import com.tpstream.player.BuildConfig
 import com.tpstream.player.TpInitParams
-import com.tpstream.player.VideoDownload
-import com.tpstream.player.VideoDownload.getDownloadRequest
+import com.tpstream.player.offline.VideoDownload.getDownloadRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

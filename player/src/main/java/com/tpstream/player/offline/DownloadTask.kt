@@ -1,4 +1,4 @@
-package com.tpstream.player
+package com.tpstream.player.offline
 
 
 import android.content.Context
@@ -6,8 +6,6 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import com.tpstream.player.data.Video
-import com.tpstream.player.offline.VideoDownloadManager
-import com.tpstream.player.offline.VideoDownloadService
 
 internal class DownloadTask (val context: Context) {
 

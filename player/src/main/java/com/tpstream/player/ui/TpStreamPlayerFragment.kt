@@ -35,7 +35,7 @@ import com.tpstream.player.offline.InternetConnectivityChecker
 import com.tpstream.player.offline.OfflineDRMLicenseHelper
 import com.tpstream.player.util.OrientationListener
 import com.tpstream.player.R
-import com.tpstream.player.SentryLogger
+import com.tpstream.player.util.SentryLogger
 import com.tpstream.player.TpStreamPlayerImpl
 import com.tpstream.player.VideoViewModel
 import com.tpstream.player.data.VideoRepository

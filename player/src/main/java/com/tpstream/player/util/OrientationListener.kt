@@ -1,7 +1,6 @@
-package com.tpstream.player
+package com.tpstream.player.util
 
 import android.content.Context
-import android.content.DialogInterface
 import android.provider.Settings
 import android.view.OrientationEventListener
 

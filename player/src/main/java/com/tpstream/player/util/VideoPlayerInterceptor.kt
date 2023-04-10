@@ -1,6 +1,8 @@
-package com.tpstream.player
+package com.tpstream.player.util
 
 import android.content.Context
+import com.tpstream.player.EncryptionKeyRepository
+import com.tpstream.player.TpInitParams
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Protocol

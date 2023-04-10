@@ -33,7 +33,7 @@ import com.tpstream.player.EncryptionKeyRepository
 import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.offline.InternetConnectivityChecker
 import com.tpstream.player.offline.OfflineDRMLicenseHelper
-import com.tpstream.player.OrientationListener
+import com.tpstream.player.util.OrientationListener
 import com.tpstream.player.R
 import com.tpstream.player.SentryLogger
 import com.tpstream.player.TpStreamPlayerImpl

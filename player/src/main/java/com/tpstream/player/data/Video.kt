@@ -2,7 +2,7 @@ package com.tpstream.player.data
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.tpstream.player.ImageSaver
+import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.data.source.local.DownloadStatus
 
 data class Video(

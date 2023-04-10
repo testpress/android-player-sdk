@@ -30,7 +30,7 @@ import com.tpstream.player.offline.DRMLicenseFetchCallback
 import com.tpstream.player.offline.DownloadCallback
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.EncryptionKeyRepository
-import com.tpstream.player.ImageSaver
+import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.offline.InternetConnectivityChecker
 import com.tpstream.player.offline.OfflineDRMLicenseHelper
 import com.tpstream.player.OrientationListener

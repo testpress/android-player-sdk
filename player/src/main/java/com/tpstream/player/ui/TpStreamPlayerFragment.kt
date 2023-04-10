@@ -37,7 +37,7 @@ import com.tpstream.player.util.OrientationListener
 import com.tpstream.player.R
 import com.tpstream.player.util.SentryLogger
 import com.tpstream.player.TpStreamPlayerImpl
-import com.tpstream.player.VideoViewModel
+import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.data.source.local.DownloadStatus

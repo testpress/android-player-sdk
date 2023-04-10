@@ -1,4 +1,4 @@
-package com.tpstream.player
+package com.tpstream.player.ui.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel

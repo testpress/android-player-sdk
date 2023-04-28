@@ -325,8 +325,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         player?.load(parameters) { exception ->
             requireActivity().runOnUiThread {
-                viewBinding.errorMessage.visibility = View.VISIBLE
-                viewBinding.errorMessage.text = "Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}"
+                showErrorMessage("Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}")
                 SentryLogger.logAPIException(exception, parameters)
             }
         }
@@ -406,18 +405,17 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
-            viewBinding.errorMessage.visibility = View.VISIBLE
             SentryLogger.logPlaybackException(error, player?.params)
             if (isDRMException(error.cause!!)) {
                 fetchDRMLicence()
             } else {
-                viewBinding.errorMessage.text = "Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName}"
+                showErrorMessage("Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName}")
             }
         }
 
         private fun fetchDRMLicence(){
             if (!InternetConnectivityChecker.isNetworkAvailable(requireContext())) {
-                viewBinding.errorMessage.text = getString(R.string.no_internet_to_sync_license)
+                showErrorMessage(getString(R.string.no_internet_to_sync_license))
                 return
             }
             val url = player?.video?.url
@@ -425,9 +423,9 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             drmLicenseRetries += 1
             if (drmLicenseRetries < 2 && downloadTask.isDownloaded(url!!)) {
                 OfflineDRMLicenseHelper.renewLicense(url, player?.params!!, activity!!, this)
-                viewBinding.errorMessage.text = getString(R.string.syncing_video)
+                showErrorMessage(getString(R.string.syncing_video))
             } else {
-                viewBinding.errorMessage.text = getString(R.string.license_request_failed)
+                showErrorMessage(getString(R.string.license_request_failed))
             }
         }
 
@@ -439,14 +437,18 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         override fun onLicenseFetchFailure() {
-            viewBinding.errorMessage.visibility = View.VISIBLE
-            viewBinding.errorMessage.text = getString(R.string.license_error)
+            showErrorMessage(getString(R.string.license_error))
         }
 
         private fun isDRMException(cause: Throwable): Boolean {
             return cause is DrmSession.DrmSessionException || cause is MediaCodec.CryptoException || cause is MediaDrmCallbackException
         }
 
+    }
+
+    private fun showErrorMessage(message: String) {
+        viewBinding.errorMessage.visibility = View.VISIBLE
+        viewBinding.errorMessage.text = message
     }
 
     private class PlayerAnalyticsListener : AnalyticsListener {

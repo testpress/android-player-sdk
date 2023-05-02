@@ -19,7 +19,8 @@ data class Video(
     var totalSize: Long = 0,
     var downloadState: DownloadStatus? = null,
     var videoWidth: Int = 0,
-    var videoHeight: Int = 0
+    var videoHeight: Int = 0,
+    var orgCode: String = ""
 ) {
     internal val isNotDownloaded get() = this.downloadState != DownloadStatus.COMPLETE
 

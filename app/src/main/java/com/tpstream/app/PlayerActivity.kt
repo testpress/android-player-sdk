@@ -36,14 +36,11 @@ class PlayerActivity : AppCompatActivity() {
                 })
             }
 
-            override fun onOfflineLicenseExpire(videoID: String): HashMap<String, String> {
+            override fun onOfflineLicenseExpire(videoID: String): String {
                 Log.d("TAG", "onAccessTokenFiler: $videoID")
                 // Pass the orgCode and newly generated accessToken
                 // For the correspond videoID
-                return hashMapOf(
-                    "orgCode" to "demoveranda",
-                    "accessToken" to "c381512b-7337-4d8e-a8cf-880f4f08fd08"
-                )
+                return "c381512b-7337-4d8e-a8cf-880f4f08fd08"
             }
 
         });

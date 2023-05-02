@@ -1,6 +1,7 @@
 package com.tpstream.player
 
 import android.os.Parcelable
+import com.tpstream.player.data.Video
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -95,10 +96,11 @@ data class TpInitParams (
     }
 
     companion object{
-        fun createOfflineParams(videoId: String):TpInitParams{
+        fun createOfflineParams(video: Video):TpInitParams{
             return TpInitParams(
-                videoId = videoId,
-                orgCode = "",
+                videoId = video.videoId,
+                orgCode = video.orgCode,
+                accessToken = "",
                 isDownloadEnabled = true,
                 autoPlay = true
             )

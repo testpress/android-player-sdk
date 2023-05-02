@@ -442,7 +442,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
-        override fun onOfflineLicenseExpire(videoID: String): HashMap<String, String> {
+        override fun onOfflineLicenseExpire(videoID: String): String {
             return this@TpStreamPlayerFragment.initializationListener?.onOfflineLicenseExpire(videoID)!!
         }
 
@@ -491,5 +491,5 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
 interface InitializationListener {
     fun onInitializationSuccess(player: TpStreamPlayer)
-    fun onOfflineLicenseExpire(videoID: String): HashMap<String, String> = hashMapOf()
+    fun onOfflineLicenseExpire(videoID: String): String = ""
 }

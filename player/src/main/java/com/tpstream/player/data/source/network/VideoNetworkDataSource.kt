@@ -1,6 +1,7 @@
 package com.tpstream.player.data.source.network
 
 import com.google.gson.Gson
+import com.google.gson.JsonParseException
 import com.tpstream.player.TPException
 import okhttp3.*
 import java.io.IOException
@@ -40,8 +41,16 @@ internal class VideoNetworkDataSource<T : Any>(val klass: Class<T>) {
         client.newCall(request).enqueue(object: Callback {
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful){
-                    val result = gson.fromJson(response.body?.charStream(), klass)
-                    callback.onSuccess(result)
+                    // If the users provide invalid subdomain we are getting success response.
+                    // But we can't able to parse the response.
+                    // This try catch block will handle.
+                    // Valid response can able to parse for Invalid throw TPException
+                    try {
+                        val result = gson.fromJson(response.body?.charStream(), klass)
+                        callback.onSuccess(result)
+                    } catch (e: JsonParseException){
+                        callback.onFailure(TPException.httpError(response))
+                    }
                 } else{
                     callback.onFailure(TPException.httpError(response))
                 }

@@ -1,6 +1,7 @@
 package com.tpstream.player.data.source.network
 
 import com.google.gson.Gson
+import com.google.gson.JsonParseException
 import com.tpstream.player.TPException
 import okhttp3.*
 import java.io.IOException
@@ -47,7 +48,7 @@ internal class VideoNetworkDataSource<T : Any>(val klass: Class<T>) {
                     try {
                         val result = gson.fromJson(response.body?.charStream(), klass)
                         callback.onSuccess(result)
-                    } catch (e: Exception){
+                    } catch (e: JsonParseException){
                         callback.onFailure(TPException.httpError(response))
                     }
                 } else{

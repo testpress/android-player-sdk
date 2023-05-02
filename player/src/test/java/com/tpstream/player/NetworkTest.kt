@@ -22,7 +22,7 @@ class NetworkTest {
     private val network: VideoNetworkDataSource<NetworkVideo> = VideoNetworkDataSource(NetworkVideo::class.java)
 
     private lateinit var callbackResponse: VideoNetworkDataSource.TPResponse<NetworkVideo>
-    private lateinit var callbackResult: NetworkVideo
+    private var callbackResult: NetworkVideo? = null
     private lateinit var callbackException: TPException
 
     @Before
@@ -93,8 +93,8 @@ class NetworkTest {
             mockWebServer.takeRequest()
             delay(50)
         }
-        assertEquals(callbackResult.title, "No Encrypt")
-        assertEquals(callbackResult.duration, "0:10:34")
+        assertEquals(callbackResult?.title, "No Encrypt")
+        assertEquals(callbackResult?.duration, "0:10:34")
     }
 
     @Test
@@ -106,8 +106,8 @@ class NetworkTest {
             mockWebServer.takeRequest()
             delay(50)
         }
-        assertEquals(callbackResult.title, "BigBuckBunny.mp4")
-        assertEquals(callbackResult.id, "73633fa3-61c6-443c-b625-ac4e85b28cfc")
+        assertEquals(callbackResult?.title, "BigBuckBunny.mp4")
+        assertEquals(callbackResult?.id, "73633fa3-61c6-443c-b625-ac4e85b28cfc")
     }
 
     @Test
@@ -120,6 +120,19 @@ class NetworkTest {
             delay(50)
         }
         assertEquals(callbackException.response?.code, 400)
+    }
+
+    @Test
+    fun testInvalidOrgCodeThrowException() {
+        val successResponse = MockResponse().setResponseCode(200).setBody(getInvalidResponse())
+        mockWebServer.enqueue(successResponse)
+        runBlocking {
+            network.get(mockWebServer.url("/").toString(), callbackResponse)
+            mockWebServer.takeRequest()
+            delay(50)
+        }
+        assertEquals(callbackException.response?.code, 200)
+        assertEquals(callbackResult, null)
     }
 
     private fun getTestpressVideoJSON(): String {
@@ -170,6 +183,18 @@ class NetworkTest {
                 "id": "73633fa3-61c6-443c-b625-ac4e85b28cfc",
                 "live_stream": null
             }
+        """.trimIndent()
+    }
+
+    private fun getInvalidResponse(): String {
+        return """
+            <html>
+            <head>
+                <title>Invalid OrgCode</title>
+            </head>
+            <body>
+            </body>
+            </html>
         """.trimIndent()
     }
 }

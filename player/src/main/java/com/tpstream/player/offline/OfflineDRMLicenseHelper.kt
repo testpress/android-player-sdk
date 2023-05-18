@@ -158,7 +158,7 @@ internal object VideoPlayerUtil {
 internal interface DRMLicenseFetchCallback {
     fun onLicenseFetchSuccess(keySetId: ByteArray)
     fun onLicenseFetchFailure()
-    fun onOfflineLicenseExpire(videoID: String): String = ""
+    fun onOfflineLicenseExpire(videoID: String): String
 }
 
 internal object InternetConnectivityChecker {

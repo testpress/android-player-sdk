@@ -5,11 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import com.tpstream.player.*
 import com.tpstream.player.ui.InitializationListener
+import com.tpstream.player.ui.TpStreamDownloadListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
 
 const val TP_OFFLINE_PARAMS = "tp_offline_params"
 
-class PlayerActivity : AppCompatActivity() {
+class PlayerActivity : AppCompatActivity(), TpStreamDownloadListener {
     lateinit var playerFragment: TpStreamPlayerFragment;
     lateinit var tpStreamPlayer: TpStreamPlayer;
     private val TAG = "PlayerActivity"
@@ -36,12 +37,12 @@ class PlayerActivity : AppCompatActivity() {
                 })
             }
 
-            override fun onOfflineLicenseExpire(videoID: String): String {
-                Log.d("TAG", "onAccessTokenFiler: $videoID")
-                // Pass the orgCode and newly generated accessToken
-                // For the correspond videoID
-                return "c381512b-7337-4d8e-a8cf-880f4f08fd08"
-            }
+//            override fun onOfflineLicenseExpire(videoID: String): String {
+//                Log.d("TAG", "onAccessTokenFiler: $videoID")
+//                // Pass the orgCode and newly generated accessToken
+//                // For the correspond videoID
+//                return "c381512b-7337-4d8e-a8cf-880f4f08fd08"
+//            }
 
         });
     }
@@ -89,6 +90,10 @@ class PlayerActivity : AppCompatActivity() {
             }
             null ->{}
         }
+    }
+
+    override fun onOfflineLicenseExpire(videoID: String): String {
+        TODO("Not yet implemented")
     }
 
 }

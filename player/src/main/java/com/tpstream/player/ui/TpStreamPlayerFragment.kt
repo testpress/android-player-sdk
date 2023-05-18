@@ -53,6 +53,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
     private var initializationListener: InitializationListener? = null
+    private var offlineDRMLicenseHelper1: TpStreamDownloadListener? = null
     private var selectedResolution = ResolutionOptions.AUTO
     private lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
@@ -443,7 +444,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         override fun onOfflineLicenseExpire(videoID: String): String {
-            return this@TpStreamPlayerFragment.initializationListener?.onOfflineLicenseExpire(videoID)!!
+            return this@TpStreamPlayerFragment.offlineDRMLicenseHelper1?.onOfflineLicenseExpire(videoID)!!
         }
 
         private fun isDRMException(cause: Throwable): Boolean {
@@ -491,5 +492,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
 interface InitializationListener {
     fun onInitializationSuccess(player: TpStreamPlayer)
-    fun onOfflineLicenseExpire(videoID: String): String = ""
+}
+
+interface TpStreamDownloadListener {
+    fun onOfflineLicenseExpire(videoID: String): String
 }

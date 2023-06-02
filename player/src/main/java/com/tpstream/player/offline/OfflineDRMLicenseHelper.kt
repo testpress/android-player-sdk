@@ -27,7 +27,7 @@ internal object OfflineDRMLicenseHelper {
         url: String,
         tpInitParams: TpInitParams,
         context: Context,
-        offlineDRMLicenseCallback: OfflineDRMLicenseFetchCallback
+        offlineDRMLicenseCallback: OfflineDRMLicenseCallback
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {

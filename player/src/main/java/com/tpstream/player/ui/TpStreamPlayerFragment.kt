@@ -54,7 +54,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
     private var initializationListener: InitializationListener? = null
-    private var offlineDRMLicenseFetchCallback: OfflineDRMLicenseFetchCallback? = null
+    private var offlineDRMLicenseFetchCallback: OfflineLicenseExpiredCallback? = null
     private var selectedResolution = ResolutionOptions.AUTO
     private lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
@@ -317,7 +317,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         this.initializationListener = listener
     }
 
-    fun setTpStreamsDownloadListener(listener: OfflineDRMLicenseFetchCallback) {
+    fun setTpStreamsDownloadListener(listener: OfflineLicenseExpiredCallback) {
         this.offlineDRMLicenseFetchCallback = listener
     }
 
@@ -400,7 +400,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
     }
 
-    private inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback, OfflineDRMLicenseFetchCallback {
+    private inner class PlayerListener : Player.Listener, OfflineDRMLicenseCallback {
         private val TAG = "PlayerListener"
 
         override fun onPlaybackStateChanged(playbackState: Int) {

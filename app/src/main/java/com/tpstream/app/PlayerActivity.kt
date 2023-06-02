@@ -3,10 +3,8 @@ package com.tpstream.app
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import androidx.media3.exoplayer.drm.OfflineLicenseHelper
 import com.tpstream.player.*
-import com.tpstream.player.offline.OfflineDRMLicenseFetchCallback
-import com.tpstream.player.offline.TpStreamDownloadManager
+import com.tpstream.player.offline.OfflineLicenseExpiredCallback
 import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
 
@@ -41,7 +39,7 @@ class PlayerActivity : AppCompatActivity() {
 
         });
 
-        playerFragment.setTpStreamsDownloadListener(object : OfflineDRMLicenseFetchCallback{
+        playerFragment.setTpStreamsDownloadListener(object : OfflineLicenseExpiredCallback {
             override fun onOfflineLicenseExpire(videoID: String): String {
                 Log.d("TAG", "onAccessTokenFiler: $videoID")
                 // Pass the orgCode and newly generated accessToken

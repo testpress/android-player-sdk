@@ -26,13 +26,8 @@ import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.tpstream.player.*
-import com.tpstream.player.offline.DRMLicenseFetchCallback
-import com.tpstream.player.offline.DownloadCallback
-import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.EncryptionKeyRepository
 import com.tpstream.player.util.ImageSaver
-import com.tpstream.player.offline.InternetConnectivityChecker
-import com.tpstream.player.offline.OfflineDRMLicenseHelper
 import com.tpstream.player.util.OrientationListener
 import com.tpstream.player.R
 import com.tpstream.player.util.SentryLogger
@@ -41,6 +36,12 @@ import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.data.source.local.DownloadStatus
+import com.tpstream.player.offline.*
+import com.tpstream.player.offline.DRMLicenseFetchCallback
+import com.tpstream.player.offline.DownloadCallback
+import com.tpstream.player.offline.DownloadTask
+import com.tpstream.player.offline.InternetConnectivityChecker
+import com.tpstream.player.offline.OfflineDRMLicenseHelper
 import com.tpstream.player.ui.Util.getRendererIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,6 +54,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
     private var initializationListener: InitializationListener? = null
+    private var offlineDRMLicenseFetchCallback: OfflineLicenseExpiredCallback? = null
     private var selectedResolution = ResolutionOptions.AUTO
     private lateinit var fullScreenDialog: Dialog
     private var isFullScreen = false
@@ -315,6 +317,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         this.initializationListener = listener
     }
 
+    fun setTpStreamsDownloadListener(listener: OfflineLicenseExpiredCallback) {
+        this.offlineDRMLicenseFetchCallback = listener
+    }
+
     fun load(parameters: TpInitParams) {
         if (player == null) {
             throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
@@ -394,7 +400,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
     }
 
-    private inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {
+    private inner class PlayerListener : Player.Listener, OfflineDRMLicenseCallback {
         private val TAG = "PlayerListener"
 
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -437,7 +443,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         override fun onLicenseFetchFailure() {
-            showErrorMessage(getString(R.string.license_error))
+            CoroutineScope(Dispatchers.Main).launch {
+                showErrorMessage(getString(R.string.license_error))
+            }
+        }
+
+        override fun onOfflineLicenseExpire(videoID: String): String {
+            return this@TpStreamPlayerFragment.offlineDRMLicenseFetchCallback?.onOfflineLicenseExpire(videoID)!!
         }
 
         private fun isDRMException(cause: Throwable): Boolean {

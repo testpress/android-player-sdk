@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.tpstream.player.*
+import com.tpstream.player.offline.OfflineLicenseExpiredCallback
 import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
 
@@ -35,7 +36,17 @@ class PlayerActivity : AppCompatActivity() {
                     }
                 })
             }
+
         });
+
+        playerFragment.setTpStreamsDownloadListener(object : OfflineLicenseExpiredCallback {
+            override fun onOfflineLicenseExpire(videoID: String): String {
+                Log.d("TAG", "onAccessTokenFiler: $videoID")
+                // Pass the orgCode and newly generated accessToken
+                // For the correspond videoID
+                return "c381512b-7337-4d8e-a8cf-880f4f08fd08"
+            }
+        })
     }
 
     fun play(){

@@ -75,6 +75,7 @@ internal class VideoRepository(context: Context) {
             override fun onSuccess(result: NetworkVideo) {
                 val video = result.asDomainVideo()
                 video.videoId = params.videoId!!
+                video.orgCode = params.orgCode
                 storeVideo(video)
                 callback.onSuccess(video)
             }

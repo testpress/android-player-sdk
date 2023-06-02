@@ -27,12 +27,17 @@ internal object OfflineDRMLicenseHelper {
         url: String,
         tpInitParams: TpInitParams,
         context: Context,
-        callback: DRMLicenseFetchCallback
+        offlineDRMLicenseCallback: OfflineDRMLicenseCallback
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val keySetId = downloadDRMKeySetId(context, tpInitParams, url)
-            replaceKeysInExistingDownloadedVideo(url, context, keySetId)
-            callback.onLicenseFetchSuccess(keySetId)
+            try {
+                tpInitParams.accessToken = offlineDRMLicenseCallback.onOfflineLicenseExpire(tpInitParams.videoId!!)
+                val keySetId = downloadDRMKeySetId(context, tpInitParams, url)
+                replaceKeysInExistingDownloadedVideo(url, context, keySetId)
+                offlineDRMLicenseCallback.onLicenseFetchSuccess(keySetId)
+            } catch (e: Exception) {
+                offlineDRMLicenseCallback.onLicenseFetchFailure()
+            }
         }
     }
 

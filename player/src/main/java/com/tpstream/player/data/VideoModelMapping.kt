@@ -19,7 +19,8 @@ internal fun LocalVideo.asDomainVideo(): Video {
         totalSize = this.totalSize,
         downloadState = this.downloadState,
         videoWidth = this.videoWidth,
-        videoHeight = this.videoHeight
+        videoHeight = this.videoHeight,
+        orgCode = this.orgCode
     )
 }
 
@@ -61,6 +62,7 @@ internal fun Video.asLocalVideo(): LocalVideo {
         totalSize = this.totalSize,
         downloadState = this.downloadState,
         videoWidth = this.videoWidth,
-        videoHeight = this.videoHeight
+        videoHeight = this.videoHeight,
+        orgCode = this.orgCode
     )
 }

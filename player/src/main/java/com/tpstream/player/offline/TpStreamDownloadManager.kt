@@ -37,3 +37,12 @@ class TpStreamDownloadManager(val context: Context) {
         }
     }
 }
+
+internal interface OfflineDRMLicenseCallback:OfflineLicenseExpiredCallback {
+    fun onLicenseFetchSuccess(keySetId: ByteArray)
+    fun onLicenseFetchFailure()
+}
+
+interface OfflineLicenseExpiredCallback {
+    fun onOfflineLicenseExpire(videoID: String): String
+}

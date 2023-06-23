@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="tp_title_text_color">#ffffffff</color>
+    <color name="tp_text_color_light">#aaaaaa</color>
+    <color name="tp_download_button_blue">#3ea6ff</color>
+    <color name="tp_download_button_text_color">#ff000000</color>
+    <color name="tp_guide_line">#4d4d4d</color>
 </resources>

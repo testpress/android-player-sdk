@@ -2,7 +2,8 @@
 <resources>
 
     <style name="RadioButtonTheme" parent="Theme.AppCompat.Light">
-        <item name="colorAccent">@color/tp_blue</item>
+        <item name="colorControlNormal">@color/tp_radio_button_outer</item>
+        <item name="colorAccent">@color/tp_download_button_blue</item>
     </style>
 
 </resources>

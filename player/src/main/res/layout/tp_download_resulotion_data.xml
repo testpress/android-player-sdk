@@ -16,7 +16,7 @@
         android:gravity="center_vertical"
         android:text="1080p"
         android:textSize="16sp"
-        android:textColor="#000000"/>
+        android:textColor="@color/tp_title_text_color"/>
 
     <TextView
         android:id="@+id/track_size"
@@ -26,7 +26,7 @@
         android:layout_marginEnd="16dp"
         android:gravity="center_vertical"
         android:text="100 MB"
-        android:textColor="@color/tp_gray"
+        android:textColor="@color/tp_text_color_light"
         android:textSize="16sp"/>
 
 </RelativeLayout>

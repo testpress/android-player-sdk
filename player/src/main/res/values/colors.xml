@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="tp_gray">#606060</color>
-    <color name="tp_light_gray">#E5E5E5</color>
-    <color name="tp_blue">#065FD4</color>
     <color name="tp_white">#FFFFFF</color>
     <color name="tp_title_text_color">#ff000000</color>
+    <color name="tp_text_color_light">#606060</color>
+    <color name="tp_radio_button_outer">#909090</color>
+    <color name="tp_download_button_blue">#065fd5</color>
+    <color name="tp_download_button_text_color">#ffffffff</color>
+    <color name="tp_guide_line">#E5E5E5</color>
 </resources>

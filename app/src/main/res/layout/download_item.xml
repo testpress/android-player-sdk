@@ -71,7 +71,7 @@
         android:id="@+id/download_image"
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:background="@color/tp_light_gray"
+        android:background="@color/tp_guide_line"
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/thumbnail_container" />

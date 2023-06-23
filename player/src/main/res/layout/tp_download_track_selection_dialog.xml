@@ -8,14 +8,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="15dp"
-        android:paddingVertical="15dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="16dp"
         android:orientation="horizontal">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:textColor="@android:color/black"
+            android:textColor="@color/tp_title_text_color"
             android:text="Download Quality"
             />
     </LinearLayout>
@@ -45,7 +45,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/tp_light_gray"/>
+            android:background="@color/tp_guide_line"/>
 
         <LinearLayout
             android:id="@+id/download_layout"
@@ -64,7 +64,7 @@
                 android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:text="Cancel"
-                android:textColor="@color/tp_blue"
+                android:textColor="@color/tp_download_button_blue"
                 android:gravity="center"
                 android:background="@drawable/tp_cancel_button"
                 android:textSize="12sp" />
@@ -77,7 +77,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_weight="1"
                 android:textSize="12sp"
-                android:textColor="@color/tp_white"
+                android:textColor="@color/tp_download_button_text_color"
                 android:gravity="center"
                 android:background="@drawable/tp_download_button"
                 android:text="Download"/>

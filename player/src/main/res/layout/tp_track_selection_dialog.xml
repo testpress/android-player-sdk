@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15sp"
-            android:textColor="@android:color/black"
+            android:textColor="@color/tp_title_text_color"
             android:text="Quality for current video  \u2022"
             />
         <TextView

@@ -52,6 +52,8 @@ public interface TpStreamPlayer {
     fun getCurrentTrackGroups(): ImmutableList<Tracks.Group>
     fun getDuration(): Long
     fun setListener(listener: TPStreamPlayerListener?)
+    fun play()
+    fun pause()
 }
 
 internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
@@ -72,6 +74,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             .also { exoPlayer ->
                 exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
             }
+        exoPlayer.play()
     }
 
     fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {
@@ -186,5 +189,13 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         } else {
             exoPlayer.removeListener(exoPlayerListener)
         }
+    }
+
+    override fun play() {
+        exoPlayer.play()
+    }
+
+    override fun pause() {
+        exoPlayer.pause()
     }
 }

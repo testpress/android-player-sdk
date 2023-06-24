@@ -181,11 +181,13 @@ internal class DownloadResolutionSelectionSheet(
         }
 
         private fun getResolution(height: Int): String {
-            return when {
-                height > 720 -> "Very High (${height}p)"
-                height > 360 -> "High (${height}p)"
-                height > 240 -> "Medium (${height}p)"
-                else -> "Low (${height}p)"
+            return when  {
+                height > 1080 -> "Ultra High (${height}p)"
+                height in 721..1080 -> "Very High (${height}p)"
+                height in 481..720 -> "High (${height}p)"
+                height in 361..480 -> "Medium (${height}p)"
+                height in 241..360 -> "Low (${height}p)"
+                else -> "Very Low (${height}p)"
             }
         }
     }

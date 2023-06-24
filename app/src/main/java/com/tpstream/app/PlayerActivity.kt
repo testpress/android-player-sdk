@@ -3,6 +3,7 @@ package com.tpstream.app
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import com.tpstream.player.*
 import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
@@ -28,6 +29,7 @@ class PlayerActivity : AppCompatActivity() {
         playerFragment.enableAutoFullScreenOnRotate()
         playerFragment.setOnInitializationListener(object: InitializationListener {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
+                tpStreamPlayer = player
                 play()
                 player.setListener( object : TPStreamPlayerListener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
@@ -36,6 +38,7 @@ class PlayerActivity : AppCompatActivity() {
                 })
             }
         });
+        initializeSampleButtons();
     }
 
     fun play(){
@@ -80,6 +83,15 @@ class PlayerActivity : AppCompatActivity() {
                 orgCode = "edee9b"
             }
             null ->{}
+        }
+    }
+
+    private fun initializeSampleButtons() {
+        findViewById<Button>(R.id.sample_play).setOnClickListener {
+            tpStreamPlayer.play()
+        }
+        findViewById<Button>(R.id.sample_pause).setOnClickListener {
+            tpStreamPlayer.pause()
         }
     }
 

@@ -74,7 +74,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             .also { exoPlayer ->
                 exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
             }
-        exoPlayer.play()
     }
 
     fun load(parameters: TpInitParams, onError:(exception: TPException) -> Unit) {

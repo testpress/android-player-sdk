@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -305,23 +306,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun initializePlayer() {
         player = TpStreamPlayerImpl(requireContext())
-        setTpStreamPlayerImplCallBack()
+        player.setTpStreamPlayerImplCallBack(tpStreamPlayerImplCallBack)
         viewBinding.videoView.player = player.exoPlayer
         player.exoPlayer.addListener(_playbackStateListener)
         this.initializationListener?.onInitializationSuccess(player!!)
-    }
-
-    private fun setTpStreamPlayerImplCallBack(){
-        player.setTpStreamPlayerImplCallBack(object : TpStreamPlayerImplCallBack{
-            override fun updateDownloadButtons(parameters: TpInitParams) {
-                requireActivity().runOnUiThread{
-                    if (parameters.isDownloadEnabled){
-                        downloadButton.visibility = View.VISIBLE
-                        updateDownloadButtonImage(parameters.videoId!!)
-                    }
-                }
-            }
-        })
     }
 
     fun setOnInitializationListener(listener: InitializationListener) {
@@ -343,25 +331,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
         player?.setPlayWhenReady(parameters.autoPlay==true)
-    }
-
-    private fun updateDownloadButtonImage(videoId: String){
-        videoViewModel.get(videoId).observe(viewLifecycleOwner) { offlineVideoInfo ->
-            downloadState = when (offlineVideoInfo?.downloadState) {
-                DownloadStatus.DOWNLOADING ->{
-                    downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
-                    DownloadStatus.DOWNLOADING
-                }
-                DownloadStatus.COMPLETE ->{
-                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-                    DownloadStatus.COMPLETE
-                }
-                else -> {
-                    downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
-                    null
-                }
-            }
-        }
     }
 
     override fun onDownloadsSuccess(videoId:String?) {
@@ -485,6 +454,38 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         ) {
             Log.d(TAG, "onDroppedVideoFrames: ")
             super.onDroppedVideoFrames(eventTime, droppedFrames, elapsedMs)
+        }
+    }
+
+    private val tpStreamPlayerImplCallBack = object :TpStreamPlayerImplCallBack{
+
+        override fun updateDownloadButtons(showDownloadButton: Boolean, videoId: String) {
+            requireActivity().runOnUiThread {
+                if (showDownloadButton) {
+                    downloadButton.isVisible = true
+                    updateDownloadButtonImage(videoId)
+                }
+            }
+        }
+
+    }
+
+    private fun updateDownloadButtonImage(videoId: String){
+        videoViewModel.get(videoId).observe(viewLifecycleOwner) { offlineVideoInfo ->
+            downloadState = when (offlineVideoInfo?.downloadState) {
+                DownloadStatus.DOWNLOADING ->{
+                    downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
+                    DownloadStatus.DOWNLOADING
+                }
+                DownloadStatus.COMPLETE ->{
+                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
+                    DownloadStatus.COMPLETE
+                }
+                else -> {
+                    downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
+                    null
+                }
+            }
         }
     }
 }

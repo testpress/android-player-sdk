@@ -83,7 +83,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             override fun onSuccess(result: Video) {
                 video = result
                 playVideoInUIThread(result.url, parameters.startPositionInMilliSecs)
-                tpStreamPlayerImplCallBack?.updateDownloadButtons(parameters)
+                updateViewsCallback(parameters)
             }
 
             override fun onFailure(exception: TPException) {
@@ -203,9 +203,13 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     fun setTpStreamPlayerImplCallBack(tpStreamPlayerImplCallBack: TpStreamPlayerImplCallBack){
         this.tpStreamPlayerImplCallBack = tpStreamPlayerImplCallBack
     }
+
+    fun updateViewsCallback(parameters: TpInitParams) {
+        tpStreamPlayerImplCallBack?.updateDownloadButtons(parameters.isDownloadEnabled,parameters.videoId!!)
+    }
 }
 
 internal interface TpStreamPlayerImplCallBack {
 
-    fun updateDownloadButtons(parameters: TpInitParams)
+    fun updateDownloadButtons(showDownloadButton: Boolean,videoId: String)
 }

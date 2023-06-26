@@ -459,7 +459,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private val tpStreamPlayerImplCallBack = object :TpStreamPlayerImplCallBack{
 
-        override fun updateDownloadButtons(showDownloadButton: Boolean, videoId: String) {
+        override fun updateDownloadButton(showDownloadButton: Boolean, videoId: String) {
             requireActivity().runOnUiThread {
                 if (showDownloadButton) {
                     downloadButton.isVisible = true

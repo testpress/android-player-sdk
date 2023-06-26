@@ -316,7 +316,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         this.initializationListener = listener
     }
 
-    @Deprecated("Deprecated",ReplaceWith("TpStreamPlayer.load()"),DeprecationLevel.WARNING)
+    @Deprecated("Deprecated",ReplaceWith("TpStreamPlayer.load()"),DeprecationLevel.ERROR)
     fun load(parameters: TpInitParams) {
         if (player == null) {
             throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
@@ -325,25 +325,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             parameters.startAt = startPosition
         }
         player?.load(parameters)
-    }
-
-    private fun updateDownloadButtonImage(videoId: String){
-        videoViewModel.get(videoId).observe(viewLifecycleOwner) { offlineVideoInfo ->
-            downloadState = when (offlineVideoInfo?.downloadState) {
-                DownloadStatus.DOWNLOADING ->{
-                    downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
-                    DownloadStatus.DOWNLOADING
-                }
-                DownloadStatus.COMPLETE ->{
-                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-                    DownloadStatus.COMPLETE
-                }
-                else -> {
-                    downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
-                    null
-                }
-            }
-        }
     }
 
     override fun onDownloadsSuccess(videoId:String?) {
@@ -483,9 +464,27 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun updateError(parameters: TpInitParams, exception: TPException) {
             requireActivity().runOnUiThread{
-                viewBinding.errorMessage.text = "Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}"
-                viewBinding.errorMessage.visibility = View.VISIBLE
+                showErrorMessage("\"Error Occurred while playing video. Error code ${exception.errorMessage}.\\n ID: ${parameters.videoId}\"")
                 SentryLogger.logAPIException(exception,parameters)
+            }
+        }
+    }
+
+    private fun updateDownloadButtonImage(videoId: String){
+        videoViewModel.get(videoId).observe(viewLifecycleOwner) { offlineVideoInfo ->
+            downloadState = when (offlineVideoInfo?.downloadState) {
+                DownloadStatus.DOWNLOADING ->{
+                    downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
+                    DownloadStatus.DOWNLOADING
+                }
+                DownloadStatus.COMPLETE ->{
+                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
+                    DownloadStatus.COMPLETE
+                }
+                else -> {
+                    downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
+                    null
+                }
             }
         }
     }

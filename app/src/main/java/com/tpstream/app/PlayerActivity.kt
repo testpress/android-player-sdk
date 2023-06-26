@@ -30,10 +30,10 @@ class PlayerActivity : AppCompatActivity() {
         playerFragment.setOnInitializationListener(object: InitializationListener {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
                 tpStreamPlayer = player
-                play()
-                player.setListener( object : TPStreamPlayerListener {
+                tpStreamPlayer.load(buildParams())
+                tpStreamPlayer.setListener( object : TPStreamPlayerListener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
-                        Log.d(TAG, "onPlaybackStateChanged: ${playbackState}")
+                        Log.d(TAG, "onPlaybackStateChanged: $playbackState")
                     }
                 })
             }
@@ -41,8 +41,8 @@ class PlayerActivity : AppCompatActivity() {
         initializeSampleButtons();
     }
 
-    fun play(){
-        if (parameters == null){
+    fun buildParams(): TpInitParams {
+        if (parameters == null) {
             parameters = TpInitParams.Builder()
                 .setVideoId(videoId)
                 .setAccessToken(accessToken)
@@ -51,8 +51,7 @@ class PlayerActivity : AppCompatActivity() {
                 .enableDownloadSupport(true)
                 .build()
         }
-        playerFragment.load(parameters!!)
-
+        return parameters!!
     }
 
     private fun selectVideoParams(videoType: String?){

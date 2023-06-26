@@ -54,6 +54,7 @@ public interface TpStreamPlayer {
     fun setListener(listener: TPStreamPlayerListener?)
     fun play()
     fun pause()
+    fun load(parameters: TpInitParams)
 }
 
 internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
@@ -211,7 +212,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 }
 
 internal interface TpStreamPlayerImplCallBack {
-
     fun updateDownloadButton(showDownloadButton: Boolean,videoId: String)
     fun updateError(parameters: TpInitParams,exception: TPException)
 }

@@ -205,11 +205,11 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     fun updateViewsCallback(parameters: TpInitParams) {
-        tpStreamPlayerImplCallBack?.updateDownloadButtons(parameters.isDownloadEnabled,parameters.videoId!!)
+        tpStreamPlayerImplCallBack?.updateDownloadButton(parameters.isDownloadEnabled,parameters.videoId!!)
     }
 }
 
 internal interface TpStreamPlayerImplCallBack {
 
-    fun updateDownloadButtons(showDownloadButton: Boolean,videoId: String)
+    fun updateDownloadButton(showDownloadButton: Boolean,videoId: String)
 }

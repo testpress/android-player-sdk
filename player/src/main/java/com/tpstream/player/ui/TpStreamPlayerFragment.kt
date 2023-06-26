@@ -333,25 +333,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         player?.setPlayWhenReady(parameters.autoPlay==true)
     }
 
-    private fun updateDownloadButtonImage(videoId: String){
-        videoViewModel.get(videoId).observe(viewLifecycleOwner) { offlineVideoInfo ->
-            downloadState = when (offlineVideoInfo?.downloadState) {
-                DownloadStatus.DOWNLOADING ->{
-                    downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
-                    DownloadStatus.DOWNLOADING
-                }
-                DownloadStatus.COMPLETE ->{
-                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-                    DownloadStatus.COMPLETE
-                }
-                else -> {
-                    downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
-                    null
-                }
-            }
-        }
-    }
-
     override fun onDownloadsSuccess(videoId:String?) {
         if (videoId == player?.params?.videoId){
             reloadVideo()
@@ -478,7 +459,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private val tpStreamPlayerImplCallBack = object :TpStreamPlayerImplCallBack{
 
-        override fun updateDownloadButton(showDownloadButton: Boolean, videoId: String) {
+        override fun updateDownloadButtons(showDownloadButton: Boolean, videoId: String) {
             requireActivity().runOnUiThread {
                 if (showDownloadButton) {
                     downloadButton.isVisible = true
@@ -487,6 +468,25 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
+    }
+
+    private fun updateDownloadButtonImage(videoId: String){
+        videoViewModel.get(videoId).observe(viewLifecycleOwner) { offlineVideoInfo ->
+            downloadState = when (offlineVideoInfo?.downloadState) {
+                DownloadStatus.DOWNLOADING ->{
+                    downloadButton.setImageResource(R.drawable.ic_baseline_downloading_24)
+                    DownloadStatus.DOWNLOADING
+                }
+                DownloadStatus.COMPLETE ->{
+                    downloadButton.setImageResource(R.drawable.ic_baseline_file_download_done_24)
+                    DownloadStatus.COMPLETE
+                }
+                else -> {
+                    downloadButton.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
+                    null
+                }
+            }
+        }
     }
 }
 

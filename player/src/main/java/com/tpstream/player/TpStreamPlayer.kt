@@ -63,6 +63,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     lateinit var exoPlayer: ExoPlayer
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
     private var videoRepository: VideoRepository = VideoRepository(context)
+    private var tpStreamPlayerImplCallBack : TpStreamPlayerImplCallBack? = null
 
     init {
         initializeExoplayer()
@@ -82,6 +83,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             override fun onSuccess(result: Video) {
                 video = result
                 playVideoInUIThread(result.url, parameters.startPositionInMilliSecs)
+                updateViewsCallback(parameters)
             }
 
             override fun onFailure(exception: TPException) {
@@ -197,4 +199,17 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     override fun pause() {
         exoPlayer.pause()
     }
+
+    fun setTpStreamPlayerImplCallBack(tpStreamPlayerImplCallBack: TpStreamPlayerImplCallBack){
+        this.tpStreamPlayerImplCallBack = tpStreamPlayerImplCallBack
+    }
+
+    fun updateViewsCallback(parameters: TpInitParams) {
+        tpStreamPlayerImplCallBack?.updateDownloadButton(parameters.isDownloadEnabled,parameters.videoId!!)
+    }
+}
+
+internal interface TpStreamPlayerImplCallBack {
+
+    fun updateDownloadButton(showDownloadButton: Boolean,videoId: String)
 }

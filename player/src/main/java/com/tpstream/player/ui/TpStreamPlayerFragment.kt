@@ -499,13 +499,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
-        override fun setShowFastForwardButton(showFastForward: Boolean) {
+        override fun onToggleFastForwardButton(showFastForward: Boolean) {
             requireActivity().runOnUiThread {
                 viewBinding.videoView.setShowFastForwardButton(showFastForward)
             }
         }
 
-        override fun setShowRewindButton(showRewindButton: Boolean) {
+        override fun onToggleRewindButton(showRewindButton: Boolean) {
             requireActivity().runOnUiThread {
                 viewBinding.videoView.setShowRewindButton(showRewindButton)
             }

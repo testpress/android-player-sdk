@@ -316,21 +316,12 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         this.initializationListener = listener
     }
 
+    @Deprecated("Deprecated",ReplaceWith("TpStreamPlayer.load()"),DeprecationLevel.ERROR)
     fun load(parameters: TpInitParams) {
         if (player == null) {
             throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
         }
-        if (startPosition != -1L){
-            parameters.startAt = startPosition
-        }
-
-        player?.load(parameters) { exception ->
-            requireActivity().runOnUiThread {
-                showErrorMessage("Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}")
-                SentryLogger.logAPIException(exception, parameters)
-            }
-        }
-        player?.setPlayWhenReady(parameters.autoPlay==true)
+        player?.load(parameters)
     }
 
     override fun onDownloadsSuccess(videoId:String?) {
@@ -346,7 +337,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun storeCurrentPlayTime(){
-        startPosition = player?.getCurrentTime()?.div(1000L) ?: -1L
+        startPosition = player?.getCurrentTime()?: -1L
     }
 
     fun enableAutoFullScreenOnRotate() {
@@ -468,6 +459,19 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
+        override fun onPlaybackError(parameters: TpInitParams, exception: TPException) {
+            requireActivity().runOnUiThread{
+                showErrorMessage("\"Error Occurred while playing video. Error code ${exception.errorMessage}.\\n ID: ${parameters.videoId}\"")
+                SentryLogger.logAPIException(exception,parameters)
+            }
+        }
+
+        override fun onPlayerPrepare() {
+            if (player != null && startPosition != -1L) {
+                player.seekTo(startPosition)
+                player.pause()
+            }
+        }
     }
 
     private fun updateDownloadButtonImage(videoId: String){

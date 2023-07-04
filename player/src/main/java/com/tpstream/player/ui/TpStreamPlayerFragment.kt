@@ -366,10 +366,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         tpImp.playVideo(player?.video?.url!!,currentPosition!!)
     }
 
-    private fun storeCurrentPlayTime(){
-        startPosition = player?.getCurrentTime()?.div(1000L) ?: -1L
-    }
-
     fun enableAutoFullScreenOnRotate() {
         orientationEventListener = OrientationListener(requireContext())
         orientationEventListener.setOnChangeListener { isLandscape ->

@@ -55,7 +55,7 @@ public interface TpStreamPlayer {
     fun play()
     fun pause()
     fun load(parameters: TpInitParams)
-    fun enableOrDisableSeekBar(disableSeekBar: Boolean, message: String = "Seek option is disabled")
+    fun enableOrDisableSeekBar(enable: Boolean, message: String = "Seek option is disabled")
 }
 
 internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
@@ -95,11 +95,11 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         })
     }
 
-    override fun enableOrDisableSeekBar(disableSeekBar: Boolean, message: String) {
-        if (disableSeekBar) {
-            tpStreamPlayerImplCallBack?.onSeekBarDisable(message)
-        } else {
+    override fun enableOrDisableSeekBar(enable: Boolean, message: String) {
+        if (enable) {
             tpStreamPlayerImplCallBack?.onSeekBarEnable()
+        } else {
+            tpStreamPlayerImplCallBack?.onSeekBarDisable(message)
         }
     }
 

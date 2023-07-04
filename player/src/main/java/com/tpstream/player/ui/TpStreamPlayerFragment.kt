@@ -459,7 +459,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
-        override fun updateError(parameters: TpInitParams, exception: TPException) {
+        override fun onPlaybackError(parameters: TpInitParams, exception: TPException) {
             requireActivity().runOnUiThread{
                 showErrorMessage("\"Error Occurred while playing video. Error code ${exception.errorMessage}.\\n ID: ${parameters.videoId}\"")
                 SentryLogger.logAPIException(exception,parameters)

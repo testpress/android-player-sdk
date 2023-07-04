@@ -495,6 +495,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onSeekBarEnable() {
             if (seekBarListener != null) {
                 seekBar.removeListener(seekBarListener!!)
+                seekBarListener = null
             }
         }
 

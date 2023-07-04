@@ -499,6 +499,18 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
+        override fun setShowFastForwardButton(showFastForward: Boolean) {
+            requireActivity().runOnUiThread {
+                viewBinding.videoView.setShowFastForwardButton(showFastForward)
+            }
+        }
+
+        override fun setShowRewindButton(showRewindButton: Boolean) {
+            requireActivity().runOnUiThread {
+                viewBinding.videoView.setShowRewindButton(showRewindButton)
+            }
+        }
+
     }
 
     private fun updateDownloadButtonImage(videoId: String){

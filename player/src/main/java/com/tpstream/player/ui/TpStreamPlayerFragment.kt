@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val _playbackStateListener: Player.Listener = PlayerListener()
-    private lateinit var player: TpStreamPlayerImpl
+    private var player: TpStreamPlayerImpl? = null
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
     private val viewBinding get() = _viewBinding!!
     private val TAG = "TpStreamPlayerFragment"
@@ -92,6 +92,9 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         super.onStart()
         if (Util.SDK_INT > 23) {
             initializePlayer()
+            if (viewBinding.videoView != null) {
+                viewBinding.videoView.onResume()
+            }
         }
     }
 
@@ -99,6 +102,9 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         super.onResume()
         if (Util.SDK_INT <= 23 || player == null) {
             initializePlayer()
+            if (viewBinding.videoView != null) {
+                viewBinding.videoView.onResume()
+            }
         }
         hideSystemUi()
     }
@@ -106,19 +112,36 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     override fun onPause() {
         super.onPause()
         if (Util.SDK_INT <= 23) {
-            storeCurrentPlayTime()
-            player?.release()
+            if (viewBinding.videoView != null) {
+                viewBinding.videoView.onPause()
+            }
+            releasePlayer()
         }
-        Log.d(TAG, "onPause: ")
     }
 
     override fun onStop() {
         super.onStop()
         if (Util.SDK_INT > 23) {
-            storeCurrentPlayTime()
-            player?.release()
+            if (viewBinding.videoView != null) {
+                viewBinding.videoView.onPause()
+            }
+            releasePlayer()
         }
-        Log.d(TAG, "onStop: ")
+    }
+
+    private fun releasePlayer() {
+        if (player != null) {
+            updateStartPosition()
+            player?.release()
+            player = null
+            viewBinding.videoView.player = null
+        }
+    }
+
+    private fun updateStartPosition() {
+        if (player != null){
+            startPosition = player?.getCurrentTime()?: -1L
+        }
     }
 
     override fun onDestroyView() {
@@ -305,11 +328,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun initializePlayer() {
-        player = TpStreamPlayerImpl(requireContext())
-        player.setTpStreamPlayerImplCallBack(tpStreamPlayerImplCallBack)
-        viewBinding.videoView.player = player.exoPlayer
-        player.exoPlayer.addListener(_playbackStateListener)
-        this.initializationListener?.onInitializationSuccess(player!!)
+        if (player == null) {
+            player = TpStreamPlayerImpl(requireContext())
+            player?.setTpStreamPlayerImplCallBack(tpStreamPlayerImplCallBack)
+            viewBinding.videoView.player = player?.exoPlayer
+            player?.exoPlayer?.addListener(_playbackStateListener)
+            this.initializationListener?.onInitializationSuccess(player!!)
+        }
     }
 
     fun setOnInitializationListener(listener: InitializationListener) {
@@ -320,10 +345,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         if (player == null) {
             throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
         }
-        if (startPosition != -1L){
-            parameters.startAt = startPosition
-        }
-
         player?.load(parameters) { exception ->
             requireActivity().runOnUiThread {
                 showErrorMessage("Error Occurred while playing video. Error code ${exception.errorMessage}.\n ID: ${parameters.videoId}")
@@ -343,10 +364,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         val currentPosition = player?.getCurrentTime()
         val tpImp = player as TpStreamPlayerImpl
         tpImp.playVideo(player?.video?.url!!,currentPosition!!)
-    }
-
-    private fun storeCurrentPlayTime(){
-        startPosition = player?.getCurrentTime()?.div(1000L) ?: -1L
     }
 
     fun enableAutoFullScreenOnRotate() {
@@ -465,6 +482,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                     downloadButton.isVisible = true
                     updateDownloadButtonImage(videoId)
                 }
+            }
+        }
+
+        override fun onPlayerPrepare() {
+            if (player != null && startPosition != -1L) {
+                player?.seekTo(startPosition)
+                player?.pause()
             }
         }
 

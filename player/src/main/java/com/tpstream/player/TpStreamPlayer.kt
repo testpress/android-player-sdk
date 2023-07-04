@@ -101,9 +101,11 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     internal fun playVideo(url: String,startPosition: Long = 0) {
+        exoPlayer.playWhenReady = params.autoPlay?: true
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.seekTo(startPosition)
         exoPlayer.prepare()
+        tpStreamPlayerImplCallBack?.onPlayerPrepare()
     }
 
     private fun getMediaSourceFactory(): MediaSource.Factory {
@@ -214,4 +216,5 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 internal interface TpStreamPlayerImplCallBack {
     fun updateDownloadButton(showDownloadButton: Boolean,videoId: String)
     fun updateError(parameters: TpInitParams,exception: TPException)
+    fun onPlayerPrepare()
 }

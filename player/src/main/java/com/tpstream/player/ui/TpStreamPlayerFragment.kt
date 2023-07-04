@@ -321,9 +321,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         if (player == null) {
             throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
         }
-        if (startPosition != -1L){
-            parameters.startAt = startPosition
-        }
         player?.load(parameters)
     }
 
@@ -340,7 +337,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     private fun storeCurrentPlayTime(){
-        startPosition = player?.getCurrentTime()?.div(1000L) ?: -1L
+        startPosition = player?.getCurrentTime()?: -1L
     }
 
     fun enableAutoFullScreenOnRotate() {
@@ -466,6 +463,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             requireActivity().runOnUiThread{
                 showErrorMessage("\"Error Occurred while playing video. Error code ${exception.errorMessage}.\\n ID: ${parameters.videoId}\"")
                 SentryLogger.logAPIException(exception,parameters)
+            }
+        }
+
+        override fun onPlayerPrepare() {
+            if (player != null && startPosition != -1L) {
+                player.seekTo(startPosition)
+                player.pause()
             }
         }
     }

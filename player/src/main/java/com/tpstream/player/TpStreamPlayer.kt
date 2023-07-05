@@ -56,8 +56,10 @@ public interface TpStreamPlayer {
     fun pause()
     fun load(parameters: TpInitParams)
     fun enableOrDisableSeekBar(enable: Boolean, message: String = "Seek option is disabled")
-    fun setShowFastForwardButton(showFastForward: Boolean)
-    fun setShowRewindButton(showRewindButton: Boolean)
+    fun showFastForwardButton()
+    fun hideFastForwardButton()
+    fun showRewindButton()
+    fun hideRewindButton()
 }
 
 internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
@@ -105,12 +107,20 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         }
     }
 
-    override fun setShowFastForwardButton(showFastForward: Boolean) {
-        tpStreamPlayerImplCallBack?.onFastForwardButtonToggle(showFastForward)
+    override fun showFastForwardButton() {
+        tpStreamPlayerImplCallBack?.onFastForwardButtonToggle(true)
     }
 
-    override fun setShowRewindButton(showRewindButton: Boolean) {
-        tpStreamPlayerImplCallBack?.onRewindButtonToggle(showRewindButton)
+    override fun hideFastForwardButton() {
+        tpStreamPlayerImplCallBack?.onFastForwardButtonToggle(false)
+    }
+
+    override fun showRewindButton() {
+        tpStreamPlayerImplCallBack?.onRewindButtonToggle(true)
+    }
+
+    override fun hideRewindButton() {
+        tpStreamPlayerImplCallBack?.onRewindButtonToggle(false)
     }
 
     private fun playVideoInUIThread(url: String,startPosition: Long = 0) {
@@ -238,6 +248,6 @@ internal interface TpStreamPlayerImplCallBack {
     fun onPlayerPrepare()
     fun onSeekBarDisable(message: String)
     fun onSeekBarEnable()
-    fun onFastForwardButtonToggle(showFastForward: Boolean)
-    fun onRewindButtonToggle(showRewindButton: Boolean)
+    fun onFastForwardButtonToggle(show: Boolean)
+    fun onRewindButtonToggle(show: Boolean)
 }

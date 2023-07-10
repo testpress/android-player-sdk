@@ -83,7 +83,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //viewModel = ViewModelProvider(this).get(TpStreamPlayerViewModel::class.java)
         registerResolutionChangeListener()
         registerFullScreenListener()
         registerDownloadListener ()
@@ -417,37 +416,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun showErrorMessage(message: String) {
         viewBinding.errorMessage.visibility = View.VISIBLE
         viewBinding.errorMessage.text = message
-    }
-
-    private class PlayerAnalyticsListener : AnalyticsListener {
-        private val TAG = "AnalyticsListener"
-        override fun onRenderedFirstFrame(
-            eventTime: AnalyticsListener.EventTime,
-            output: Any,
-            renderTimeMs: Long
-        ) {
-            Log.d(TAG, "onRenderedFirstFrame: ")
-            super.onRenderedFirstFrame(eventTime, output, renderTimeMs)
-        }
-
-        override fun onAudioUnderrun(
-            eventTime: AnalyticsListener.EventTime,
-            bufferSize: Int,
-            bufferSizeMs: Long,
-            elapsedSinceLastFeedMs: Long
-        ) {
-            Log.d(TAG, "onAudioUnderrun: ")
-            super.onAudioUnderrun(eventTime, bufferSize, bufferSizeMs, elapsedSinceLastFeedMs)
-        }
-
-        override fun onDroppedVideoFrames(
-            eventTime: AnalyticsListener.EventTime,
-            droppedFrames: Int,
-            elapsedMs: Long
-        ) {
-            Log.d(TAG, "onDroppedVideoFrames: ")
-            super.onDroppedVideoFrames(eventTime, droppedFrames, elapsedMs)
-        }
     }
 
     private val tpStreamPlayerImplCallBack = object :TpStreamPlayerImplCallBack{

@@ -59,7 +59,7 @@ android {
     }
 }
 def mediaVersion = "1.0.2"
-def room_version = "2.4.3"
+def room_version = "2.5.2"
 
 dependencies {
 

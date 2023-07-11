@@ -58,7 +58,7 @@ android {
         androidTest.assets.srcDirs += file("$projectDir/schemas".toString())
     }
 }
-def mediaVersion = "1.0.0-beta02"
+def mediaVersion = "1.0.2"
 def room_version = "2.4.3"
 
 dependencies {

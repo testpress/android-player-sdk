@@ -2,11 +2,13 @@ package com.tpstream.player.ui
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
@@ -16,8 +18,10 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.media3.common.C
 import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerView
 import com.tpstream.player.*
+import androidx.media3.ui.TimeBar
 import com.tpstream.player.EncryptionKeyRepository
 import com.tpstream.player.TpStreamPlayerImpl
 import com.tpstream.player.data.VideoRepository
@@ -44,6 +48,9 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var selectedResolution = ResolutionOptions.AUTO
     private lateinit var simpleResolutionSheet:SimpleResolutionSelectionSheet
     private lateinit var advancedResolutionSheet:AdvancedResolutionSelectionSheet
+    private var seekBarListener: TimeBar.OnScrubListener? = null
+    private val seekBar =
+        playerView.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress)
 
     init {
         registerDownloadListener()
@@ -201,4 +208,50 @@ class TPStreamPlayerView @JvmOverloads constructor(
     override fun getViewModelStore(): ViewModelStore {
         return viewModelStore
     }
+
+    fun showFastForwardButton() = playerView.setShowFastForwardButton(true)
+
+    fun hideFastForwardButton() = playerView.setShowFastForwardButton(false)
+
+    fun showRewindButton() = playerView.setShowRewindButton(true)
+
+    fun hideRewindButton() = playerView.setShowRewindButton(false)
+
+    fun showDownloadButton() {
+        downloadButton?.isVisible = true
+    }
+
+    fun hideDownloadButton() {
+        downloadButton?.isVisible = false
+    }
+
+    fun showResolutionButton() {
+        resolutionButton?.isVisible = true
+    }
+
+    fun hideResolutionButton() {
+        resolutionButton?.isVisible = false
+    }
+
+    fun disableSeekBar(message: String) {
+        if (seekBarListener != null) return
+        seekBarListener = object : TimeBar.OnScrubListener {
+            override fun onScrubStart(timeBar: TimeBar, position: Long) {
+                timeBar.setEnabled(false)
+                Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onScrubMove(timeBar: TimeBar, position: Long) {}
+            override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {}
+        }
+        seekBar.addListener(seekBarListener!!)
+    }
+
+    fun enableSeekBar() {
+        if (seekBarListener != null) {
+            seekBar.removeListener(seekBarListener!!)
+            seekBarListener = null
+        }
+    }
+
 }

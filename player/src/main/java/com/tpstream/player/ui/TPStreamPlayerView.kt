@@ -1,6 +1,7 @@
 package com.tpstream.player.ui
 
 import android.content.Context
+import android.content.DialogInterface
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -12,6 +13,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.media3.common.C
+import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 import com.tpstream.player.*
 import com.tpstream.player.EncryptionKeyRepository
@@ -33,12 +37,15 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var playerView: PlayerView = binding.playerView
     private lateinit var player: TpStreamPlayerImpl
     private var downloadButton: ImageButton? = null
+    private var resolutionButton : ImageButton? = null
     private var downloadState : DownloadStatus? = null
     private lateinit var videoViewModel: VideoViewModel
     private lateinit var viewModelStore: ViewModelStore
+    private var selectedResolution = ResolutionOptions.AUTO
 
     init {
         registerDownloadListener()
+        registerResolutionChangeListener()
         initializeViewModel()
     }
 
@@ -47,6 +54,76 @@ class TPStreamPlayerView @JvmOverloads constructor(
         downloadButton?.setOnClickListener {
             onDownloadButtonClick()
         }
+        downloadButton?.isVisible = true
+    }
+
+    private fun registerResolutionChangeListener() {
+        resolutionButton = playerView.findViewById(R.id.exo_resolution)
+        resolutionButton?.setOnClickListener {
+            onResolutionButtonClick()
+        }
+    }
+
+    private fun onResolutionButtonClick() {
+        if (downloadState == DownloadStatus.COMPLETE) {
+            Toast.makeText(context, "Quality Unavailable", Toast.LENGTH_SHORT).show()
+        } else {
+            val simpleVideoResolutionSelector = initializeVideoResolutionSelectionSheets()
+            simpleVideoResolutionSelector.show(
+                (context as AppCompatActivity).supportFragmentManager,
+                SimpleVideoResolutionSelectionSheet.TAG
+            )
+        }
+    }
+
+    private fun initializeVideoResolutionSelectionSheets(): SimpleVideoResolutionSelectionSheet {
+        val simpleVideoResolutionSelector =
+            SimpleVideoResolutionSelectionSheet(player!!, selectedResolution)
+        val advancedVideoResolutionSelector =
+            AdvancedResolutionSelectionSheet(player!!, player!!.getTrackSelectionParameters())
+        advancedVideoResolutionSelector.onClickListener =
+            onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector)
+        simpleVideoResolutionSelector.onClickListener =
+            onVideoResolutionSelection(
+                simpleVideoResolutionSelector,
+                advancedVideoResolutionSelector
+            )
+        return simpleVideoResolutionSelector
+    }
+
+    private fun onAdvancedVideoResolutionSelection(advancedVideoResolutionSelector: AdvancedResolutionSelectionSheet) =
+        DialogInterface.OnClickListener { p0, p1 ->
+            val mappedTrackInfo = (player.getTrackSelector() as DefaultTrackSelector).currentMappedTrackInfo
+            mappedTrackInfo?.let {
+                val rendererIndex = Util.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
+                if (advancedVideoResolutionSelector.overrides.isNotEmpty()) {
+                    val params = TrackSelectionParameters.Builder(context)
+                        .clearOverridesOfType(rendererIndex)
+                        .addOverride(advancedVideoResolutionSelector.overrides.values.elementAt(0))
+                        .build()
+                    player.setTrackSelectionParameters(params)
+                }
+            }
+        }
+
+    private fun onVideoResolutionSelection(
+        videoResolutionSelector: SimpleVideoResolutionSelectionSheet,
+        advancedVideoResolutionSelector: AdvancedResolutionSelectionSheet
+    ) = DialogInterface.OnClickListener { p0, p1 ->
+        this.selectedResolution = videoResolutionSelector.selectedResolution
+        if (videoResolutionSelector.selectedResolution == ResolutionOptions.ADVANCED) {
+            advancedVideoResolutionSelector.show(
+                (context as AppCompatActivity).supportFragmentManager,
+                "AdvancedSheet"
+            )
+            return@OnClickListener
+        }
+
+        val parameters = videoResolutionSelector.selectedResolution.getTrackSelectionParameter(
+            context,
+            null
+        )
+        player.setTrackSelectionParameters(parameters)
     }
 
     private fun initializeViewModel() {

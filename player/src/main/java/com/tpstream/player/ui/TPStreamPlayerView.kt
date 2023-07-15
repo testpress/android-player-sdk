@@ -2,13 +2,11 @@ package com.tpstream.player.ui
 
 import android.content.Context
 import android.content.DialogInterface
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.Toast
-import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
@@ -231,6 +229,18 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun hideResolutionButton() {
         resolutionButton?.isVisible = false
+    }
+
+    fun showController() {
+        playerView.showController()
+    }
+
+    fun hideController() {
+        playerView.hideController()
+    }
+
+    fun useController(useController: Boolean) {
+        playerView.useController = useController
     }
 
     fun disableSeekBar(message: String) {

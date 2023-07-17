@@ -243,25 +243,4 @@ class TPStreamPlayerView @JvmOverloads constructor(
         playerView.useController = useController
     }
 
-    fun disableSeekBar(message: String) {
-        if (seekBarListener != null) return
-        seekBarListener = object : TimeBar.OnScrubListener {
-            override fun onScrubStart(timeBar: TimeBar, position: Long) {
-                timeBar.setEnabled(false)
-                Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onScrubMove(timeBar: TimeBar, position: Long) {}
-            override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {}
-        }
-        seekBar.addListener(seekBarListener!!)
-    }
-
-    fun enableSeekBar() {
-        if (seekBarListener != null) {
-            seekBar.removeListener(seekBarListener!!)
-            seekBarListener = null
-        }
-    }
-
 }

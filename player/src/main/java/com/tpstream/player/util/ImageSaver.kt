@@ -76,4 +76,15 @@ internal class ImageSaver(val context: Context) {
         val file = File(dir, "/thumbnail/$imageFileName.png")
         file.delete()
     }
+
+    fun deleteAll() {
+        val dir = context.filesDir
+        val folder = File(dir, "/thumbnail")
+        if (folder.exists()) {
+            val files = folder.listFiles()
+            files?.forEach { file ->
+                file.delete()
+            }
+        }
+    }
 }

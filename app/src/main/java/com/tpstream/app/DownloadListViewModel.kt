@@ -29,4 +29,8 @@ class DownloadListViewModel(context: Context): ViewModel() {
     fun deleteDownload(video: Video) {
         tpStreamDownloadManager.deleteDownload(video)
     }
+
+    fun deleteAllDownload() {
+        tpStreamDownloadManager.deleteAllDownloads()
+    }
 }

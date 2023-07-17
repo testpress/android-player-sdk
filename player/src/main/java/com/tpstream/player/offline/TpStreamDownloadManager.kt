@@ -36,4 +36,12 @@ class TpStreamDownloadManager(val context: Context) {
             videoRepository.delete(video)
         }
     }
+
+    fun deleteAllDownloads() {
+        CoroutineScope(Dispatchers.IO).launch {
+            videoRepository.deleteAll()
+            DownloadTask(context).deleteAll()
+            ImageSaver(context).deleteAll()
+        }
+    }
 }

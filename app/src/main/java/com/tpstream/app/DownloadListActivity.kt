@@ -32,6 +32,10 @@ class DownloadListActivity : AppCompatActivity() {
         downloadListViewModel.getDownloadData().observe(this) {
             binding.recycleView.adapter = DownloadListAdapter(it!!)
         }
+
+        binding.deleteAllButton.setOnClickListener {
+            downloadListViewModel.deleteAllDownload()
+        }
     }
 
     private fun initializeViewModel(){

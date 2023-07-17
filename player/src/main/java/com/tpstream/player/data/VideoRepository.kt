@@ -40,6 +40,10 @@ internal class VideoRepository(context: Context) {
         videoDao.delete(video.videoId)
     }
 
+    suspend fun deleteAll(){
+        videoDao.deleteAll()
+    }
+
     fun getAllDownloadsInLiveData():LiveData<List<Video>?>{
         return Transformations.map(videoDao.getAllDownloadInLiveData()) {
             it?.asDomainVideos()

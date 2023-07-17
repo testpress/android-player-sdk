@@ -60,6 +60,14 @@ internal class DownloadTask (val context: Context) {
         }
     }
 
+    fun deleteAll() {
+        DownloadService.sendRemoveAllDownloads(
+            context,
+            VideoDownloadService::class.java,
+            false
+        )
+    }
+
     fun isDownloaded(url:String): Boolean {
         val download = downloadIndex.getDownload(url)
         return download != null && download.state == Download.STATE_COMPLETED

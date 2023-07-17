@@ -79,7 +79,6 @@ internal class VideoRepository(context: Context) {
             override fun onSuccess(result: NetworkVideo) {
                 val video = result.asDomainVideo()
                 video.videoId = params.videoId!!
-                storeVideo(video)
                 callback.onSuccess(video)
             }
 
@@ -87,12 +86,6 @@ internal class VideoRepository(context: Context) {
                 callback.onFailure(exception)
             }
         })
-    }
-
-    private fun storeVideo(video: Video){
-        CoroutineScope(Dispatchers.IO).launch {
-            videoDao.insert(video.asLocalVideo())
-        }
     }
 
 }

@@ -16,10 +16,8 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.media3.common.C
 import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerView
 import com.tpstream.player.*
-import androidx.media3.ui.TimeBar
 import com.tpstream.player.EncryptionKeyRepository
 import com.tpstream.player.TpStreamPlayerImpl
 import com.tpstream.player.data.VideoRepository
@@ -57,13 +55,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
         downloadButton = playerView.findViewById(R.id.exo_download)
         downloadButton?.setOnClickListener {
             onDownloadButtonClick()
-        }
-    }
-
-    private fun registerResolutionChangeListener() {
-        resolutionButton = playerView.findViewById(R.id.exo_resolution)
-        resolutionButton?.setOnClickListener {
-            onResolutionButtonClick()
         }
     }
 

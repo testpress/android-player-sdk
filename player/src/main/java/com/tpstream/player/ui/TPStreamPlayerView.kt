@@ -46,9 +46,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var selectedResolution = ResolutionOptions.AUTO
     private lateinit var simpleResolutionSheet:SimpleResolutionSelectionSheet
     private lateinit var advancedResolutionSheet:AdvancedResolutionSelectionSheet
-    private var seekBarListener: TimeBar.OnScrubListener? = null
-    private val seekBar =
-        playerView.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress)
 
     init {
         registerDownloadListener()
@@ -61,7 +58,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
         downloadButton?.setOnClickListener {
             onDownloadButtonClick()
         }
-        downloadButton?.isVisible = true
     }
 
     private fun registerResolutionChangeListener() {
@@ -214,14 +210,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
     fun showRewindButton() = playerView.setShowRewindButton(true)
 
     fun hideRewindButton() = playerView.setShowRewindButton(false)
-
-    fun showDownloadButton() {
-        downloadButton?.isVisible = true
-    }
-
-    fun hideDownloadButton() {
-        downloadButton?.isVisible = false
-    }
 
     fun showResolutionButton() {
         resolutionButton?.isVisible = true

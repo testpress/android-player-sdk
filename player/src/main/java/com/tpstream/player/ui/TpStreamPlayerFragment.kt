@@ -25,8 +25,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.ui.DefaultTimeBar
-import androidx.media3.ui.TimeBar
 import com.tpstream.player.*
 import com.tpstream.player.offline.DRMLicenseFetchCallback
 import com.tpstream.player.offline.DownloadCallback
@@ -405,9 +403,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private val tpStreamPlayerImplCallBack = object :TpStreamPlayerImplCallBack{
 
-        private val seekBar get() = viewBinding.videoView.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress)
-        private var seekBarListener: TimeBar.OnScrubListener? = null
-
         override fun updateDownloadButton(showDownloadButton: Boolean, videoId: String) {
             requireActivity().runOnUiThread {
                 if (showDownloadButton) {
@@ -430,28 +425,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 player.pause()
             }
         }
-
-        override fun onSeekBarDisable(message: String) {
-            if (seekBarListener != null) return
-            seekBarListener = object : TimeBar.OnScrubListener {
-                override fun onScrubStart(timeBar: TimeBar, position: Long) {
-                    timeBar.setEnabled(false)
-                    Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onScrubMove(timeBar: TimeBar, position: Long) {}
-                override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {}
-            }
-            seekBar.addListener(seekBarListener!!)
-        }
-
-        override fun onSeekBarEnable() {
-            if (seekBarListener != null) {
-                seekBar.removeListener(seekBarListener!!)
-                seekBarListener = null
-            }
-        }
-
     }
 
     private fun updateDownloadButtonImage(videoId: String){

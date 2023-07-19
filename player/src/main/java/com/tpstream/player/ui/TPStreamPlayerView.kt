@@ -18,6 +18,7 @@ import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
 import com.tpstream.player.*
+import androidx.media3.ui.PlayerView.FullscreenButtonClickListener
 import com.tpstream.player.EncryptionKeyRepository
 import com.tpstream.player.TpStreamPlayerImpl
 import com.tpstream.player.data.VideoRepository
@@ -220,6 +221,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun useController(useController: Boolean) {
         playerView.useController = useController
+    }
+
+    fun setFullscreenButtonClickListener(listener: FullscreenButtonClickListener?) {
+        playerView.setFullscreenButtonClickListener(listener)
     }
 
 }

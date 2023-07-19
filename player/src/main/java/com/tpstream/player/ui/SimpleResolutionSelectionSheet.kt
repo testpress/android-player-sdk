@@ -22,7 +22,7 @@ import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
 
 
 @UnstableApi
-internal class SimpleVideoResolutionSelectionSheet(
+internal class SimpleResolutionSelectionSheet(
     private val player: TpStreamPlayer,
     var selectedResolution: ResolutionOptions
 ) : BottomSheetDialogFragment(){
@@ -70,7 +70,7 @@ internal class SimpleVideoResolutionSelectionSheet(
             it.adapter = ResolutionAdapter(requireContext(), list, selectedResolution)
             it.setOnItemClickListener { adapterView, view, i, l ->
                 val resolution = list[i]
-                this@SimpleVideoResolutionSelectionSheet.selectedResolution = resolution.option
+                this@SimpleResolutionSelectionSheet.selectedResolution = resolution.option
                 onClickListener?.onClick(dialog, DialogInterface.BUTTON_POSITIVE)
                 dismiss()
             }

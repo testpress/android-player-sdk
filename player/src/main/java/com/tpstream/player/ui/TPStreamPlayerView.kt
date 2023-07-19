@@ -193,4 +193,33 @@ class TPStreamPlayerView @JvmOverloads constructor(
     override fun getViewModelStore(): ViewModelStore {
         return viewModelStore
     }
+
+    fun showFastForwardButton() = playerView.setShowFastForwardButton(true)
+
+    fun hideFastForwardButton() = playerView.setShowFastForwardButton(false)
+
+    fun showRewindButton() = playerView.setShowRewindButton(true)
+
+    fun hideRewindButton() = playerView.setShowRewindButton(false)
+
+    fun showResolutionButton() {
+        resolutionButton?.isVisible = true
+    }
+
+    fun hideResolutionButton() {
+        resolutionButton?.isVisible = false
+    }
+
+    fun showController() {
+        playerView.showController()
+    }
+
+    fun hideController() {
+        playerView.hideController()
+    }
+
+    fun useController(useController: Boolean) {
+        playerView.useController = useController
+    }
+
 }

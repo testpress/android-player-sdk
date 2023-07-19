@@ -70,6 +70,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
     private var videoRepository: VideoRepository = VideoRepository(context)
     private var tpStreamPlayerImplCallBack : TpStreamPlayerImplCallBack? = null
+    private var loadCompleteListener : LoadCompleteListener? = null
 
     init {
         initializeExoplayer()
@@ -91,6 +92,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
                 video = result
                 playVideoInUIThread(result.url, parameters.startPositionInMilliSecs)
                 updateViewsCallback(parameters)
+                loadCompleteListener?.onComplete()
             }
 
             override fun onFailure(exception: TPException) {
@@ -240,6 +242,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     fun updateViewsCallback(parameters: TpInitParams) {
         tpStreamPlayerImplCallBack?.updateDownloadButton(parameters.isDownloadEnabled,parameters.videoId!!)
     }
+
+    fun setLoadCompleteListener(listener: LoadCompleteListener) {
+        loadCompleteListener = listener
+    }
 }
 
 internal interface TpStreamPlayerImplCallBack {
@@ -250,4 +256,8 @@ internal interface TpStreamPlayerImplCallBack {
     fun onSeekBarEnable()
     fun onFastForwardButtonToggle(show: Boolean)
     fun onRewindButtonToggle(show: Boolean)
+}
+
+internal fun interface LoadCompleteListener {
+    fun onComplete()
 }

@@ -56,6 +56,14 @@ class TPStreamPlayerView @JvmOverloads constructor(
         downloadButton?.setOnClickListener {
             onDownloadButtonClick()
         }
+        downloadButton?.isVisible = true
+    }
+
+    private fun registerResolutionChangeListener() {
+        resolutionButton = playerView.findViewById(R.id.exo_resolution)
+        resolutionButton?.setOnClickListener {
+            onResolutionButtonClick()
+        }
     }
 
     private fun registerResolutionChangeListener() {

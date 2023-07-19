@@ -64,6 +64,46 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
+    private fun initializeViewModel() {
+        viewModelStore = ViewModelStore()
+        videoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return VideoViewModel(VideoRepository(context)) as T
+            }
+        }).get(VideoViewModel::class.java)
+    }
+
+    private fun onDownloadButtonClick() {
+        when (downloadState) {
+            DownloadStatus.COMPLETE -> {
+                Toast.makeText(context, "Download complete", Toast.LENGTH_SHORT).show()
+            }
+            DownloadStatus.DOWNLOADING -> {
+                Toast.makeText(context, "Downloading", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                EncryptionKeyRepository(context).fetchAndStore(
+                    player.params,
+                    player.video?.url!!
+                )
+                val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
+                    player,
+                    player.getTrackSelectionParameters(),
+                )
+                downloadResolutionSelectionSheet.show((context as AppCompatActivity).supportFragmentManager, "DownloadSelectionSheet")
+                downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, video ->
+                    DownloadTask(context).start(downloadRequest)
+                    video?.videoId = player.params.videoId!!
+                    ImageSaver(context).save(
+                        video?.thumbnail!!,
+                        video.videoId
+                    )
+                    videoViewModel.insert(video)
+                }
+            }
+        }
+    }
+
     private fun onResolutionButtonClick() {
         if (downloadState == DownloadStatus.COMPLETE) {
             Toast.makeText(context, "Quality Unavailable", Toast.LENGTH_SHORT).show()
@@ -124,46 +164,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
             null
         )
         player.setTrackSelectionParameters(parameters)
-    }
-
-    private fun initializeViewModel() {
-        viewModelStore = ViewModelStore()
-        videoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return VideoViewModel(VideoRepository(context)) as T
-            }
-        }).get(VideoViewModel::class.java)
-    }
-
-    private fun onDownloadButtonClick() {
-        when (downloadState) {
-            DownloadStatus.COMPLETE -> {
-                Toast.makeText(context, "Download complete", Toast.LENGTH_SHORT).show()
-            }
-            DownloadStatus.DOWNLOADING -> {
-                Toast.makeText(context, "Downloading", Toast.LENGTH_SHORT).show()
-            }
-            else -> {
-                EncryptionKeyRepository(context).fetchAndStore(
-                    player.params,
-                    player.video?.url!!
-                )
-                val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
-                    player,
-                    player.getTrackSelectionParameters(),
-                )
-                downloadResolutionSelectionSheet.show((context as AppCompatActivity).supportFragmentManager, "DownloadSelectionSheet")
-                downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, video ->
-                    DownloadTask(context).start(downloadRequest)
-                    video?.videoId = player.params.videoId!!
-                    ImageSaver(context).save(
-                        video?.thumbnail!!,
-                        video.videoId
-                    )
-                    videoViewModel.insert(video)
-                }
-            }
-        }
     }
 
     fun getPlayer(): TpStreamPlayer = player

@@ -16,9 +16,11 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.media3.common.C
 import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerView
 import com.tpstream.player.*
 import androidx.media3.ui.PlayerView.FullscreenButtonClickListener
+import androidx.media3.ui.TimeBar
 import com.tpstream.player.EncryptionKeyRepository
 import com.tpstream.player.TpStreamPlayerImpl
 import com.tpstream.player.data.VideoRepository
@@ -45,6 +47,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var selectedResolution = ResolutionOptions.AUTO
     private lateinit var simpleResolutionSheet:SimpleResolutionSelectionSheet
     private lateinit var advancedResolutionSheet:AdvancedResolutionSelectionSheet
+    private val seekBar get() = binding.playerView.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress)
+    private var seekBarListener: TimeBar.OnScrubListener? = null
 
     init {
         registerDownloadListener()
@@ -225,6 +229,39 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun setFullscreenButtonClickListener(listener: FullscreenButtonClickListener?) {
         playerView.setFullscreenButtonClickListener(listener)
+    }
+
+    fun enableOrDisableSeekBar(enable: Boolean, message: String = "Seek option is Disable") {
+        if (enable) {
+            seekBarEnable()
+        } else {
+            seekBarDisable(message)
+        }
+    }
+
+    private fun seekBarEnable() {
+        removeSeekBarListener()
+    }
+
+    private fun seekBarDisable(message: String) {
+        removeSeekBarListener()
+        seekBarListener = object : TimeBar.OnScrubListener {
+            override fun onScrubStart(timeBar: TimeBar, position: Long) {
+                timeBar.setEnabled(false)
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onScrubMove(timeBar: TimeBar, position: Long) {}
+            override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {}
+        }
+        seekBar.addListener(seekBarListener!!)
+    }
+
+    private fun removeSeekBarListener() {
+        if (seekBarListener != null) {
+            seekBar.removeListener(seekBarListener!!)
+            seekBarListener = null
+        }
     }
 
 }

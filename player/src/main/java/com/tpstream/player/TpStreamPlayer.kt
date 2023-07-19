@@ -234,7 +234,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 }
 
 internal interface TpStreamPlayerImplCallBack {
-    fun updateDownloadButton(showDownloadButton: Boolean,videoId: String)
     fun onPlaybackError(parameters: TpInitParams,exception: TPException)
     fun onPlayerPrepare()
 }

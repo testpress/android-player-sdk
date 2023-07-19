@@ -86,7 +86,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             override fun onSuccess(result: Video) {
                 video = result
                 playVideoInUIThread(result.url, parameters.startPositionInMilliSecs)
-                updateViewsCallback(parameters)
                 loadCompleteListener?.onComplete()
             }
 
@@ -210,17 +209,12 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         this.tpStreamPlayerImplCallBack = tpStreamPlayerImplCallBack
     }
 
-    fun updateViewsCallback(parameters: TpInitParams) {
-        tpStreamPlayerImplCallBack?.updateDownloadButton(parameters.isDownloadEnabled,parameters.videoId!!)
-    }
-
     fun setLoadCompleteListener(listener: LoadCompleteListener) {
         loadCompleteListener = listener
     }
 }
 
 internal interface TpStreamPlayerImplCallBack {
-    fun updateDownloadButton(showDownloadButton: Boolean,videoId: String)
     fun onPlaybackError(parameters: TpInitParams,exception: TPException)
     fun onPlayerPrepare()
 }

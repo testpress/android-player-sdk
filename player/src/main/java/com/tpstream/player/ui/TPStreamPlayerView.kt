@@ -268,12 +268,38 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
-    fun addMarkers(timesInSeconds: LongArray, @ColorInt markerColor: Int = Color.YELLOW) {
-        if (markers != null) {
-            addUnPlayerMarkers(markerColor)
+    fun addMarkers(
+        timesInSeconds: LongArray,
+        @ColorInt markerColor: Int = Color.YELLOW,
+        deleteAfterDelivery: Boolean = true
+    ) {
+        if (deleteAfterDelivery) {
+            if (markers != null) {
+                addUnPlayerOneTimeMarkers(markerColor)
+            } else {
+                addAllOneTimeMarkers(timesInSeconds, markerColor)
+            }
         } else {
             addAllMarkers(timesInSeconds, markerColor)
         }
+    }
+
+    private fun addUnPlayerOneTimeMarkers(markerColor: Int) {
+        markers?.map {
+            if (!it.value) {
+                player.addOneTimeMarker(it.key)
+            }
+        }
+        updateMarkerInTimeBar(markerColor)
+    }
+
+    private fun addAllOneTimeMarkers(timesInSeconds: LongArray, markerColor: Int) {
+        val timesInMs = timesInSeconds.map { TimeUnit.SECONDS.toMillis(it) }.toLongArray()
+        markers = timesInMs.associateWith { false }.toMap(linkedMapOf())
+        markers?.map {
+            player.addOneTimeMarker(it.key)
+        }
+        updateMarkerInTimeBar(markerColor)
     }
 
     private fun addAllMarkers(timesInSeconds: LongArray, markerColor: Int) {
@@ -281,15 +307,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
         markers = timesInMs.associateWith { false }.toMap(linkedMapOf())
         markers?.map {
             player.addMarker(it.key)
-        }
-        updateMarkerInTimeBar(markerColor)
-    }
-
-    private fun addUnPlayerMarkers(markerColor: Int) {
-        markers?.map {
-            if (!it.value) {
-                player.addMarker(it.key)
-            }
         }
         updateMarkerInTimeBar(markerColor)
     }

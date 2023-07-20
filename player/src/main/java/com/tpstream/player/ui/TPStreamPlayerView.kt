@@ -231,19 +231,11 @@ class TPStreamPlayerView @JvmOverloads constructor(
         playerView.setFullscreenButtonClickListener(listener)
     }
 
-    fun enableOrDisableSeekBar(enable: Boolean, message: String = "Seek option is Disable") {
-        if (enable) {
-            seekBarEnable()
-        } else {
-            seekBarDisable(message)
-        }
-    }
-
-    private fun seekBarEnable() {
+    fun enableSeekBar(){
         removeSeekBarListener()
     }
 
-    private fun seekBarDisable(message: String) {
+    fun disableSeekBar(message: String = "Seek option is Disable") {
         removeSeekBarListener()
         seekBarListener = object : TimeBar.OnScrubListener {
             override fun onScrubStart(timeBar: TimeBar, position: Long) {

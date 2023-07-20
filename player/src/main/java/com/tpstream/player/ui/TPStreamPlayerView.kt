@@ -1,12 +1,18 @@
 package com.tpstream.player.ui
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +39,7 @@ import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.util.MarkerState
 import com.tpstream.player.util.getPlayedStatusArray
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class TPStreamPlayerView @JvmOverloads constructor(
@@ -55,6 +62,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private val seekBar get() = binding.playerView.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress)
     private var seekBarListener: TimeBar.OnScrubListener? = null
     private var markers: LinkedHashMap<Long, MarkerState>? = null
+    private var animator: ObjectAnimator? = null
 
     init {
         registerDownloadListener()
@@ -318,6 +326,44 @@ class TPStreamPlayerView @JvmOverloads constructor(
             markers?.values?.getPlayedStatusArray()
         )
         seekBar.setAdMarkerColor(markerColor)
+    }
+
+    fun enableWaterMark(){
+        binding.watermarkView.isVisible = true
+        Handler(Looper.getMainLooper()).postDelayed({animateTextView(binding.watermarkView)},1000)
+    }
+
+    fun disableWaterMarker() {
+        animator?.cancel()
+        binding.watermarkView.x = -binding.watermarkView.width.toFloat()
+        binding.watermarkView.isVisible = false
+    }
+
+    private fun animateTextView(textView: TextView) {
+        val screenWidth = playerView.width
+        val screenHeight = playerView.height
+
+        animator = ObjectAnimator.ofFloat(
+            textView,
+            "translationX",
+            -textView.width.toFloat(),
+            screenWidth.toFloat()
+        )
+
+        animator?.let {
+            it.duration = 15000
+            it.repeatMode = ObjectAnimator.REVERSE
+            it.repeatCount = ObjectAnimator.INFINITE
+            it.addListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(p0: Animator?) {}
+                override fun onAnimationEnd(p0: Animator?) {}
+                override fun onAnimationCancel(p0: Animator?) {}
+                override fun onAnimationRepeat(p0: Animator?) {
+                    textView.y = Random().nextFloat() * (screenHeight - textView.height)
+                }
+            })
+            it.start()
+        }
     }
 
 }

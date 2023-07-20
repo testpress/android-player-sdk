@@ -10,4 +10,13 @@
         android:layout_height="match_parent"
         app:animation_enabled="true"
         app:show_buffering="always" />
+
+    <TextView
+        android:id="@+id/watermark_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your Watermark Text"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:visibility="visible" />
 </FrameLayout>

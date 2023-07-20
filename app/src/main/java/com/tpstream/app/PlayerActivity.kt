@@ -3,6 +3,8 @@ package com.tpstream.app
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
@@ -44,6 +46,9 @@ class PlayerActivity : AppCompatActivity() {
                 })
 
                 playerFragment.tpStreamPlayerView.setMarkers(longArrayOf(60,120,180),Color.RED,false)
+                playerFragment.tpStreamPlayerView.enableWaterMark()
+                Handler(Looper.getMainLooper()).postDelayed({playerFragment.tpStreamPlayerView.disableWaterMarker()},10000)
+                Handler(Looper.getMainLooper()).postDelayed({playerFragment.tpStreamPlayerView.enableWaterMark()},15000)
             }
         });
         initializeSampleButtons();

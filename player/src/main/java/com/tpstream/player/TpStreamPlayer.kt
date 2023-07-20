@@ -16,6 +16,7 @@ import com.tpstream.player.data.source.network.VideoNetworkDataSource
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
+import java.util.concurrent.TimeUnit
 
 interface TPStreamPlayerListener {
     fun onTracksChanged(tracks: Tracks) {}
@@ -33,6 +34,7 @@ interface TPStreamPlayerListener {
     fun onTimelineChanged(timeline: Timeline, reason: Int) {}
     fun onPlaybackStateChanged(playbackState: Int) {}
     fun onPlayerError(error: PlaybackException) {}
+    fun onMarkerCallback(timesInSeconds: Long) {}
 }
 
 public interface TpStreamPlayer {
@@ -66,6 +68,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private var videoRepository: VideoRepository = VideoRepository(context)
     private var tpStreamPlayerImplCallBack : TpStreamPlayerImplCallBack? = null
     private var loadCompleteListener : LoadCompleteListener? = null
+    private var markerListener: MarkerListener? = null
 
     init {
         initializeExoplayer()
@@ -93,6 +96,17 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
                 tpStreamPlayerImplCallBack?.onPlaybackError(parameters,exception)
             }
         })
+    }
+
+    fun addMarker(timesInMs: Long) {
+        Handler(Looper.getMainLooper()).post {
+            exoPlayer.createMessage { _, _ ->
+                markerListener?.onMarkerCall(timesInMs)
+                _listener?.onMarkerCallback(TimeUnit.MILLISECONDS.toSeconds(timesInMs))
+            }.setPosition(timesInMs)
+                .setLooper(Looper.getMainLooper())
+                .send()
+        }
     }
 
     private fun playVideoInUIThread(url: String,startPosition: Long = 0) {
@@ -212,6 +226,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     fun setLoadCompleteListener(listener: LoadCompleteListener) {
         loadCompleteListener = listener
     }
+
+    fun setMarkerListener(listener: MarkerListener) {
+        markerListener = listener
+    }
 }
 
 internal interface TpStreamPlayerImplCallBack {
@@ -221,4 +239,8 @@ internal interface TpStreamPlayerImplCallBack {
 
 internal fun interface LoadCompleteListener {
     fun onComplete()
+}
+
+internal fun interface MarkerListener {
+    fun onMarkerCall(timeInMs: Long)
 }

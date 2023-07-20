@@ -1,9 +1,11 @@
 package com.tpstream.app
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
 import com.tpstream.player.*
 import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
@@ -35,7 +37,13 @@ class PlayerActivity : AppCompatActivity() {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         Log.d(TAG, "onPlaybackStateChanged: $playbackState")
                     }
+
+                    override fun onMarkerCallback(timesInSeconds: Long) {
+                        Toast.makeText(this@PlayerActivity,"$timesInSeconds",Toast.LENGTH_SHORT).show()
+                    }
                 })
+
+                playerFragment.tpStreamPlayerView.addMarkers(longArrayOf(60,120,180),Color.RED)
             }
         });
         initializeSampleButtons();

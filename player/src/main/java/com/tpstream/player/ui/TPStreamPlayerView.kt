@@ -2,11 +2,13 @@ package com.tpstream.player.ui
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
@@ -29,6 +31,7 @@ import com.tpstream.player.databinding.TpStreamPlayerViewBinding
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.ImageSaver
+import java.util.concurrent.TimeUnit
 
 class TPStreamPlayerView @JvmOverloads constructor(
     context: Context,
@@ -49,6 +52,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private lateinit var advancedResolutionSheet:AdvancedResolutionSelectionSheet
     private val seekBar get() = binding.playerView.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress)
     private var seekBarListener: TimeBar.OnScrubListener? = null
+    private var markers: LinkedHashMap<Long,Boolean>? = null
 
     init {
         registerDownloadListener()
@@ -163,6 +167,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         this.player = player as TpStreamPlayerImpl
         playerView.player = this.player.exoPlayer
         initializeLoadCompleteListener()
+        initializeMarkerListener()
     }
 
     private fun initializeLoadCompleteListener() {
@@ -173,6 +178,13 @@ class TPStreamPlayerView @JvmOverloads constructor(
                     updateDownloadButtonImage()
                 }
             }
+        }
+    }
+
+    private fun initializeMarkerListener() {
+        player.setMarkerListener {
+            markers?.updateCompleteMarkers(it)
+            playerView.setExtraAdGroupMarkers(markers?.keys?.toLongArray(),markers?.values?.toBooleanArray())
         }
     }
 
@@ -255,5 +267,41 @@ class TPStreamPlayerView @JvmOverloads constructor(
             seekBarListener = null
         }
     }
+
+    fun addMarkers(timesInSeconds: LongArray, @ColorInt markerColor: Int = Color.YELLOW) {
+        if (markers != null) {
+            addUnPlayerMarkers(markerColor)
+        } else {
+            addAllMarkers(timesInSeconds, markerColor)
+        }
+    }
+
+    private fun addAllMarkers(timesInSeconds: LongArray, markerColor: Int) {
+        val timesInMs = timesInSeconds.map { TimeUnit.SECONDS.toMillis(it) }.toLongArray()
+        markers = timesInMs.associateWith { false }.toMap(linkedMapOf())
+        markers?.map {
+            player.addMarker(it.key)
+        }
+        updateMarkerInTimeBar(markerColor)
+    }
+
+    private fun addUnPlayerMarkers(markerColor: Int) {
+        markers?.map {
+            if (!it.value) {
+                player.addMarker(it.key)
+            }
+        }
+        updateMarkerInTimeBar(markerColor)
+    }
+
+    private fun updateMarkerInTimeBar(markerColor: Int) {
+        playerView.setExtraAdGroupMarkers(
+            markers?.keys?.toLongArray(),
+            markers?.values?.toBooleanArray()
+        )
+        seekBar.setAdMarkerColor(markerColor)
+    }
+
+    private fun LinkedHashMap<Long, Boolean>.updateCompleteMarkers(time: Long) = this.apply { put(time, true) }
 
 }

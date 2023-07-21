@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.DialogInterface
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
@@ -17,6 +18,7 @@ import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.core.view.marginTop
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
@@ -328,9 +330,29 @@ class TPStreamPlayerView @JvmOverloads constructor(
         seekBar.setAdMarkerColor(markerColor)
     }
 
-    fun enableWaterMark(){
-        binding.watermarkView.isVisible = true
-        Handler(Looper.getMainLooper()).postDelayed({animateTextView(binding.watermarkView)},1000)
+    fun enableWaterMark(text: String, @ColorInt color: Int, dynamic: Boolean = true) {
+        if (dynamic) {
+            //This function is used to display watermarks on the screen. However, at the time of calling this function,
+            //the watermarkView object might not be initialize, which can prevent the animation from being applied smoothly.
+            //To ensure that the animation is applied correctly, we use a delay of 1 second before triggering the animation.
+            //By delaying the animation, we allow the view to become visible, and the animation can be executed as intended.
+            Handler(Looper.getMainLooper()).postDelayed(
+                {
+                    binding.watermarkView.setConfiguration(text, color)
+                    binding.watermarkView.x = -binding.watermarkView.width.toFloat()
+                    animateTextView(binding.watermarkView)
+                },
+                1000
+            )
+        } else {
+            binding.watermarkView.setConfiguration(text, color)
+        }
+    }
+
+    private fun TextView.setConfiguration(text: String, color: Int) {
+        this.isVisible = true
+        this.text = text
+        this.setTextColor(ColorStateList.valueOf(color))
     }
 
     fun disableWaterMarker() {

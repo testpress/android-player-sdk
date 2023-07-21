@@ -46,9 +46,7 @@ class PlayerActivity : AppCompatActivity() {
                 })
 
                 playerFragment.tpStreamPlayerView.setMarkers(longArrayOf(60,120,180),Color.RED,false)
-                playerFragment.tpStreamPlayerView.enableWaterMark()
-                Handler(Looper.getMainLooper()).postDelayed({playerFragment.tpStreamPlayerView.disableWaterMarker()},10000)
-                Handler(Looper.getMainLooper()).postDelayed({playerFragment.tpStreamPlayerView.enableWaterMark()},15000)
+                playerFragment.tpStreamPlayerView.enableWaterMark("PruthiviRaj",Color.RED, true)
             }
         });
         initializeSampleButtons();

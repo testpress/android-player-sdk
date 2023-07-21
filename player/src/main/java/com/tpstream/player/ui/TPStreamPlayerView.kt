@@ -285,12 +285,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
         deleteAfterDelivery: Boolean = true
     ) {
         if (markers != null) {
-            addMarkersToPlayer(markerColor)
-            updateMarkerInTimeBar(markerColor)
+            addMarkersToPlayer()
+            addMarkerToPlayerView(markerColor)
         } else {
             markers = populateMarkers(timesInSeconds, deleteAfterDelivery)
-            addMarkersToPlayer(markerColor)
-            updateMarkerInTimeBar(markerColor)
+            addMarkersToPlayer()
+            addMarkerToPlayerView(markerColor)
         }
     }
 
@@ -304,7 +304,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }.toMap(linkedMapOf())
     }
 
-    private fun addMarkersToPlayer(@ColorInt markerColor: Int) {
+    private fun addMarkersToPlayer() {
         markers?.map {
             if (!it.value.played) {
                 player.addMarker(it.key, it.value.deleteAfterDelivery)
@@ -312,7 +312,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
-    private fun updateMarkerInTimeBar(markerColor: Int) {
+    private fun addMarkerToPlayerView(markerColor: Int) {
         playerView.setExtraAdGroupMarkers(
             markers?.keys?.toLongArray(),
             markers?.values?.getPlayedArray()

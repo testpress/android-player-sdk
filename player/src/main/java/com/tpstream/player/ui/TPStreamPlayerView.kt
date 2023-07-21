@@ -32,7 +32,7 @@ import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.util.MarkerState
-import com.tpstream.player.util.getPlayedArray
+import com.tpstream.player.util.getPlayedStatusArray
 import java.util.concurrent.TimeUnit
 
 class TPStreamPlayerView @JvmOverloads constructor(
@@ -188,7 +188,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
             markers?.updatePlayedMarker(time)
             playerView.setExtraAdGroupMarkers(
                 markers?.keys?.toLongArray(),
-                markers?.values?.getPlayedArray()
+                markers?.values?.getPlayedStatusArray()
             )
         }
     }
@@ -315,7 +315,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun addMarkerToPlayerView(markerColor: Int) {
         playerView.setExtraAdGroupMarkers(
             markers?.keys?.toLongArray(),
-            markers?.values?.getPlayedArray()
+            markers?.values?.getPlayedStatusArray()
         )
         seekBar.setAdMarkerColor(markerColor)
     }

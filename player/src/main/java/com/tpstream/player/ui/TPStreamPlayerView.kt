@@ -31,6 +31,8 @@ import com.tpstream.player.databinding.TpStreamPlayerViewBinding
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.ImageSaver
+import com.tpstream.player.util.MarkerState
+import com.tpstream.player.util.getPlayedArray
 import java.util.concurrent.TimeUnit
 
 class TPStreamPlayerView @JvmOverloads constructor(
@@ -52,7 +54,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private lateinit var advancedResolutionSheet:AdvancedResolutionSelectionSheet
     private val seekBar get() = binding.playerView.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress)
     private var seekBarListener: TimeBar.OnScrubListener? = null
-    private var markers: LinkedHashMap<Long,Boolean>? = null
+    private var markers: LinkedHashMap<Long, MarkerState>? = null
 
     init {
         registerDownloadListener()
@@ -182,9 +184,18 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun initializeMarkerListener() {
-        player.setMarkerListener {
-            markers?.updateCompleteMarkers(it)
-            playerView.setExtraAdGroupMarkers(markers?.keys?.toLongArray(),markers?.values?.toBooleanArray())
+        player.setMarkerListener { time ->
+            markers?.updatePlayedMarker(time)
+            playerView.setExtraAdGroupMarkers(
+                markers?.keys?.toLongArray(),
+                markers?.values?.getPlayedArray()
+            )
+        }
+    }
+
+    private fun LinkedHashMap<Long, MarkerState>.updatePlayedMarker(time: Long) {
+        if (this[time]?.deleteAfterDelivery == true) {
+            this[time]?.played = true
         }
     }
 
@@ -268,57 +279,45 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
-    fun addMarkers(
+    fun setMarkers(
         timesInSeconds: LongArray,
         @ColorInt markerColor: Int = Color.YELLOW,
         deleteAfterDelivery: Boolean = true
     ) {
-        if (deleteAfterDelivery) {
-            if (markers != null) {
-                addUnPlayerOneTimeMarkers(markerColor)
-            } else {
-                addAllOneTimeMarkers(timesInSeconds, markerColor)
-            }
+        if (markers != null) {
+            addMarkersToPlayer(markerColor)
+            updateMarkerInTimeBar(markerColor)
         } else {
-            addAllMarkers(timesInSeconds, markerColor)
+            markers = populateMarkers(timesInSeconds, deleteAfterDelivery)
+            addMarkersToPlayer(markerColor)
+            updateMarkerInTimeBar(markerColor)
         }
     }
 
-    private fun addUnPlayerOneTimeMarkers(markerColor: Int) {
+    private fun populateMarkers(
+        timesInSeconds: LongArray,
+        deleteAfterDelivery: Boolean = true
+    ): LinkedHashMap<Long, MarkerState> {
+        val timesInMs = timesInSeconds.map { TimeUnit.SECONDS.toMillis(it) }.toLongArray()
+        return timesInMs.associateWith {
+            MarkerState(false, deleteAfterDelivery)
+        }.toMap(linkedMapOf())
+    }
+
+    private fun addMarkersToPlayer(@ColorInt markerColor: Int) {
         markers?.map {
-            if (!it.value) {
-                player.addOneTimeMarker(it.key)
+            if (!it.value.played) {
+                player.addMarker(it.key, it.value.deleteAfterDelivery)
             }
         }
-        updateMarkerInTimeBar(markerColor)
-    }
-
-    private fun addAllOneTimeMarkers(timesInSeconds: LongArray, markerColor: Int) {
-        val timesInMs = timesInSeconds.map { TimeUnit.SECONDS.toMillis(it) }.toLongArray()
-        markers = timesInMs.associateWith { false }.toMap(linkedMapOf())
-        markers?.map {
-            player.addOneTimeMarker(it.key)
-        }
-        updateMarkerInTimeBar(markerColor)
-    }
-
-    private fun addAllMarkers(timesInSeconds: LongArray, markerColor: Int) {
-        val timesInMs = timesInSeconds.map { TimeUnit.SECONDS.toMillis(it) }.toLongArray()
-        markers = timesInMs.associateWith { false }.toMap(linkedMapOf())
-        markers?.map {
-            player.addMarker(it.key)
-        }
-        updateMarkerInTimeBar(markerColor)
     }
 
     private fun updateMarkerInTimeBar(markerColor: Int) {
         playerView.setExtraAdGroupMarkers(
             markers?.keys?.toLongArray(),
-            markers?.values?.toBooleanArray()
+            markers?.values?.getPlayedArray()
         )
         seekBar.setAdMarkerColor(markerColor)
     }
-
-    private fun LinkedHashMap<Long, Boolean>.updateCompleteMarkers(time: Long) = this.apply { put(time, true) }
 
 }

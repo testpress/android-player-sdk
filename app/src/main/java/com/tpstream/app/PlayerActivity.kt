@@ -43,7 +43,7 @@ class PlayerActivity : AppCompatActivity() {
                     }
                 })
 
-                playerFragment.tpStreamPlayerView.addMarkers(longArrayOf(60,120,180),Color.RED)
+                playerFragment.tpStreamPlayerView.setMarkers(longArrayOf(60,120,180),Color.RED)
             }
         });
         initializeSampleButtons();

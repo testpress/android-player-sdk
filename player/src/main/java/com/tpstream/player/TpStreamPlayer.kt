@@ -98,24 +98,14 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         })
     }
 
-    fun addOneTimeMarker(timesInMs: Long) {
+    fun addMarker(timesInMs: Long, deleteAfterDelivery: Boolean) {
         Handler(Looper.getMainLooper()).post {
             exoPlayer.createMessage { _, _ ->
                 markerListener?.onMarkerCall(timesInMs)
                 _listener?.onMarkerCallback(TimeUnit.MILLISECONDS.toSeconds(timesInMs))
             }.setPosition(timesInMs)
                 .setLooper(Looper.getMainLooper())
-                .send()
-        }
-    }
-
-    fun addMarker(timesInMs: Long) {
-        Handler(Looper.getMainLooper()).post {
-            exoPlayer.createMessage { _, _ ->
-                _listener?.onMarkerCallback(TimeUnit.MILLISECONDS.toSeconds(timesInMs))
-            }.setPosition(timesInMs)
-                .setLooper(Looper.getMainLooper())
-                .setDeleteAfterDelivery(false)
+                .setDeleteAfterDelivery(deleteAfterDelivery)
                 .send()
         }
     }

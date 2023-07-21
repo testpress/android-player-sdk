@@ -10,7 +10,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
@@ -18,7 +17,6 @@ import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.core.view.marginTop
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
@@ -43,6 +41,8 @@ import com.tpstream.player.util.MarkerState
 import com.tpstream.player.util.getPlayedStatusArray
 import java.util.*
 import java.util.concurrent.TimeUnit
+
+private const val ONE_SECONDS_DELAY: Long = 1000
 
 class TPStreamPlayerView @JvmOverloads constructor(
     context: Context,
@@ -330,23 +330,18 @@ class TPStreamPlayerView @JvmOverloads constructor(
         seekBar.setAdMarkerColor(markerColor)
     }
 
-    fun enableWaterMark(text: String, @ColorInt color: Int, dynamic: Boolean = true) {
-        if (dynamic) {
-            //This function is used to display watermarks on the screen. However, at the time of calling this function,
-            //the watermarkView object might not be initialize, which can prevent the animation from being applied smoothly.
-            //To ensure that the animation is applied correctly, we use a delay of 1 second before triggering the animation.
-            //By delaying the animation, we allow the view to become visible, and the animation can be executed as intended.
-            Handler(Looper.getMainLooper()).postDelayed(
-                {
-                    binding.watermarkView.setConfiguration(text, color)
-                    binding.watermarkView.x = -binding.watermarkView.width.toFloat()
-                    animateTextView(binding.watermarkView)
-                },
-                1000
-            )
-        } else {
-            binding.watermarkView.setConfiguration(text, color)
-        }
+    fun enableWaterMark(text: String, @ColorInt color: Int) {
+        binding.watermarkView.setConfiguration(text, color)
+        //This function is used to display watermarks on the screen. However, at the time of calling this function,
+        //the watermarkView object might not be initialize, which can prevent the animation from being applied smoothly.
+        //To ensure that the animation is applied correctly, we use a delay of 1 second before triggering the animation.
+        //By delaying the animation, we allow the view to become visible, and the animation can be executed as intended.
+        Handler(Looper.getMainLooper()).postDelayed(
+            {
+                binding.watermarkView.startAnimation()
+            },
+            ONE_SECONDS_DELAY
+        )
     }
 
     private fun TextView.setConfiguration(text: String, color: Int) {
@@ -355,25 +350,25 @@ class TPStreamPlayerView @JvmOverloads constructor(
         this.setTextColor(ColorStateList.valueOf(color))
     }
 
-    fun disableWaterMarker() {
+    fun disableWaterMark() {
         animator?.cancel()
-        binding.watermarkView.x = -binding.watermarkView.width.toFloat()
         binding.watermarkView.isVisible = false
     }
 
-    private fun animateTextView(textView: TextView) {
+    private fun TextView.startAnimation() {
+        this.x = -this.width.toFloat()
         val screenWidth = playerView.width
         val screenHeight = playerView.height
 
         animator = ObjectAnimator.ofFloat(
-            textView,
+            this,
             "translationX",
-            -textView.width.toFloat(),
+            -this.width.toFloat(),
             screenWidth.toFloat()
         )
 
         animator?.let {
-            it.duration = 15000
+            it.duration = 10000
             it.repeatMode = ObjectAnimator.REVERSE
             it.repeatCount = ObjectAnimator.INFINITE
             it.addListener(object : Animator.AnimatorListener {
@@ -381,7 +376,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 override fun onAnimationEnd(p0: Animator?) {}
                 override fun onAnimationCancel(p0: Animator?) {}
                 override fun onAnimationRepeat(p0: Animator?) {
-                    textView.y = Random().nextFloat() * (screenHeight - textView.height)
+                    this@startAnimation.y =
+                        Random().nextFloat() * (screenHeight - this@startAnimation.height)
                 }
             })
             it.start()

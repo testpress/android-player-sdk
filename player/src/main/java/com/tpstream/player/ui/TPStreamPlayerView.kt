@@ -194,8 +194,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun LinkedHashMap<Long, MarkerState>.updatePlayedMarker(time: Long) {
-        if (this[time]?.deleteAfterDelivery == true) {
-            this[time]?.played = true
+        if (this[time]?.shouldDeleteAfterDelivery == true) {
+            this[time]?.isPlayed = true
         }
     }
 
@@ -284,17 +284,17 @@ class TPStreamPlayerView @JvmOverloads constructor(
         @ColorInt markerColor: Int = Color.YELLOW,
         deleteAfterDelivery: Boolean = true
     ) {
-        if (markers != null) {
-            addMarkersToPlayer()
-            addMarkerToPlayerView(markerColor)
-        } else {
-            markers = populateMarkers(timesInSeconds, deleteAfterDelivery)
-            addMarkersToPlayer()
-            addMarkerToPlayerView(markerColor)
+        // Check if markers have already been generated. If not, generate new markers.
+        //If the app comes from the background, the markers will be already available,
+        //and there is no need to generate new markers again.
+        if (markers == null) {
+            markers = generateMarkers(timesInSeconds, deleteAfterDelivery)
         }
+        addMarkersToPlayer()
+        addMarkerToPlayerView(markerColor)
     }
 
-    private fun populateMarkers(
+    private fun generateMarkers(
         timesInSeconds: LongArray,
         deleteAfterDelivery: Boolean = true
     ): LinkedHashMap<Long, MarkerState> {
@@ -306,8 +306,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     private fun addMarkersToPlayer() {
         markers?.map {
-            if (!it.value.played) {
-                player.addMarker(it.key, it.value.deleteAfterDelivery)
+            if (!it.value.isPlayed) {
+                player.addMarker(it.key, it.value.shouldDeleteAfterDelivery)
             }
         }
     }

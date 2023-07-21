@@ -1,5 +1,5 @@
 package com.tpstream.player.util
 
-internal data class MarkerState(var played: Boolean, val deleteAfterDelivery: Boolean)
+internal data class MarkerState(var isPlayed: Boolean, val shouldDeleteAfterDelivery: Boolean)
 
-internal fun Collection<MarkerState>.getPlayedStatusArray(): BooleanArray = map { it.played }.toBooleanArray()
+internal fun Collection<MarkerState>.getPlayedStatusArray(): BooleanArray = map { it.isPlayed }.toBooleanArray()

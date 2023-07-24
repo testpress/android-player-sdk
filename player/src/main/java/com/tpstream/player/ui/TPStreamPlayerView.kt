@@ -9,7 +9,11 @@ import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewTreeObserver
+import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
@@ -332,16 +336,25 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun enableWaterMark(text: String, @ColorInt color: Int) {
         binding.watermarkView.setConfiguration(text, color)
-        //This function is used to display watermarks on the screen. However, at the time of calling this function,
-        //the watermarkView object might not be initialize, which can prevent the animation from being applied smoothly.
-        //To ensure that the animation is applied correctly, we use a delay of 1 second before triggering the animation.
-        //By delaying the animation, we allow the view to become visible, and the animation can be executed as intended.
-        Handler(Looper.getMainLooper()).postDelayed(
-            {
+        // Since the width of the TextView is not immediately available after it is created or modified,
+        // we need to use a layout change listener to wait for the layout to be updated.
+        binding.watermarkView.addOnLayoutChangeListener(object : OnLayoutChangeListener {
+            override fun onLayoutChange(
+                view: View,
+                left: Int,
+                top: Int,
+                right: Int,
+                bottom: Int,
+                oldLeft: Int,
+                oldTop: Int,
+                oldRight: Int,
+                oldBottom: Int
+            ) {
+                // We remove the layout change listener to avoid unnecessary future calls.
+                binding.watermarkView.removeOnLayoutChangeListener(this)
                 binding.watermarkView.startAnimation()
-            },
-            ONE_SECONDS_DELAY
-        )
+            }
+        })
     }
 
     private fun TextView.setConfiguration(text: String, color: Int) {
@@ -357,8 +370,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     private fun TextView.startAnimation() {
         this.x = -this.width.toFloat()
-        val screenWidth = playerView.width
-        val screenHeight = playerView.height
+        val screenWidth = resources.displayMetrics.widthPixels
 
         animator = ObjectAnimator.ofFloat(
             this,
@@ -377,7 +389,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 override fun onAnimationCancel(p0: Animator?) {}
                 override fun onAnimationRepeat(p0: Animator?) {
                     this@startAnimation.y =
-                        Random().nextFloat() * (screenHeight - this@startAnimation.height)
+                        Random().nextFloat() * (playerView.height - this@startAnimation.height)
                 }
             })
             it.start()

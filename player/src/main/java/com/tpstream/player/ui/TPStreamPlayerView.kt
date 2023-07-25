@@ -328,7 +328,9 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     fun enableWaterMark(text: String, @ColorInt color: Int) {
-        binding.watermarkView.setConfiguration(text, color)
+        binding.watermarkView.isVisible = true
+        binding.watermarkView.text = text
+        binding.watermarkView.setTextColor(ColorStateList.valueOf(color))
         // Since the width of the TextView is not immediately available after it is created or modified,
         // we need to use a layout change listener to wait for the layout to be updated.
         binding.watermarkView.addOnLayoutChangeListener(object : OnLayoutChangeListener {
@@ -348,12 +350,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 binding.watermarkView.startAnimation()
             }
         })
-    }
-
-    private fun TextView.setConfiguration(text: String, color: Int) {
-        this.isVisible = true
-        this.text = text
-        this.setTextColor(ColorStateList.valueOf(color))
     }
 
     fun disableWaterMark() {

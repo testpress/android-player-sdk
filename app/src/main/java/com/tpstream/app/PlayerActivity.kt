@@ -44,6 +44,7 @@ class PlayerActivity : AppCompatActivity() {
                 })
 
                 playerFragment.tpStreamPlayerView.setMarkers(longArrayOf(60,120,180),Color.RED,false)
+                playerFragment.tpStreamPlayerView.enableWaterMark("Tpstreams",Color.RED)
             }
         });
         initializeSampleButtons();

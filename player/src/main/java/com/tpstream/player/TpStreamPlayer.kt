@@ -138,7 +138,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun buildMediaItem(url: String): MediaItem {
-        val drmLicenseURL = BuildConfig.DRM_LICENSE_URL.format(params.orgCode,params.videoId,params.accessToken)
+        val drmLicenseURL = TPStreamsSDK.constructDRMLicenseUrl(params.videoId, params.accessToken)
         return MediaItem.Builder()
             .setUri(url)
             .setDrmConfiguration(

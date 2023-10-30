@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.tpstream.player.BuildConfig
 import com.tpstream.player.TPException
+import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.data.source.local.TPStreamsDatabase
 import com.tpstream.player.data.source.network.NetworkVideo
@@ -74,7 +75,7 @@ internal class VideoRepository(context: Context) {
         params: TpInitParams,
         callback : VideoNetworkDataSource.TPResponse<Video>
     ) {
-        val url =BuildConfig.VIDEO_URL.format(params.orgCode,params.videoId,params.accessToken)
+        val url = TPStreamsSDK.constructVideoInfoUrl(params.videoId, params.accessToken)
         VideoNetworkDataSource<NetworkVideo>().get(url, object : VideoNetworkDataSource.TPResponse<NetworkVideo> {
             override fun onSuccess(result: NetworkVideo) {
                 val video = result.asDomainVideo()

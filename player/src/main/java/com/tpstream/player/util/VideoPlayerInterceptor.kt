@@ -2,6 +2,7 @@ package com.tpstream.player.util
 
 import android.content.Context
 import com.tpstream.player.EncryptionKeyRepository
+import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -24,7 +25,7 @@ internal class VideoPlayerInterceptor(private val context: Context, private val 
                 return response
             } else {
                 request = request.newBuilder()
-                    .url("https://${params?.orgCode}.testpress.in/api/v2.5/encryption_key/${params?.videoId}/?access_token=${params?.accessToken}")
+                    .url("https://${TPStreamsSDK.orgCode}.testpress.in/api/v2.5/encryption_key/${params?.videoId}/?access_token=${params?.accessToken}")
                     .build()
             }
         }

@@ -1,14 +1,9 @@
-import groovy.json.JsonSlurper
-
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
     id 'kotlin-kapt'
 }
-
-def jsonFile = file('src/main/assets/config.json')
-def json = new JsonSlurper().parseText(jsonFile.text)
 
 android {
     namespace 'com.tpstream.player'
@@ -25,14 +20,6 @@ android {
                 arguments += ["room.schemaLocation":
                                       "$projectDir/schemas".toString()]
             }
-        }
-
-        if (json.provider == "testpress") {
-            buildConfigField "String", "VIDEO_URL", "\"" +json.testpress_base_url+json.testpress_video_path + "\""
-            buildConfigField "String", "DRM_LICENSE_URL", "\"" + json.testpress_base_url+json.testpress_drm_license_path + "\""
-        } else {
-            buildConfigField "String", "VIDEO_URL", "\"" + json.tpStreams_base_url+json.tpStreams_video_path + "\""
-            buildConfigField "String", "DRM_LICENSE_URL", "\"" + json.tpStreams_base_url+json.tpStreams_drm_license_path + "\""
         }
     }
 

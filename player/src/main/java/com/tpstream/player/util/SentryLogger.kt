@@ -2,6 +2,7 @@ package com.tpstream.player.util
 
 import androidx.media3.common.PlaybackException
 import com.tpstream.player.TPException
+import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import io.sentry.Sentry
 
@@ -12,7 +13,7 @@ internal object SentryLogger {
                 " Message: ${exception.response?.message}" +
                 " Video ID: ${params?.videoId}" +
                 " AccessToken: ${params?.accessToken}" +
-                " Org Code: ${params?.orgCode}")
+                " Org Code: ${TPStreamsSDK.orgCode}")
     }
 
     fun logPlaybackException(error: PlaybackException,params: TpInitParams?){
@@ -22,6 +23,6 @@ internal object SentryLogger {
                 " Message: ${error.message}" +
                 " Video ID: ${params?.videoId}" +
                 " AccessToken: ${params?.accessToken}" +
-                " Org Code: ${params?.orgCode}")
+                " Org Code: ${TPStreamsSDK.orgCode}")
     }
 }

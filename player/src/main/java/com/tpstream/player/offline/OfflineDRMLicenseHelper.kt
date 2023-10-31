@@ -13,6 +13,7 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import com.tpstream.player.BuildConfig
+import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.offline.VideoDownload.getDownloadRequest
 import kotlinx.coroutines.CoroutineScope
@@ -46,7 +47,7 @@ internal object OfflineDRMLicenseHelper {
         val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
         val drmInitData =
             DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
-        val drmLicenseURL = "${BuildConfig.DRM_LICENSE_URL.format(tpInitParams.orgCode,tpInitParams.videoId,tpInitParams.accessToken)}$OFFLINE_DRM_LICENSE_PARAMS"
+        val drmLicenseURL = "${TPStreamsSDK.constructDRMLicenseUrl(tpInitParams.videoId,tpInitParams.accessToken)}$OFFLINE_DRM_LICENSE_PARAMS"
         return OfflineLicenseHelper.newWidevineInstance(
             drmLicenseURL,
             VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
@@ -108,7 +109,7 @@ internal object OfflineDRMLicenseHelper {
         downloadHelper: DownloadHelper,
         callback: DRMLicenseFetchCallback
     ) {
-        val drmLicenseURL = "${BuildConfig.DRM_LICENSE_URL.format(tpInitParams.orgCode,tpInitParams.videoId,tpInitParams.accessToken)}$OFFLINE_DRM_LICENSE_PARAMS"
+        val drmLicenseURL = "${TPStreamsSDK.constructDRMLicenseUrl(tpInitParams.videoId,tpInitParams.accessToken)}$OFFLINE_DRM_LICENSE_PARAMS"
         val offlineLicenseHelper = OfflineLicenseHelper.newWidevineInstance(
             drmLicenseURL,
             VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),

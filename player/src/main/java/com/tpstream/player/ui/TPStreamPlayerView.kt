@@ -14,7 +14,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.ColorInt
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -109,7 +109,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
                     player,
                     player.getTrackSelectionParameters(),
                 )
-                downloadResolutionSelectionSheet.show((context as AppCompatActivity).supportFragmentManager, "DownloadSelectionSheet")
+                downloadResolutionSelectionSheet.show((context as FragmentActivity).supportFragmentManager, "DownloadSelectionSheet")
                 downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, video ->
                     DownloadTask(context).start(downloadRequest)
                     video?.videoId = player.params.videoId!!
@@ -129,7 +129,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         } else {
             initializeResolutionSelectionSheets()
             simpleResolutionSheet.show(
-                (context as AppCompatActivity).supportFragmentManager,
+                (context as FragmentActivity).supportFragmentManager,
                 SimpleResolutionSelectionSheet.TAG
             )
         }
@@ -145,7 +145,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun onSimpleResolutionSelection() = DialogInterface.OnClickListener { p0, p1 ->
         selectedResolution = simpleResolutionSheet.selectedResolution
         if (simpleResolutionSheet.selectedResolution == ResolutionOptions.ADVANCED) {
-            advancedResolutionSheet.show((context as AppCompatActivity).supportFragmentManager, "AdvancedSheet")
+            advancedResolutionSheet.show((context as FragmentActivity).supportFragmentManager, "AdvancedSheet")
             return@OnClickListener
         } else {
             val parameters = simpleResolutionSheet.selectedResolution.getTrackSelectionParameter(
@@ -181,7 +181,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     private fun initializeLoadCompleteListener() {
         player.setLoadCompleteListener {
-            (context as AppCompatActivity).runOnUiThread {
+            (context as FragmentActivity).runOnUiThread {
                 if (player.params.isDownloadEnabled) {
                     downloadButton?.isVisible = true
                     updateDownloadButtonImage()
@@ -207,7 +207,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun updateDownloadButtonImage(){
-        videoViewModel.get(player.video?.videoId!!).observe(context as AppCompatActivity) { video ->
+        videoViewModel.get(player.video?.videoId!!).observe(context as FragmentActivity) { video ->
             downloadState = when (video?.downloadState) {
                 DownloadStatus.DOWNLOADING ->{
                     downloadButton?.setImageResource(R.drawable.ic_baseline_downloading_24)

@@ -57,6 +57,12 @@ public interface TpStreamPlayer {
     fun play()
     fun pause()
     fun load(parameters: TpInitParams)
+
+    class Builder(private val context: Context) {
+        fun build(): TpStreamPlayer {
+            return TpStreamPlayerImpl(context)
+        }
+    }
 }
 
 internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {

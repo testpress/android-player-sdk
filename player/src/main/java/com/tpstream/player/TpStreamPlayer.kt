@@ -57,6 +57,7 @@ public interface TpStreamPlayer {
     fun play()
     fun pause()
     fun load(parameters: TpInitParams)
+    fun release()
 
     class Builder(private val context: Context) {
         fun build(): TpStreamPlayer {
@@ -184,7 +185,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     fun getTrackSelector(): TrackSelector? = exoPlayer.trackSelector
 
-    fun release() {
+    override fun release() {
         exoPlayer.release()
     }
 

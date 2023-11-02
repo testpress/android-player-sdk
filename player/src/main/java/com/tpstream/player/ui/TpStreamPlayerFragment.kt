@@ -231,11 +231,12 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
-            SentryLogger.logPlaybackException(error, player?.params)
+            val errorPlayerId = SentryLogger.generatePlayerIdString()
+            SentryLogger.logPlaybackException(error, player?.params, errorPlayerId)
             if (isDRMException(error.cause!!)) {
                 fetchDRMLicence()
             } else {
-                showErrorMessage("Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName}")
+                showErrorMessage("Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName} PlayerId: ${errorPlayerId}")
             }
         }
 
@@ -281,8 +282,9 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onPlaybackError(parameters: TpInitParams, exception: TPException) {
             requireActivity().runOnUiThread{
-                showErrorMessage("\"Error Occurred while playing video. Error code ${exception.errorMessage}.\\n ID: ${parameters.videoId}\"")
-                SentryLogger.logAPIException(exception,parameters)
+                val errorPlayerId = SentryLogger.generatePlayerIdString()
+                showErrorMessage("\"Error Occurred while playing video. Error code ${exception.errorMessage}.\\n ID: ${parameters.videoId}\" PlayerId: $errorPlayerId")
+                SentryLogger.logAPIException(exception,parameters, errorPlayerId)
             }
         }
 

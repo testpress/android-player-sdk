@@ -7,22 +7,34 @@ import com.tpstream.player.TpInitParams
 import io.sentry.Sentry
 
 internal object SentryLogger {
-    fun logAPIException(exception: TPException, params: TpInitParams?){
-        Sentry.captureMessage("Server error" +
-                " Code: ${exception.response?.code}" +
-                " Message: ${exception.response?.message}" +
-                " Video ID: ${params?.videoId}" +
-                " AccessToken: ${params?.accessToken}" +
-                " Org Code: ${TPStreamsSDK.orgCode}")
+
+    fun generatePlayerIdString(): String {
+        return (1..10)
+            .map { ('a'..'z').toList() + ('0'..'9').toList() }
+            .map { it.random() }
+            .joinToString("")
     }
 
-    fun logPlaybackException(error: PlaybackException,params: TpInitParams?){
-        Sentry.captureMessage("Player error" +
-                " Code: ${error.errorCode}" +
-                " Code name: ${error.errorCodeName}" +
-                " Message: ${error.message}" +
-                " Video ID: ${params?.videoId}" +
-                " AccessToken: ${params?.accessToken}" +
-                " Org Code: ${TPStreamsSDK.orgCode}")
+    fun logAPIException(exception: TPException, params: TpInitParams?, playerId: String) {
+        Sentry.captureMessage(
+            "Server error" +
+                    " Code: ${exception.response?.code}" +
+                    " Message: ${exception.response?.message}" +
+                    " Video ID: ${params?.videoId}" +
+                    " AccessToken: ${params?.accessToken}" +
+                    " Org Code: ${TPStreamsSDK.orgCode}"
+        ) { scope -> scope.setTag("playerId", playerId) }
+    }
+
+    fun logPlaybackException(error: PlaybackException, params: TpInitParams?, playerId: String) {
+        Sentry.captureMessage(
+            "Player error" +
+                    " Code: ${error.errorCode}" +
+                    " Code name: ${error.errorCodeName}" +
+                    " Message: ${error.message}" +
+                    " Video ID: ${params?.videoId}" +
+                    " AccessToken: ${params?.accessToken}" +
+                    " Org Code: ${TPStreamsSDK.orgCode}"
+        ) { scope -> scope.setTag("playerId", playerId) }
     }
 }

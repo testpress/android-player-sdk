@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.TrackSelectionParameters
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.MappingTrackSelector
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -20,8 +19,6 @@ import com.tpstream.player.R
 import com.tpstream.player.TpStreamPlayer
 import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
 
-
-@UnstableApi
 internal class SimpleResolutionSelectionSheet(
     private val player: TpStreamPlayer,
     var selectedResolution: ResolutionOptions

@@ -20,14 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
-import androidx.media3.common.C
-import androidx.media3.common.TrackSelectionParameters
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.ui.DefaultTimeBar
-import androidx.media3.ui.PlayerView
 import com.tpstream.player.*
-import androidx.media3.ui.PlayerView.FullscreenButtonClickListener
-import androidx.media3.ui.TimeBar
 import com.tpstream.player.EncryptionKeyRepository
 import com.tpstream.player.TpStreamPlayerImpl
 import com.tpstream.player.data.VideoRepository
@@ -58,8 +51,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var selectedResolution = ResolutionOptions.AUTO
     private lateinit var simpleResolutionSheet:SimpleResolutionSelectionSheet
     private lateinit var advancedResolutionSheet:AdvancedResolutionSelectionSheet
-    private val seekBar get() = binding.playerView.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress)
-    private var seekBarListener: TimeBar.OnScrubListener? = null
+    private val seekBar get() = binding.playerView.findViewById<DefaultTimeBar>(ExoplayerProgressBarID.exo_progress)
+    private var seekBarListener: OnScrubListener? = null
     private var markers: LinkedHashMap<Long, MarkerState>? = null
     private var animator: ObjectAnimator? = null
 
@@ -161,7 +154,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         mappedTrackInfo?.let {
             val rendererIndex = Util.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
             if (advancedResolutionSheet.overrides.isNotEmpty()) {
-                val params = TrackSelectionParameters.Builder(context)
+                val params = TrackSelectionParametersBuilder(context)
                     .clearOverridesOfType(rendererIndex)
                     .addOverride(advancedResolutionSheet.overrides.values.elementAt(0))
                     .build()
@@ -267,7 +260,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun disableSeekBar(message: String = "Seek option is Disable") {
         removeSeekBarListener()
-        seekBarListener = object : TimeBar.OnScrubListener {
+        seekBarListener = object : OnScrubListener {
             override fun onScrubStart(timeBar: TimeBar, position: Long) {
                 timeBar.setEnabled(false)
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

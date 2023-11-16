@@ -1,8 +1,6 @@
 package com.tpstream.player
 
-import androidx.media3.common.*
-
-internal class ExoPlayerListenerWrapper(var player: TpStreamPlayerImpl) : Player.Listener {
+internal class ExoPlayerListenerWrapper(var player: TpStreamPlayerImpl) : PlayerListener {
     private val TAG = "ExoPlayerListener"
     var listener:TPStreamPlayerListener? = player._listener
 
@@ -38,7 +36,7 @@ internal class ExoPlayerListenerWrapper(var player: TpStreamPlayerImpl) : Player
         listener?.onMetadata(metadata)
     }
 
-    override fun onEvents(exoplayer: Player, events: Player.Events) {
+    override fun onEvents(exoplayer: Player, events: PlayerEvents) {
         listener?.onEvents(player, events)
     }
 
@@ -55,8 +53,8 @@ internal class ExoPlayerListenerWrapper(var player: TpStreamPlayerImpl) : Player
     }
 
     override fun onPositionDiscontinuity(
-        oldPosition: Player.PositionInfo,
-        newPosition: Player.PositionInfo,
+        oldPosition: PlayerPositionInfo,
+        newPosition: PlayerPositionInfo,
         reason: Int
     ) {
         listener?.onPositionDiscontinuity(oldPosition, newPosition, reason)

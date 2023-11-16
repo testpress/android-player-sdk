@@ -1,6 +1,6 @@
 package com.tpstream.player.util
 
-import androidx.media3.common.PlaybackException
+import com.tpstream.player.PlaybackException
 import com.tpstream.player.TPException
 import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams

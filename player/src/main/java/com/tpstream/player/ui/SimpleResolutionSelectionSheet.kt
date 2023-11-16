@@ -9,9 +9,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.media3.common.TrackSelectionOverride
-import androidx.media3.common.TrackSelectionParameters
-import androidx.media3.exoplayer.trackselection.MappingTrackSelector
+import com.tpstream.player.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -94,7 +92,7 @@ internal class SimpleResolutionSelectionSheet(
 }
 
 internal object Util{
-    fun getRendererIndex(trackType: Int, mappedTrackInfo: MappingTrackSelector.MappedTrackInfo): Int {
+    fun getRendererIndex(trackType: Int, mappedTrackInfo: MappingTrackSelectorMappedTrackInfo): Int {
         for (i in 0 until mappedTrackInfo.rendererCount) {
             if (mappedTrackInfo.getRendererType(i) == trackType) {
                 return i
@@ -142,7 +140,7 @@ internal enum class ResolutionOptions {
             context: Context,
             override: TrackSelectionOverride?
         ): TrackSelectionParameters {
-            return TrackSelectionParameters.Builder(context).build()
+            return TrackSelectionParametersBuilder(context).build()
         }
     },
     HIGH {
@@ -150,7 +148,7 @@ internal enum class ResolutionOptions {
             context: Context,
             override: TrackSelectionOverride?
         ): TrackSelectionParameters {
-            return TrackSelectionParameters.Builder(context).setForceHighestSupportedBitrate(true).build()
+            return TrackSelectionParametersBuilder(context).setForceHighestSupportedBitrate(true).build()
         }
     },
     LOW {
@@ -158,7 +156,7 @@ internal enum class ResolutionOptions {
             context: Context,
             override: TrackSelectionOverride?
         ): TrackSelectionParameters {
-            return TrackSelectionParameters.Builder(context).setForceLowestBitrate(true).build()
+            return TrackSelectionParametersBuilder(context).setForceLowestBitrate(true).build()
         }
     },
     ADVANCED {
@@ -166,7 +164,7 @@ internal enum class ResolutionOptions {
             context: Context,
             override: TrackSelectionOverride?
         ): TrackSelectionParameters {
-            return TrackSelectionParameters.Builder(context).addOverride(override!!).build()
+            return TrackSelectionParametersBuilder(context).addOverride(override!!).build()
         }
     };
 

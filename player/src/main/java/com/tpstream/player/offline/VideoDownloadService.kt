@@ -1,11 +1,7 @@
 package com.tpstream.player.offline
 
 import android.app.Notification
-import androidx.media3.common.util.NotificationUtil
-import androidx.media3.common.util.Util
-import androidx.media3.exoplayer.offline.*
-import androidx.media3.exoplayer.scheduler.PlatformScheduler
-import androidx.media3.exoplayer.scheduler.Scheduler
+import com.tpstream.player.*
 import com.tpstream.player.R
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.data.source.local.getVideoState
@@ -20,13 +16,13 @@ private const val FOREGROUND_NOTIFICATION_ID = 1
 private const val CHANNEL_ID = "download_channel"
 private var nextNotificationId = FOREGROUND_NOTIFICATION_ID + 1
 
-internal class VideoDownloadService:DownloadService(
+internal class VideoDownloadService: DownloadService(
     FOREGROUND_NOTIFICATION_ID,
     DEFAULT_FOREGROUND_NOTIFICATION_UPDATE_INTERVAL,
     CHANNEL_ID,
     R.string.download,
     R.string.download_description
-) , DownloadManager.Listener{
+) , DownloadManagerListener{
 
     private lateinit var notificationHelper: DownloadNotificationHelper
     private lateinit var videoRepository: VideoRepository

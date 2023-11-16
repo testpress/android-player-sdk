@@ -1,18 +1,9 @@
 package com.tpstream.player
 
 import android.content.Context
-import android.net.Uri
-import android.util.Log
-import androidx.media3.exoplayer.hls.playlist.HlsMediaPlaylist
-import androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
-import androidx.media3.exoplayer.hls.playlist.HlsPlaylist
-import androidx.media3.exoplayer.hls.playlist.HlsPlaylistParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.ResponseBody.Companion.toResponseBody
 
 internal class EncryptionKeyRepository(context: Context) {
     private val sharedPreference = context.getSharedPreferences(

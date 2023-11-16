@@ -3,14 +3,7 @@ package com.tpstream.player.offline
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.media3.common.*
-import androidx.media3.common.MediaItem.DrmConfiguration
-import androidx.media3.common.util.Util
-import androidx.media3.exoplayer.DefaultRenderersFactory
-import androidx.media3.exoplayer.offline.DownloadHelper
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import com.tpstream.player.BuildConfig
+import com.tpstream.player.*
 import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpStreamPlayerImpl
 import kotlinx.coroutines.CoroutineScope
@@ -22,9 +15,9 @@ internal class VideoDownloadRequestCreationHandler(
     val context: Context,
     private val player: TpStreamPlayerImpl
 ) :
-    DownloadHelper.Callback, DRMLicenseFetchCallback {
+    DownloadHelperCallback, DRMLicenseFetchCallback {
     private val downloadHelper: DownloadHelper
-    private val trackSelectionParameters: DefaultTrackSelector.Parameters
+    private val trackSelectionParameters: DefaultTrackSelectorParameters
     var listener: Listener? = null
     private val mediaItem: MediaItem
     private var keySetId: ByteArray? = null
@@ -33,10 +26,10 @@ internal class VideoDownloadRequestCreationHandler(
         val url = player.video?.url!!
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         val drmLicenseURL = "${TPStreamsSDK.constructDRMLicenseUrl(player.params.videoId, player.params.accessToken)}$OFFLINE_DRM_LICENSE_PARAMS"
-        mediaItem = MediaItem.Builder()
+        mediaItem = MediaItemBuilder()
             .setUri(url)
             .setDrmConfiguration(
-                DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                DrmConfigurationBuilder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
                     .setLicenseUri(drmLicenseURL)
                     .build()

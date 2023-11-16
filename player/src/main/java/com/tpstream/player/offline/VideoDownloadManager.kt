@@ -2,16 +2,7 @@ package com.tpstream.player.offline
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.media3.database.DatabaseProvider
-import androidx.media3.database.StandaloneDatabaseProvider
-import androidx.media3.datasource.DataSource
-import androidx.media3.datasource.cache.Cache
-import androidx.media3.datasource.cache.CacheDataSource
-import androidx.media3.datasource.cache.NoOpCacheEvictor
-import androidx.media3.datasource.cache.SimpleCache
-import androidx.media3.datasource.okhttp.OkHttpDataSource
-import androidx.media3.exoplayer.offline.DefaultDownloadIndex
-import androidx.media3.exoplayer.offline.DownloadManager
+import com.tpstream.player.*
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.util.VideoPlayerInterceptor
 import okhttp3.OkHttpClient
@@ -25,7 +16,7 @@ internal class VideoDownloadManager {
     private var downloadManager: DownloadManager? = null
     private lateinit var databaseProvider: StandaloneDatabaseProvider
     private lateinit var downloadDirectory: File
-    private lateinit var httpDataSourceFactory: OkHttpDataSource.Factory
+    private lateinit var httpDataSourceFactory: OkHttpDataSourceFactory
 
     fun get(): DownloadManager {
         if (downloadManager == null) {
@@ -53,17 +44,17 @@ internal class VideoDownloadManager {
         return databaseProvider
     }
 
-    fun getHttpDataSourceFactory(params: TpInitParams? = null): DataSource.Factory {
+    fun getHttpDataSourceFactory(params: TpInitParams? = null): DataSourceFactory {
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(VideoPlayerInterceptor(context,params))
             .build()
-        httpDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
+        httpDataSourceFactory = OkHttpDataSourceFactory(okHttpClient)
         return httpDataSourceFactory
     }
 
-    fun build(params: TpInitParams? = null): CacheDataSource.Factory {
+    fun build(params: TpInitParams? = null): CacheDataSourceFactory {
         val cache = VideoDownloadManager(context).getDownloadCache()
-        return CacheDataSource.Factory()
+        return CacheDataSourceFactory()
             .setCache(cache)
             .setUpstreamDataSourceFactory(getHttpDataSourceFactory(params))
             .setCacheWriteDataSinkFactory(null)

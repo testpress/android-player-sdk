@@ -14,12 +14,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
-import androidx.media3.common.*
-import androidx.media3.common.util.Util
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.drm.DrmSession
-import androidx.media3.exoplayer.drm.MediaDrmCallbackException
 import com.tpstream.player.*
+import com.tpstream.player.Util
 import com.tpstream.player.offline.DRMLicenseFetchCallback
 import com.tpstream.player.offline.DownloadCallback
 import com.tpstream.player.offline.DownloadTask
@@ -35,7 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
-    private val _playbackStateListener: Player.Listener = PlayerListener()
+    private val _playbackStateListener: PlayerListener = InternalPlayerListener()
     private lateinit var player: TpStreamPlayerImpl
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
     private val viewBinding get() = _viewBinding!!
@@ -222,7 +218,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
     }
 
-    private inner class PlayerListener : Player.Listener, DRMLicenseFetchCallback {
+    private inner class InternalPlayerListener : PlayerListener, DRMLicenseFetchCallback {
         private val TAG = "PlayerListener"
 
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -269,7 +265,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         private fun isDRMException(cause: Throwable): Boolean {
-            return cause is DrmSession.DrmSessionException || cause is MediaCodec.CryptoException || cause is MediaDrmCallbackException
+            return cause is DrmSessionException || cause is MediaCodec.CryptoException || cause is MediaDrmCallbackException
         }
 
     }

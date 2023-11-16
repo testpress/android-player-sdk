@@ -45,29 +45,38 @@ android {
         androidTest.assets.srcDirs += file("$projectDir/schemas".toString())
     }
 }
-def mediaVersion = "1.0.2"
+
+def media3playerVersion = "1.0.2"
+def exoPlayer2Version = "2.19.1"
 def room_version = "2.5.2"
 
 dependencies {
 
-    api 'androidx.core:core-ktx:1.7.0'
-    api 'androidx.appcompat:appcompat:1.5.1'
-    api 'com.google.android.material:material:1.6.1'
-    api 'androidx.legacy:legacy-support-v4:1.0.0'
-    api 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
-    api 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    api "androidx.media3:media3-exoplayer:$mediaVersion"
-    api "androidx.media3:media3-ui:$mediaVersion"
-    api "androidx.media3:media3-exoplayer-dash:$mediaVersion"
-    api "androidx.media3:media3-exoplayer-hls:$mediaVersion"
-    api "androidx.media3:media3-datasource-okhttp:$mediaVersion"
-    api "com.google.code.gson:gson:2.10"
-    api "androidx.room:room-runtime:$room_version"
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation "com.google.code.gson:gson:2.10"
+    implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
-    api "androidx.room:room-ktx:$room_version"
-    api 'androidx.fragment:fragment-ktx:1.5.4'
-    api 'io.sentry:sentry-android:6.4.2'
-
+    implementation "androidx.room:room-ktx:$room_version"
+    implementation 'androidx.fragment:fragment-ktx:1.5.4'
+    implementation 'io.sentry:sentry-android:6.4.2'
+    if (false) {
+        implementation "androidx.media3:media3-exoplayer:$media3playerVersion"
+        implementation "androidx.media3:media3-ui:$media3playerVersion"
+        implementation "androidx.media3:media3-exoplayer-dash:$media3playerVersion"
+        implementation "androidx.media3:media3-exoplayer-hls:$media3playerVersion"
+        implementation "androidx.media3:media3-datasource-okhttp:$media3playerVersion"
+    } else {
+        implementation "com.google.android.exoplayer:exoplayer:$exoPlayer2Version"
+        implementation "com.google.android.exoplayer:exoplayer-ui:$exoPlayer2Version"
+        implementation "com.google.android.exoplayer:exoplayer-dash:$exoPlayer2Version"
+        implementation "com.google.android.exoplayer:exoplayer-hls:$exoPlayer2Version"
+        implementation "com.google.android.exoplayer:extension-okhttp:$exoPlayer2Version"
+    }
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.2'
     testImplementation "androidx.arch.core:core-testing:2.1.0"
@@ -79,3 +88,31 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-build-packages.gradle')
+
+task useRegularFile {
+    if (false) {
+        def oldPath = project.provider {
+            layout.projectDirectory.file("src/main/assets/Media3PlayerMapping.kt")
+        }
+        def newPath = project.provider {
+            layout.projectDirectory.dir("src/main/java/com/tpstream/player")
+        }
+        tasks.register('copyReport', Copy) {
+            from oldPath
+            into newPath
+            rename 'Media3PlayerMapping.kt', 'Mapping.kt'
+        }
+    } else {
+        def oldPath = project.provider {
+            layout.projectDirectory.file("src/main/assets/ExoPlayerMapping.kt")
+        }
+        def newPath = project.provider {
+            layout.projectDirectory.dir("src/main/java/com/tpstream/player")
+        }
+        tasks.register('copyReport', Copy) {
+            from oldPath
+            into newPath
+            rename 'ExoPlayerMapping.kt', 'Mapping.kt'
+        }
+    }
+}

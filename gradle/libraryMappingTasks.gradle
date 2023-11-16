@@ -1,0 +1,79 @@
+tasks.register("deleteAllMappingFiles", Delete) {
+    delete layout.projectDirectory.dir("src/main/java/com/tpstream/player/Mapping.kt")
+    delete layout.projectDirectory.dir("src/main/res/layout/exo_player_control_view.xml")
+    delete layout.projectDirectory.dir("src/main/res/layout/exo_styled_player_control_view.xml")
+}
+
+
+tasks.register("copyTypeAliseFile", Copy)  {
+    dependsOn tasks.deleteAllMappingFiles
+    if (useMedia3Library) {
+        def oldPath = project.provider {
+            layout.projectDirectory.file("src/main/assets/Media3PlayerMapping.kt")
+        }
+        def newPath = project.provider {
+            layout.projectDirectory.dir("src/main/java/com/tpstream/player")
+        }
+        from oldPath
+        into newPath
+        rename 'Media3PlayerMapping.kt', 'Mapping.kt'
+    } else {
+        def oldPath = project.provider {
+            layout.projectDirectory.file("src/main/assets/ExoPlayerMapping.kt")
+        }
+        def newPath = project.provider {
+            layout.projectDirectory.dir("src/main/java/com/tpstream/player")
+        }
+        from oldPath
+        into newPath
+        rename 'ExoPlayerMapping.kt', 'Mapping.kt'
+    }
+}
+
+tasks.register("copyPlayerControlViewXML", Copy)  {
+    dependsOn tasks.copyTypeAliseFile
+    if (useMedia3Library) {
+        def oldPath = project.provider {
+            layout.projectDirectory.file("src/main/assets/exo_player_control_view.xml")
+        }
+        def newPath = project.provider {
+            layout.projectDirectory.dir("src/main/res/layout")
+        }
+        from oldPath
+        into newPath
+    } else {
+        def oldPath = project.provider {
+            layout.projectDirectory.file("src/main/assets/exo_styled_player_control_view.xml")
+        }
+        def newPath = project.provider {
+            layout.projectDirectory.dir("src/main/res/layout")
+        }
+        from oldPath
+        into newPath
+    }
+}
+
+tasks.register("copyPlayerViewXML", Copy)  {
+    dependsOn tasks.copyPlayerControlViewXML
+    if (useMedia3Library) {
+        def oldPath = project.provider {
+            layout.projectDirectory.file("src/main/assets/exo_player_view.xml")
+        }
+        def newPath = project.provider {
+            layout.projectDirectory.dir("src/main/res/layout")
+        }
+        from oldPath
+        into newPath
+        rename 'exo_player_view.xml', 'mapped_exo_player_view.xml'
+    } else {
+        def oldPath = project.provider {
+            layout.projectDirectory.file("src/main/assets/exo_styled_player_view.xml")
+        }
+        def newPath = project.provider {
+            layout.projectDirectory.dir("src/main/res/layout")
+        }
+        from oldPath
+        into newPath
+        rename 'exo_styled_player_view.xml', 'mapped_exo_player_view.xml'
+    }
+}

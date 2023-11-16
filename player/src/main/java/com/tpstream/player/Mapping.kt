@@ -1,80 +1,107 @@
 package com.tpstream.player
 
-typealias DefaultTimeBar = com.google.android.exoplayer2.ui.DefaultTimeBar
-typealias PlayerView =  com.google.android.exoplayer2.ui.StyledPlayerView
-typealias TimeBar = com.google.android.exoplayer2.ui.TimeBar
-typealias OnScrubListener = com.google.android.exoplayer2.ui.TimeBar.OnScrubListener
-typealias FullscreenButtonClickListener =  com.google.android.exoplayer2.ui.StyledPlayerView.FullscreenButtonClickListener
-typealias ExoplayerProgressBarID = com.google.android.exoplayer2.ui.R.id
-typealias DefaultTrackSelector = com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-typealias DefaultTrackSelectorParameters = com.google.android.exoplayer2.trackselection.DefaultTrackSelector.Parameters
-typealias TrackSelector = com.google.android.exoplayer2.trackselection.TrackSelector
-typealias MappingTrackSelectorMappedTrackInfo = com.google.android.exoplayer2.trackselection.MappingTrackSelector.MappedTrackInfo
-typealias Download = com.google.android.exoplayer2.offline.Download
-typealias DownloadRequest = com.google.android.exoplayer2.offline.DownloadRequest
-typealias DownloadService = com.google.android.exoplayer2.offline.DownloadService
-typealias DownloadHelper = com.google.android.exoplayer2.offline.DownloadHelper
-typealias DownloadHelperCallback = com.google.android.exoplayer2.offline.DownloadHelper.Callback
-typealias DownloadRequestBuilder = com.google.android.exoplayer2.offline.DownloadRequest.Builder
-typealias DefaultDownloadIndex = com.google.android.exoplayer2.offline.DefaultDownloadIndex
-typealias DownloadManager = com.google.android.exoplayer2.offline.DownloadManager
-typealias DownloadManagerListener = com.google.android.exoplayer2.offline.DownloadManager.Listener
-typealias DownloadNotificationHelper = com.google.android.exoplayer2.ui.DownloadNotificationHelper
-typealias C = com.google.android.exoplayer2.C
-typealias Format = com.google.android.exoplayer2.Format
-typealias DrmInitData = com.google.android.exoplayer2.drm.DrmInitData
-typealias MediaItem = com.google.android.exoplayer2.MediaItem
-typealias MediaItemBuilder = com.google.android.exoplayer2.MediaItem.Builder
-typealias DrmConfigurationBuilder = com.google.android.exoplayer2.MediaItem.DrmConfiguration.Builder
-typealias TrackGroup = com.google.android.exoplayer2.source.TrackGroup
-typealias TrackSelectionOverride = com.google.android.exoplayer2.trackselection.TrackSelectionOverride
-typealias TrackSelectionParameters = com.google.android.exoplayer2.trackselection.TrackSelectionParameters
-typealias TrackSelectionParametersBuilder = com.google.android.exoplayer2.trackselection.TrackSelectionParameters.Builder
-typealias Util = com.google.android.exoplayer2.util.Util
-typealias NotificationUtil = com.google.android.exoplayer2.util.NotificationUtil
-typealias TracksGroup = com.google.android.exoplayer2.Tracks.Group
-typealias PlayerListener = com.google.android.exoplayer2.Player.Listener
-typealias PlaybackException = com.google.android.exoplayer2.PlaybackException
-typealias Metadata = com.google.android.exoplayer2.metadata.Metadata
-typealias PlayerEvents = com.google.android.exoplayer2.Player.Events
-typealias PlayerPositionInfo = com.google.android.exoplayer2.Player.PositionInfo
-typealias AudioAttributes = com.google.android.exoplayer2.audio.AudioAttributes
-typealias DeviceInfo = com.google.android.exoplayer2.DeviceInfo
-typealias Player = com.google.android.exoplayer2.Player
-typealias Tracks = com.google.android.exoplayer2.Tracks
-typealias VideoSize = com.google.android.exoplayer2.video.VideoSize
-typealias Timeline = com.google.android.exoplayer2.Timeline
-typealias DashUtil = com.google.android.exoplayer2.source.dash.DashUtil
-typealias HlsMediaPlaylist = com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist
-typealias HlsMediaPlaylistSegment = com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist.Segment
-typealias HlsMultivariantPlaylist = com.google.android.exoplayer2.source.hls.playlist.HlsMultivariantPlaylist
-typealias HlsPlaylist = com.google.android.exoplayer2.source.hls.playlist.HlsPlaylist
-typealias HlsPlaylistParser = com.google.android.exoplayer2.source.hls.playlist.HlsPlaylistParser
-typealias DrmSession = com.google.android.exoplayer2.drm.DrmSession
-typealias DrmSessionEventListener = com.google.android.exoplayer2.drm.DrmSessionEventListener
-typealias OfflineLicenseHelper = com.google.android.exoplayer2.drm.OfflineLicenseHelper
-typealias DrmSessionEventListenerEventDispatcher = com.google.android.exoplayer2.drm.DrmSessionEventListener.EventDispatcher
-typealias DrmSessionException = com.google.android.exoplayer2.drm.DrmSession.DrmSessionException
-typealias MediaDrmCallbackException = com.google.android.exoplayer2.drm.MediaDrmCallbackException
-typealias DatabaseProvider = com.google.android.exoplayer2.database.DatabaseProvider
-typealias StandaloneDatabaseProvider = com.google.android.exoplayer2.database.StandaloneDatabaseProvider
-typealias DataSource = com.google.android.exoplayer2.upstream.DataSource
-typealias DataSourceFactory = com.google.android.exoplayer2.upstream.DataSource.Factory
-typealias Cache = com.google.android.exoplayer2.upstream.cache.Cache
-typealias CacheDataSource = com.google.android.exoplayer2.upstream.cache.CacheDataSource
-typealias CacheDataSourceFactory = com.google.android.exoplayer2.upstream.cache.CacheDataSource.Factory
-typealias NoOpCacheEvictor = com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
-typealias SimpleCache = com.google.android.exoplayer2.upstream.cache.SimpleCache
-typealias OkHttpDataSource = com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
-typealias OkHttpDataSourceFactory = com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource.Factory
-typealias DefaultRenderersFactory = com.google.android.exoplayer2.DefaultRenderersFactory
-typealias ExoPlayer = com.google.android.exoplayer2.ExoPlayer
-typealias ExoPlayerBuilder = com.google.android.exoplayer2.ExoPlayer.Builder
-typealias PlatformScheduler = com.google.android.exoplayer2.scheduler.PlatformScheduler
-typealias Scheduler = com.google.android.exoplayer2.scheduler.Scheduler
-typealias DefaultMediaSourceFactory = com.google.android.exoplayer2.source.DefaultMediaSourceFactory
-typealias MediaSource = com.google.android.exoplayer2.source.MediaSource
-typealias MediaSourceFactory = com.google.android.exoplayer2.source.MediaSource.Factory
+// androidx.media3.ui
+typealias DefaultTimeBar = androidx.media3.ui.DefaultTimeBar
+typealias PlayerView =  androidx.media3.ui.PlayerView
+typealias TimeBar = androidx.media3.ui.TimeBar
+typealias OnScrubListener = androidx.media3.ui.TimeBar.OnScrubListener
+typealias FullscreenButtonClickListener =  androidx.media3.ui.PlayerView.FullscreenButtonClickListener
+typealias ExoplayerProgressBarID = androidx.media3.ui.R.id
+
+// androidx.media3.exoplayer.trackselection
+typealias DefaultTrackSelector = androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+typealias DefaultTrackSelectorParameters = androidx.media3.exoplayer.trackselection.DefaultTrackSelector.Parameters
+typealias TrackSelector = androidx.media3.exoplayer.trackselection.TrackSelector
+typealias MappingTrackSelectorMappedTrackInfo = androidx.media3.exoplayer.trackselection.MappingTrackSelector.MappedTrackInfo
+
+// androidx.media3.exoplayer.offline
+typealias Download = androidx.media3.exoplayer.offline.Download
+typealias DownloadRequest = androidx.media3.exoplayer.offline.DownloadRequest
+typealias DownloadService = androidx.media3.exoplayer.offline.DownloadService
+typealias DownloadHelper = androidx.media3.exoplayer.offline.DownloadHelper
+typealias DownloadHelperCallback = androidx.media3.exoplayer.offline.DownloadHelper.Callback
+typealias DownloadRequestBuilder = androidx.media3.exoplayer.offline.DownloadRequest.Builder
+typealias DefaultDownloadIndex = androidx.media3.exoplayer.offline.DefaultDownloadIndex
+typealias DownloadManager = androidx.media3.exoplayer.offline.DownloadManager
+typealias DownloadManagerListener = androidx.media3.exoplayer.offline.DownloadManager.Listener
+typealias DownloadNotificationHelper = androidx.media3.exoplayer.offline.DownloadNotificationHelper
+
+// androidx.media3.common
+typealias C = androidx.media3.common.C
+typealias Format = androidx.media3.common.Format
+typealias DrmInitData= androidx.media3.common.DrmInitData
+typealias MediaItem = androidx.media3.common.MediaItem
+typealias MediaItemBuilder = androidx.media3.common.MediaItem.Builder
+typealias DrmConfigurationBuilder = androidx.media3.common.MediaItem.DrmConfiguration.Builder
+typealias TrackGroup = androidx.media3.common.TrackGroup
+typealias TrackSelectionOverride = androidx.media3.common.TrackSelectionOverride
+typealias TrackSelectionParameters = androidx.media3.common.TrackSelectionParameters
+typealias TrackSelectionParametersBuilder = androidx.media3.common.TrackSelectionParameters.Builder
+typealias Util = androidx.media3.common.util.Util
+typealias NotificationUtil = androidx.media3.common.util.NotificationUtil
+typealias TracksGroup = androidx.media3.common.Tracks.Group
+typealias PlayerListener = androidx.media3.common.Player.Listener
+typealias PlaybackException = androidx.media3.common.PlaybackException
+typealias Metadata = androidx.media3.common.Metadata
+typealias PlayerEvents = androidx.media3.common.Player.Events
+typealias PlayerPositionInfo = androidx.media3.common.Player.PositionInfo
+typealias AudioAttributes = androidx.media3.common.AudioAttributes
+typealias DeviceInfo = androidx.media3.common.DeviceInfo
+typealias Player = androidx.media3.common.Player
+typealias Tracks = androidx.media3.common.Tracks
+typealias VideoSize = androidx.media3.common.VideoSize
+typealias Timeline = androidx.media3.common.Timeline
+
+// androidx.media3.exoplayer.dash
+typealias DashUtil = androidx.media3.exoplayer.dash.DashUtil
+
+// androidx.media3.exoplayer.hls
+typealias HlsMediaPlaylist = androidx.media3.exoplayer.hls.playlist.HlsMediaPlaylist
+typealias HlsMultivariantPlaylist = androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
+typealias HlsPlaylist = androidx.media3.exoplayer.hls.playlist.HlsPlaylist
+typealias HlsPlaylistParser = androidx.media3.exoplayer.hls.playlist.HlsPlaylistParser
+typealias HlsMediaPlaylistSegment = androidx.media3.exoplayer.hls.playlist.HlsMediaPlaylist.Segment
+
+// androidx.media3.exoplayer.drm
+typealias DrmSession = androidx.media3.exoplayer.drm.DrmSession
+typealias DrmSessionEventListener =  androidx.media3.exoplayer.drm.DrmSessionEventListener
+typealias OfflineLicenseHelper =  androidx.media3.exoplayer.drm.OfflineLicenseHelper
+typealias DrmSessionEventListenerEventDispatcher =  androidx.media3.exoplayer.drm.DrmSessionEventListener.EventDispatcher
+typealias DrmSessionException = androidx.media3.exoplayer.drm.DrmSession.DrmSessionException
+typealias MediaDrmCallbackException = androidx.media3.exoplayer.drm.MediaDrmCallbackException
+
+// androidx.media3.database
+typealias DatabaseProvider = androidx.media3.database.DatabaseProvider
+typealias StandaloneDatabaseProvider = androidx.media3.database.StandaloneDatabaseProvider
+
+// androidx.media3.datasource
+typealias DataSource =  androidx.media3.datasource.DataSource
+typealias DataSourceFactory =  androidx.media3.datasource.DataSource.Factory
+
+// androidx.media3.datasource.cache
+typealias Cache =  androidx.media3.datasource.cache.Cache
+typealias CacheDataSource =  androidx.media3.datasource.cache.CacheDataSource
+typealias CacheDataSourceFactory =  androidx.media3.datasource.cache.CacheDataSource.Factory
+typealias NoOpCacheEvictor =  androidx.media3.datasource.cache.NoOpCacheEvictor
+typealias SimpleCache =  androidx.media3.datasource.cache.SimpleCache
+
+// androidx.media3.datasource.okhttp
+typealias OkHttpDataSource =  androidx.media3.datasource.okhttp.OkHttpDataSource
+typealias OkHttpDataSourceFactory = androidx.media3.datasource.okhttp.OkHttpDataSource.Factory
+
+// androidx.media3.exoplayer
+typealias DefaultRenderersFactory = androidx.media3.exoplayer.DefaultRenderersFactory
+typealias ExoPlayer = androidx.media3.exoplayer.ExoPlayer
+typealias ExoPlayerBuilder = androidx.media3.exoplayer.ExoPlayer.Builder
+
+// androidx.media3.exoplayer.scheduler
+typealias PlatformScheduler = androidx.media3.exoplayer.scheduler.PlatformScheduler
+typealias Scheduler = androidx.media3.exoplayer.scheduler.Scheduler
+
+// androidx.media3.exoplayer.source
+typealias DefaultMediaSourceFactory = androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+typealias MediaSource = androidx.media3.exoplayer.source.MediaSource
+typealias MediaSourceFactory = androidx.media3.exoplayer.source.MediaSource.Factory
 
 
 

@@ -41,7 +41,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr), ViewModelStoreOwner {
     private val binding: TpStreamPlayerViewBinding =
         TpStreamPlayerViewBinding.inflate(LayoutInflater.from(context), this, true)
-    private var playerView: PlayerView = binding.playerView
+    private var playerView: PlayerView = binding.root.findViewById(R.id.player_view)
     private lateinit var player: TpStreamPlayerImpl
     private var downloadButton: ImageButton? = null
     private var resolutionButton : ImageButton? = null
@@ -51,7 +51,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var selectedResolution = ResolutionOptions.AUTO
     private lateinit var simpleResolutionSheet:SimpleResolutionSelectionSheet
     private lateinit var advancedResolutionSheet:AdvancedResolutionSelectionSheet
-    private val seekBar get() = binding.playerView.findViewById<DefaultTimeBar>(ExoplayerProgressBarID.exo_progress)
+    private val seekBar get() = playerView.findViewById<DefaultTimeBar>(ExoplayerProgressBarID.exo_progress)
     private var seekBarListener: OnScrubListener? = null
     private var markers: LinkedHashMap<Long, MarkerState>? = null
     private var animator: ObjectAnimator? = null

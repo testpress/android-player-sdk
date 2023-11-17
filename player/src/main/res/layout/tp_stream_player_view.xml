@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/mapped_exo_player_view"/>
+    <include layout="@layout/player_view"/>
 
     <TextView
         android:id="@+id/watermark_view"

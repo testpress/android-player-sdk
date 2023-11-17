@@ -1,4 +1,4 @@
-tasks.register("runPlayerLibraryTask") {
+tasks.register("runPlayerLibraryMappingTasks") {
     dependsOn tasks.copyPlayerViewXML
 }
 
@@ -8,32 +8,34 @@ tasks.register("deleteAllMappingFiles", Delete) {
     delete layout.projectDirectory.dir("src/main/res/layout/exo_styled_player_control_view.xml")
 }
 
-tasks.register("copyMappingFiles", Copy) {
+tasks.register("copyPlayerMappingFile", Copy) {
     dependsOn tasks.deleteAllMappingFiles
 
-    def mappingFile = useMedia3Library ? "Media3PlayerMapping.kt" : "ExoPlayerMapping.kt"
+    def mappingFile = useMedia3Library ? "Media3PlayerMapping.kt" : "ExoPlayer2Mapping.kt"
 
-    from project.provider { layout.projectDirectory.file("src/main/assets/$mappingFile") }
+    from project.provider { layout.projectDirectory.file("src/main/player-mapping-files/kotlin/$mappingFile") }
     into project.provider { layout.projectDirectory.dir("src/main/java/com/tpstream/player") }
     rename mappingFile, 'Mapping.kt'
 }
 
 tasks.register("copyPlayerControlViewXML", Copy) {
-    dependsOn tasks.copyMappingFiles
+    dependsOn tasks.copyPlayerMappingFile
 
-    def controlViewFile = useMedia3Library ? "exo_player_control_view.xml" : "exo_styled_player_control_view.xml"
+    def controlViewFile = useMedia3Library ? "media3_player_control_view.xml" : "exo_player2_control_view.xml"
+    def mappedViewFile = useMedia3Library ? "exo_player_control_view.xml" : "exo_styled_player_control_view.xml"
 
-    from project.provider { layout.projectDirectory.file("src/main/assets/$controlViewFile") }
+    from project.provider { layout.projectDirectory.file("src/main/player-mapping-files/layout/$controlViewFile") }
     into project.provider { layout.projectDirectory.dir("src/main/res/layout") }
+    rename controlViewFile, mappedViewFile
 }
 
 tasks.register("copyPlayerViewXML", Copy) {
     dependsOn tasks.copyPlayerControlViewXML
 
-    def viewFile = useMedia3Library ? "exo_player_view.xml" : "exo_styled_player_view.xml"
-    def mappedViewFile = "mapped_exo_player_view.xml"
+    def viewFile = useMedia3Library ? "media3_player_view.xml" : "exo_player2_view.xml"
+    def mappedViewFile = "player_view.xml"
 
-    from project.provider { layout.projectDirectory.file("src/main/assets/$viewFile") }
+    from project.provider { layout.projectDirectory.file("src/main/player-mapping-files/layout/$viewFile") }
     into project.provider { layout.projectDirectory.dir("src/main/res/layout") }
     rename viewFile, mappedViewFile
 }

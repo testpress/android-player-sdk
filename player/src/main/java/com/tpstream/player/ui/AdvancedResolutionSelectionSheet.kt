@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.media3.common.*
+import com.tpstream.player.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -121,7 +121,7 @@ internal class AdvancedResolutionSelectionSheet(
         }
     }
 
-    inner class TrackInfo(val trackGroup: Tracks.Group, val trackIndex: Int) {
+    inner class TrackInfo(val trackGroup: TracksGroup, val trackIndex: Int) {
         val format: Format
             get() = trackGroup.getTrackFormat(trackIndex)
     }

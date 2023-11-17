@@ -1,11 +1,6 @@
 package com.tpstream.player
 
 import android.net.Uri
-import android.util.Log
-import androidx.media3.exoplayer.hls.playlist.HlsMediaPlaylist
-import androidx.media3.exoplayer.hls.playlist.HlsMultivariantPlaylist
-import androidx.media3.exoplayer.hls.playlist.HlsPlaylist
-import androidx.media3.exoplayer.hls.playlist.HlsPlaylistParser
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
@@ -37,8 +32,8 @@ internal class EncryptionKeyDownloader {
             response.body?.byteStream()!!
         )
         val mediaPlaylist: HlsMediaPlaylist = playlist as HlsMediaPlaylist
-        val segments: List<HlsMediaPlaylist.Segment> = mediaPlaylist.segments
-        val segment: HlsMediaPlaylist.Segment = segments[0]
+        val segments: List<HlsMediaPlaylistSegment> = mediaPlaylist.segments
+        val segment: HlsMediaPlaylistSegment = segments[0]
         return segment.fullSegmentEncryptionKeyUri.toString()
     }
 

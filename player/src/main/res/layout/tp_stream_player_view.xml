@@ -4,12 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/player_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:animation_enabled="true"
-        app:show_buffering="always" />
+    <include layout="@layout/player_view"/>
 
     <TextView
         android:id="@+id/watermark_view"

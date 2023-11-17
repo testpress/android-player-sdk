@@ -5,6 +5,10 @@ plugins {
     id 'kotlin-kapt'
 }
 
+ext {
+    useMedia3Library = true
+}
+
 android {
     namespace 'com.tpstream.player'
     compileSdk 32
@@ -20,6 +24,11 @@ android {
                 arguments += ["room.schemaLocation":
                                       "$projectDir/schemas".toString()]
             }
+        }
+        if (useMedia3Library) {
+            manifestPlaceholders = [serviceClassName: "androidx.media3.exoplayer.scheduler.PlatformScheduler\$PlatformSchedulerService"]
+        } else {
+            manifestPlaceholders = [serviceClassName: "com.google.android.exoplayer2.scheduler.PlatformScheduler\$PlatformSchedulerService"]
         }
     }
 
@@ -44,8 +53,12 @@ android {
     sourceSets{
         androidTest.assets.srcDirs += file("$projectDir/schemas".toString())
     }
+
+    preBuild.dependsOn "runPlayerLibraryMappingTasks"
 }
-def mediaVersion = "1.0.2"
+
+def media3playerVersion = "1.0.2"
+def exoPlayer2Version = "2.19.1"
 def room_version = "2.5.2"
 
 dependencies {
@@ -56,18 +69,25 @@ dependencies {
     api 'androidx.legacy:legacy-support-v4:1.0.0'
     api 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
     api 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    api "androidx.media3:media3-exoplayer:$mediaVersion"
-    api "androidx.media3:media3-ui:$mediaVersion"
-    api "androidx.media3:media3-exoplayer-dash:$mediaVersion"
-    api "androidx.media3:media3-exoplayer-hls:$mediaVersion"
-    api "androidx.media3:media3-datasource-okhttp:$mediaVersion"
     api "com.google.code.gson:gson:2.10"
     api "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     api "androidx.room:room-ktx:$room_version"
     api 'androidx.fragment:fragment-ktx:1.5.4'
     api 'io.sentry:sentry-android:6.4.2'
-
+    if (useMedia3Library) {
+        api "androidx.media3:media3-exoplayer:$media3playerVersion"
+        api "androidx.media3:media3-ui:$media3playerVersion"
+        api "androidx.media3:media3-exoplayer-dash:$media3playerVersion"
+        api "androidx.media3:media3-exoplayer-hls:$media3playerVersion"
+        api "androidx.media3:media3-datasource-okhttp:$media3playerVersion"
+    } else {
+        api "com.google.android.exoplayer:exoplayer:$exoPlayer2Version"
+        api "com.google.android.exoplayer:exoplayer-ui:$exoPlayer2Version"
+        api "com.google.android.exoplayer:exoplayer-dash:$exoPlayer2Version"
+        api "com.google.android.exoplayer:exoplayer-hls:$exoPlayer2Version"
+        api "com.google.android.exoplayer:extension-okhttp:$exoPlayer2Version"
+    }
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.2'
     testImplementation "androidx.arch.core:core-testing:2.1.0"
@@ -79,3 +99,4 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-build-packages.gradle')
+apply from: rootProject.file('gradle/exoplayerMappingTasks.gradle')

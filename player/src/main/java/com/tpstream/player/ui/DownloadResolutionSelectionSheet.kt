@@ -9,9 +9,6 @@ import android.widget.ArrayAdapter
 import android.widget.CheckedTextView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.media3.common.*
-import androidx.media3.exoplayer.offline.DownloadHelper
-import androidx.media3.exoplayer.offline.DownloadRequest
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -38,7 +35,7 @@ internal class DownloadResolutionSelectionSheet(
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()
     var isResolutionSelected = false
-    private var trackGroups: MutableList<Tracks.Group> = mutableListOf()
+    private var trackGroups: MutableList<TracksGroup> = mutableListOf()
     private var onSubmitListener: OnSubmitListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -192,7 +189,7 @@ internal class DownloadResolutionSelectionSheet(
         }
     }
 
-    inner class TrackInfo(val trackGroup: Tracks.Group, val trackIndex: Int) {
+    inner class TrackInfo(val trackGroup: TracksGroup, val trackIndex: Int) {
         val format: Format
             get() = trackGroup.getTrackFormat(trackIndex)
     }

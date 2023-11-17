@@ -3,12 +3,6 @@ package com.tpstream.player
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import androidx.media3.common.*
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.offline.DownloadRequest
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.exoplayer.trackselection.TrackSelector
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.VideoRepository
@@ -25,11 +19,11 @@ interface TPStreamPlayerListener {
     fun onIsLoadingChanged(loading: Boolean) {}
     fun onDeviceInfoChanged(deviceInfo: DeviceInfo) {}
     fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {}
-    fun onEvents(player: TpStreamPlayer?, events: Player.Events) {}
+    fun onEvents(player: TpStreamPlayer?, events: PlayerEvents) {}
     fun onSeekBackIncrementChanged(seekBackIncrementMs: Long) {}
     fun onSeekForwardIncrementChanged(seekForwardIncrementMs: Long) {}
     fun onVideoSizeChanged(videoSize: VideoSize) {}
-    fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {}
+    fun onPositionDiscontinuity(oldPosition: PlayerPositionInfo, newPosition: PlayerPositionInfo, reason: Int) {}
     fun onPlayerErrorChanged(error: PlaybackException?) {}
     fun onTimelineChanged(timeline: Timeline, reason: Int) {}
     fun onPlaybackStateChanged(playbackState: Int) {}
@@ -51,7 +45,7 @@ public interface TpStreamPlayer {
     fun setPlaybackSpeed(speed: Float)
     fun seekTo(seconds: Long)
     fun getVideoFormat(): Format?
-    fun getCurrentTrackGroups(): ImmutableList<Tracks.Group>
+    fun getCurrentTrackGroups(): ImmutableList<TracksGroup>
     fun getDuration(): Long
     fun setListener(listener: TPStreamPlayerListener?)
     fun play()
@@ -82,7 +76,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun initializeExoplayer() {
-        exoPlayer = ExoPlayer.Builder(context)
+        exoPlayer = ExoPlayerBuilder(context)
             .build()
             .also { exoPlayer ->
                 exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
@@ -131,7 +125,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
     }
 
-    private fun getMediaSourceFactory(): MediaSource.Factory {
+    private fun getMediaSourceFactory(): MediaSourceFactory {
         return DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build(params))
     }
@@ -146,10 +140,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     private fun buildMediaItem(url: String): MediaItem {
         val drmLicenseURL = TPStreamsSDK.constructDRMLicenseUrl(params.videoId, params.accessToken)
-        return MediaItem.Builder()
+        return MediaItemBuilder()
             .setUri(url)
             .setDrmConfiguration(
-                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                DrmConfigurationBuilder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
                     .setLicenseUri(drmLicenseURL)
                     .build()
@@ -157,7 +151,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun buildDownloadedMediaItem(downloadRequest: DownloadRequest):MediaItem{
-        val builder = MediaItem.Builder()
+        val builder = MediaItemBuilder()
         builder
             .setMediaId(downloadRequest.id)
             .setUri(downloadRequest.uri)
@@ -165,7 +159,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             .setMimeType(downloadRequest.mimeType)
             .setStreamKeys(downloadRequest.streamKeys)
             .setDrmConfiguration(
-                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                DrmConfigurationBuilder(C.WIDEVINE_UUID)
                     .setKeySetId(downloadRequest.keySetId)
                     .build()
             )
@@ -205,7 +199,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     override fun getVideoFormat(): Format? = exoPlayer.videoFormat
 
-    override fun getCurrentTrackGroups(): ImmutableList<Tracks.Group> = exoPlayer.currentTracks.groups
+    override fun getCurrentTrackGroups(): ImmutableList<TracksGroup> = exoPlayer.currentTracks.groups
 
     override fun getDuration(): Long = exoPlayer.duration
 

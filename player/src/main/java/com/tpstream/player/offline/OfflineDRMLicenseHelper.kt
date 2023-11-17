@@ -4,15 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
-import androidx.media3.common.Format
-import androidx.media3.exoplayer.dash.DashUtil
-import androidx.media3.exoplayer.drm.DrmSession
-import androidx.media3.exoplayer.drm.DrmSessionEventListener
-import androidx.media3.exoplayer.drm.OfflineLicenseHelper
-import androidx.media3.exoplayer.offline.Download
-import androidx.media3.exoplayer.offline.DownloadHelper
-import androidx.media3.exoplayer.offline.DownloadRequest
-import com.tpstream.player.BuildConfig
+import com.tpstream.player.*
 import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.offline.VideoDownload.getDownloadRequest
@@ -51,7 +43,7 @@ internal object OfflineDRMLicenseHelper {
         return OfflineLicenseHelper.newWidevineInstance(
             drmLicenseURL,
             VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
-            DrmSessionEventListener.EventDispatcher()
+            DrmSessionEventListenerEventDispatcher()
         ).downloadLicense(drmInitData!!)
     }
 
@@ -76,7 +68,7 @@ internal object OfflineDRMLicenseHelper {
         downloadRequest: DownloadRequest,
         keySetId: ByteArray
     ): DownloadRequest {
-        return DownloadRequest.Builder(
+        return DownloadRequestBuilder(
             downloadRequest.id,
             downloadRequest.uri
         )
@@ -113,14 +105,14 @@ internal object OfflineDRMLicenseHelper {
         val offlineLicenseHelper = OfflineLicenseHelper.newWidevineInstance(
             drmLicenseURL,
             VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
-            DrmSessionEventListener.EventDispatcher()
+            DrmSessionEventListenerEventDispatcher()
         )
         val format = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val keySetId = offlineLicenseHelper.downloadLicense(format!!)
                 callback.onLicenseFetchSuccess(keySetId)
-            } catch (e: DrmSession.DrmSessionException) {
+            } catch (e: DrmSessionException) {
                 callback.onLicenseFetchFailure()
             } finally {
                 offlineLicenseHelper.release()

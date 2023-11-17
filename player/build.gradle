@@ -54,7 +54,7 @@ android {
         androidTest.assets.srcDirs += file("$projectDir/schemas".toString())
     }
 
-    preBuild.dependsOn "copyPlayerViewXML"
+    preBuild.dependsOn "runPlayerLibraryTask"
 }
 
 def media3playerVersion = "1.0.2"

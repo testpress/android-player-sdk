@@ -57,7 +57,7 @@ android {
     preBuild.dependsOn "runPlayerLibraryMappingTasks"
 }
 
-def media3playerVersion = "1.0.2"
+def media3playerVersion = "1.1.1"
 def exoPlayer2Version = "2.19.1"
 def room_version = "2.5.2"
 

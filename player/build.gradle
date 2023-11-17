@@ -99,4 +99,4 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-build-packages.gradle')
-apply from: rootProject.file('gradle/libraryMappingTasks.gradle')
+apply from: rootProject.file('gradle/playerLibraryMappingTasks.gradle')

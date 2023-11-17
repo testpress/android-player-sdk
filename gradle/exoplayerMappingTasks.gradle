@@ -2,14 +2,14 @@ tasks.register("runPlayerLibraryMappingTasks") {
     dependsOn tasks.copyPlayerViewXML
 }
 
-tasks.register("deleteAllMappingFiles", Delete) {
+tasks.register("clearOldMappings", Delete) {
     delete layout.projectDirectory.dir("src/main/java/com/tpstream/player/Mapping.kt")
     delete layout.projectDirectory.dir("src/main/res/layout/exo_player_control_view.xml")
     delete layout.projectDirectory.dir("src/main/res/layout/exo_styled_player_control_view.xml")
 }
 
 tasks.register("copyPlayerMappingFile", Copy) {
-    dependsOn tasks.deleteAllMappingFiles
+    dependsOn tasks.clearOldMappings
 
     def mappingFile = useMedia3Library ? "Media3PlayerMapping.kt" : "ExoPlayer2Mapping.kt"
 

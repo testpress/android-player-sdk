@@ -43,6 +43,10 @@ class PlayerActivity : AppCompatActivity() {
                     override fun onMarkerCallback(timesInSeconds: Long) {
                         Toast.makeText(this@PlayerActivity,"$timesInSeconds",Toast.LENGTH_SHORT).show()
                     }
+
+                    override fun onFullScreenChange(isFullScreen: Boolean) {
+                        Toast.makeText(this@PlayerActivity, isFullScreen.toString(), Toast.LENGTH_SHORT).show()
+                    }
                 })
 
                 playerFragment.tpStreamPlayerView.setMarkers(longArrayOf(60,120,180),Color.RED,false)

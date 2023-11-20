@@ -111,8 +111,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         fullScreenDialog =
             object : Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
                 override fun onBackPressed() {
-                    super.onBackPressed()
                     exitFullScreen()
+                    super.onBackPressed()
                 }
             }
     }
@@ -139,7 +139,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
     }
 
-    private fun exitFullScreen() {
+    fun exitFullScreen() {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         (tpStreamPlayerView.parent as ViewGroup).removeView(tpStreamPlayerView)
         viewBinding.mainFrameLayout.addView(tpStreamPlayerView)
@@ -151,7 +151,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         isFullScreen = false
     }
 
-    private fun showFullScreen() {
+    fun showFullScreen() {
         (tpStreamPlayerView.parent as ViewGroup).removeView(tpStreamPlayerView)
         fullScreenDialog.addContentView(tpStreamPlayerView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         tpStreamPlayerView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(),

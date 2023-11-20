@@ -107,6 +107,9 @@ class PlayerActivity : AppCompatActivity() {
         findViewById<Button>(R.id.sample_pause).setOnClickListener {
             tpStreamPlayer.pause()
         }
+        findViewById<Button>(R.id.enter_full_screen).setOnClickListener {
+            playerFragment.showFullScreen()
+        }
     }
 
 }

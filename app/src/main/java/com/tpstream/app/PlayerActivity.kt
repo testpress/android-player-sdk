@@ -44,7 +44,7 @@ class PlayerActivity : AppCompatActivity() {
                         Toast.makeText(this@PlayerActivity,"$timesInSeconds",Toast.LENGTH_SHORT).show()
                     }
 
-                    override fun onFullScreenChange(isFullScreen: Boolean) {
+                    override fun onFullScreenChanged(isFullScreen: Boolean) {
                         Toast.makeText(this@PlayerActivity, isFullScreen.toString(), Toast.LENGTH_SHORT).show()
                     }
                 })

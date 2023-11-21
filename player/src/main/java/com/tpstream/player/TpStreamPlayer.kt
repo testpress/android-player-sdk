@@ -29,6 +29,7 @@ interface TPStreamPlayerListener {
     fun onPlaybackStateChanged(playbackState: Int) {}
     fun onPlayerError(error: PlaybackException) {}
     fun onMarkerCallback(timesInSeconds: Long) {}
+    fun onFullScreenChanged(isFullScreen: Boolean) {}
 }
 
 public interface TpStreamPlayer {

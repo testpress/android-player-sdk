@@ -149,6 +149,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         ));
         fullScreenDialog.dismiss()
         isFullScreen = false
+        player?._listener?.onFullScreenChanged(false)
     }
 
     fun showFullScreen() {
@@ -160,6 +161,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         fullScreenDialog.show()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         isFullScreen = true
+        player?._listener?.onFullScreenChanged(true)
     }
 
     private fun initializePlayer() {

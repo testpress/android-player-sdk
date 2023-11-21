@@ -1,6 +1,7 @@
 package com.tpstream.player.util
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.provider.Settings
 import android.view.OrientationEventListener
 
@@ -26,6 +27,9 @@ internal class OrientationListener(val context: Context): OrientationEventListen
 
     private fun isOrientationChanged(orientation: Int): Boolean {
         var isLandscapeCurrently = false
+        if (isLandscape && orientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
+            isLandscapeCurrently = true
+        }
         if (orientation in 45..135 || orientation in 225..300) {
             isLandscapeCurrently = true
         }

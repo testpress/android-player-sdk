@@ -140,7 +140,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     fun exitFullScreen() {
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         (tpStreamPlayerView.parent as ViewGroup).removeView(tpStreamPlayerView)
         viewBinding.mainFrameLayout.addView(tpStreamPlayerView)
         tpStreamPlayerView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(

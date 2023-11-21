@@ -345,6 +345,11 @@ class TPStreamPlayerView @JvmOverloads constructor(
         })
     }
 
+    fun setSeekBarColor(@ColorInt color: Int) {
+        seekBar.setPlayedColor(color)
+        seekBar.setScrubberColor(color)
+    }
+
     fun disableWaterMark() {
         animator?.cancel()
         binding.watermarkView.isVisible = false

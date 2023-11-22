@@ -150,6 +150,11 @@
         <ImageButton android:id="@id/exo_play_pause"
             style="@style/ExoStyledControls.Button.Center.PlayPause"/>
 
+        <ImageButton android:id="@+id/exo_reload"
+            android:visibility="gone"
+            android:src="@drawable/ic_baseline_refresh_24"
+            style="@style/ExoStyledControls.Button.Center.PlayPause"/>
+
         <include layout="@layout/exo_player_control_ffwd_button" />
 
     </LinearLayout>

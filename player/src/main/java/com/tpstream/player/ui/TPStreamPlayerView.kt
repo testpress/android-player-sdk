@@ -183,6 +183,23 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
+    internal fun updateReloadButton(isVideoEnd: Boolean) {
+        val playPauseButton =
+            playerView.findViewById<ImageButton>(ExoplayerResourceID.exo_play_pause)
+        val reloadButton = playerView.findViewById<ImageButton>(R.id.exo_reload)
+        if (isVideoEnd) {
+            playPauseButton.isVisible = false
+            reloadButton.isVisible = true
+            reloadButton.setOnClickListener {
+                player.seekTo(0)
+                player.setPlayWhenReady(true)
+            }
+        } else {
+            playPauseButton.isVisible = true
+            reloadButton.isVisible = false
+        }
+    }
+
     private fun initializeMarkerListener() {
         player.setMarkerListener { time ->
             markers?.updatePlayedMarker(time)

@@ -226,10 +226,12 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
             if (playbackState == ExoPlayer.STATE_READY) {
                 viewBinding.errorMessage.visibility = View.GONE
-                tpStreamPlayerView.updateReloadButton(false)
+                tpStreamPlayerView.hideReloadButton()
+                tpStreamPlayerView.showPlayButton()
             }
             if (playbackState == ExoPlayer.STATE_ENDED) {
-                tpStreamPlayerView.updateReloadButton(true)
+                tpStreamPlayerView.hidePlayButton()
+                tpStreamPlayerView.showReloadButton()
             }
         }
 

@@ -14,7 +14,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
-import androidx.media3.common.PlaybackParameters
 import com.tpstream.player.*
 import com.tpstream.player.Util
 import com.tpstream.player.offline.DRMLicenseFetchCallback
@@ -243,11 +242,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             } else {
                 showErrorMessage("Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName} PlayerId: ${errorPlayerId}")
             }
-        }
-
-        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
-            super.onPlaybackParametersChanged(playbackParameters)
-            playbackParameters.speed
         }
 
         private fun fetchDRMLicence(){

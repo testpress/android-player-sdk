@@ -9,20 +9,15 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.ColorInt
-import androidx.fragment.app.FragmentActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.tpstream.player.*
-import com.tpstream.player.EncryptionKeyRepository
-import com.tpstream.player.TpStreamPlayerImpl
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
@@ -83,6 +78,20 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 return VideoViewModel(VideoRepository(context)) as T
             }
         }).get(VideoViewModel::class.java)
+    }
+
+    internal fun setPlayBackSpeedText(speed: Float) {
+        val playBackSpeed = playerView.findViewById<Button>(ExoplayerResourceID.exo_playback_speed)
+        val speedTextMap = mapOf(
+            0.25f to "0.25x",
+            0.5f to "0.5x",
+            0.75f to "0.75x",
+            1.0f to "1x",
+            1.25f to "1.25x",
+            1.5f to "1.5x",
+            2.0f to "2x"
+        )
+        playBackSpeed.text = speedTextMap[speed]
     }
 
     private fun onDownloadButtonClick() {

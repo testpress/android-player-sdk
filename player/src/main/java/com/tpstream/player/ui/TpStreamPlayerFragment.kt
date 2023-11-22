@@ -14,6 +14,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import androidx.media3.common.PlaybackParameters
 import com.tpstream.player.*
 import com.tpstream.player.Util
 import com.tpstream.player.offline.DRMLicenseFetchCallback
@@ -233,6 +234,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 tpStreamPlayerView.hidePlayButton()
                 tpStreamPlayerView.showReloadButton()
             }
+        }
+
+        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+            super.onPlaybackParametersChanged(playbackParameters)
+            tpStreamPlayerView.setPlayBackSpeedText(playbackParameters.speed)
         }
 
         override fun onPlayerError(error: PlaybackException) {

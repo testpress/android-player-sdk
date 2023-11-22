@@ -6,7 +6,7 @@ internal typealias PlayerView =  androidx.media3.ui.PlayerView
 internal typealias TimeBar = androidx.media3.ui.TimeBar
 internal typealias OnScrubListener = androidx.media3.ui.TimeBar.OnScrubListener
 internal typealias FullscreenButtonClickListener =  androidx.media3.ui.PlayerView.FullscreenButtonClickListener
-internal typealias ExoplayerProgressBarID = androidx.media3.ui.R.id
+internal typealias ExoplayerResourceID = androidx.media3.ui.R.id
 
 // androidx.media3.exoplayer.trackselection
 internal typealias DefaultTrackSelector = androidx.media3.exoplayer.trackselection.DefaultTrackSelector

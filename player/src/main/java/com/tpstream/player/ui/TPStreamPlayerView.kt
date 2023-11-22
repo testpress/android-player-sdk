@@ -51,7 +51,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var selectedResolution = ResolutionOptions.AUTO
     private lateinit var simpleResolutionSheet:SimpleResolutionSelectionSheet
     private lateinit var advancedResolutionSheet:AdvancedResolutionSelectionSheet
-    private val seekBar get() = playerView.findViewById<DefaultTimeBar>(ExoplayerProgressBarID.exo_progress)
+    private val seekBar get() = playerView.findViewById<DefaultTimeBar>(ExoplayerResourceID.exo_progress)
     private var seekBarListener: OnScrubListener? = null
     private var markers: LinkedHashMap<Long, MarkerState>? = null
     private var animator: ObjectAnimator? = null

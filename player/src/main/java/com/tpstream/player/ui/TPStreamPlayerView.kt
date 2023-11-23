@@ -21,11 +21,11 @@ import com.tpstream.player.*
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
+import com.tpstream.player.enum.PlaybackSpeed
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.util.MarkerState
-import com.tpstream.player.util.PlaybackSpeed
 import com.tpstream.player.util.getPlayedStatusArray
 import java.util.*
 import java.util.concurrent.TimeUnit

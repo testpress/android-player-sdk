@@ -193,17 +193,17 @@ class TPStreamPlayerView @JvmOverloads constructor(
         playerView.findViewById<ImageButton>(ExoplayerResourceID.exo_play_pause).isVisible = false
     }
 
-    internal fun showReloadButton() {
-        val reloadButton = playerView.findViewById<ImageButton>(R.id.exo_reload)
-        reloadButton.isVisible = true
-        reloadButton.setOnClickListener {
+    internal fun showReplayButton() {
+        val replayButton = playerView.findViewById<ImageButton>(R.id.exo_replay)
+        replayButton.isVisible = true
+        replayButton.setOnClickListener {
             player.seekTo(0)
             player.setPlayWhenReady(true)
         }
     }
 
-    internal fun hideReloadButton() {
-        playerView.findViewById<ImageButton>(R.id.exo_reload).isVisible = false
+    internal fun hideReplayButton() {
+        playerView.findViewById<ImageButton>(R.id.exo_replay).isVisible = false
     }
 
     private fun initializeMarkerListener() {

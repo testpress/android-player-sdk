@@ -26,6 +26,7 @@ import com.tpstream.player.R
 import com.tpstream.player.util.SentryLogger
 import com.tpstream.player.TpStreamPlayerImpl
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
+import com.tpstream.player.enum.toError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -244,10 +245,16 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             super.onPlayerError(error)
             val errorPlayerId = SentryLogger.generatePlayerIdString()
             SentryLogger.logPlaybackException(error, player?.params, errorPlayerId)
+            if (error.errorCode == PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED) {
+                showErrorMessage(getString(R.string.license_error))
+                player?._listener?.onPlayerError(error.toError())
+                return
+            }
             if (isDRMException(error.cause!!)) {
                 fetchDRMLicence()
             } else {
                 showErrorMessage("Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName} PlayerId: ${errorPlayerId}")
+                player?._listener?.onPlayerError(error.toError())
             }
         }
 
@@ -295,6 +302,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             requireActivity().runOnUiThread{
                 val errorPlayerId = SentryLogger.generatePlayerIdString()
                 showErrorMessage("\"Error Occurred while playing video. Error code ${exception.errorMessage}.\\n ID: ${parameters.videoId}\" PlayerId: $errorPlayerId")
+                player?._listener?.onPlayerError(exception.toError())
                 SentryLogger.logAPIException(exception,parameters, errorPlayerId)
             }
         }

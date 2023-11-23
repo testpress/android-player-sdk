@@ -25,6 +25,7 @@ import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.util.MarkerState
+import com.tpstream.player.util.PlaybackSpeed
 import com.tpstream.player.util.getPlayedStatusArray
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -80,18 +81,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }).get(VideoViewModel::class.java)
     }
 
-    internal fun setPlayBackSpeedText(speed: Float) {
-        val playBackSpeed = playerView.findViewById<Button>(ExoplayerResourceID.exo_playback_speed)
-        val speedTextMap = mapOf(
-            0.25f to "0.25x",
-            0.5f to "0.5x",
-            0.75f to "0.75x",
-            1.0f to "1x",
-            1.25f to "1.25x",
-            1.5f to "1.5x",
-            2.0f to "2x"
-        )
-        playBackSpeed.text = speedTextMap[speed]
+    internal fun setPlaybackSpeedText(speed: Float) {
+        val playbackSpeedButton = playerView.findViewById<Button>(ExoplayerResourceID.exo_playback_speed)
+        val playbackSpeed = PlaybackSpeed.values().find { it.value == speed }
+        playbackSpeedButton.text = playbackSpeed?.text
     }
 
     private fun onDownloadButtonClick() {

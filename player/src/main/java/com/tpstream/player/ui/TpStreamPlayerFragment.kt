@@ -237,7 +237,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
             super.onPlaybackParametersChanged(playbackParameters)
-            tpStreamPlayerView.setPlayBackSpeedText(playbackParameters.speed)
+            tpStreamPlayerView.setPlaybackSpeedText(playbackParameters.speed)
         }
 
         override fun onPlayerError(error: PlaybackException) {

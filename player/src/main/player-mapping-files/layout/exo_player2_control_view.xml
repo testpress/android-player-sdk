@@ -72,8 +72,19 @@
             <ImageButton android:id="@id/exo_subtitle"
                 style="@style/ExoStyledControls.Button.Bottom.CC"/>
 
-            <ImageButton android:id="@id/exo_settings"
-                style="@style/ExoStyledControls.Button.Bottom.Settings"/>
+            <Button
+                android:id="@id/exo_playback_speed"
+                android:layout_width="36dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="12dp"
+                android:backgroundTint="#ffffff"
+                android:gravity="center"
+                android:padding="0dp"
+                android:text="1x"
+                android:textAllCaps="false"
+                android:textColor="#000000"
+                android:textSize="12sp" />
 
             <ImageButton android:id="@id/exo_overflow_show"
                 style="@style/ExoStyledControls.Button.Bottom.OverflowShow"/>

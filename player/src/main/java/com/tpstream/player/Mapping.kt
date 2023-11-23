@@ -51,6 +51,7 @@ internal typealias Player = androidx.media3.common.Player
 internal typealias Tracks = androidx.media3.common.Tracks
 internal typealias VideoSize = androidx.media3.common.VideoSize
 internal typealias Timeline = androidx.media3.common.Timeline
+internal typealias PlaybackParameters = androidx.media3.common.PlaybackParameters
 
 // androidx.media3.exoplayer.dash
 internal typealias DashUtil = androidx.media3.exoplayer.dash.DashUtil

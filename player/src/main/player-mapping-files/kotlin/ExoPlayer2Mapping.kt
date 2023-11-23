@@ -44,6 +44,7 @@ internal typealias Player = com.google.android.exoplayer2.Player
 internal typealias Tracks = com.google.android.exoplayer2.Tracks
 internal typealias VideoSize = com.google.android.exoplayer2.video.VideoSize
 internal typealias Timeline = com.google.android.exoplayer2.Timeline
+internal typealias PlaybackParameters = com.google.android.exoplayer2.PlaybackParameters
 internal typealias DashUtil = com.google.android.exoplayer2.source.dash.DashUtil
 internal typealias HlsMediaPlaylist = com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist
 internal typealias HlsMediaPlaylistSegment = com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist.Segment

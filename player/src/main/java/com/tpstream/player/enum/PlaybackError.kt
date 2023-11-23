@@ -13,7 +13,7 @@ enum class PlaybackError {
     UNSPECIFIED
 }
 
-fun TPException.toError(): PlaybackError {
+internal fun TPException.toError(): PlaybackError {
     return when {
         this.isNetworkError() -> PlaybackError.NETWORK_CONNECTION_FAILED
         this.response?.code == 404 -> PlaybackError.INVALID_ASSETS_ID
@@ -24,7 +24,7 @@ fun TPException.toError(): PlaybackError {
 }
 
 
-fun PlaybackException.toError(): PlaybackError {
+internal fun PlaybackException.toError(): PlaybackError {
     return when (this.errorCode) {
         PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> PlaybackError.NETWORK_CONNECTION_FAILED
         PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> PlaybackError.NETWORK_CONNECTION_TIMEOUT

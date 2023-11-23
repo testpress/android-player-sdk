@@ -254,6 +254,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 fetchDRMLicence()
             } else {
                 showErrorMessage("Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName} PlayerId: ${errorPlayerId}")
+                player?._listener?.onPlayerError(error.toError())
             }
         }
 

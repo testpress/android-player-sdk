@@ -8,10 +8,6 @@ internal class ExoPlayerListenerWrapper(var player: TpStreamPlayerImpl) : Player
         listener?.onPlaybackStateChanged(playbackState)
     }
 
-    override fun onPlayerError(error: PlaybackException) {
-        listener?.onPlayerError(error)
-    }
-
     override fun onTracksChanged(tracks: Tracks) {
         listener?.onTracksChanged(tracks)
     }

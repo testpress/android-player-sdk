@@ -7,7 +7,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import com.tpstream.player.*
-import com.tpstream.player.enum.Error
+import com.tpstream.player.enum.PlaybackError
 import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
 
@@ -49,9 +49,9 @@ class PlayerActivity : AppCompatActivity() {
                         Toast.makeText(this@PlayerActivity, isFullScreen.toString(), Toast.LENGTH_SHORT).show()
                     }
 
-                    override fun onPlayerError(error: Error) {
-                        super.onPlayerError(error)
-                        Log.d("TAG", "onPlayerError: ${error}")
+                    override fun onPlayerError(playbackError: PlaybackError) {
+                        super.onPlayerError(playbackError)
+                        Log.d("TAG", "onPlayerError: ${playbackError}")
                     }
                 })
 

@@ -1,6 +1,6 @@
 package com.tpstream.player
 
-import com.tpstream.player.enum.Error
+import com.tpstream.player.enum.PlaybackError
 
 interface TPStreamPlayerListener {
     fun onTracksChanged(tracks: Tracks) {}
@@ -17,7 +17,7 @@ interface TPStreamPlayerListener {
     fun onPlayerErrorChanged(error: PlaybackException?) {}
     fun onTimelineChanged(timeline: Timeline, reason: Int) {}
     fun onPlaybackStateChanged(playbackState: Int) {}
-    fun onPlayerError(error: Error) {}
+    fun onPlayerError(playbackError: PlaybackError) {}
     fun onMarkerCallback(timesInSeconds: Long) {}
     fun onFullScreenChanged(isFullScreen: Boolean) {}
 }

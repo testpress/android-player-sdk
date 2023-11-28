@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.Toast
 import com.tpstream.player.*
 import com.tpstream.player.enum.PlaybackError
+import com.tpstream.player.enum.VideoResolution
 import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
 
@@ -39,6 +40,8 @@ class PlayerActivity : AppCompatActivity() {
                 tpStreamPlayer.setListener( object : TPStreamPlayerListener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         Log.d(TAG, "onPlaybackStateChanged: $playbackState")
+
+                        player.setResolutionOption(VideoResolution.HIGH)
                     }
 
                     override fun onMarkerCallback(timesInSeconds: Long) {

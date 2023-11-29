@@ -27,6 +27,7 @@ public interface TpStreamPlayer {
     fun seekTo(seconds: Long)
     fun getVideoFormat(): Format?
     fun getCurrentTrackGroups(): ImmutableList<TracksGroup>
+    fun setMaxVideoSize(maxVideoWidth: Int, maxVideoHeight: Int)
     fun getDuration(): Long
     fun setListener(listener: TPStreamPlayerListener?)
     fun play()
@@ -183,6 +184,13 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     override fun getVideoFormat(): Format? = exoPlayer.videoFormat
 
     override fun getCurrentTrackGroups(): ImmutableList<TracksGroup> = exoPlayer.currentTracks.groups
+
+    override fun setMaxVideoSize(maxVideoWidth: Int, maxVideoHeight: Int) {
+        val trackSelectionParameters = TrackSelectionParametersBuilder(context)
+            .setMaxVideoSize(maxVideoWidth,maxVideoHeight)
+            .build()
+        setTrackSelectionParameters(trackSelectionParameters)
+    }
 
     override fun getDuration(): Long = exoPlayer.duration
 

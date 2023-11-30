@@ -11,6 +11,7 @@ import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 public interface TpStreamPlayer {
     object PLAYBACK_STATE {
@@ -30,6 +31,7 @@ public interface TpStreamPlayer {
     fun setMaxVideoSize(maxVideoWidth: Int, maxVideoHeight: Int)
     fun getDuration(): Long
     fun setListener(listener: TPStreamPlayerListener?)
+    fun setMaxResolution(resolutions: Int)
     fun play()
     fun pause()
     fun load(parameters: TpInitParams)
@@ -52,6 +54,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private var tpStreamPlayerImplCallBack : TpStreamPlayerImplCallBack? = null
     private var loadCompleteListener : LoadCompleteListener? = null
     private var markerListener: MarkerListener? = null
+    var maximumResolution: Int = 1080
 
     init {
         initializeExoplayer()
@@ -204,6 +207,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         }
     }
 
+    override fun setMaxResolution(resolutions: Int) {
+        maximumResolution = resolutions
+    }
+
     override fun play() {
         exoPlayer.play()
     }
@@ -222,6 +229,73 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     fun setMarkerListener(listener: MarkerListener) {
         markerListener = listener
+    }
+
+    fun setAutoResolution() {
+        if (maximumResolution == 1080) return
+        val formatIndex = mutableListOf<Int>()
+        exoPlayer.currentTracks.groups
+            .filter { it.type == C.TRACK_TYPE_VIDEO }
+            .forEach { tracksGroup ->
+                val mediaTrackGroup = tracksGroup.mediaTrackGroup
+                val totalResolutionAvailable = mediaTrackGroup.length
+                for (resolution in 0 until totalResolutionAvailable) {
+                    if (maximumResolution >= mediaTrackGroup.getFormat(resolution).height) {
+                        formatIndex.add(resolution)
+                    }
+                }
+                setTrackSelectionParameters(
+                    TrackSelectionParametersBuilder(context)
+                        .addOverride(TrackSelectionOverride(mediaTrackGroup, formatIndex))
+                        .build()
+                )
+            }
+    }
+
+    fun setLowResolution() {
+        setTrackSelectionParameters(
+            TrackSelectionParametersBuilder(context).setForceLowestBitrate(true).build()
+        )
+    }
+
+    fun setHighResolution() {
+        if (maximumResolution == 1080) {
+            setTrackSelectionParameters(
+                TrackSelectionParametersBuilder(context).setForceHighestSupportedBitrate(true)
+                    .build()
+            )
+        } else {
+            val targetResolution = maximumResolution
+            var selectedResolution = -1
+            var minResolutionDifference = Int.MAX_VALUE
+            exoPlayer.currentTracks.groups
+                .filter { it.type == C.TRACK_TYPE_VIDEO }
+                .forEach { tracksGroups ->
+                    val mediaTrackGroup = tracksGroups.mediaTrackGroup
+                    val totalResolutionAvailable = mediaTrackGroup.length
+                    for (resolution in 0 until totalResolutionAvailable) {
+                        val currentResolution = mediaTrackGroup.getFormat(resolution).height
+                        val resolutionDifference = abs(currentResolution - targetResolution)
+
+                        if (resolutionDifference < minResolutionDifference) {
+                            minResolutionDifference = resolutionDifference
+                            selectedResolution = resolution
+                        }
+                    }
+                    if (selectedResolution != -1) {
+                        setTrackSelectionParameters(
+                            TrackSelectionParametersBuilder(context)
+                                .addOverride(
+                                    TrackSelectionOverride(
+                                        mediaTrackGroup,
+                                        selectedResolution
+                                    )
+                                )
+                                .build()
+                        )
+                    }
+                }
+        }
     }
 }
 

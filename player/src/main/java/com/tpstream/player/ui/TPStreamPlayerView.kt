@@ -139,15 +139,17 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     private fun onSimpleResolutionSelection() = DialogInterface.OnClickListener { p0, p1 ->
         selectedResolution = simpleResolutionSheet.selectedResolution
-        if (simpleResolutionSheet.selectedResolution == ResolutionOptions.ADVANCED) {
-            advancedResolutionSheet.show((context as FragmentActivity).supportFragmentManager, "AdvancedSheet")
-            return@OnClickListener
-        } else {
-            val parameters = simpleResolutionSheet.selectedResolution.getTrackSelectionParameter(
-                context,
-                null
-            )
-            player?.setTrackSelectionParameters(parameters)
+        when (simpleResolutionSheet.selectedResolution) {
+            ResolutionOptions.ADVANCED -> {
+                advancedResolutionSheet.show(
+                    (context as FragmentActivity).supportFragmentManager,
+                    "AdvancedSheet"
+                )
+                return@OnClickListener
+            }
+            ResolutionOptions.AUTO -> player.setAutoResolution()
+            ResolutionOptions.LOW -> player.setLowResolution()
+            ResolutionOptions.HIGH -> player.setHighResolution()
         }
     }
 

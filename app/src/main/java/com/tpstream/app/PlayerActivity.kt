@@ -36,7 +36,7 @@ class PlayerActivity : AppCompatActivity() {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
                 tpStreamPlayer = player
                 tpStreamPlayer.load(buildParams())
-                tpStreamPlayer.setMaxResolution(480)
+                tpStreamPlayer.setMaxResolution(540)
                 tpStreamPlayer.setListener( object : TPStreamPlayerListener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         Log.d(TAG, "onPlaybackStateChanged: $playbackState")

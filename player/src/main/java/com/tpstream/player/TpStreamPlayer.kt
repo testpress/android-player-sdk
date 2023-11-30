@@ -254,8 +254,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             val trackIndices = mutableListOf<Int>()
             for (tracksGroup in getVideoTracksGroup()) {
                 val mediaTrackGroup = tracksGroup.mediaTrackGroup
-                val totalResolutionAvailable = mediaTrackGroup.length
-                for (resolution in 0 until totalResolutionAvailable) {
+                for (resolution in 0 until mediaTrackGroup.length) {
                     if (maximumResolution!! >= mediaTrackGroup.getFormat(resolution).height) {
                         trackIndices.add(resolution)
                     }

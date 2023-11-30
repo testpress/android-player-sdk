@@ -83,7 +83,6 @@ internal class AdvancedResolutionSelectionSheet(
         val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
         for (trackIndex in 0 until trackGroup.length) {
             val trackFormat = trackGroup.mediaTrackGroup.getFormat(trackIndex)
-
             if (player.getMaxResolution() != null && player.getMaxResolution()!! >= trackFormat.height){
                 trackInfos.add(TrackInfo(trackGroup, trackIndex))
             }

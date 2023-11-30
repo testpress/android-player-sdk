@@ -3,7 +3,6 @@ package com.tpstream.player
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import androidx.media3.common.TrackGroup
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.VideoRepository
@@ -51,10 +50,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     var video: Video? = null
     var _listener: TPStreamPlayerListener? = null
     lateinit var exoPlayer: ExoPlayer
-    private val exoPlayerListener: ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
+    private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
     private var videoRepository: VideoRepository = VideoRepository(context)
-    private var tpStreamPlayerImplCallBack: TpStreamPlayerImplCallBack? = null
-    private var loadCompleteListener: LoadCompleteListener? = null
+    private var tpStreamPlayerImplCallBack : TpStreamPlayerImplCallBack? = null
+    private var loadCompleteListener : LoadCompleteListener? = null
     private var markerListener: MarkerListener? = null
     var maximumResolution: Int? = null
 
@@ -64,14 +63,8 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     private fun initializeExoplayer() {
         exoPlayer = ExoPlayerBuilder(context)
-            .setSeekForwardIncrementMs(
-                context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms)
-                    .toLong()
-            )
-            .setSeekBackIncrementMs(
-                context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms)
-                    .toLong()
-            )
+            .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
+            .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
             .build()
             .also { exoPlayer ->
                 exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
@@ -80,7 +73,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     override fun load(parameters: TpInitParams) {
         params = parameters
-        exoPlayer.playWhenReady = parameters.autoPlay ?: true
+        exoPlayer.playWhenReady = parameters.autoPlay?:true
         videoRepository.getVideo(parameters, object : VideoNetworkDataSource.TPResponse<Video> {
             override fun onSuccess(result: Video) {
                 video = result
@@ -89,7 +82,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             }
 
             override fun onFailure(exception: TPException) {
-                tpStreamPlayerImplCallBack?.onPlaybackError(parameters, exception)
+                tpStreamPlayerImplCallBack?.onPlaybackError(parameters,exception)
             }
         })
     }
@@ -106,14 +99,14 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         }
     }
 
-    private fun playVideoInUIThread(url: String, startPosition: Long = 0) {
+    private fun playVideoInUIThread(url: String,startPosition: Long = 0) {
         Handler(Looper.getMainLooper()).post {
             playVideo(url, startPosition)
         }
     }
 
-    internal fun playVideo(url: String, startPosition: Long = 0) {
-        exoPlayer.playWhenReady = params.autoPlay ?: true
+    internal fun playVideo(url: String,startPosition: Long = 0) {
+        exoPlayer.playWhenReady = params.autoPlay?: true
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.seekTo(startPosition)
         exoPlayer.prepare()
@@ -145,7 +138,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             ).build()
     }
 
-    private fun buildDownloadedMediaItem(downloadRequest: DownloadRequest): MediaItem {
+    private fun buildDownloadedMediaItem(downloadRequest: DownloadRequest):MediaItem{
         val builder = MediaItemBuilder()
         builder
             .setMediaId(downloadRequest.id)
@@ -169,7 +162,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     fun getTrackSelectionParameters(): TrackSelectionParameters = exoPlayer.trackSelectionParameters
 
-    fun setTrackSelectionParameters(parameters: TrackSelectionParameters) {
+    fun setTrackSelectionParameters(parameters: TrackSelectionParameters){
         exoPlayer.trackSelectionParameters = parameters
     }
 
@@ -195,12 +188,11 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     override fun getVideoFormat(): Format? = exoPlayer.videoFormat
 
-    override fun getCurrentTrackGroups(): ImmutableList<TracksGroup> =
-        exoPlayer.currentTracks.groups
+    override fun getCurrentTrackGroups(): ImmutableList<TracksGroup> = exoPlayer.currentTracks.groups
 
     override fun setMaxVideoSize(maxVideoWidth: Int, maxVideoHeight: Int) {
         val trackSelectionParameters = TrackSelectionParametersBuilder(context)
-            .setMaxVideoSize(maxVideoWidth, maxVideoHeight)
+            .setMaxVideoSize(maxVideoWidth,maxVideoHeight)
             .build()
         setTrackSelectionParameters(trackSelectionParameters)
     }
@@ -233,7 +225,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.pause()
     }
 
-    fun setTpStreamPlayerImplCallBack(tpStreamPlayerImplCallBack: TpStreamPlayerImplCallBack) {
+    fun setTpStreamPlayerImplCallBack(tpStreamPlayerImplCallBack: TpStreamPlayerImplCallBack){
         this.tpStreamPlayerImplCallBack = tpStreamPlayerImplCallBack
     }
 
@@ -316,7 +308,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 }
 
 internal interface TpStreamPlayerImplCallBack {
-    fun onPlaybackError(parameters: TpInitParams, exception: TPException)
+    fun onPlaybackError(parameters: TpInitParams,exception: TPException)
     fun onPlayerPrepare()
 }
 

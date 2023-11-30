@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.data.source.network.VideoNetworkDataSource
+import com.tpstream.player.enum.VideoResolution
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
@@ -30,6 +31,7 @@ public interface TpStreamPlayer {
     fun setMaxVideoSize(maxVideoWidth: Int, maxVideoHeight: Int)
     fun getDuration(): Long
     fun setListener(listener: TPStreamPlayerListener?)
+    fun setResolutionOption(option: VideoResolution)
     fun play()
     fun pause()
     fun load(parameters: TpInitParams)
@@ -202,6 +204,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         } else {
             exoPlayer.removeListener(exoPlayerListener)
         }
+    }
+
+    override fun setResolutionOption(option: VideoResolution) {
+        exoPlayer.trackSelectionParameters = option.getResolutionOptions().getTrackSelectionParameter(context)
     }
 
     override fun play() {

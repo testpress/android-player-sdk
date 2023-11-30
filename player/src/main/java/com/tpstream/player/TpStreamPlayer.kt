@@ -33,7 +33,7 @@ public interface TpStreamPlayer {
     fun getDuration(): Long
     fun setListener(listener: TPStreamPlayerListener?)
     fun getMaxResolution(): Int?
-    fun setMaxResolution(resolutions: Int)
+    fun setMaxResolution(resolution: Int)
     fun play()
     fun pause()
     fun load(parameters: TpInitParams)
@@ -221,8 +221,8 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         return maximumResolution
     }
 
-    override fun setMaxResolution(resolutions: Int) {
-        maximumResolution = resolutions
+    override fun setMaxResolution(resolution: Int) {
+        maximumResolution = resolution
     }
 
     override fun play() {

@@ -261,7 +261,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onIsLoadingChanged(isLoading: Boolean) {
             super.onIsLoadingChanged(isLoading)
             if (!isLoading){
-                if (player.getVideoFormat()?.height!! > player.maximumResolution){
+                if (player.getMaxResolution() != null && (player.getVideoFormat()?.height!! > player.getMaxResolution()!!)){
                     player.setAutoResolution()
                 }
             }

@@ -11,6 +11,7 @@ import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 public interface TpStreamPlayer {
     object PLAYBACK_STATE {
@@ -30,6 +31,8 @@ public interface TpStreamPlayer {
     fun setMaxVideoSize(maxVideoWidth: Int, maxVideoHeight: Int)
     fun getDuration(): Long
     fun setListener(listener: TPStreamPlayerListener?)
+    fun getMaxResolution(): Int?
+    fun setMaxResolution(resolution: Int)
     fun play()
     fun pause()
     fun load(parameters: TpInitParams)
@@ -52,6 +55,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private var tpStreamPlayerImplCallBack : TpStreamPlayerImplCallBack? = null
     private var loadCompleteListener : LoadCompleteListener? = null
     private var markerListener: MarkerListener? = null
+    var maximumResolution: Int? = null
 
     init {
         initializeExoplayer()
@@ -149,6 +153,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             )
         return builder.build()
     }
+
     fun getPlayWhenReady() = exoPlayer.playWhenReady
 
     fun setPlayWhenReady(canPlay: Boolean) {
@@ -204,6 +209,14 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         }
     }
 
+    override fun getMaxResolution(): Int? {
+        return maximumResolution
+    }
+
+    override fun setMaxResolution(resolution: Int) {
+        maximumResolution = resolution
+    }
+
     override fun play() {
         exoPlayer.play()
     }
@@ -222,6 +235,75 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     fun setMarkerListener(listener: MarkerListener) {
         markerListener = listener
+    }
+
+    fun setAutoResolution() {
+        if (maximumResolution == null) {
+            setTrackSelectionParameters(
+                TrackSelectionParametersBuilder(context).build()
+            )
+        } else {
+            val trackIndices = mutableListOf<Int>()
+            for (tracksGroup in getVideoTracksGroup()) {
+                val mediaTrackGroup = tracksGroup.mediaTrackGroup
+                for (resolution in 0 until mediaTrackGroup.length) {
+                    if (maximumResolution!! >= mediaTrackGroup.getFormat(resolution).height) {
+                        trackIndices.add(resolution)
+                    }
+                }
+                setTrackSelectionParameters(
+                    TrackSelectionParametersBuilder(context)
+                        .addOverride(TrackSelectionOverride(mediaTrackGroup, trackIndices))
+                        .build()
+                )
+            }
+        }
+    }
+
+    fun setLowResolution() {
+        setTrackSelectionParameters(
+            TrackSelectionParametersBuilder(context).setForceLowestBitrate(true).build()
+        )
+    }
+
+    fun setHighResolution() {
+        if (maximumResolution == null) {
+            setTrackSelectionParameters(
+                TrackSelectionParametersBuilder(context).setForceHighestSupportedBitrate(true)
+                    .build()
+            )
+        } else {
+            for (tracksGroup in getVideoTracksGroup()) {
+                val mediaTrackGroup = tracksGroup.mediaTrackGroup
+                val selectedResolutionIndex = findClosestResolutionIndex(mediaTrackGroup)
+                if (selectedResolutionIndex != -1) {
+                    val trackSelectorParameters = TrackSelectionParametersBuilder(context)
+                        .addOverride(TrackSelectionOverride(mediaTrackGroup, selectedResolutionIndex))
+                        .build()
+                    setTrackSelectionParameters(trackSelectorParameters)
+                }
+            }
+        }
+    }
+
+    private fun findClosestResolutionIndex(mediaTrackGroup: TrackGroup): Int {
+        val totalResolutionCount = mediaTrackGroup.length
+        val targetResolution = maximumResolution!!
+        var minResolutionDifference = Int.MAX_VALUE
+        var selectedResolution = -1
+        for (resolution in 0 until totalResolutionCount) {
+            val currentResolution = mediaTrackGroup.getFormat(resolution).height
+            val resolutionDifference = abs(currentResolution - targetResolution)
+            if (resolutionDifference < minResolutionDifference) {
+                minResolutionDifference = resolutionDifference
+                selectedResolution = resolution
+            }
+        }
+        return selectedResolution
+    }
+
+    private fun getVideoTracksGroup(): List<TracksGroup> {
+        return getCurrentTrackGroups().filter { it.type == C.TRACK_TYPE_VIDEO }
     }
 }
 

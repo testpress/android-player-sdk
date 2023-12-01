@@ -258,6 +258,15 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
+        override fun onIsLoadingChanged(isLoading: Boolean) {
+            super.onIsLoadingChanged(isLoading)
+            if (!isLoading){
+                if (player.getMaxResolution() != null && (player.getVideoFormat()?.height!! > player.getMaxResolution()!!)){
+                    player.setAutoResolution()
+                }
+            }
+        }
+
         private fun fetchDRMLicence(){
             if (!InternetConnectivityChecker.isNetworkAvailable(requireContext())) {
                 showErrorMessage(getString(R.string.no_internet_to_sync_license))

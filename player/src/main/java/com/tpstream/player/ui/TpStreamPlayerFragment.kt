@@ -16,17 +16,11 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import com.tpstream.player.*
 import com.tpstream.player.Util
-import com.tpstream.player.offline.DRMLicenseFetchCallback
-import com.tpstream.player.offline.DownloadCallback
-import com.tpstream.player.offline.DownloadTask
-import com.tpstream.player.offline.InternetConnectivityChecker
-import com.tpstream.player.offline.OfflineDRMLicenseHelper
-import com.tpstream.player.util.OrientationListener
-import com.tpstream.player.R
-import com.tpstream.player.util.SentryLogger
-import com.tpstream.player.TpStreamPlayerImpl
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.enum.toError
+import com.tpstream.player.offline.*
+import com.tpstream.player.util.OrientationListener
+import com.tpstream.player.util.SentryLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -260,10 +254,16 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onIsLoadingChanged(isLoading: Boolean) {
             super.onIsLoadingChanged(isLoading)
-            if (!isLoading){
-                if (player.getMaxResolution() != null && (player.getVideoFormat()?.height!! > player.getMaxResolution()!!)){
-                    player.setAutoResolution()
-                }
+            if (!isLoading && player.getPlaybackState() == TpStreamPlayer.PLAYBACK_STATE.STATE_READY) {
+                adjustResolutionIfExceedsMax()
+            }
+        }
+
+        private fun adjustResolutionIfExceedsMax() {
+            val maxResolution = player.getMaxResolution()
+            val videoHeight = player.getVideoFormat()?.height
+            if (maxResolution != null && videoHeight != null && videoHeight > maxResolution) {
+                player.setAutoResolution()
             }
         }
 

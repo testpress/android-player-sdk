@@ -255,11 +255,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onIsLoadingChanged(isLoading: Boolean) {
             super.onIsLoadingChanged(isLoading)
             if (!isLoading && player.getPlaybackState() == TpStreamPlayer.PLAYBACK_STATE.STATE_READY) {
-                adjustResolutionIfExceedsMax()
+                restrictVideoToMaximumResolution()
             }
         }
 
-        private fun adjustResolutionIfExceedsMax() {
+        private fun restrictVideoToMaximumResolution() {
             val maxResolution = player.getMaxResolution()
             val videoHeight = player.getVideoFormat()?.height
             if (maxResolution != null && videoHeight != null && videoHeight > maxResolution) {

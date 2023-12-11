@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.data.source.network.VideoNetworkDataSource
-import com.tpstream.player.enum.PlaybackSpeed
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager

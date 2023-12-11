@@ -94,6 +94,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Ensure that the full-screen dialog is dismissed when the Activity is destroyed
+        // to prevent a WindowLeaked exception. This is necessary to handle scenarios
+        // where the dialog is still visible when the Activity is no longer in the foreground.
+        if (fullScreenDialog.isShowing)
+            fullScreenDialog.onBackPressed()
         _viewBinding = null
     }
 

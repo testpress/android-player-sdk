@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.VideoRepository
 import com.tpstream.player.data.source.network.VideoNetworkDataSource
+import com.tpstream.player.enum.PlaybackSpeed
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
@@ -37,6 +38,8 @@ public interface TpStreamPlayer {
     fun pause()
     fun load(parameters: TpInitParams)
     fun release()
+    fun getPlayBackSpeed(): PlaybackSpeed
+    fun setPlatBackSpeed(playbackSpeed: PlaybackSpeed)
 
     class Builder(private val context: Context) {
         fun build(): TpStreamPlayer {
@@ -170,6 +173,14 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     override fun release() {
         exoPlayer.release()
+    }
+
+    override fun getPlayBackSpeed(): PlaybackSpeed {
+        return PlaybackSpeed.values().find { it.value == exoPlayer.playbackParameters.speed }!!
+    }
+
+    override fun setPlatBackSpeed(playbackSpeed: PlaybackSpeed) {
+        exoPlayer.playbackParameters = PlaybackParameters(playbackSpeed.value)
     }
 
     override fun getPlaybackState(): Int = exoPlayer.playbackState

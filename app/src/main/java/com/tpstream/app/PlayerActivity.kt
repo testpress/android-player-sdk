@@ -56,6 +56,7 @@ class PlayerActivity : AppCompatActivity() {
                     }
                 })
 
+                tpStreamPlayer.setPlaybackSpeed(2.0f)
                 playerFragment.tpStreamPlayerView.setMarkers(longArrayOf(60,120,180),Color.RED,false)
                 playerFragment.tpStreamPlayerView.enableWaterMark("Tpstreams",Color.RED)
                 playerFragment.tpStreamPlayerView.setSeekBarColor(Color.GREEN)

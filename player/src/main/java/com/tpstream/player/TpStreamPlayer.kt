@@ -39,7 +39,6 @@ public interface TpStreamPlayer {
     fun load(parameters: TpInitParams)
     fun release()
     fun getPlayBackSpeed(): Float
-    fun setPlatBackSpeed(speed: Float)
 
     class Builder(private val context: Context) {
         fun build(): TpStreamPlayer {
@@ -176,10 +175,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     override fun getPlayBackSpeed() = exoPlayer.playbackParameters.speed
-
-    override fun setPlatBackSpeed(speed: Float) {
-        exoPlayer.playbackParameters = PlaybackParameters(speed)
-    }
 
     override fun getPlaybackState(): Int = exoPlayer.playbackState
 

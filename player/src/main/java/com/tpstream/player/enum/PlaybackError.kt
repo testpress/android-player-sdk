@@ -32,3 +32,23 @@ internal fun PlaybackException.toError(): PlaybackError {
         else -> PlaybackError.UNSPECIFIED
     }
 }
+
+internal fun TPException.getErrorMessage(playerId: String): String {
+    return when {
+        this.isNetworkError() -> "5004\n No Internet Connection.\n playerId: $playerId"
+        this.response?.code == 404 -> "5001\n Resource Not Found.\n playerId: $playerId"
+        this.isUnauthenticated() -> "5002\n Unauthorized Access.\n playerId: $playerId"
+        this.isServerError() -> "5005\n Server Error.\n playerId: $playerId"
+        else -> "5100\n Unknown Error.\n playerId: $playerId"
+    }
+}
+
+
+internal fun PlaybackException.getErrorMessage(playerId: String): String {
+    return when (this.errorCode) {
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> "5004\n No Internet Connection.\n playerId: $playerId"
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> "5006\n Network Timeout, Please try again.\n playerId: $playerId"
+        PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED -> "5004\n Couldn't fetch license key.\n playerId: $playerId"
+        else -> "5100\n Unknown Error.\n playerId: $playerId"
+    }
+}

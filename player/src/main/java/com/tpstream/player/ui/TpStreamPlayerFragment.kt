@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import com.tpstream.player.*
 import com.tpstream.player.Util
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
+import com.tpstream.player.enum.getErrorMessage
 import com.tpstream.player.enum.toError
 import com.tpstream.player.offline.*
 import com.tpstream.player.util.OrientationListener
@@ -24,6 +25,7 @@ import com.tpstream.player.util.SentryLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val _playbackStateListener: PlayerListener = InternalPlayerListener()
@@ -245,14 +247,14 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             val errorPlayerId = SentryLogger.generatePlayerIdString()
             SentryLogger.logPlaybackException(error, player?.params, errorPlayerId)
             if (error.errorCode == PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED) {
-                showErrorMessage(getString(R.string.license_error))
+                showErrorMessage(error.getErrorMessage(errorPlayerId))
                 player?._listener?.onPlayerError(error.toError())
                 return
             }
             if (isDRMException(error.cause!!)) {
-                fetchDRMLicence()
+                fetchDRMLicence(error)
             } else {
-                showErrorMessage("Error occurred while playing video. \\n ${error.errorCode} ${error.errorCodeName} PlayerId: ${errorPlayerId}")
+                showErrorMessage(error.getErrorMessage(errorPlayerId))
                 player?._listener?.onPlayerError(error.toError())
             }
         }
@@ -272,9 +274,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
-        private fun fetchDRMLicence(){
+        private fun fetchDRMLicence(error: PlaybackException){
+            val errorPlayerId = SentryLogger.generatePlayerIdString()
             if (!InternetConnectivityChecker.isNetworkAvailable(requireContext())) {
-                showErrorMessage(getString(R.string.no_internet_to_sync_license))
+                showErrorMessage(TPException.networkError(IOException()).getErrorMessage(errorPlayerId))
                 return
             }
             val url = player?.video?.url
@@ -284,7 +287,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 OfflineDRMLicenseHelper.renewLicense(url, player?.params!!, activity!!, this)
                 showErrorMessage(getString(R.string.syncing_video))
             } else {
-                showErrorMessage(getString(R.string.license_request_failed))
+                showErrorMessage(error.getErrorMessage(errorPlayerId))
             }
         }
 
@@ -315,7 +318,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun onPlaybackError(parameters: TpInitParams, exception: TPException) {
             requireActivity().runOnUiThread{
                 val errorPlayerId = SentryLogger.generatePlayerIdString()
-                showErrorMessage("\"Error Occurred while playing video. Error code ${exception.errorMessage}.\\n ID: ${parameters.videoId}\" PlayerId: $errorPlayerId")
+                showErrorMessage(exception.getErrorMessage(errorPlayerId))
                 player?._listener?.onPlayerError(exception.toError())
                 SentryLogger.logAPIException(exception,parameters, errorPlayerId)
             }

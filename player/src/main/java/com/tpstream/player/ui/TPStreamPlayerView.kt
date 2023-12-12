@@ -57,7 +57,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
         registerDownloadListener()
         registerResolutionChangeListener()
         initializeViewModel()
-        //bufferView.isVisible = true
     }
 
     private fun registerDownloadListener() {

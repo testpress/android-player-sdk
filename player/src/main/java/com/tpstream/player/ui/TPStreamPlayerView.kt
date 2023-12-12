@@ -51,7 +51,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var seekBarListener: OnScrubListener? = null
     private var markers: LinkedHashMap<Long, MarkerState>? = null
     private var animator: ObjectAnimator? = null
-    private var bufferView: View = findViewById(ExoplayerResourceID.exo_buffering)
+    private var loadingScreen: View = findViewById(ExoplayerResourceID.exo_buffering)
     private var tPStreamPlayerViewCallBack: TPStreamPlayerViewCallBack? = null
 
     init {
@@ -272,11 +272,11 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun showLoading() {
         tPStreamPlayerViewCallBack?.hideErrorView()
-        bufferView.isVisible = true
+        loadingScreen.isVisible = true
     }
 
     fun hideLoading() {
-        bufferView.isVisible = false
+        loadingScreen.isVisible = false
     }
 
     fun showController() {

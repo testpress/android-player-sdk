@@ -57,6 +57,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tpStreamPlayerView = viewBinding.tpStreamPlayerView
+        tpStreamPlayerView.setTPStreamPlayerViewCallBack(tPStreamPlayerViewCallBack)
         registerFullScreenListener()
         DownloadCallback.invoke().callback = this
     }
@@ -329,6 +330,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 player.seekTo(startPosition)
                 player.pause()
             }
+        }
+    }
+
+    private val tPStreamPlayerViewCallBack = object : TPStreamPlayerViewCallBack {
+
+        override fun hideErrorView() {
+            viewBinding.errorMessage.visibility = View.GONE
         }
     }
 

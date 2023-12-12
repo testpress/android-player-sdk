@@ -51,6 +51,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var seekBarListener: OnScrubListener? = null
     private var markers: LinkedHashMap<Long, MarkerState>? = null
     private var animator: ObjectAnimator? = null
+    private var loadingScreen: View = findViewById(ExoplayerResourceID.exo_buffering)
+    private var tPStreamPlayerViewCallBack: TPStreamPlayerViewCallBack? = null
 
     init {
         registerDownloadListener()
@@ -177,6 +179,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
         setPlaybackSpeedText(player.getPlayBackSpeed())
     }
 
+    internal fun setTPStreamPlayerViewCallBack(callBack: TPStreamPlayerViewCallBack) {
+        tPStreamPlayerViewCallBack = callBack
+    }
+
     private fun initializeLoadCompleteListener() {
         player.setLoadCompleteListener {
             (context as FragmentActivity).runOnUiThread {
@@ -262,6 +268,15 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun hideResolutionButton() {
         resolutionButton?.isVisible = false
+    }
+
+    fun showLoading() {
+        tPStreamPlayerViewCallBack?.hideErrorView()
+        loadingScreen.isVisible = true
+    }
+
+    fun hideLoading() {
+        loadingScreen.isVisible = false
     }
 
     fun showController() {
@@ -409,4 +424,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
+}
+
+internal interface TPStreamPlayerViewCallBack {
+    fun hideErrorView()
 }

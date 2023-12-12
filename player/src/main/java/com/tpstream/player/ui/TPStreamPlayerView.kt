@@ -58,6 +58,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         registerDownloadListener()
         registerResolutionChangeListener()
         initializeViewModel()
+        //bufferView.isVisible = true
     }
 
     private fun registerDownloadListener() {
@@ -174,6 +175,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     fun setPlayer(player: TpStreamPlayer) {
         this.player = player as TpStreamPlayerImpl
         playerView.player = this.player.exoPlayer
+        showBuffer()
         initializeLoadCompleteListener()
         initializeMarkerListener()
         setPlaybackSpeedText(player.getPlayBackSpeed())

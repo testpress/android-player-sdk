@@ -314,6 +314,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         viewBinding.errorMessage.text = message
     }
 
+    fun showBuffer(){
+        tpStreamPlayerView.showBuffer()
+        viewBinding.errorMessage.visibility = View.GONE
+    }
+
     private val tpStreamPlayerImplCallBack = object :TpStreamPlayerImplCallBack{
 
         override fun onPlaybackError(parameters: TpInitParams, exception: TPException) {

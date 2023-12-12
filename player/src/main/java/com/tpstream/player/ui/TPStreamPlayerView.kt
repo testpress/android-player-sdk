@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Message
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -279,6 +280,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
         loadingScreen.isVisible = false
     }
 
+    fun showErrorMessage(message: String) {
+        tPStreamPlayerViewCallBack?.showErrorMessage(message)
+    }
+
     fun showController() {
         playerView.showController()
     }
@@ -428,4 +433,5 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
 internal interface TPStreamPlayerViewCallBack {
     fun hideErrorView()
+    fun showErrorMessage(message: String)
 }

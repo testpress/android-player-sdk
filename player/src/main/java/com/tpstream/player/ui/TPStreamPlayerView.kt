@@ -51,11 +51,13 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var seekBarListener: OnScrubListener? = null
     private var markers: LinkedHashMap<Long, MarkerState>? = null
     private var animator: ObjectAnimator? = null
+    private var bufferView: View = findViewById(ExoplayerResourceID.exo_buffering)
 
     init {
         registerDownloadListener()
         registerResolutionChangeListener()
         initializeViewModel()
+        //bufferView.isVisible = true
     }
 
     private fun registerDownloadListener() {
@@ -172,6 +174,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     fun setPlayer(player: TpStreamPlayer) {
         this.player = player as TpStreamPlayerImpl
         playerView.player = this.player.exoPlayer
+        showBuffer()
         initializeLoadCompleteListener()
         initializeMarkerListener()
         setPlaybackSpeedText(player.getPlayBackSpeed())
@@ -262,6 +265,14 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun hideResolutionButton() {
         resolutionButton?.isVisible = false
+    }
+
+    fun showBuffer() {
+        bufferView.isVisible = true
+    }
+
+    fun hideBuffer() {
+        bufferView.isVisible = false
     }
 
     fun showController() {

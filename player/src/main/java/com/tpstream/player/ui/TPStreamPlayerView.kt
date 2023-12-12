@@ -174,7 +174,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
     fun setPlayer(player: TpStreamPlayer) {
         this.player = player as TpStreamPlayerImpl
         playerView.player = this.player.exoPlayer
-        showBuffer()
         initializeLoadCompleteListener()
         initializeMarkerListener()
         setPlaybackSpeedText(player.getPlayBackSpeed())

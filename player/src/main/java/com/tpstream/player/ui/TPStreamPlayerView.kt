@@ -52,6 +52,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var markers: LinkedHashMap<Long, MarkerState>? = null
     private var animator: ObjectAnimator? = null
     private var bufferView: View = findViewById(ExoplayerResourceID.exo_buffering)
+    private var tPStreamPlayerViewCallBack: TPStreamPlayerViewCallBack? = null
 
     init {
         registerDownloadListener()
@@ -178,6 +179,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
         setPlaybackSpeedText(player.getPlayBackSpeed())
     }
 
+    internal fun setTPStreamPlayerViewCallBack(callBack: TPStreamPlayerViewCallBack) {
+        tPStreamPlayerViewCallBack = callBack
+    }
+
     private fun initializeLoadCompleteListener() {
         player.setLoadCompleteListener {
             (context as FragmentActivity).runOnUiThread {
@@ -265,11 +270,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
         resolutionButton?.isVisible = false
     }
 
-    fun showBuffer() {
+    fun showLoading() {
+        tPStreamPlayerViewCallBack?.hideErrorView()
         bufferView.isVisible = true
     }
 
-    fun hideBuffer() {
+    fun hideLoading() {
         bufferView.isVisible = false
     }
 
@@ -418,4 +424,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
+}
+
+internal interface TPStreamPlayerViewCallBack {
+    fun hideErrorView()
 }

@@ -279,6 +279,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
         loadingScreen.isVisible = false
     }
 
+    fun showErrorMessage(message: String) {
+        tPStreamPlayerViewCallBack?.showErrorMessage(message)
+    }
+
     fun showController() {
         playerView.showController()
     }
@@ -428,4 +432,5 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
 internal interface TPStreamPlayerViewCallBack {
     fun hideErrorView()
+    fun showErrorMessage(message: String)
 }

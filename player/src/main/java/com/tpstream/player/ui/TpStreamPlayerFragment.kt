@@ -267,6 +267,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
+        override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+            super.onPlayWhenReadyChanged(playWhenReady, reason)
+            if (playWhenReady) viewBinding.errorMessage.visibility = View.GONE
+        }
+
         private fun restrictVideoToMaximumResolution() {
             val maxResolution = player.getMaxResolution()
             val videoHeight = player.getVideoFormat()?.height
@@ -337,6 +342,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun hideErrorView() {
             viewBinding.errorMessage.visibility = View.GONE
+        }
+
+        override fun showErrorMessage(message: String) {
+            this@TpStreamPlayerFragment.showErrorMessage(message)
         }
     }
 

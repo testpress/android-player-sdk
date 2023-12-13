@@ -227,7 +227,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         private val TAG = "PlayerListener"
 
         override fun onPlaybackStateChanged(playbackState: Int) {
-            if (playbackState == ExoPlayer.STATE_READY) {
+            if (playbackState == ExoPlayer.STATE_READY || playbackState == ExoPlayer.STATE_BUFFERING) {
                 viewBinding.errorMessage.visibility = View.GONE
                 tpStreamPlayerView.hideReplayButton()
                 tpStreamPlayerView.showPlayButton()

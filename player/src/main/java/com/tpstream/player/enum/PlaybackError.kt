@@ -35,20 +35,20 @@ internal fun PlaybackException.toError(): PlaybackError {
 
 internal fun TPException.getErrorMessage(playerId: String): String {
     return when {
-        this.isNetworkError() -> "5004\n No Internet Connection.\n playerId: $playerId"
-        this.response?.code == 404 -> "5001\n Resource Not Found.\n playerId: $playerId"
-        this.isUnauthenticated() -> "5002\n Unauthorized Access.\n playerId: $playerId"
-        this.isServerError() -> "5005\n Server Error.\n playerId: $playerId"
-        else -> "5100\n Unknown Error.\n playerId: $playerId"
+        this.isNetworkError() -> "Oops! It seems like you're not connected to the internet. Please check your connection and try again.\n Error code: 5004. Player Id: $playerId"
+        this.response?.code == 404 -> "The video is not available. Please try another one.\n Error code: 5001. Player Id: $playerId"
+        this.isUnauthenticated() -> "Sorry, you don't have permission to access this video. Please check your credentials and try again.\n Error code: 5002. Player Id: $playerId"
+        this.isServerError() -> "We're sorry, but there's an issue on our server. Please try again later.\n Error code: 5005. Player Id: $playerId"
+        else -> "Oops! Something went wrong. Please contact support for assistance and provide details about the issue.\n Error code: 5100. Player Id: $playerId"
     }
 }
 
 
 internal fun PlaybackException.getErrorMessage(playerId: String): String {
     return when (this.errorCode) {
-        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> "5004\n No Internet Connection.\n playerId: $playerId"
-        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> "5006\n Network Timeout, Please try again.\n playerId: $playerId"
-        PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED -> "5004\n Couldn't fetch license key.\n playerId: $playerId"
-        else -> "5100\n Unknown Error.\n playerId: $playerId"
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> "Oops! It seems like you're not connected to the internet. Please check your connection and try again.\n Error code: 5004. Player Id: $playerId"
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> "The request took too long to process due to a slow or unstable network connection. Please try again.\n Error code: 5006. Player Id: $playerId"
+        PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED -> "There was an issue fetching the license key for this video. Please try again later.\n Error code: 5003. Player Id: $playerId"
+        else -> "Oops! Something went wrong. Please contact support for assistance and provide details about the issue.\n Error code: 5100. Player Id: $playerId"
     }
 }

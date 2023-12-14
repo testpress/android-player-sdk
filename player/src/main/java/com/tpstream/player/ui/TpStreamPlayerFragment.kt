@@ -322,6 +322,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val tpStreamPlayerImplCallBack = object :TpStreamPlayerImplCallBack{
 
         override fun onPlaybackError(parameters: TpInitParams, exception: TPException) {
+            if (!isAdded) return
             requireActivity().runOnUiThread{
                 val errorPlayerId = SentryLogger.generatePlayerIdString()
                 showErrorMessage(exception.getErrorMessage(errorPlayerId))

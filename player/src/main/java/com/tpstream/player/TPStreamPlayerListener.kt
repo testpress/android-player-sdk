@@ -8,7 +8,6 @@ interface TPStreamPlayerListener {
     fun onMetadata(metadata: Metadata) {}
     fun onIsPlayingChanged(playing: Boolean) {}
     fun onIsLoadingChanged(loading: Boolean) {}
-    @Deprecated("Deprecated",level = DeprecationLevel.WARNING)
     fun onDeviceInfoChanged(deviceInfo: DeviceInfo) {}
     fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {}
     fun onEvents(player: TpStreamPlayer?, events: PlayerEvents) {}

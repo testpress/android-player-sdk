@@ -43,14 +43,14 @@ internal typealias TracksGroup = androidx.media3.common.Tracks.Group
 internal typealias PlayerListener = androidx.media3.common.Player.Listener
 internal typealias PlaybackException = androidx.media3.common.PlaybackException
 internal typealias Metadata = androidx.media3.common.Metadata
-internal typealias PlayerEvents = androidx.media3.common.Player.Events
+typealias PlayerEvents = androidx.media3.common.Player.Events
 internal typealias PlayerPositionInfo = androidx.media3.common.Player.PositionInfo
 internal typealias AudioAttributes = androidx.media3.common.AudioAttributes
-internal typealias DeviceInfo = androidx.media3.common.DeviceInfo
+typealias DeviceInfo = androidx.media3.common.DeviceInfo
 internal typealias Player = androidx.media3.common.Player
-internal typealias Tracks = androidx.media3.common.Tracks
-internal typealias VideoSize = androidx.media3.common.VideoSize
-internal typealias Timeline = androidx.media3.common.Timeline
+typealias Tracks = androidx.media3.common.Tracks
+typealias VideoSize = androidx.media3.common.VideoSize
+typealias Timeline = androidx.media3.common.Timeline
 internal typealias PlaybackParameters = androidx.media3.common.PlaybackParameters
 
 // androidx.media3.exoplayer.dash

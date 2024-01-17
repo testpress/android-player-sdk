@@ -75,19 +75,28 @@ internal class AdvancedResolutionSelectionSheet(
     }
 
     private fun getTrackInfos(): ArrayList<TrackInfo> {
-        val trackInfos = arrayListOf<TrackInfo>()
         if (trackGroups.none { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }) {
-            return trackInfos
+            return arrayListOf()
         }
 
         val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
-        for (trackIndex in 0 until trackGroup.length) {
-            val trackFormat = trackGroup.mediaTrackGroup.getFormat(trackIndex)
-            if (player.getMaxResolution() != null && player.getMaxResolution()!! >= trackFormat.height){
-                trackInfos.add(TrackInfo(trackGroup, trackIndex))
-            }
+        return if (player.getMaxResolution() == null) {
+            addAllTrackInfo(trackGroup)
+        } else {
+            addTrackInfoBelowMaxResolution(trackGroup)
         }
-        return trackInfos
+    }
+
+    private fun addAllTrackInfo(trackGroup: TracksGroup): ArrayList<TrackInfo> {
+        return (0 until trackGroup.length).mapTo(arrayListOf()) { TrackInfo(trackGroup, it) }
+    }
+
+    private fun addTrackInfoBelowMaxResolution(trackGroup: TracksGroup): ArrayList<TrackInfo> {
+        val maxResolution = player.getMaxResolution()!!
+
+        return (0 until trackGroup.length)
+            .filter { maxResolution >= trackGroup.mediaTrackGroup.getFormat(it).height }
+            .mapTo(arrayListOf()) { TrackInfo(trackGroup, it) }
     }
 
     private fun configureBottomSheetBehaviour() {

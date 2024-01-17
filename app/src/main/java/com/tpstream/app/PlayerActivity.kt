@@ -36,7 +36,6 @@ class PlayerActivity : AppCompatActivity() {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
                 tpStreamPlayer = player
                 tpStreamPlayer.load(buildParams())
-                tpStreamPlayer.setMaxResolution(540)
                 tpStreamPlayer.setListener( object : TPStreamPlayerListener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         Log.d(TAG, "onPlaybackStateChanged: $playbackState")
@@ -55,10 +54,6 @@ class PlayerActivity : AppCompatActivity() {
                         Log.d("TAG", "onPlayerError: ${playbackError}")
                     }
                 })
-
-                playerFragment.tpStreamPlayerView.setMarkers(longArrayOf(60,120,180),Color.RED,false)
-                playerFragment.tpStreamPlayerView.enableWaterMark("Tpstreams",Color.RED)
-                playerFragment.tpStreamPlayerView.setSeekBarColor(Color.GREEN)
             }
         });
         initializeSampleButtons();
@@ -79,33 +74,33 @@ class PlayerActivity : AppCompatActivity() {
     private fun selectVideoParams(videoType: String?){
         when(videoType){
             "TP_DRM" -> {
-                accessToken = "c381512b-7337-4d8e-a8cf-880f4f08fd08"
-                videoId = "C3XLe1CCcOq"
-                orgCode = "demoveranda"
+                accessToken = "a4c04ca8-9c0e-4c9c-a889-bd3bf8ea586a"
+                videoId = "ATJfRdHIUC9"
+                orgCode = "lmsdemo"
                 provider = TPStreamsSDK.Provider.TestPress
             }
             "TP_AES_Encrypt" -> {
-                accessToken = "143a0c71-567e-4ecd-b22d-06177228c25b"
-                videoId = "o7pOsacWaJt"
-                orgCode = "demoveranda"
+                accessToken = "5f6355d0-62ac-4bfd-98ca-4a1e9a2857e3"
+                videoId = "ZZb3S5OB3nY"
+                orgCode = "lmsdemo"
                 provider = TPStreamsSDK.Provider.TestPress
             }
             "TP_NON_DRM" -> {
-                accessToken = "70f61402-3724-4ed8-99de-5473b2310efe"
-                videoId = "qJQlWGLJvNv"
-                orgCode = "demoveranda"
+                accessToken = "5c49285b-0557-4cef-b214-66034d0b77c3"
+                videoId = "z1TLpfuZzXh"
+                orgCode = "lmsdemo"
                 provider = TPStreamsSDK.Provider.TestPress
             }
             "TPS_DRM" -> {
-                accessToken = "7119c3dc-720b-4b67-9cf1-45c18cce6eeb"
-                videoId = "d19729f0-8823-4805-9034-2a7ea9429195"
-                orgCode = "edee9b"
+                accessToken = "ab70caed-6168-497f-89c1-1e308da2c9aa"
+                videoId = "6suEBPy7EG4"
+                orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             "TPS_NON_DRM" -> {
-                accessToken = "4b11bf9e-d6b7-4b1f-80b8-19d92b26e966"
-                videoId = "73633fa3-61c6-443c-b625-ac4e85b28cfc"
-                orgCode = "edee9b"
+                accessToken = "06d4191c-f470-476a-a0ef-58de2c9c2245"
+                videoId = "5X3sT3UXyNY"
+                orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             null ->{}

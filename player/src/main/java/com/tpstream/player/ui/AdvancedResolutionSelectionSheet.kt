@@ -81,13 +81,33 @@ internal class AdvancedResolutionSelectionSheet(
         }
 
         val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
+        if (player.getMaxResolution() == null) {
+            addAllTrackInfo(trackGroup, trackInfos)
+        } else {
+            addTrackInfoBelowMaxResolution(trackGroup, trackInfos)
+        }
+        return trackInfos
+    }
+
+    private fun addAllTrackInfo(
+        trackGroup: TracksGroup,
+        trackInfos: ArrayList<TrackInfo>
+    ) {
+        for (trackIndex in 0 until trackGroup.length) {
+            trackInfos.add(TrackInfo(trackGroup, trackIndex))
+        }
+    }
+
+    private fun addTrackInfoBelowMaxResolution(
+        trackGroup: TracksGroup,
+        trackInfos: ArrayList<TrackInfo>
+    ) {
         for (trackIndex in 0 until trackGroup.length) {
             val trackFormat = trackGroup.mediaTrackGroup.getFormat(trackIndex)
-            if (player.getMaxResolution() != null && player.getMaxResolution()!! >= trackFormat.height){
+            if (player.getMaxResolution()!! >= trackFormat.height) {
                 trackInfos.add(TrackInfo(trackGroup, trackIndex))
             }
         }
-        return trackInfos
     }
 
     private fun configureBottomSheetBehaviour() {

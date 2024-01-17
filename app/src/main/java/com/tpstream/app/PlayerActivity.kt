@@ -22,13 +22,14 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var orgCode :String
     private lateinit var provider: TPStreamsSDK.Provider
     private var parameters : TpInitParams? = null
+    private lateinit var authToken: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
         parameters = intent.getParcelableExtra(TP_OFFLINE_PARAMS)
         selectVideoParams(intent.getStringExtra("VideoParameter"))
-        TPStreamsSDK.initialize(provider, orgCode)
+        TPStreamsSDK.initialize(provider, orgCode, authToken)
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
         playerFragment.enableAutoFullScreenOnRotate()

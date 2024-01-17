@@ -3,6 +3,7 @@ package com.tpstream.player.data.source.network
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.tpstream.player.TPException
+import com.tpstream.player.TPStreamsSDK
 import okhttp3.*
 import java.io.IOException
 import java.net.URL
@@ -16,7 +17,10 @@ internal class VideoNetworkDataSource<T : Any>(val klass: Class<T>) {
     private val gson = Gson()
 
     fun get(url: String, callback: TPResponse<T>? = null): T? {
-        val request = Request.Builder().url(URL(url)).build()
+        val request = Request.Builder()
+            .header("Authorization","Token ${TPStreamsSDK.authToken}")
+            .url(URL(url))
+            .build()
         return makeRequest(callback, request)
     }
 

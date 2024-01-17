@@ -137,6 +137,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
                 DrmConfigurationBuilder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
                     .setLicenseUri(drmLicenseURL)
+                    .setLicenseRequestHeaders(mapOf("Authorization" to "Token ${TPStreamsSDK.authToken}"))
                     .build()
             ).build()
     }

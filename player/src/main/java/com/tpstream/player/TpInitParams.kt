@@ -21,6 +21,7 @@ data class TpInitParams (
 
         fun setAutoPlay(autoPlay: Boolean) = apply { this.autoPlay = autoPlay }
         fun startAt(timeInSeconds: Long) = apply { this.startAt = timeInSeconds }
+        @Deprecated("Deprecated", level = DeprecationLevel.WARNING)
         fun setAccessToken(accessToken: String) = apply { this.accessToken = accessToken }
         fun setVideoId(videoId: String) = apply { this.videoId = videoId }
         fun enableDownloadSupport(isDownloadEnabled: Boolean) = apply { this.isDownloadEnabled = isDownloadEnabled }

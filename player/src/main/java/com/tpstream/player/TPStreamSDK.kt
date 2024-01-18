@@ -12,12 +12,13 @@ object TPStreamsSDK {
             return _orgCode!!
         }
 
-    val authToken: String
+    private val authToken: String
         get() = checkNotNull(_authToken) { "TPStreamsSDK is not initialized. You must call initialize first." }
 
     internal val authenticationHeader: Map<String, String>
         get() = getAuthenticationHeader()
 
+    @Deprecated("Deprecated", ReplaceWith("TPStreamsSDK.initialize(provider, orgCode, authToken)"), DeprecationLevel.WARNING)
     fun initialize(provider: Provider = Provider.TPStreams, orgCode: String) {
         if (orgCode.isEmpty()) {
             throw IllegalArgumentException("orgCode cannot be empty.")

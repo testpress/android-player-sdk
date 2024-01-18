@@ -18,7 +18,7 @@ object TPStreamsSDK {
     internal val authenticationHeader: Map<String, String>
         get() = getAuthenticationHeader()
 
-    @Deprecated("Deprecated", ReplaceWith("TPStreamsSDK.initialize(provider, orgCode, authToken)"), DeprecationLevel.WARNING)
+    @Deprecated("Deprecated", ReplaceWith("TPStreamsSDK.initialize(provider, orgCode, authToken)"), DeprecationLevel.ERROR)
     fun initialize(provider: Provider = Provider.TPStreams, orgCode: String) {
         if (orgCode.isEmpty()) {
             throw IllegalArgumentException("orgCode cannot be empty.")

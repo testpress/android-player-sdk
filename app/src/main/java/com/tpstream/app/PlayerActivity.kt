@@ -64,7 +64,6 @@ class PlayerActivity : AppCompatActivity() {
         if (parameters == null) {
             parameters = TpInitParams.Builder()
                 .setVideoId(videoId)
-                .setAccessToken(accessToken)
                 .setAutoPlay(true)
                 .enableDownloadSupport(true)
                 .build()
@@ -79,30 +78,35 @@ class PlayerActivity : AppCompatActivity() {
                 videoId = "ATJfRdHIUC9"
                 orgCode = "lmsdemo"
                 provider = TPStreamsSDK.Provider.TestPress
+                authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6MiwidXNlcl9pZCI6MiwiaW5zdGl0dXRlIjoxMSwiaWQiOjIsImV4cCI6MTcwNTQ5NzM1NCwiZW1haWwiOiIxMjJAZ21haWwuY29tIn0.0l3cyZClu480VOpkF0XM3NQcEKBXPyXPUikomEx0m1M"
             }
             "TP_AES_Encrypt" -> {
                 accessToken = "5f6355d0-62ac-4bfd-98ca-4a1e9a2857e3"
                 videoId = "ZZb3S5OB3nY"
                 orgCode = "lmsdemo"
                 provider = TPStreamsSDK.Provider.TestPress
+                authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6MiwidXNlcl9pZCI6MiwiaW5zdGl0dXRlIjoxMSwiaWQiOjIsImV4cCI6MTcwNTQ5NzM1NCwiZW1haWwiOiIxMjJAZ21haWwuY29tIn0.0l3cyZClu480VOpkF0XM3NQcEKBXPyXPUikomEx0m1M"
             }
             "TP_NON_DRM" -> {
                 accessToken = "5c49285b-0557-4cef-b214-66034d0b77c3"
                 videoId = "z1TLpfuZzXh"
                 orgCode = "lmsdemo"
                 provider = TPStreamsSDK.Provider.TestPress
+                authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6MiwidXNlcl9pZCI6MiwiaW5zdGl0dXRlIjoxMSwiaWQiOjIsImV4cCI6MTcwNTQ5NzM1NCwiZW1haWwiOiIxMjJAZ21haWwuY29tIn0.0l3cyZClu480VOpkF0XM3NQcEKBXPyXPUikomEx0m1M"
             }
             "TPS_DRM" -> {
                 accessToken = "ab70caed-6168-497f-89c1-1e308da2c9aa"
                 videoId = "6suEBPy7EG4"
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
+                authToken = "7ac134707a29077369a40a5ea99c3342e51d1cf64bddef5bcee31031e0b1f346"
             }
             "TPS_NON_DRM" -> {
                 accessToken = "06d4191c-f470-476a-a0ef-58de2c9c2245"
                 videoId = "5X3sT3UXyNY"
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
+                authToken = "7ac134707a29077369a40a5ea99c3342e51d1cf64bddef5bcee31031e0b1f346"
             }
             null ->{}
         }

@@ -12,6 +12,9 @@ object TPStreamsSDK {
     val authToken: String
         get() = checkNotNull(_authToken) { "TPStreamsSDK is not initialized. You must call initialize first." }
 
+    internal val authenticationHeader: Map<String, String>
+        get() = getAuthenticationHeader()
+
     fun initialize(provider: Provider = Provider.TPStreams, orgCode: String) {
         if (orgCode.isEmpty()) {
             throw IllegalArgumentException("orgCode cannot be empty.")
@@ -30,7 +33,7 @@ object TPStreamsSDK {
     fun constructVideoInfoUrl(contentId: String?, accessToken: String?): String {
         val url = when (provider) {
             Provider.TestPress -> "https://%s.testpress.in/api/v2.5/video_info/%s/?access_token=%s"
-            Provider.TPStreams -> "https://app.tpstreams.com/api/v1/%s/assets/%s/"
+            Provider.TPStreams -> "https://app.tpstreams.com/api/v1/%s/assets/%s/?access_token=%s"
         }
         return url.format(orgCode, contentId, accessToken)
     }
@@ -38,13 +41,20 @@ object TPStreamsSDK {
     fun constructDRMLicenseUrl(contentId: String?, accessToken: String?): String {
         val url = when (provider) {
             Provider.TestPress -> "https://%s.testpress.in/api/v2.5/drm_license_key/%s/?access_token=%s"
-            Provider.TPStreams -> "https://app.tpstreams.com/api/v1/%s/assets/%s/drm_license/"
+            Provider.TPStreams -> "https://app.tpstreams.com/api/v1/%s/assets/%s/drm_license/?access_token=%s"
         }
         return url.format(orgCode, contentId, accessToken)
     }
 
     internal fun constructOfflineDRMLicenseUrl(contentId: String?, accessToken: String?): String {
         return "${constructDRMLicenseUrl(contentId, accessToken)}&drm_type=widevine&download=true"
+    }
+
+    private fun getAuthenticationHeader() : Map<String,String> {
+        return when (provider) {
+            Provider.TestPress -> mapOf("Authorization" to "JWT $authToken")
+            Provider.TPStreams -> mapOf("Authorization" to "Token $authToken")
+        }
     }
 
     enum class Provider {

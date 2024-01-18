@@ -32,6 +32,7 @@ internal class VideoDownloadRequestCreationHandler(
                 DrmConfigurationBuilder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
                     .setLicenseUri(drmLicenseURL)
+                    .setLicenseRequestHeaders(TPStreamsSDK.authenticationHeader)
                     .build()
             )
             .build()

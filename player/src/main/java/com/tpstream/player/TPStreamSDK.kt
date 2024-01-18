@@ -1,7 +1,5 @@
 package com.tpstream.player
 
-import com.tpstream.player.util.checkNotEmpty
-
 object TPStreamsSDK {
     private var provider: Provider = Provider.TPStreams
     private var _orgCode: String? = null
@@ -25,8 +23,10 @@ object TPStreamsSDK {
     }
 
     fun initialize(provider: Provider = Provider.TPStreams, orgCode: String, authToken: String) {
-        this._orgCode = checkNotEmpty(orgCode) { "orgCode cannot be empty." }
-        this._authToken = checkNotEmpty(authToken) { "authToken cannot be empty." }
+        require(orgCode.isNotEmpty()) { "orgCode cannot be empty." }
+        require(authToken.isNotEmpty()) { "authToken cannot be empty." }
+        this._orgCode = orgCode
+        this._authToken = authToken
         this.provider = provider
     }
 
@@ -46,8 +46,8 @@ object TPStreamsSDK {
         return url.format(orgCode, contentId, accessToken)
     }
 
-    internal fun constructOfflineDRMLicenseUrl(contentId: String?, accessToken: String?): String {
-        return "${constructDRMLicenseUrl(contentId, accessToken)}&drm_type=widevine&download=true"
+    internal fun constructOfflineDRMLicenseUrl(videoId: String?, accessToken: String?): String {
+        return "${constructDRMLicenseUrl(videoId, accessToken)}&drm_type=widevine&download=true"
     }
 
     private fun getAuthenticationHeader() : Map<String,String> {

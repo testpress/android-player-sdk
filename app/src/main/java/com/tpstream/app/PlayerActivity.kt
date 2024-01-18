@@ -17,11 +17,11 @@ class PlayerActivity : AppCompatActivity() {
     lateinit var playerFragment: TpStreamPlayerFragment;
     lateinit var tpStreamPlayer: TpStreamPlayer;
     private val TAG = "PlayerActivity"
+    private lateinit var authToken: String
     private lateinit var videoId :String
     private lateinit var orgCode :String
     private lateinit var provider: TPStreamsSDK.Provider
     private var parameters : TpInitParams? = null
-    private lateinit var authToken: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

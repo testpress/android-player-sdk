@@ -19,7 +19,7 @@ internal class VideoNetworkDataSource<T : Any>(val klass: Class<T>) {
     fun get(url: String, callback: TPResponse<T>? = null): T? {
         val request = Request.Builder()
             .url(URL(url))
-            .header(TPStreamsSDK.authenticationHeader.keys.first(),TPStreamsSDK.authenticationHeader.values.first())
+            .header(TPStreamsSDK.getAuthenticationHeader().keys.first(),TPStreamsSDK.getAuthenticationHeader().values.first())
             .build()
         return makeRequest(callback, request)
     }

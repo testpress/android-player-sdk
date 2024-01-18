@@ -73,34 +73,34 @@ class PlayerActivity : AppCompatActivity() {
     private fun selectVideoParams(videoType: String?){
         when(videoType){
             "TP_DRM" -> {
-                videoId = "ATJfRdHIUC9"
-                orgCode = "lmsdemo"
+                videoId = TestpressSample.DRM_VIDEO
+                orgCode = TestpressSample.ORG_CODE
                 provider = TPStreamsSDK.Provider.TestPress
-                authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6MiwidXNlcl9pZCI6MiwiaW5zdGl0dXRlIjoxMSwiaWQiOjIsImV4cCI6MTcwNTQ5NzM1NCwiZW1haWwiOiIxMjJAZ21haWwuY29tIn0.0l3cyZClu480VOpkF0XM3NQcEKBXPyXPUikomEx0m1M"
+                authToken = TestpressSample.AUTH_TOKEN
             }
             "TP_AES_Encrypt" -> {
-                videoId = "ZZb3S5OB3nY"
-                orgCode = "lmsdemo"
+                videoId = TestpressSample.AES_VIDEO
+                orgCode = TestpressSample.ORG_CODE
                 provider = TPStreamsSDK.Provider.TestPress
-                authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6MiwidXNlcl9pZCI6MiwiaW5zdGl0dXRlIjoxMSwiaWQiOjIsImV4cCI6MTcwNTQ5NzM1NCwiZW1haWwiOiIxMjJAZ21haWwuY29tIn0.0l3cyZClu480VOpkF0XM3NQcEKBXPyXPUikomEx0m1M"
+                authToken = TestpressSample.AUTH_TOKEN
             }
             "TP_NON_DRM" -> {
-                videoId = "z1TLpfuZzXh"
-                orgCode = "lmsdemo"
+                videoId = TestpressSample.NON_DRM_VIDEO
+                orgCode = TestpressSample.ORG_CODE
                 provider = TPStreamsSDK.Provider.TestPress
-                authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6MiwidXNlcl9pZCI6MiwiaW5zdGl0dXRlIjoxMSwiaWQiOjIsImV4cCI6MTcwNTQ5NzM1NCwiZW1haWwiOiIxMjJAZ21haWwuY29tIn0.0l3cyZClu480VOpkF0XM3NQcEKBXPyXPUikomEx0m1M"
+                authToken = TestpressSample.AUTH_TOKEN
             }
             "TPS_DRM" -> {
-                videoId = "6suEBPy7EG4"
-                orgCode = "6eafqn"
+                videoId = TPStreamsSample.DRM_VIDEO
+                orgCode = TPStreamsSample.ORG_CODE
                 provider = TPStreamsSDK.Provider.TPStreams
-                authToken = "7ac134707a29077369a40a5ea99c3342e51d1cf64bddef5bcee31031e0b1f346"
+                authToken = TPStreamsSample.AUTH_TOKEN
             }
             "TPS_NON_DRM" -> {
-                videoId = "5X3sT3UXyNY"
-                orgCode = "6eafqn"
+                videoId = TPStreamsSample.NON_DRM_VIDEO
+                orgCode = TPStreamsSample.ORG_CODE
                 provider = TPStreamsSDK.Provider.TPStreams
-                authToken = "7ac134707a29077369a40a5ea99c3342e51d1cf64bddef5bcee31031e0b1f346"
+                authToken = TPStreamsSample.AUTH_TOKEN
             }
             null ->{}
         }

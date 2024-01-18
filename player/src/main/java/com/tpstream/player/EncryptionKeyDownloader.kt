@@ -40,6 +40,7 @@ internal class EncryptionKeyDownloader {
      fun getEncryptionKey(params: TpInitParams): String {
         val request = Request.Builder()
             .url("https://${TPStreamsSDK.orgCode}.testpress.in/api/v2.5/encryption_key/${params.videoId}/?access_token=${params.accessToken}")
+            .header(TPStreamsSDK.getAuthenticationHeader().keys.first(),TPStreamsSDK.getAuthenticationHeader().values.first())
             .build()
         val response = OkHttpClient().newCall(request).execute()
         return response.body?.byteStream()?.readBytes()?.contentToString() ?: ""

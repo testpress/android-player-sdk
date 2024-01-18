@@ -26,6 +26,7 @@ internal class VideoPlayerInterceptor(private val context: Context, private val 
             } else {
                 request = request.newBuilder()
                     .url("https://${TPStreamsSDK.orgCode}.testpress.in/api/v2.5/encryption_key/${params?.videoId}/?access_token=${params?.accessToken}")
+                    .header(TPStreamsSDK.getAuthenticationHeader().keys.first(),TPStreamsSDK.getAuthenticationHeader().values.first())
                     .build()
             }
         }

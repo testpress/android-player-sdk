@@ -4,8 +4,6 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.tpstream.player.*
-import com.tpstream.player.TPStreamsSDK
-import com.tpstream.player.TpStreamPlayerImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,7 +30,6 @@ internal class VideoDownloadRequestCreationHandler(
                 DrmConfigurationBuilder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
                     .setLicenseUri(drmLicenseURL)
-                    .setLicenseRequestHeaders(TPStreamsSDK.authenticationHeader)
                     .build()
             )
             .build()

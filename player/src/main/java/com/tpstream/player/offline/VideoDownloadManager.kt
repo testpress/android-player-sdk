@@ -49,6 +49,7 @@ internal class VideoDownloadManager {
             .addInterceptor(VideoPlayerInterceptor(context,params))
             .build()
         httpDataSourceFactory = OkHttpDataSourceFactory(okHttpClient)
+            .setDefaultRequestProperties(TPStreamsSDK.getAuthenticationHeader())
         return httpDataSourceFactory
     }
 

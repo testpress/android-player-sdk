@@ -15,9 +15,6 @@ object TPStreamsSDK {
     private val authToken: String
         get() = checkNotNull(_authToken) { "TPStreamsSDK is not initialized. You must call initialize first." }
 
-    internal val authenticationHeader: Map<String, String>
-        get() = getAuthenticationHeader()
-
     @Deprecated("Deprecated", ReplaceWith("TPStreamsSDK.initialize(provider, orgCode, authToken)"), DeprecationLevel.ERROR)
     fun initialize(provider: Provider = Provider.TPStreams, orgCode: String) {
         if (orgCode.isEmpty()) {
@@ -56,7 +53,7 @@ object TPStreamsSDK {
         return "${constructDRMLicenseUrl(contentId, accessToken)}&drm_type=widevine&download=true"
     }
 
-    private fun getAuthenticationHeader() : Map<String,String> {
+    internal fun getAuthenticationHeader() : Map<String, String> {
         return when (provider) {
             Provider.TestPress -> mapOf("Authorization" to "JWT $authToken")
             Provider.TPStreams -> mapOf("Authorization" to "Token $authToken")

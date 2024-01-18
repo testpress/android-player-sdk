@@ -5,7 +5,12 @@ object TPStreamsSDK {
     private var _orgCode: String? = null
     private var _authToken: String? = null
     val orgCode: String
-        get() = checkNotNull(_orgCode) { "TPStreamsSDK is not initialized. You must call initialize first." }
+        get() {
+            if (_orgCode == null) {
+                throw IllegalStateException("TPStreamsSDK is not initialized. You must call initialize first.")
+            }
+            return _orgCode!!
+        }
 
     val authToken: String
         get() = checkNotNull(_authToken) { "TPStreamsSDK is not initialized. You must call initialize first." }
@@ -46,8 +51,8 @@ object TPStreamsSDK {
         return url.format(orgCode, contentId, accessToken)
     }
 
-    internal fun constructOfflineDRMLicenseUrl(videoId: String?, accessToken: String?): String {
-        return "${constructDRMLicenseUrl(videoId, accessToken)}&drm_type=widevine&download=true"
+    internal fun constructOfflineDRMLicenseUrl(contentId: String?, accessToken: String?): String {
+        return "${constructDRMLicenseUrl(contentId, accessToken)}&drm_type=widevine&download=true"
     }
 
     private fun getAuthenticationHeader() : Map<String,String> {

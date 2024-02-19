@@ -35,7 +35,7 @@ internal class VideoRepository(context: Context) {
     }
 
     suspend fun delete(video: Video){
-        videoDao.delete(video.videoId)
+        videoDao.delete(video.id)
     }
 
     suspend fun deleteAll(){
@@ -76,7 +76,7 @@ internal class VideoRepository(context: Context) {
         NetworkClient<NetworkAsset>().get(url, object : NetworkClient.TPResponse<NetworkAsset> {
             override fun onSuccess(result: NetworkAsset) {
                 val video = result.asDomainVideo()
-                video.videoId = params.videoId!!
+                video.id = params.videoId!!
                 callback.onSuccess(video)
             }
 

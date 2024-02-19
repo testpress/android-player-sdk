@@ -70,13 +70,13 @@ class VideoDaoTest {
     @Throws(Exception::class)
     fun testDelete() = runBlocking {
         insertData()
-        val video4 = Video(id = 4L, videoId = "VideoID_4")
+        val video4 = Video(id = "VideoID_4")
         videoDao.insert(video4.asLocalVideo())
         // Check data added
         val beforeResult = videoDao.getAllVideo()
         assertThat(beforeResult?.size, equalTo(4))
         // Delete one data
-        videoDao.delete(video4.videoId)
+        videoDao.delete(video4.id)
         // Check deleted
         val afterResult = videoDao.getAllVideo()
         assertThat(afterResult?.size, equalTo(3))
@@ -93,8 +93,7 @@ class VideoDaoTest {
             val liveData = Transformations.map(videoDao.getVideoById("VideoID_1")) { it?.asDomainVideo() }
             val observer = Observer<Video?> { result ->
                 assertNotNull(result)
-                assertEquals(1L, result.id)
-                assertEquals("VideoID_1", result.videoId)
+                assertEquals("VideoID_1", result.id)
             }
             liveData.observeForever(observer)
             // Cleanup
@@ -111,7 +110,7 @@ class VideoDaoTest {
             val observer = Observer<List<Video>?> { result ->
                 assertNotNull(result)
                 assertEquals(3, result.size)
-                assertEquals("VideoID_1", result[0].videoId)
+                assertEquals("VideoID_1", result[0].id)
             }
             liveData.observeForever(observer)
             // Cleanup
@@ -120,9 +119,9 @@ class VideoDaoTest {
     }
 
     private fun insertData() = runBlocking {
-        val video1 = Video(id = 1L, videoId = "VideoID_1", url = "url_1")
-        val video2 = Video(id = 2L, videoId = "VideoID_2", url = "url_2")
-        val video3 = Video(id = 3L, videoId = "VideoID_3", url = "url_3")
+        val video1 = Video(id = "VideoID_1", url = "url_1")
+        val video2 = Video(id = "VideoID_2", url = "url_2")
+        val video3 = Video(id = "VideoID_3", url = "url_3")
         // Add data to db
         videoDao.insert(video1.asLocalVideo())
         videoDao.insert(video2.asLocalVideo())

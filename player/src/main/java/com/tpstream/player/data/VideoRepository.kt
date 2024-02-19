@@ -3,16 +3,13 @@ package com.tpstream.player.data
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.tpstream.player.BuildConfig
 import com.tpstream.player.TPException
 import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.data.source.local.TPStreamsDatabase
 import com.tpstream.player.data.source.network.NetworkVideo
 import com.tpstream.player.data.source.network.VideoNetworkDataSource
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 internal class VideoRepository(context: Context) {

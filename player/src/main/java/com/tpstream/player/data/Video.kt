@@ -21,7 +21,6 @@ data class Video(
     var videoWidth: Int = 0,
     var videoHeight: Int = 0
 ) {
-    internal val isNotDownloaded get() = this.downloadState != DownloadStatus.COMPLETE
 
     fun getLocalThumbnail(context: Context): Bitmap?{
         return ImageSaver(context).load(videoId)

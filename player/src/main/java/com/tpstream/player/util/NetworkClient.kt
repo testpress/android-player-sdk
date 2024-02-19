@@ -1,4 +1,4 @@
-package com.tpstream.player.data.source.network
+package com.tpstream.player.util
 
 import com.google.gson.Gson
 import com.google.gson.JsonParseException

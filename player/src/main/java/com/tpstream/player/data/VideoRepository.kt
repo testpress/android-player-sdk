@@ -8,7 +8,7 @@ import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.data.source.local.TPStreamsDatabase
 import com.tpstream.player.data.source.network.NetworkAsset
-import com.tpstream.player.data.source.network.NetworkClient
+import com.tpstream.player.util.NetworkClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 

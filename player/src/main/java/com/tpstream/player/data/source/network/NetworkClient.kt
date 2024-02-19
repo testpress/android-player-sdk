@@ -7,9 +7,9 @@ import okhttp3.*
 import java.io.IOException
 import java.net.URL
 
-internal class Network<T : Any>(val klass: Class<T>) {
+internal class NetworkClient<T : Any>(val klass: Class<T>) {
     companion object {
-        inline operator fun <reified T : Any>invoke() = Network(T::class.java)
+        inline operator fun <reified T : Any>invoke() = NetworkClient(T::class.java)
     }
 
     private var client: OkHttpClient = OkHttpClient();

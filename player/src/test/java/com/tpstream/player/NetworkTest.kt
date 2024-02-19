@@ -2,7 +2,7 @@ package com.tpstream.player
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.tpstream.player.data.source.network.NetworkAsset
-import com.tpstream.player.data.source.network.VideoNetworkDataSource
+import com.tpstream.player.data.source.network.Network
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -19,9 +19,9 @@ class NetworkTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var mockWebServer: MockWebServer
-    private val network: VideoNetworkDataSource<NetworkAsset> = VideoNetworkDataSource(NetworkAsset::class.java)
+    private val network: Network<NetworkAsset> = Network(NetworkAsset::class.java)
 
-    private lateinit var callbackResponse: VideoNetworkDataSource.TPResponse<NetworkAsset>
+    private lateinit var callbackResponse: Network.TPResponse<NetworkAsset>
     private var callbackResult: NetworkAsset? = null
     private lateinit var callbackException: TPException
 
@@ -29,7 +29,7 @@ class NetworkTest {
     fun createService() {
         mockWebServer = MockWebServer()
         runBlocking {
-            callbackResponse = object : VideoNetworkDataSource.TPResponse<NetworkAsset> {
+            callbackResponse = object : Network.TPResponse<NetworkAsset> {
                 override fun onSuccess(result: NetworkAsset) {
                     callbackResult = result
                 }

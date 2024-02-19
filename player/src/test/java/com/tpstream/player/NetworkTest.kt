@@ -1,7 +1,7 @@
 package com.tpstream.player
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.tpstream.player.data.source.network.NetworkVideo
+import com.tpstream.player.data.source.network.NetworkAsset
 import com.tpstream.player.data.source.network.VideoNetworkDataSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -19,18 +19,18 @@ class NetworkTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var mockWebServer: MockWebServer
-    private val network: VideoNetworkDataSource<NetworkVideo> = VideoNetworkDataSource(NetworkVideo::class.java)
+    private val network: VideoNetworkDataSource<NetworkAsset> = VideoNetworkDataSource(NetworkAsset::class.java)
 
-    private lateinit var callbackResponse: VideoNetworkDataSource.TPResponse<NetworkVideo>
-    private var callbackResult: NetworkVideo? = null
+    private lateinit var callbackResponse: VideoNetworkDataSource.TPResponse<NetworkAsset>
+    private var callbackResult: NetworkAsset? = null
     private lateinit var callbackException: TPException
 
     @Before
     fun createService() {
         mockWebServer = MockWebServer()
         runBlocking {
-            callbackResponse = object : VideoNetworkDataSource.TPResponse<NetworkVideo> {
-                override fun onSuccess(result: NetworkVideo) {
+            callbackResponse = object : VideoNetworkDataSource.TPResponse<NetworkAsset> {
+                override fun onSuccess(result: NetworkAsset) {
                     callbackResult = result
                 }
 
@@ -67,7 +67,7 @@ class NetworkTest {
         mockWebServer.takeRequest()
         assertEquals(response?.title, "BigBuckBunny.mp4")
         assertEquals(
-            response?.networkVideoContent?.dash_url,
+            response?.networkVideo?.dash_url,
             "https://d3cydmgt9q030i.cloudfront.net/transcoded/73633fa3-61c6-443c-b625-ac4e85b28cfc/video.mpd"
         )
     }

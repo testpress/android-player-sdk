@@ -133,7 +133,7 @@ class DownloadListActivity : AppCompatActivity() {
             val intent = Intent(this@DownloadListActivity, PlayerActivity::class.java)
             intent.putExtra(
                 TP_OFFLINE_PARAMS,
-                TpInitParams.createOfflineParams(video.videoId)
+                TpInitParams.createOfflineParams(video.id)
             )
             startActivity(intent)
         }
@@ -152,7 +152,7 @@ class DownloadListActivity : AppCompatActivity() {
             override fun areContentsTheSame(
                 oldItem: Video,
                 newItem: Video
-            ): Boolean = oldItem.videoId == newItem.videoId
+            ): Boolean = oldItem.id == newItem.id
         }
     }
 }

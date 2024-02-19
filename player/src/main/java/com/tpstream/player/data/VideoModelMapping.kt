@@ -6,8 +6,7 @@ import com.tpstream.player.data.source.network.NetworkAsset
 // LocalVideo to Video
 internal fun LocalVideo.asDomainVideo(): Video {
     return Video(
-        id = this.id,
-        videoId = this.videoId,
+        id = this.videoId,
         title = this.title,
         thumbnail = this.thumbnail,
         url = this.url,
@@ -36,7 +35,7 @@ internal fun NetworkAsset.asDomainVideo(): Video {
         dashUrl ?: url ?: ""
     }
     return Video(
-        videoId = this.id ?: "",
+        id = this.id ?: "",
         title = this.title ?: "",
         thumbnail = thumbnailUrl,
         url = url,
@@ -49,7 +48,7 @@ internal fun NetworkAsset.asDomainVideo(): Video {
 //Video to LocalVideo
 internal fun Video.asLocalVideo(): LocalVideo {
     return LocalVideo(
-        videoId = this.videoId,
+        videoId = this.id,
         title = this.title,
         thumbnail = this.thumbnail,
         url = this.url,

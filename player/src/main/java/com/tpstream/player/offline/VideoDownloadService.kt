@@ -72,7 +72,7 @@ internal class VideoDownloadService: DownloadService(
         var videoId : String?
 
         runBlocking(Dispatchers.IO) {
-            videoId = videoRepository.getVideoByUrl(download.request.uri.toString())?.videoId
+            videoId = videoRepository.getVideoByUrl(download.request.uri.toString())?.id
         }
 
         when (download.state) {

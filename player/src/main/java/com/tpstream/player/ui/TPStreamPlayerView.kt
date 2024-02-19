@@ -109,10 +109,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 downloadResolutionSelectionSheet.show((context as FragmentActivity).supportFragmentManager, "DownloadSelectionSheet")
                 downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, video ->
                     DownloadTask(context).start(downloadRequest)
-                    video?.videoId = player.params.videoId!!
+                    video?.id = player.params.videoId!!
                     ImageSaver(context).save(
                         video?.thumbnail!!,
-                        video.videoId
+                        video.id
                     )
                     videoViewModel.insert(video)
                 }
@@ -232,7 +232,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun updateDownloadButtonImage(){
-        videoViewModel.get(player.video?.videoId!!).observe(context as FragmentActivity) { video ->
+        videoViewModel.get(player.video?.id!!).observe(context as FragmentActivity) { video ->
             downloadState = when (video?.downloadState) {
                 DownloadStatus.DOWNLOADING ->{
                     downloadButton?.setImageResource(R.drawable.ic_baseline_downloading_24)

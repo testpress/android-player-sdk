@@ -6,8 +6,7 @@ import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.data.source.local.DownloadStatus
 
 data class Video(
-    internal var id:Long? = null,
-    var videoId: String = "",
+    var id: String = "",
     var title: String = "",
     var thumbnail: String = "",
     internal var url: String = "",
@@ -23,7 +22,7 @@ data class Video(
 ) {
 
     fun getLocalThumbnail(context: Context): Bitmap?{
-        return ImageSaver(context).load(videoId)
+        return ImageSaver(context).load(id)
     }
 
 }

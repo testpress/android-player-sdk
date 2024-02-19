@@ -6,7 +6,7 @@ import android.os.Looper
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.VideoRepository
-import com.tpstream.player.data.source.network.VideoNetworkDataSource
+import com.tpstream.player.util.NetworkClient
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
@@ -77,7 +77,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     override fun load(parameters: TpInitParams) {
         params = parameters
         exoPlayer.playWhenReady = parameters.autoPlay?:true
-        videoRepository.getVideo(parameters, object : VideoNetworkDataSource.TPResponse<Video> {
+        videoRepository.getVideo(parameters, object : NetworkClient.TPResponse<Video> {
             override fun onSuccess(result: Video) {
                 video = result
                 playVideoInUIThread(result.url, parameters.startPositionInMilliSecs)

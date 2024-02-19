@@ -8,7 +8,7 @@ import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.data.source.local.TPStreamsDatabase
 import com.tpstream.player.data.source.network.NetworkAsset
-import com.tpstream.player.data.source.network.VideoNetworkDataSource
+import com.tpstream.player.util.NetworkClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -50,7 +50,7 @@ internal class VideoRepository(context: Context) {
 
     fun getVideo(
         params: TpInitParams,
-        callback : VideoNetworkDataSource.TPResponse<Video>
+        callback : NetworkClient.TPResponse<Video>
     ){
         val video = getVideoFromDB(params)
         if (video != null) {
@@ -70,10 +70,10 @@ internal class VideoRepository(context: Context) {
 
     private fun fetchVideo(
         params: TpInitParams,
-        callback : VideoNetworkDataSource.TPResponse<Video>
+        callback : NetworkClient.TPResponse<Video>
     ) {
         val url = TPStreamsSDK.constructVideoInfoUrl(params.videoId, params.accessToken)
-        VideoNetworkDataSource<NetworkAsset>().get(url, object : VideoNetworkDataSource.TPResponse<NetworkAsset> {
+        NetworkClient<NetworkAsset>().get(url, object : NetworkClient.TPResponse<NetworkAsset> {
             override fun onSuccess(result: NetworkAsset) {
                 val video = result.asDomainVideo()
                 video.videoId = params.videoId!!

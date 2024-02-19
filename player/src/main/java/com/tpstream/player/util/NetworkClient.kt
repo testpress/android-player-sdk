@@ -1,4 +1,4 @@
-package com.tpstream.player.data.source.network
+package com.tpstream.player.util
 
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
@@ -7,9 +7,9 @@ import okhttp3.*
 import java.io.IOException
 import java.net.URL
 
-internal class VideoNetworkDataSource<T : Any>(val klass: Class<T>) {
+internal class NetworkClient<T : Any>(val klass: Class<T>) {
     companion object {
-        inline operator fun <reified T : Any>invoke() = VideoNetworkDataSource(T::class.java)
+        inline operator fun <reified T : Any>invoke() = NetworkClient(T::class.java)
     }
 
     private var client: OkHttpClient = OkHttpClient();

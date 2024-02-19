@@ -2,7 +2,7 @@ package com.tpstream.player
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.tpstream.player.data.source.network.NetworkAsset
-import com.tpstream.player.data.source.network.VideoNetworkDataSource
+import com.tpstream.player.util.NetworkClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -19,9 +19,9 @@ class NetworkTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var mockWebServer: MockWebServer
-    private val network: VideoNetworkDataSource<NetworkAsset> = VideoNetworkDataSource(NetworkAsset::class.java)
+    private val networkClient: NetworkClient<NetworkAsset> = NetworkClient(NetworkAsset::class.java)
 
-    private lateinit var callbackResponse: VideoNetworkDataSource.TPResponse<NetworkAsset>
+    private lateinit var callbackResponse: NetworkClient.TPResponse<NetworkAsset>
     private var callbackResult: NetworkAsset? = null
     private lateinit var callbackException: TPException
 
@@ -29,7 +29,7 @@ class NetworkTest {
     fun createService() {
         mockWebServer = MockWebServer()
         runBlocking {
-            callbackResponse = object : VideoNetworkDataSource.TPResponse<NetworkAsset> {
+            callbackResponse = object : NetworkClient.TPResponse<NetworkAsset> {
                 override fun onSuccess(result: NetworkAsset) {
                     callbackResult = result
                 }
@@ -50,7 +50,7 @@ class NetworkTest {
     fun testTestpressVideoGetSyncRequest() {
         val successResponse = MockResponse().setResponseCode(200).setBody(getTestpressVideoJSON())
         mockWebServer.enqueue(successResponse)
-        val response = network.get(mockWebServer.url("/").toString())
+        val response = networkClient.get(mockWebServer.url("/").toString())
         mockWebServer.takeRequest()
         assertEquals(response?.title, "No Encrypt")
         assertEquals(
@@ -63,7 +63,7 @@ class NetworkTest {
     fun testTpStreamsVideoGetSyncRequest() {
         val successResponse = MockResponse().setResponseCode(200).setBody(getTpStreamsVideoJSON())
         mockWebServer.enqueue(successResponse)
-        val response = network.get(mockWebServer.url("/").toString())
+        val response = networkClient.get(mockWebServer.url("/").toString())
         mockWebServer.takeRequest()
         assertEquals(response?.title, "BigBuckBunny.mp4")
         assertEquals(
@@ -77,7 +77,7 @@ class NetworkTest {
         val errorResponse = MockResponse().setResponseCode(400)
         mockWebServer.enqueue(errorResponse)
         try {
-            network.get(mockWebServer.url("/").toString())
+            networkClient.get(mockWebServer.url("/").toString())
             mockWebServer.takeRequest()
         } catch (exception: TPException) {
             assertEquals(exception.response?.code, 400)
@@ -89,7 +89,7 @@ class NetworkTest {
         val successResponse = MockResponse().setResponseCode(200).setBody(getTestpressVideoJSON())
         mockWebServer.enqueue(successResponse)
         runBlocking {
-            network.get(mockWebServer.url("/").toString(), callbackResponse)
+            networkClient.get(mockWebServer.url("/").toString(), callbackResponse)
             mockWebServer.takeRequest()
             delay(50)
         }
@@ -102,7 +102,7 @@ class NetworkTest {
         val successResponse = MockResponse().setResponseCode(200).setBody(getTpStreamsVideoJSON())
         mockWebServer.enqueue(successResponse)
         runBlocking {
-            network.get(mockWebServer.url("/").toString(), callbackResponse)
+            networkClient.get(mockWebServer.url("/").toString(), callbackResponse)
             mockWebServer.takeRequest()
             delay(50)
         }
@@ -115,7 +115,7 @@ class NetworkTest {
         val errorResponse = MockResponse().setResponseCode(400)
         mockWebServer.enqueue(errorResponse)
         runBlocking {
-            network.get(mockWebServer.url("/").toString(), callbackResponse)
+            networkClient.get(mockWebServer.url("/").toString(), callbackResponse)
             mockWebServer.takeRequest()
             delay(50)
         }
@@ -127,7 +127,7 @@ class NetworkTest {
         val successResponse = MockResponse().setResponseCode(200).setBody(getInvalidResponse())
         mockWebServer.enqueue(successResponse)
         runBlocking {
-            network.get(mockWebServer.url("/").toString(), callbackResponse)
+            networkClient.get(mockWebServer.url("/").toString(), callbackResponse)
             mockWebServer.takeRequest()
             delay(50)
         }

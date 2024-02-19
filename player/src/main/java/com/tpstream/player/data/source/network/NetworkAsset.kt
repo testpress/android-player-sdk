@@ -2,7 +2,7 @@ package com.tpstream.player.data.source.network
 
 import com.google.gson.annotations.SerializedName
 
-internal data class NetworkVideo(
+internal data class NetworkAsset(
     val title: String?,
     val thumbnail: String?,
 
@@ -27,10 +27,10 @@ internal data class NetworkVideo(
     val bytes: Long?,
     val type: String?,
     @SerializedName("video")
-    val networkVideoContent: NetworkVideoContent?
+    val networkVideo: NetworkVideo?
 ) {
 
-    inner class NetworkVideoContent(
+    inner class NetworkVideo(
         val progress: Int?,
         val thumbnails: Array<String>?,
         val status: String?,

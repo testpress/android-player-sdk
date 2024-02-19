@@ -7,7 +7,7 @@ import com.tpstream.player.TPException
 import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.data.source.local.TPStreamsDatabase
-import com.tpstream.player.data.source.network.NetworkVideo
+import com.tpstream.player.data.source.network.NetworkAsset
 import com.tpstream.player.data.source.network.VideoNetworkDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -73,8 +73,8 @@ internal class VideoRepository(context: Context) {
         callback : VideoNetworkDataSource.TPResponse<Video>
     ) {
         val url = TPStreamsSDK.constructVideoInfoUrl(params.videoId, params.accessToken)
-        VideoNetworkDataSource<NetworkVideo>().get(url, object : VideoNetworkDataSource.TPResponse<NetworkVideo> {
-            override fun onSuccess(result: NetworkVideo) {
+        VideoNetworkDataSource<NetworkAsset>().get(url, object : VideoNetworkDataSource.TPResponse<NetworkAsset> {
+            override fun onSuccess(result: NetworkAsset) {
                 val video = result.asDomainVideo()
                 video.videoId = params.videoId!!
                 callback.onSuccess(video)

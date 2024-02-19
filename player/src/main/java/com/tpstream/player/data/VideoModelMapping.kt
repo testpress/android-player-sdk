@@ -1,7 +1,7 @@
 package com.tpstream.player.data
 
 import com.tpstream.player.data.source.local.LocalVideo
-import com.tpstream.player.data.source.network.NetworkVideo
+import com.tpstream.player.data.source.network.NetworkAsset
 
 // LocalVideo to Video
 internal fun LocalVideo.asDomainVideo(): Video {
@@ -26,12 +26,12 @@ internal fun LocalVideo.asDomainVideo(): Video {
 internal fun List<LocalVideo>.asDomainVideos() = map(LocalVideo::asDomainVideo)
 
 //NetworkVideo to Video
-internal fun NetworkVideo.asDomainVideo(): Video {
-    val thumbnailUrl = if (networkVideoContent != null) networkVideoContent.preview_thumbnail_url
+internal fun NetworkAsset.asDomainVideo(): Video {
+    val thumbnailUrl = if (networkVideo != null) networkVideo.preview_thumbnail_url
         ?: "" else thumbnail ?: ""
-    val url = if (networkVideoContent != null) {
-        if (networkVideoContent.enable_drm == true) networkVideoContent.dash_url
-            ?: "" else networkVideoContent.playback_url ?: ""
+    val url = if (networkVideo != null) {
+        if (networkVideo.enable_drm == true) networkVideo.dash_url
+            ?: "" else networkVideo.playback_url ?: ""
     } else {
         dashUrl ?: url ?: ""
     }

@@ -75,9 +75,9 @@ internal class VideoRepository(context: Context) {
         val url = TPStreamsSDK.constructVideoInfoUrl(params.videoId, params.accessToken)
         NetworkClient<NetworkAsset>().get(url, object : NetworkClient.TPResponse<NetworkAsset> {
             override fun onSuccess(result: NetworkAsset) {
-                val video = result.asDomainAsset()
-                video.id = params.videoId!!
-                callback.onSuccess(video)
+                val asset = result.asDomainAsset()
+                asset.id = params.videoId!!
+                callback.onSuccess(asset)
             }
 
             override fun onFailure(exception: TPException) {

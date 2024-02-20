@@ -6,9 +6,10 @@ import androidx.lifecycle.Transformations
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.tpstream.player.data.Asset
 import com.tpstream.player.data.Video
-import com.tpstream.player.data.asDomainVideo
-import com.tpstream.player.data.asDomainVideos
+import com.tpstream.player.data.asDomainAsset
+import com.tpstream.player.data.asDomainAssets
 import com.tpstream.player.data.asLocalVideo
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
@@ -70,13 +71,13 @@ class VideoDaoTest {
     @Throws(Exception::class)
     fun testDelete() = runBlocking {
         insertData()
-        val video4 = Video(id = "VideoID_4")
-        videoDao.insert(video4.asLocalVideo())
+        val asset4 = Asset(id = "VideoID_4")
+        videoDao.insert(asset4.asLocalVideo())
         // Check data added
         val beforeResult = videoDao.getAllVideo()
         assertThat(beforeResult?.size, equalTo(4))
         // Delete one data
-        videoDao.delete(video4.id)
+        videoDao.delete(asset4.id)
         // Check deleted
         val afterResult = videoDao.getAllVideo()
         assertThat(afterResult?.size, equalTo(3))
@@ -90,8 +91,8 @@ class VideoDaoTest {
     fun testGetOfflineVideoInfoById() {
         insertData()
         CoroutineScope(Dispatchers.Main).launch {
-            val liveData = Transformations.map(videoDao.getVideoById("VideoID_1")) { it?.asDomainVideo() }
-            val observer = Observer<Video?> { result ->
+            val liveData = Transformations.map(videoDao.getVideoById("VideoID_1")) { it?.asDomainAsset() }
+            val observer = Observer<Asset?> { result ->
                 assertNotNull(result)
                 assertEquals("VideoID_1", result.id)
             }
@@ -106,8 +107,8 @@ class VideoDaoTest {
     fun testGetAllDownloadInLiveData() {
         insertData()
         CoroutineScope(Dispatchers.Main).launch {
-            val liveData = Transformations.map(videoDao.getAllDownloadInLiveData()) { it?.asDomainVideos() }
-            val observer = Observer<List<Video>?> { result ->
+            val liveData = Transformations.map(videoDao.getAllDownloadInLiveData()) { it?.asDomainAssets() }
+            val observer = Observer<List<Asset>?> { result ->
                 assertNotNull(result)
                 assertEquals(3, result.size)
                 assertEquals("VideoID_1", result[0].id)
@@ -119,13 +120,13 @@ class VideoDaoTest {
     }
 
     private fun insertData() = runBlocking {
-        val video1 = Video(id = "VideoID_1", url = "url_1")
-        val video2 = Video(id = "VideoID_2", url = "url_2")
-        val video3 = Video(id = "VideoID_3", url = "url_3")
+        val asset1 = Asset(id = "VideoID_1", video = Video(url = "url_1"))
+        val asset2 = Asset(id = "VideoID_2", video = Video(url = "url_1"))
+        val asset3 = Asset(id = "VideoID_3", video = Video(url = "url_1"))
         // Add data to db
-        videoDao.insert(video1.asLocalVideo())
-        videoDao.insert(video2.asLocalVideo())
-        videoDao.insert(video3.asLocalVideo())
+        videoDao.insert(asset1.asLocalVideo())
+        videoDao.insert(asset2.asLocalVideo())
+        videoDao.insert(asset3.asLocalVideo())
     }
 
 }

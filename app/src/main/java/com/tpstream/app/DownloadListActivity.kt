@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tpstream.app.databinding.ActivityDownloadListBinding
 import com.tpstream.app.databinding.DownloadItemBinding
 import com.tpstream.player.TpInitParams
-import com.tpstream.player.data.Video
+import com.tpstream.player.data.Asset
 import com.tpstream.player.data.source.local.DownloadStatus
 
 class DownloadListActivity : AppCompatActivity() {
@@ -47,8 +47,8 @@ class DownloadListActivity : AppCompatActivity() {
     }
 
     inner class DownloadListAdapter(
-        private val data: List<Video>
-    ) : ListAdapter<Video, DownloadListAdapter.DownloadListViewHolder>(
+        private val data: List<Asset>
+    ) : ListAdapter<Asset, DownloadListAdapter.DownloadListViewHolder>(
         DOWNLOAD_COMPARATOR
     ) {
 
@@ -61,13 +61,13 @@ class DownloadListActivity : AppCompatActivity() {
             val resumeButton: Button = binding.resumeButton
             val thumbnail: ImageView = binding.thumbnail
 
-            fun bind(video: Video) {
-                binding.title.text = video.title
-                thumbnail.setImageBitmap(video.getLocalThumbnail(applicationContext))
-                binding.downloadImage.setImageResource(getDownloadImage(video.downloadState))
-                binding.duration.text = video.duration
-                binding.percentage.text = "${video.percentageDownloaded} %"
-                showOrHideButtons(video.downloadState)
+            fun bind(asset: Asset) {
+                binding.title.text = asset.title
+                thumbnail.setImageBitmap(asset.getLocalThumbnail(applicationContext))
+                binding.downloadImage.setImageResource(getDownloadImage(asset.video.downloadState))
+                binding.duration.text = asset.video.duration
+                binding.percentage.text = "${asset.video.percentageDownloaded} %"
+                showOrHideButtons(asset.video.downloadState)
             }
 
             private fun getDownloadImage(videoState: DownloadStatus?): Int {
@@ -114,26 +114,26 @@ class DownloadListActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: DownloadListViewHolder, position: Int) {
-            val video = data[position]
-            holder.bind(video)
-            holder.deleteButton.setOnClickListener { downloadListViewModel.deleteDownload(video) }
-            holder.cancelButton.setOnClickListener { downloadListViewModel.cancelDownload(video) }
-            holder.pauseButton.setOnClickListener { downloadListViewModel.pauseDownload(video) }
-            holder.resumeButton.setOnClickListener { downloadListViewModel.resumeDownload(video) }
+            val asset = data[position]
+            holder.bind(asset)
+            holder.deleteButton.setOnClickListener { downloadListViewModel.deleteDownload(asset) }
+            holder.cancelButton.setOnClickListener { downloadListViewModel.cancelDownload(asset) }
+            holder.pauseButton.setOnClickListener { downloadListViewModel.pauseDownload(asset) }
+            holder.resumeButton.setOnClickListener { downloadListViewModel.resumeDownload(asset) }
             holder.thumbnail.setOnClickListener {
-                if (video.downloadState == DownloadStatus.COMPLETE) {
-                    playVideo(video)
+                if (asset.video.downloadState == DownloadStatus.COMPLETE) {
+                    playVideo(asset)
                 } else {
                     Toast.makeText(applicationContext, "Downloading", Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
-        private fun playVideo(video: Video) {
+        private fun playVideo(asset: Asset) {
             val intent = Intent(this@DownloadListActivity, PlayerActivity::class.java)
             intent.putExtra(
                 TP_OFFLINE_PARAMS,
-                TpInitParams.createOfflineParams(video.id)
+                TpInitParams.createOfflineParams(asset.id)
             )
             startActivity(intent)
         }
@@ -143,15 +143,15 @@ class DownloadListActivity : AppCompatActivity() {
 
     companion object {
 
-        private val DOWNLOAD_COMPARATOR = object : DiffUtil.ItemCallback<Video>() {
+        private val DOWNLOAD_COMPARATOR = object : DiffUtil.ItemCallback<Asset>() {
             override fun areItemsTheSame(
-                oldItem: Video,
-                newItem: Video
+                oldItem: Asset,
+                newItem: Asset
             ): Boolean = oldItem == newItem
 
             override fun areContentsTheSame(
-                oldItem: Video,
-                newItem: Video
+                oldItem: Asset,
+                newItem: Asset
             ): Boolean = oldItem.id == newItem.id
         }
     }

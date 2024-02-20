@@ -3,7 +3,7 @@ package com.tpstream.player.offline
 
 import android.content.Context
 import com.tpstream.player.*
-import com.tpstream.player.data.Video
+import com.tpstream.player.data.Asset
 
 internal class DownloadTask (val context: Context) {
 
@@ -19,8 +19,8 @@ internal class DownloadTask (val context: Context) {
         )
     }
 
-    fun pause(video: Video) {
-        val download = downloadIndex.getDownload(video.url)
+    fun pause(asset: Asset) {
+        val download = downloadIndex.getDownload(asset.video.url)
         val STOP_REASON_PAUSED = 1
         download?.let {
             DownloadService.sendSetStopReason(
@@ -33,8 +33,8 @@ internal class DownloadTask (val context: Context) {
         }
     }
 
-    fun resume(video: Video) {
-        val download = downloadIndex.getDownload(video.url)
+    fun resume(asset: Asset) {
+        val download = downloadIndex.getDownload(asset.video.url)
         download?.let {
             DownloadService.sendSetStopReason(
                 context,
@@ -46,8 +46,8 @@ internal class DownloadTask (val context: Context) {
         }
     }
 
-    fun delete(video: Video) {
-        val download = downloadIndex.getDownload(video.url)
+    fun delete(asset: Asset) {
+        val download = downloadIndex.getDownload(asset.video.url)
         download?.let {
             DownloadService.sendRemoveDownload(
                 context,

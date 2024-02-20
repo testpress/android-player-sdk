@@ -118,13 +118,13 @@ internal class VideoDownloadService: DownloadService(
 
     private fun updateDownloadStatus(download:Download){
         CoroutineScope(Dispatchers.IO).launch{
-            val video = videoRepository.getVideoByUrl(download.request.uri.toString())
-            video?.let {
-                video.percentageDownloaded = download.percentDownloaded.toInt()
-                video.bytesDownloaded = download.bytesDownloaded
-                video.totalSize = download.contentLength
-                video.downloadState = getVideoState(download.state)
-                videoRepository.update(video)
+            val asset = videoRepository.getVideoByUrl(download.request.uri.toString())
+            asset?.let {
+                asset.video.percentageDownloaded = download.percentDownloaded.toInt()
+                asset.video.bytesDownloaded = download.bytesDownloaded
+                asset.video.totalSize = download.contentLength
+                asset.video.downloadState = getVideoState(download.state)
+                videoRepository.update(asset)
             }
         }
     }

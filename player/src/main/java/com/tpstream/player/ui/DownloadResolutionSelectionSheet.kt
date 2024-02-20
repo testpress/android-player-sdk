@@ -16,12 +16,12 @@ import com.google.common.collect.ImmutableList
 import com.tpstream.player.*
 import com.tpstream.player.R
 import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
-import com.tpstream.player.data.Video
+import com.tpstream.player.data.Asset
 import com.tpstream.player.offline.VideoDownloadRequestCreationHandler
 import okio.IOException
 import kotlin.math.roundToInt
 
-internal typealias OnSubmitListener = (DownloadRequest,Video?) -> Unit
+internal typealias OnSubmitListener = (DownloadRequest, Asset?) -> Unit
 
 internal class DownloadResolutionSelectionSheet(
     val player: TpStreamPlayerImpl,
@@ -30,7 +30,7 @@ internal class DownloadResolutionSelectionSheet(
 
     private var _binding: TpDownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
-    private val video = player.video
+    private val asset = player.asset
     private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
     var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
         parameters.overrides.toMutableMap()
@@ -113,7 +113,7 @@ internal class DownloadResolutionSelectionSheet(
             if (isResolutionSelected){
                 val downloadRequest =
                     videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
-                onSubmitListener?.invoke(downloadRequest,video)
+                onSubmitListener?.invoke(downloadRequest,asset)
                 Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
                 dismiss()
             } else {

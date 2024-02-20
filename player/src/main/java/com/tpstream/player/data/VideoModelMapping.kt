@@ -4,28 +4,30 @@ import com.tpstream.player.data.source.local.LocalVideo
 import com.tpstream.player.data.source.network.NetworkAsset
 
 // LocalVideo to Video
-internal fun LocalVideo.asDomainVideo(): Video {
-    return Video(
+internal fun LocalVideo.asDomainAsset(): Asset {
+    return Asset(
         id = this.videoId,
         title = this.title,
-        thumbnail = this.thumbnail,
-        url = this.url,
-        duration = this.duration,
         description = this.description,
-        transcodingStatus = this.transcodingStatus,
-        percentageDownloaded = this.percentageDownloaded,
-        bytesDownloaded = this.bytesDownloaded,
-        totalSize = this.totalSize,
-        downloadState = this.downloadState,
-        videoWidth = this.videoWidth,
-        videoHeight = this.videoHeight
+        thumbnail = this.thumbnail,
+        video = Video(
+            url = this.url,
+            duration = this.duration,
+            transcodingStatus = this.transcodingStatus,
+            percentageDownloaded = this.percentageDownloaded,
+            bytesDownloaded = this.bytesDownloaded,
+            totalSize = this.totalSize,
+            downloadState = this.downloadState,
+            width = this.videoWidth,
+            height = this.videoHeight,
+        )
     )
 }
 
-internal fun List<LocalVideo>.asDomainVideos() = map(LocalVideo::asDomainVideo)
+internal fun List<LocalVideo>.asDomainAssets() = map(LocalVideo::asDomainAsset)
 
 //NetworkVideo to Video
-internal fun NetworkAsset.asDomainVideo(): Video {
+internal fun NetworkAsset.asDomainAsset(): Asset {
     val thumbnailUrl = if (networkVideo != null) networkVideo.preview_thumbnail_url
         ?: "" else thumbnail ?: ""
     val url = if (networkVideo != null) {
@@ -34,32 +36,34 @@ internal fun NetworkAsset.asDomainVideo(): Video {
     } else {
         dashUrl ?: url ?: ""
     }
-    return Video(
+    return Asset(
         id = this.id ?: "",
         title = this.title ?: "",
         thumbnail = thumbnailUrl,
-        url = url,
-        duration = duration ?: "",
+        video = Video(
+            url = url,
+            duration = duration ?: "",
+            transcodingStatus = transcodingStatus ?: ""
+        ),
         description = description ?: "",
-        transcodingStatus = transcodingStatus ?: ""
     )
 }
 
 //Video to LocalVideo
-internal fun Video.asLocalVideo(): LocalVideo {
+internal fun Asset.asLocalVideo(): LocalVideo {
     return LocalVideo(
         videoId = this.id,
         title = this.title,
         thumbnail = this.thumbnail,
-        url = this.url,
-        duration = this.duration,
+        url = this.video.url,
+        duration = this.video.duration,
         description = this.description,
-        transcodingStatus = this.transcodingStatus,
-        percentageDownloaded = this.percentageDownloaded,
-        bytesDownloaded = this.bytesDownloaded,
-        totalSize = this.totalSize,
-        downloadState = this.downloadState,
-        videoWidth = this.videoWidth,
-        videoHeight = this.videoHeight
+        transcodingStatus = this.video.transcodingStatus,
+        percentageDownloaded = this.video.percentageDownloaded,
+        bytesDownloaded = this.video.bytesDownloaded,
+        totalSize = this.video.totalSize,
+        downloadState = this.video.downloadState,
+        videoWidth = this.video.width,
+        videoHeight = this.video.height
     )
 }

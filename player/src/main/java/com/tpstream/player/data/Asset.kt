@@ -5,24 +5,26 @@ import android.graphics.Bitmap
 import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.data.source.local.DownloadStatus
 
-data class Video(
+data class Asset(
     var id: String = "",
     var title: String = "",
     var thumbnail: String = "",
-    internal var url: String = "",
-    var duration: String = "",
     var description: String = "",
+    var video: Video = Video()
+) {
+    fun getLocalThumbnail(context: Context): Bitmap?{
+        return ImageSaver(context).load(id)
+    }
+}
+
+data class Video(
+    internal var url: String = "",
+    var width: Int = 0,
+    var height: Int = 0,
     var transcodingStatus: String = "",
+    var duration: String = "",
     var percentageDownloaded: Int = 0,
     var bytesDownloaded: Long = 0,
     var totalSize: Long = 0,
     var downloadState: DownloadStatus? = null,
-    var videoWidth: Int = 0,
-    var videoHeight: Int = 0
-) {
-
-    fun getLocalThumbnail(context: Context): Bitmap?{
-        return ImageSaver(context).load(id)
-    }
-
-}
+)

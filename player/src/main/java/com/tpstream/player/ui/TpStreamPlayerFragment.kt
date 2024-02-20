@@ -196,7 +196,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun reloadVideo(){
         val currentPosition = player?.getCurrentTime()
         val tpImp = player as TpStreamPlayerImpl
-        tpImp.playVideo(player?.video?.url!!,currentPosition!!)
+        tpImp.playVideo(player?.asset?.video?.url!!,currentPosition!!)
     }
 
     private fun storeCurrentPlayTime(){
@@ -286,7 +286,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 showErrorMessage(TPException.networkError(IOException()).getErrorMessage(errorPlayerId))
                 return
             }
-            val url = player?.video?.url
+            val url = player?.asset?.video?.url
             val downloadTask = DownloadTask(requireContext())
             drmLicenseRetries += 1
             if (drmLicenseRetries < 2 && downloadTask.isDownloaded(url!!)) {

@@ -23,7 +23,7 @@ internal class VideoDownloadRequestCreationHandler(
     private var keySetId: ByteArray? = null
 
     init {
-        val url = player.video?.url!!
+        val url = player.asset?.video?.url!!
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(player.params.videoId, player.params.accessToken)
         mediaItem = MediaItemBuilder()
@@ -85,7 +85,7 @@ internal class VideoDownloadRequestCreationHandler(
 
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
         setSelectedTracks(overrides)
-        val name = player.video?.title!!
+        val name = player.asset?.title!!
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 

@@ -100,7 +100,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
             else -> {
                 EncryptionKeyRepository(context).fetchAndStore(
                     player.params,
-                    player.video?.url!!
+                    player.asset?.video?.url!!
                 )
                 val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
                     player,
@@ -232,8 +232,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun updateDownloadButtonImage(){
-        videoViewModel.get(player.video?.id!!).observe(context as FragmentActivity) { video ->
-            downloadState = when (video?.downloadState) {
+        videoViewModel.get(player.asset?.id!!).observe(context as FragmentActivity) { asset ->
+            downloadState = when (asset?.video?.downloadState) {
                 DownloadStatus.DOWNLOADING ->{
                     downloadButton?.setImageResource(R.drawable.ic_baseline_downloading_24)
                     DownloadStatus.DOWNLOADING

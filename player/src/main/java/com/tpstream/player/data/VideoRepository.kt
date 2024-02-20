@@ -16,41 +16,41 @@ internal class VideoRepository(context: Context) {
 
     private val videoDao = TPStreamsDatabase(context).videoDao()
 
-    suspend fun update(video: Video){
-        videoDao.insert(video.asLocalVideo())
+    suspend fun update(asset: Asset){
+        videoDao.insert(asset.asLocalVideo())
     }
 
-    fun get(videoId: String): LiveData<Video?> {
+    fun get(videoId: String): LiveData<Asset?> {
         return Transformations.map(videoDao.getVideoById(videoId)) {
-            it?.asDomainVideo()
+            it?.asDomainAsset()
         }
     }
 
-    fun getVideoByUrl(url:String):Video? {
-        return videoDao.getVideoByUrl(url)?.asDomainVideo()
+    fun getVideoByUrl(url:String):Asset? {
+        return videoDao.getVideoByUrl(url)?.asDomainAsset()
     }
 
-    suspend fun insert(video: Video){
-        videoDao.insert(video.asLocalVideo())
+    suspend fun insert(asset: Asset){
+        videoDao.insert(asset.asLocalVideo())
     }
 
-    suspend fun delete(video: Video){
-        videoDao.delete(video.id)
+    suspend fun delete(asset: Asset){
+        videoDao.delete(asset.id)
     }
 
     suspend fun deleteAll(){
         videoDao.deleteAll()
     }
 
-    fun getAllDownloadsInLiveData():LiveData<List<Video>?>{
+    fun getAllDownloadsInLiveData():LiveData<List<Asset>?>{
         return Transformations.map(videoDao.getAllDownloadInLiveData()) {
-            it?.asDomainVideos()
+            it?.asDomainAssets()
         }
     }
 
     fun getVideo(
         params: TpInitParams,
-        callback : NetworkClient.TPResponse<Video>
+        callback : NetworkClient.TPResponse<Asset>
     ){
         val video = getVideoFromDB(params)
         if (video != null) {
@@ -60,22 +60,22 @@ internal class VideoRepository(context: Context) {
         }
     }
 
-    private fun getVideoFromDB(params: TpInitParams): Video?{
-        var video : Video? = null
+    private fun getVideoFromDB(params: TpInitParams): Asset?{
+        var asset : Asset? = null
         runBlocking(Dispatchers.IO) {
-            video = videoDao.getVideoByVideoId(params.videoId!!)?.asDomainVideo()
+            asset = videoDao.getVideoByVideoId(params.videoId!!)?.asDomainAsset()
         }
-        return video
+        return asset
     }
 
     private fun fetchVideo(
         params: TpInitParams,
-        callback : NetworkClient.TPResponse<Video>
+        callback : NetworkClient.TPResponse<Asset>
     ) {
         val url = TPStreamsSDK.constructVideoInfoUrl(params.videoId, params.accessToken)
         NetworkClient<NetworkAsset>().get(url, object : NetworkClient.TPResponse<NetworkAsset> {
             override fun onSuccess(result: NetworkAsset) {
-                val video = result.asDomainVideo()
+                val video = result.asDomainAsset()
                 video.id = params.videoId!!
                 callback.onSuccess(video)
             }

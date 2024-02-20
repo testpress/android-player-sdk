@@ -3,7 +3,7 @@ package com.tpstream.player.offline
 import android.content.Context
 import androidx.lifecycle.LiveData
 import com.tpstream.player.util.ImageSaver
-import com.tpstream.player.data.Video
+import com.tpstream.player.data.Asset
 import com.tpstream.player.data.VideoRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,27 +13,27 @@ class TpStreamDownloadManager(val context: Context) {
 
     private val videoRepository = VideoRepository(context)
 
-    fun getAllDownloads(): LiveData<List<Video>?> {
+    fun getAllDownloads(): LiveData<List<Asset>?> {
         return videoRepository.getAllDownloadsInLiveData()
     }
 
-    fun pauseDownload(video: Video) {
-        DownloadTask(context).pause(video)
+    fun pauseDownload(asset: Asset) {
+        DownloadTask(context).pause(asset)
     }
 
-    fun resumeDownload(video: Video) {
-        DownloadTask(context).resume(video)
+    fun resumeDownload(asset: Asset) {
+        DownloadTask(context).resume(asset)
     }
 
-    fun cancelDownload(video: Video) {
-        deleteDownload(video)
+    fun cancelDownload(asset: Asset) {
+        deleteDownload(asset)
     }
 
-    fun deleteDownload(video: Video) {
+    fun deleteDownload(asset: Asset) {
         CoroutineScope(Dispatchers.IO).launch {
-            DownloadTask(context).delete(video)
-            ImageSaver(context).delete(video.id)
-            videoRepository.delete(video)
+            DownloadTask(context).delete(asset)
+            ImageSaver(context).delete(asset.id)
+            videoRepository.delete(asset)
         }
     }
 

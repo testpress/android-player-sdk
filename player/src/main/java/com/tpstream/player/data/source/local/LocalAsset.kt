@@ -4,8 +4,8 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "Video", indices = [Index(value = ["videoId"], unique = true)])
-internal class LocalVideo(
+@Entity(tableName = "Asset", indices = [Index(value = ["videoId"], unique = true)])
+internal class LocalAsset(
     @PrimaryKey(autoGenerate = true)
     val id : Long = 0L,
     var videoId: String = "",

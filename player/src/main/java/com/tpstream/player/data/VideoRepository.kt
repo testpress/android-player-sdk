@@ -14,36 +14,36 @@ import kotlinx.coroutines.runBlocking
 
 internal class VideoRepository(context: Context) {
 
-    private val videoDao = TPStreamsDatabase(context).videoDao()
+    private val assetDao = TPStreamsDatabase(context).assetDao()
 
     suspend fun update(asset: Asset){
-        videoDao.insert(asset.asLocalVideo())
+        assetDao.insert(asset.asLocalAsset())
     }
 
     fun get(videoId: String): LiveData<Asset?> {
-        return Transformations.map(videoDao.getVideoById(videoId)) {
+        return Transformations.map(assetDao.getVideoById(videoId)) {
             it?.asDomainAsset()
         }
     }
 
     fun getVideoByUrl(url:String):Asset? {
-        return videoDao.getVideoByUrl(url)?.asDomainAsset()
+        return assetDao.getVideoByUrl(url)?.asDomainAsset()
     }
 
     suspend fun insert(asset: Asset){
-        videoDao.insert(asset.asLocalVideo())
+        assetDao.insert(asset.asLocalAsset())
     }
 
     suspend fun delete(asset: Asset){
-        videoDao.delete(asset.id)
+        assetDao.delete(asset.id)
     }
 
     suspend fun deleteAll(){
-        videoDao.deleteAll()
+        assetDao.deleteAll()
     }
 
     fun getAllDownloadsInLiveData():LiveData<List<Asset>?>{
-        return Transformations.map(videoDao.getAllDownloadInLiveData()) {
+        return Transformations.map(assetDao.getAllDownloadInLiveData()) {
             it?.asDomainAssets()
         }
     }
@@ -63,7 +63,7 @@ internal class VideoRepository(context: Context) {
     private fun getVideoFromDB(params: TpInitParams): Asset?{
         var asset : Asset? = null
         runBlocking(Dispatchers.IO) {
-            asset = videoDao.getVideoByVideoId(params.videoId!!)?.asDomainAsset()
+            asset = assetDao.getVideoByVideoId(params.videoId!!)?.asDomainAsset()
         }
         return asset
     }

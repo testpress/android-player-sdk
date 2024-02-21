@@ -1,10 +1,10 @@
 package com.tpstream.player.data
 
-import com.tpstream.player.data.source.local.LocalVideo
+import com.tpstream.player.data.source.local.LocalAsset
 import com.tpstream.player.data.source.network.NetworkAsset
 
 // LocalVideo to Video
-internal fun LocalVideo.asDomainAsset(): Asset {
+internal fun LocalAsset.asDomainAsset(): Asset {
     return Asset(
         id = this.videoId,
         title = this.title,
@@ -24,7 +24,7 @@ internal fun LocalVideo.asDomainAsset(): Asset {
     )
 }
 
-internal fun List<LocalVideo>.asDomainAssets() = map(LocalVideo::asDomainAsset)
+internal fun List<LocalAsset>.asDomainAssets() = map(LocalAsset::asDomainAsset)
 
 //NetworkVideo to Video
 internal fun NetworkAsset.asDomainAsset(): Asset {
@@ -50,8 +50,8 @@ internal fun NetworkAsset.asDomainAsset(): Asset {
 }
 
 //Video to LocalVideo
-internal fun Asset.asLocalVideo(): LocalVideo {
-    return LocalVideo(
+internal fun Asset.asLocalAsset(): LocalAsset {
+    return LocalAsset(
         videoId = this.id,
         title = this.title,
         thumbnail = this.thumbnail,

@@ -10,7 +10,7 @@ import com.tpstream.player.data.Asset
 import com.tpstream.player.data.Video
 import com.tpstream.player.data.asDomainAsset
 import com.tpstream.player.data.asDomainAssets
-import com.tpstream.player.data.asLocalVideo
+import com.tpstream.player.data.asLocalAsset
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.*
@@ -23,9 +23,9 @@ import org.junit.runner.RunWith
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-class VideoDaoTest {
+class AssetDaoTest {
 
-    private lateinit var videoDao: VideoDao
+    private lateinit var assetDao: AssetDao
     private lateinit var db: TPStreamsDatabase
 
     @Before
@@ -34,7 +34,7 @@ class VideoDaoTest {
         db = Room.inMemoryDatabaseBuilder(
             context, TPStreamsDatabase::class.java
         ).build()
-        videoDao = db.videoDao()
+        assetDao = db.assetDao()
     }
 
     @After
@@ -47,7 +47,7 @@ class VideoDaoTest {
     @Throws(Exception::class)
     fun testGetOfflineVideoInfoByVideoId() {
         insertData()
-        val result = videoDao.getVideoByVideoId("VideoID_1")
+        val result = assetDao.getVideoByVideoId("VideoID_1")
         assertThat(result?.id, equalTo(1L))
     }
 
@@ -55,7 +55,7 @@ class VideoDaoTest {
     @Throws(Exception::class)
     fun testGetAllOfflineVideoInfo() {
         insertData()
-        val result = videoDao.getAllVideo()
+        val result = assetDao.getAllVideo()
         assertThat(result?.size, equalTo(3))
     }
 
@@ -63,7 +63,7 @@ class VideoDaoTest {
     @Throws(Exception::class)
     fun testGetOfflineVideoInfoByUrl() {
         insertData()
-        val result = videoDao.getVideoByUrl("url_2")
+        val result = assetDao.getVideoByUrl("url_2")
         assertThat(result?.id, equalTo(2L))
     }
 
@@ -72,17 +72,17 @@ class VideoDaoTest {
     fun testDelete() = runBlocking {
         insertData()
         val asset4 = Asset(id = "VideoID_4")
-        videoDao.insert(asset4.asLocalVideo())
+        assetDao.insert(asset4.asLocalAsset())
         // Check data added
-        val beforeResult = videoDao.getAllVideo()
+        val beforeResult = assetDao.getAllVideo()
         assertThat(beforeResult?.size, equalTo(4))
         // Delete one data
-        videoDao.delete(asset4.id)
+        assetDao.delete(asset4.id)
         // Check deleted
-        val afterResult = videoDao.getAllVideo()
+        val afterResult = assetDao.getAllVideo()
         assertThat(afterResult?.size, equalTo(3))
 
-        val result = videoDao.getVideoByVideoId("VideoID_4")
+        val result = assetDao.getVideoByVideoId("VideoID_4")
         assertThat(result, equalTo(null))
     }
 
@@ -91,7 +91,7 @@ class VideoDaoTest {
     fun testGetOfflineVideoInfoById() {
         insertData()
         CoroutineScope(Dispatchers.Main).launch {
-            val liveData = Transformations.map(videoDao.getVideoById("VideoID_1")) { it?.asDomainAsset() }
+            val liveData = Transformations.map(assetDao.getVideoById("VideoID_1")) { it?.asDomainAsset() }
             val observer = Observer<Asset?> { result ->
                 assertNotNull(result)
                 assertEquals("VideoID_1", result.id)
@@ -107,7 +107,7 @@ class VideoDaoTest {
     fun testGetAllDownloadInLiveData() {
         insertData()
         CoroutineScope(Dispatchers.Main).launch {
-            val liveData = Transformations.map(videoDao.getAllDownloadInLiveData()) { it?.asDomainAssets() }
+            val liveData = Transformations.map(assetDao.getAllDownloadInLiveData()) { it?.asDomainAssets() }
             val observer = Observer<List<Asset>?> { result ->
                 assertNotNull(result)
                 assertEquals(3, result.size)
@@ -124,9 +124,9 @@ class VideoDaoTest {
         val asset2 = Asset(id = "VideoID_2", video = Video(url = "url_1"))
         val asset3 = Asset(id = "VideoID_3", video = Video(url = "url_1"))
         // Add data to db
-        videoDao.insert(asset1.asLocalVideo())
-        videoDao.insert(asset2.asLocalVideo())
-        videoDao.insert(asset3.asLocalVideo())
+        assetDao.insert(asset1.asLocalAsset())
+        assetDao.insert(asset2.asLocalAsset())
+        assetDao.insert(asset3.asLocalAsset())
     }
 
 }

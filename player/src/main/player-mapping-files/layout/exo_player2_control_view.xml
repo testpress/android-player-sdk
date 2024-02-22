@@ -46,12 +46,37 @@
             <TextView android:id="@id/exo_position"
                 style="@style/ExoStyledControls.TimeText.Position"/>
 
-            <TextView
+            <TextView android:id="@+id/exo_separator"
                 style="@style/ExoStyledControls.TimeText.Separator"/>
 
             <TextView android:id="@id/exo_duration"
                 style="@style/ExoStyledControls.TimeText.Duration"/>
 
+            <RelativeLayout
+                android:id="@+id/live_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:padding="6dp">
+
+                <View
+                    android:id="@+id/redDot"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:background="@drawable/red_dot_circle"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/redDot"
+                    android:text="LIVE"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:paddingLeft="5dp"
+                    android:textColor="@android:color/white" />
+            </RelativeLayout>
         </LinearLayout>
 
         <LinearLayout android:id="@id/exo_basic_controls"

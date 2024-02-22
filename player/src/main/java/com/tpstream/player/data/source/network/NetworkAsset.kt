@@ -27,7 +27,10 @@ internal data class NetworkAsset(
     val bytes: Long?,
     val type: String?,
     @SerializedName("video")
-    val networkVideo: NetworkVideo?
+    val networkVideo: NetworkVideo?,
+
+    @SerializedName("live_stream")
+    val networkLiveStream: NetworkLiveStream?
 ) {
 
     inner class NetworkVideo(
@@ -42,5 +45,24 @@ internal data class NetworkAsset(
         val video_codec: String?,
         val audio_codec: String?,
         val enable_drm: Boolean?
+    )
+
+    inner class NetworkLiveStream(
+        val status: String,
+
+        @SerializedName("start")
+        val startTime: String,
+
+        @SerializedName("hls_url")
+        val url: String,
+
+        @SerializedName("transcode_recorded_video")
+        val recordingEnabled: Boolean,
+
+        @SerializedName("enable_drm")
+        val enabledDRMForLive: Boolean,
+
+        @SerializedName("enable_drm_for_recording")
+        val enabledDRMForRecording: Boolean
     )
 }

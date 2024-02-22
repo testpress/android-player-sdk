@@ -38,6 +38,7 @@ internal fun NetworkAsset.asDomainAsset(): Asset {
     }
     return Asset(
         id = this.id ?: "",
+        type = this.type ?: "video",
         title = this.title ?: "",
         thumbnail = thumbnailUrl,
         video = Video(
@@ -46,8 +47,25 @@ internal fun NetworkAsset.asDomainAsset(): Asset {
             transcodingStatus = transcodingStatus ?: ""
         ),
         description = description ?: "",
+        liveStream = getDomainLiveStream(this)
     )
 }
+
+internal fun getDomainLiveStream(asset: NetworkAsset): LiveStream? =
+    if (asset.type == "livestream" && asset.networkLiveStream != null) {
+        asset.networkLiveStream.run {
+            LiveStream(
+                url = url,
+                status = status,
+                startTime = startTime,
+                recordingEnabled = recordingEnabled,
+                enabledDRMForLive = enabledDRMForLive,
+                enabledDRMForRecording = enabledDRMForRecording
+            )
+        }
+    } else {
+        null
+    }
 
 //Video to LocalVideo
 internal fun Asset.asLocalAsset(): LocalAsset {

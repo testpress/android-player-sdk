@@ -18,7 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.tpstream.player.*
-import com.tpstream.player.data.VideoRepository
+import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
 import com.tpstream.player.enum.PlaybackSpeed
@@ -78,7 +78,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         viewModelStore = ViewModelStore()
         videoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return VideoViewModel(VideoRepository(context)) as T
+                return VideoViewModel(AssetRepository(context)) as T
             }
         }).get(VideoViewModel::class.java)
     }

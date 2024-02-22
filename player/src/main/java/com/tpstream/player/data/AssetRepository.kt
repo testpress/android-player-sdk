@@ -12,7 +12,7 @@ import com.tpstream.player.util.NetworkClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
-internal class VideoRepository(context: Context) {
+internal class AssetRepository(context: Context) {
 
     private val assetDao = TPStreamsDatabase(context).assetDao()
 
@@ -21,13 +21,13 @@ internal class VideoRepository(context: Context) {
     }
 
     fun get(videoId: String): LiveData<Asset?> {
-        return Transformations.map(assetDao.getVideoById(videoId)) {
+        return Transformations.map(assetDao.getAssetById(videoId)) {
             it?.asDomainAsset()
         }
     }
 
-    fun getVideoByUrl(url:String):Asset? {
-        return assetDao.getVideoByUrl(url)?.asDomainAsset()
+    fun getAssetByUrl(url:String):Asset? {
+        return assetDao.getAssetByUrl(url)?.asDomainAsset()
     }
 
     suspend fun insert(asset: Asset){
@@ -48,27 +48,27 @@ internal class VideoRepository(context: Context) {
         }
     }
 
-    fun getVideo(
+    fun getAsset(
         params: TpInitParams,
         callback : NetworkClient.TPResponse<Asset>
     ){
-        val video = getVideoFromDB(params)
+        val video = getAssetFromDB(params)
         if (video != null) {
             callback.onSuccess(video)
         } else {
-            fetchVideo(params, callback)
+            fetchAsset(params, callback)
         }
     }
 
-    private fun getVideoFromDB(params: TpInitParams): Asset?{
+    private fun getAssetFromDB(params: TpInitParams): Asset?{
         var asset : Asset? = null
         runBlocking(Dispatchers.IO) {
-            asset = assetDao.getVideoByVideoId(params.videoId!!)?.asDomainAsset()
+            asset = assetDao.getAssetByVideoId(params.videoId!!)?.asDomainAsset()
         }
         return asset
     }
 
-    private fun fetchVideo(
+    private fun fetchAsset(
         params: TpInitParams,
         callback : NetworkClient.TPResponse<Asset>
     ) {

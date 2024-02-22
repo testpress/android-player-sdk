@@ -47,7 +47,7 @@ class AssetDaoTest {
     @Throws(Exception::class)
     fun testGetOfflineVideoInfoByVideoId() {
         insertData()
-        val result = assetDao.getVideoByVideoId("VideoID_1")
+        val result = assetDao.getAssetByVideoId("VideoID_1")
         assertThat(result?.id, equalTo(1L))
     }
 
@@ -55,7 +55,7 @@ class AssetDaoTest {
     @Throws(Exception::class)
     fun testGetAllOfflineVideoInfo() {
         insertData()
-        val result = assetDao.getAllVideo()
+        val result = assetDao.getAllAsset()
         assertThat(result?.size, equalTo(3))
     }
 
@@ -63,7 +63,7 @@ class AssetDaoTest {
     @Throws(Exception::class)
     fun testGetOfflineVideoInfoByUrl() {
         insertData()
-        val result = assetDao.getVideoByUrl("url_2")
+        val result = assetDao.getAssetByUrl("url_2")
         assertThat(result?.id, equalTo(2L))
     }
 
@@ -74,15 +74,15 @@ class AssetDaoTest {
         val asset4 = Asset(id = "VideoID_4")
         assetDao.insert(asset4.asLocalAsset())
         // Check data added
-        val beforeResult = assetDao.getAllVideo()
+        val beforeResult = assetDao.getAllAsset()
         assertThat(beforeResult?.size, equalTo(4))
         // Delete one data
         assetDao.delete(asset4.id)
         // Check deleted
-        val afterResult = assetDao.getAllVideo()
+        val afterResult = assetDao.getAllAsset()
         assertThat(afterResult?.size, equalTo(3))
 
-        val result = assetDao.getVideoByVideoId("VideoID_4")
+        val result = assetDao.getAssetByVideoId("VideoID_4")
         assertThat(result, equalTo(null))
     }
 
@@ -91,7 +91,7 @@ class AssetDaoTest {
     fun testGetOfflineVideoInfoById() {
         insertData()
         CoroutineScope(Dispatchers.Main).launch {
-            val liveData = Transformations.map(assetDao.getVideoById("VideoID_1")) { it?.asDomainAsset() }
+            val liveData = Transformations.map(assetDao.getAssetById("VideoID_1")) { it?.asDomainAsset() }
             val observer = Observer<Asset?> { result ->
                 assertNotNull(result)
                 assertEquals("VideoID_1", result.id)

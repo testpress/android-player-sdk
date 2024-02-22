@@ -10,22 +10,22 @@ import androidx.room.Query
 internal interface AssetDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(video: LocalAsset)
+    suspend fun insert(asset: LocalAsset)
 
     @Query("DELETE FROM Asset WHERE videoId=:videoID")
     suspend fun delete(videoID:String)
 
     @Query("SELECT * FROM Asset")
-    fun getAllVideo():List<LocalAsset>?
+    fun getAllAsset():List<LocalAsset>?
 
     @Query("SELECT * FROM Asset WHERE videoId=:videoID")
-    fun getVideoByVideoId(videoID:String): LocalAsset?
+    fun getAssetByVideoId(videoID:String): LocalAsset?
 
     @Query("SELECT * FROM Asset WHERE url=:url")
-    fun getVideoByUrl(url:String): LocalAsset?
+    fun getAssetByUrl(url:String): LocalAsset?
 
     @Query("SELECT * FROM Asset WHERE videoId=:videoId")
-    fun getVideoById(videoId:String): LiveData<LocalAsset?>
+    fun getAssetById(videoId:String): LiveData<LocalAsset?>
 
     @Query("SELECT * FROM Asset WHERE downloadState NOT null")
     fun getAllDownloadInLiveData():LiveData<List<LocalAsset>?>

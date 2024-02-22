@@ -3,7 +3,7 @@ package com.tpstream.player.offline
 import android.app.Notification
 import com.tpstream.player.*
 import com.tpstream.player.R
-import com.tpstream.player.data.VideoRepository
+import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.data.source.local.getVideoState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,12 +25,12 @@ internal class VideoDownloadService: DownloadService(
 ) , DownloadManagerListener{
 
     private lateinit var notificationHelper: DownloadNotificationHelper
-    private lateinit var videoRepository: VideoRepository
+    private lateinit var assetRepository: AssetRepository
     private lateinit var downloadCallback : DownloadCallback
 
     override fun onCreate() {
         super.onCreate()
-        videoRepository = VideoRepository(this)
+        assetRepository = AssetRepository(this)
         notificationHelper = DownloadNotificationHelper(this, CHANNEL_ID)
         downloadCallback = DownloadCallback.invoke()
     }
@@ -72,7 +72,7 @@ internal class VideoDownloadService: DownloadService(
         var videoId : String?
 
         runBlocking(Dispatchers.IO) {
-            videoId = videoRepository.getVideoByUrl(download.request.uri.toString())?.id
+            videoId = assetRepository.getAssetByUrl(download.request.uri.toString())?.id
         }
 
         when (download.state) {
@@ -118,13 +118,13 @@ internal class VideoDownloadService: DownloadService(
 
     private fun updateDownloadStatus(download:Download){
         CoroutineScope(Dispatchers.IO).launch{
-            val asset = videoRepository.getVideoByUrl(download.request.uri.toString())
+            val asset = assetRepository.getAssetByUrl(download.request.uri.toString())
             asset?.let {
                 asset.video.percentageDownloaded = download.percentDownloaded.toInt()
                 asset.video.bytesDownloaded = download.bytesDownloaded
                 asset.video.totalSize = download.contentLength
                 asset.video.downloadState = getVideoState(download.state)
-                videoRepository.update(asset)
+                assetRepository.update(asset)
             }
         }
     }

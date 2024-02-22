@@ -5,7 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
-import com.tpstream.player.data.VideoRepository
+import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.util.NetworkClient
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
@@ -54,7 +54,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     var _listener: TPStreamPlayerListener? = null
     lateinit var exoPlayer: ExoPlayer
     private val exoPlayerListener:ExoPlayerListenerWrapper = ExoPlayerListenerWrapper(this)
-    private var videoRepository: VideoRepository = VideoRepository(context)
+    private var assetRepository: AssetRepository = AssetRepository(context)
     private var tpStreamPlayerImplCallBack : TpStreamPlayerImplCallBack? = null
     private var loadCompleteListener : LoadCompleteListener? = null
     private var markerListener: MarkerListener? = null
@@ -77,7 +77,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     override fun load(parameters: TpInitParams) {
         params = parameters
         exoPlayer.playWhenReady = parameters.autoPlay?:true
-        videoRepository.getVideo(parameters, object : NetworkClient.TPResponse<Asset> {
+        assetRepository.getAsset(parameters, object : NetworkClient.TPResponse<Asset> {
             override fun onSuccess(result: Asset) {
                 asset = result
                 playVideoInUIThread(result.video.url, parameters.startPositionInMilliSecs)

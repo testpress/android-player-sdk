@@ -44,7 +44,7 @@ class RoomMigrationTest {
         )
             .build()
 
-        val video = versionDB.assetDao().getVideoByUrl("url")
+        val video = versionDB.assetDao().getAssetByUrl("url")
         assertEquals("videoID",video?.videoId)
         assertEquals(1L,video?.id)
     }
@@ -70,8 +70,8 @@ class RoomMigrationTest {
         )
             .build()
 
-        val video = versionDB.assetDao().getVideoByUrl("url2")
-        val allVideos = versionDB.assetDao().getAllVideo()
+        val video = versionDB.assetDao().getAssetByUrl("url2")
+        val allVideos = versionDB.assetDao().getAllAsset()
         assertEquals("videoID2",video?.videoId)
         assertEquals(2L,video?.id)
         assertEquals(3,allVideos?.size)

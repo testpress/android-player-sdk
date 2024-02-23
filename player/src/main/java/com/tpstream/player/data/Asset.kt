@@ -18,6 +18,14 @@ data class Asset(
         return ImageSaver(context).load(id)
     }
 
+    fun getPlaybackURL(): String? {
+        return when {
+            this.isLiveStream && this.liveStream?.isStreaming == true -> this.liveStream!!.url
+            this.video.isTranscodingCompleted -> this.video.url
+            else -> null
+        }
+    }
+
     val isLiveStream: Boolean
         get() = type == "livestream"
 }

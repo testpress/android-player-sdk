@@ -80,8 +80,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         assetRepository.getAsset(parameters, object : NetworkClient.TPResponse<Asset> {
             override fun onSuccess(result: Asset) {
                 asset = result
-                val url = getPlaybackURL(result)
-                url?.let {
+                asset!!.getPlaybackURL()?.let {
                     playVideoInUIThread(it, parameters.startPositionInMilliSecs)
                 }
                 loadCompleteListener?.onComplete(result)
@@ -91,14 +90,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
                 tpStreamPlayerImplCallBack?.onPlaybackError(parameters,exception)
             }
         })
-    }
-
-    private fun getPlaybackURL(asset: Asset): String? {
-        return when {
-            asset.isLiveStream && asset.liveStream?.isStreaming == true -> asset.liveStream!!.url
-            asset.video.isTranscodingCompleted -> asset.video.url
-            else -> null
-        }
     }
 
     fun addMarker(timesInMs: Long, deleteAfterDelivery: Boolean) {

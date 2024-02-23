@@ -8,13 +8,26 @@ import com.tpstream.player.data.source.local.DownloadStatus
 data class Asset(
     var id: String = "",
     var title: String = "",
+    var type: String = "",
     var thumbnail: String = "",
     var description: String = "",
-    var video: Video = Video()
+    var video: Video = Video(),
+    var liveStream: LiveStream? = null
 ) {
     fun getLocalThumbnail(context: Context): Bitmap?{
         return ImageSaver(context).load(id)
     }
+
+    fun getPlaybackURL(): String? {
+        return when {
+            this.isLiveStream && this.liveStream?.isStreaming == true -> this.liveStream!!.url
+            this.video.isTranscodingCompleted -> this.video.url
+            else -> null
+        }
+    }
+
+    val isLiveStream: Boolean
+        get() = type == "livestream"
 }
 
 data class Video(
@@ -27,4 +40,19 @@ data class Video(
     var bytesDownloaded: Long = 0,
     var totalSize: Long = 0,
     var downloadState: DownloadStatus? = null,
-)
+){
+    val isTranscodingCompleted: Boolean
+        get() = transcodingStatus == "Completed"
+}
+
+data class LiveStream(
+    var url: String,
+    var status: String,
+    var startTime: String,
+    var recordingEnabled: Boolean,
+    var enabledDRMForRecording: Boolean,
+    val enabledDRMForLive: Boolean,
+) {
+    val isStreaming: Boolean
+        get() = status == "Streaming"
+}

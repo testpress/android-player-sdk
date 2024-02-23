@@ -186,9 +186,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun initializeLoadCompleteListener() {
         player.setLoadCompleteListener {
             (context as FragmentActivity).runOnUiThread {
-                if (player.params.isDownloadEnabled) {
+                if (player.params.isDownloadEnabled && !it.isLiveStream) {
                     downloadButton?.isVisible = true
                     updateDownloadButtonImage()
+                }
+                if (it.isLiveStream && it.liveStream?.isStreaming == true){
+                    updatePlayerViewForLive()
                 }
             }
         }
@@ -248,6 +251,16 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 }
             }
         }
+    }
+
+    private fun updatePlayerViewForLive(){
+        val durationView: TextView = playerView.findViewById(ExoplayerResourceID.exo_duration)
+        val durationSeparator: TextView = playerView.findViewById(R.id.exo_separator)
+        val liveLabel: RelativeLayout = playerView.findViewById(R.id.live_label)
+
+        durationView.visibility = View.GONE
+        durationSeparator.visibility = View.GONE
+        liveLabel.visibility = View.VISIBLE
     }
 
     override fun getViewModelStore(): ViewModelStore {

@@ -80,8 +80,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         assetRepository.getAsset(parameters, object : NetworkClient.TPResponse<Asset> {
             override fun onSuccess(result: Asset) {
                 asset = result
-                playVideoInUIThread(result.video.url, parameters.startPositionInMilliSecs)
-                loadCompleteListener?.onComplete()
+                asset!!.getPlaybackURL()?.let {
+                    playVideoInUIThread(it, parameters.startPositionInMilliSecs)
+                }
+                loadCompleteListener?.onComplete(result)
             }
 
             override fun onFailure(exception: TPException) {
@@ -318,7 +320,7 @@ internal interface TpStreamPlayerImplCallBack {
 }
 
 internal fun interface LoadCompleteListener {
-    fun onComplete()
+    fun onComplete(asset: Asset)
 }
 
 internal fun interface MarkerListener {

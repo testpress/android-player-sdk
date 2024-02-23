@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.data.source.local.DownloadStatus
+import java.text.SimpleDateFormat
+import java.util.*
 
 data class Asset(
     var id: String = "",
@@ -28,6 +30,32 @@ data class Asset(
 
     val isLiveStream: Boolean
         get() = type == "livestream"
+
+    fun shouldShowNoticeScreen(): Boolean {
+        if (!isLiveStream) return false
+
+        val livestream = this.liveStream!!
+
+        return !livestream.isStreaming &&
+                !(livestream.isEnded && livestream.recordingEnabled && video.isTranscodingCompleted)
+    }
+
+    fun getNoticeMessage(): String? {
+        val liveStream = this.liveStream
+        val currentDateTime = Date()
+
+        return when {
+            liveStream?.status == "Not Started" && liveStream.startTime?.after(currentDateTime) == true ->
+                "Live stream is scheduled to start at ${liveStream.getFormattedStartTime()}"
+            liveStream?.status == "Not Started" ->
+                "Live stream will begin soon."
+            liveStream?.isEnded == true && liveStream.recordingEnabled && !video.isTranscodingCompleted ->
+                "Live stream has ended. Recording will be available soon."
+            liveStream?.isEnded == true && !liveStream.recordingEnabled ->
+                "Live stream has concluded. Stay tuned for future broadcasts."
+            else -> null
+        }
+    }
 }
 
 data class Video(
@@ -48,11 +76,29 @@ data class Video(
 data class LiveStream(
     var url: String,
     var status: String,
-    var startTime: String,
+    var startTime: Date?,
     var recordingEnabled: Boolean,
     var enabledDRMForRecording: Boolean,
     val enabledDRMForLive: Boolean,
 ) {
     val isStreaming: Boolean
         get() = status == "Streaming"
+
+    val isEnded: Boolean
+        get() = status == "Completed"
+
+    fun getFormattedStartTime(): String {
+        val outputFormat = SimpleDateFormat("MMMM d, yyyy, h:mm a", Locale.getDefault())
+
+        val timeZone = TimeZone.getDefault()
+
+        val formattedStartTime = startTime?.let {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            inputFormat.timeZone = timeZone
+            outputFormat.timeZone = timeZone
+            outputFormat.format(it)
+        } ?: "N/A"
+
+        return formattedStartTime
+    }
 }

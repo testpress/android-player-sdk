@@ -28,6 +28,7 @@ internal fun List<LocalAsset>.asDomainAssets() = map(LocalAsset::asDomainAsset)
 
 //NetworkVideo to Video
 internal fun NetworkAsset.asDomainAsset(): Asset {
+    val transcodingStatus = if (networkVideo != null) networkVideo.status else this.transcodingStatus
     val thumbnailUrl = if (networkVideo != null) networkVideo.preview_thumbnail_url
         ?: "" else thumbnail ?: ""
     val url = if (networkVideo != null) {

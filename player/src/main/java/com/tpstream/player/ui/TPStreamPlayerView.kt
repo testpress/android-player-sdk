@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.tpstream.player.*
+import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
@@ -53,11 +54,14 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var animator: ObjectAnimator? = null
     private var loadingScreen: View = findViewById(ExoplayerResourceID.exo_buffering)
     private var tPStreamPlayerViewCallBack: TPStreamPlayerViewCallBack? = null
+    private var noticeScreenLayout: LinearLayout? = null
+    private var noticeMessage: TextView? = null
 
     init {
         registerDownloadListener()
         registerResolutionChangeListener()
         initializeViewModel()
+        initializeNoticeScreen()
     }
 
     private fun registerDownloadListener() {
@@ -81,6 +85,17 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 return VideoViewModel(AssetRepository(context)) as T
             }
         }).get(VideoViewModel::class.java)
+    }
+
+    private fun initializeNoticeScreen(){
+        noticeScreenLayout = LayoutInflater.from(context).inflate(
+            R.layout.notice_screen_layout,
+            this,
+            false
+        ) as LinearLayout
+        noticeScreenLayout!!.visibility = View.GONE
+        noticeMessage = noticeScreenLayout?.findViewById(R.id.notice_message)
+        addView(noticeScreenLayout)
     }
 
     internal fun setPlaybackSpeedText(speed: Float) {
@@ -192,6 +207,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 }
                 if (it.isLiveStream && it.liveStream?.isStreaming == true){
                     updatePlayerViewForLive()
+                } else if (it.shouldShowNoticeScreen()) {
+                    showNoticeScreen(it)
                 }
             }
         }
@@ -261,6 +278,13 @@ class TPStreamPlayerView @JvmOverloads constructor(
         durationView.visibility = View.GONE
         durationSeparator.visibility = View.GONE
         liveLabel.visibility = View.VISIBLE
+    }
+
+    private fun showNoticeScreen(asset: Asset) {
+        asset.getNoticeMessage()?.let {
+            noticeMessage!!.text = it
+            noticeScreenLayout!!.visibility = View.VISIBLE
+        }
     }
 
     override fun getViewModelStore(): ViewModelStore {

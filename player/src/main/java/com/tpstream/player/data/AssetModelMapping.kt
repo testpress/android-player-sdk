@@ -2,6 +2,7 @@ package com.tpstream.player.data
 
 import com.tpstream.player.data.source.local.LocalAsset
 import com.tpstream.player.data.source.network.NetworkAsset
+import com.tpstream.player.util.parseDateTime
 
 // LocalVideo to Video
 internal fun LocalAsset.asDomainAsset(): Asset {
@@ -58,7 +59,7 @@ internal fun getDomainLiveStream(asset: NetworkAsset): LiveStream? =
             LiveStream(
                 url = url,
                 status = status,
-                startTime = startTime,
+                startTime = parseDateTime(startTime),
                 recordingEnabled = recordingEnabled,
                 enabledDRMForLive = enabledDRMForLive,
                 enabledDRMForRecording = enabledDRMForRecording

@@ -1,6 +1,7 @@
 package com.tpstream.player.data.source.network
 
 import com.google.gson.annotations.SerializedName
+import com.tpstream.player.data.Track
 
 internal data class NetworkAsset(
     val title: String?,
@@ -44,8 +45,17 @@ internal data class NetworkAsset(
         val resolutions: Array<String>?,
         val video_codec: String?,
         val audio_codec: String?,
-        val enable_drm: Boolean?
-    )
+        val enable_drm: Boolean?,
+        val tracks: List<Track>?
+    ) {
+        inner class Track(
+            val type: String?,
+            val name: String?,
+            val url: String?,
+            val language: String?,
+            val duration: Long?
+        )
+    }
 
     inner class NetworkLiveStream(
         val status: String,

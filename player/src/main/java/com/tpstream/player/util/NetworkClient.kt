@@ -1,5 +1,6 @@
 package com.tpstream.player.util
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.tpstream.player.TPException
@@ -46,7 +47,9 @@ internal class NetworkClient<T : Any>(val klass: Class<T>) {
                     // This try catch block will handle.
                     // Valid response can able to parse for Invalid throw TPException
                     try {
+                        Log.d("TAG", "onResponse: ${response.body?.charStream().toString()}")
                         val result = gson.fromJson(response.body?.charStream(), klass)
+                        Log.d("TAG", "onResponse: $result")
                         callback.onSuccess(result)
                     } catch (e: JsonParseException){
                         callback.onFailure(TPException.httpError(response))

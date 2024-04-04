@@ -102,6 +102,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         val playbackSpeedButton = playerView.findViewById<Button>(ExoplayerResourceID.exo_playback_speed)
         val playbackSpeed = PlaybackSpeed.values().find { it.value == speed }
         playbackSpeedButton.text = playbackSpeed?.text
+        playerView.setShowSubtitleButton(true)
     }
 
     private fun onDownloadButtonClick() {

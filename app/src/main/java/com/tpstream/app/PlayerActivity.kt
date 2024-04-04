@@ -57,7 +57,7 @@ class PlayerActivity : AppCompatActivity() {
                 })
             }
         });
-        playerFragment.setPreferredExitFullscreenOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
+        playerFragment.setPreferredFullscreenExitOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
         initializeSampleButtons();
     }
 

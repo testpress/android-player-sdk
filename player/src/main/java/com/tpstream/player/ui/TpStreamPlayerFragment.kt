@@ -143,7 +143,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
     }
 
-    fun setPreferredExitFullscreenOrientation(orientation :Int){
+    fun setPreferredFullscreenExitOrientation(orientation :Int){
         preferredFullscreenExitOrientation  = orientation
     }
 

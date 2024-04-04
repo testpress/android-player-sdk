@@ -40,6 +40,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private var startPosition : Long = -1L
     private var drmLicenseRetries = 0
     lateinit var tpStreamPlayerView: TPStreamPlayerView
+    private var preferredFullscreenExitOrientation  = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,8 +143,12 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
     }
 
+    fun setPreferredExitFullscreenOrientation(orientation :Int){
+        preferredFullscreenExitOrientation  = orientation
+    }
+
     fun exitFullScreen() {
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        requireActivity().requestedOrientation = preferredFullscreenExitOrientation
         (tpStreamPlayerView.parent as ViewGroup).removeView(tpStreamPlayerView)
         viewBinding.mainFrameLayout.addView(tpStreamPlayerView)
         tpStreamPlayerView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(

@@ -7,10 +7,8 @@ import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
@@ -196,17 +194,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
         setPlaybackSpeedText(player.getPlayBackSpeed())
     }
 
-    private fun setupSubtitle() {
-        player.asset?.video?.tracks?.let {
-            playerView.setShowSubtitleButton(true)
-            val density = resources.displayMetrics.density
-            val bottomMarginInDp = 16
-            val bottomMarginInPx = (bottomMarginInDp * density).toInt()
-            (playerView.subtitleView?.layoutParams as? MarginLayoutParams)?.bottomMargin =
-                bottomMarginInPx
-        }
-    }
-
     internal fun setTPStreamPlayerViewCallBack(callBack: TPStreamPlayerViewCallBack) {
         tPStreamPlayerViewCallBack = callBack
     }
@@ -225,6 +212,17 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 }
                 setupSubtitle()
             }
+        }
+    }
+
+    private fun setupSubtitle() {
+        player.asset?.video?.tracks?.let {
+            playerView.setShowSubtitleButton(true)
+            val density = resources.displayMetrics.density
+            val bottomMarginInDp = 16
+            val bottomMarginInPx = (bottomMarginInDp * density).toInt()
+            (playerView.subtitleView?.layoutParams as? MarginLayoutParams)?.bottomMargin =
+                bottomMarginInPx
         }
     }
 

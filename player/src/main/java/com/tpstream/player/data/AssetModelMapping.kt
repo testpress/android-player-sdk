@@ -1,6 +1,5 @@
 package com.tpstream.player.data
 
-import android.util.Log
 import com.tpstream.player.data.source.local.LocalAsset
 import com.tpstream.player.data.source.network.NetworkAsset
 import com.tpstream.player.util.parseDateTime
@@ -49,8 +48,8 @@ internal fun NetworkAsset.asDomainAsset(): Asset {
             duration = duration ?: "",
             transcodingStatus = transcodingStatus ?: "",
             tracks = this.networkVideo?.tracks?.map {
-                Log.d("TAG", "asDomainAsset: ${it.name}")
-                it.asDomainTracks() }
+                it.asDomainTracks()
+            }
         ),
         description = description ?: "",
         liveStream = getDomainLiveStream(this)

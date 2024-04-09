@@ -210,12 +210,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 } else if (it.shouldShowNoticeScreen()) {
                     showNoticeScreen(it)
                 }
-                setupSubtitle()
+                initializeSubtitleView()
             }
         }
     }
 
-    private fun setupSubtitle() {
+    private fun initializeSubtitleView() {
         player.asset?.video?.tracks?.let {
             playerView.setShowSubtitleButton(true)
             val density = resources.displayMetrics.density

@@ -4,9 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import androidx.media3.common.MediaItem.SubtitleConfiguration
-import androidx.media3.common.MimeTypes
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
@@ -139,7 +136,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         val drmLicenseURL = TPStreamsSDK.constructDRMLicenseUrl(params.videoId, params.accessToken)
         return MediaItemBuilder()
             .setUri(url)
-            .setSubtitleConfigurations(buildSubTitle())
+            .setSubtitleConfigurations(buildSubTitleConfiguration())
             .setDrmConfiguration(
                 DrmConfigurationBuilder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
@@ -148,10 +145,9 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             ).build()
     }
 
-    private fun buildSubTitle(): List<SubtitleConfiguration> {
+    private fun buildSubTitleConfiguration(): List<SubtitleConfiguration> {
         return asset?.video?.tracks?.filter { it.type == "Subtitle" }?.map { track ->
-            SubtitleConfiguration.Builder(Uri.parse(track.url))
-                .setLabel(track.name)
+            SubtitleConfigurationBuilder(Uri.parse(track.url))
                 .setLanguage(track.language)
                 .setMimeType(MimeTypes.TEXT_VTT)
                 .build()

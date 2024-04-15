@@ -46,7 +46,10 @@ internal fun NetworkAsset.asDomainAsset(): Asset {
         video = Video(
             url = url,
             duration = duration ?: "",
-            transcodingStatus = transcodingStatus ?: ""
+            transcodingStatus = transcodingStatus ?: "",
+            tracks = this.networkVideo?.tracks?.map {
+                it.asDomainTracks()
+            }
         ),
         description = description ?: "",
         liveStream = getDomainLiveStream(this)
@@ -68,6 +71,16 @@ internal fun getDomainLiveStream(asset: NetworkAsset): LiveStream? =
     } else {
         null
     }
+
+internal fun NetworkAsset.NetworkVideo.Track.asDomainTracks(): Track {
+    return Track(
+        type = this.type ?: "",
+        name = this.name ?: "",
+        url = this.url ?: "",
+        language = this.language ?: "",
+        duration = this.duration ?: 0
+    )
+}
 
 //Video to LocalVideo
 internal fun Asset.asLocalAsset(): LocalAsset {

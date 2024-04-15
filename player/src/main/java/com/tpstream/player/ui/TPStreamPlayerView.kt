@@ -210,7 +210,19 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 } else if (it.shouldShowNoticeScreen()) {
                     showNoticeScreen(it)
                 }
+                initializeSubtitleView()
             }
+        }
+    }
+
+    private fun initializeSubtitleView() {
+        player.asset?.video?.tracks?.let {
+            playerView.setShowSubtitleButton(true)
+            val density = resources.displayMetrics.density
+            val bottomMarginInDp = 16
+            val bottomMarginInPx = (bottomMarginInDp * density).toInt()
+            (playerView.subtitleView?.layoutParams as? MarginLayoutParams)?.bottomMargin =
+                bottomMarginInPx
         }
     }
 

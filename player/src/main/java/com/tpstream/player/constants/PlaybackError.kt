@@ -1,4 +1,4 @@
-package com.tpstream.player.enum
+package com.tpstream.player.constants
 
 import com.tpstream.player.PlaybackException
 import com.tpstream.player.TPException

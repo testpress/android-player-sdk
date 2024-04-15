@@ -8,7 +8,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import com.tpstream.player.*
-import com.tpstream.player.enum.PlaybackError
+import com.tpstream.player.constants.PlaybackError
 import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
 

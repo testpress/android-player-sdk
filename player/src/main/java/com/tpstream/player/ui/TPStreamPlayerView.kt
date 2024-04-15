@@ -22,7 +22,7 @@ import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
-import com.tpstream.player.enum.PlaybackSpeed
+import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.ImageSaver

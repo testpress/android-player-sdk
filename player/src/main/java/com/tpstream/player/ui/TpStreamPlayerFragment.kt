@@ -17,8 +17,8 @@ import androidx.fragment.app.Fragment
 import com.tpstream.player.*
 import com.tpstream.player.Util
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
-import com.tpstream.player.enum.getErrorMessage
-import com.tpstream.player.enum.toError
+import com.tpstream.player.constants.getErrorMessage
+import com.tpstream.player.constants.toError
 import com.tpstream.player.offline.*
 import com.tpstream.player.util.OrientationListener
 import com.tpstream.player.util.SentryLogger

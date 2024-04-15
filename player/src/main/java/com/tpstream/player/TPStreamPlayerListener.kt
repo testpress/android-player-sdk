@@ -1,6 +1,6 @@
 package com.tpstream.player
 
-import com.tpstream.player.enum.PlaybackError
+import com.tpstream.player.constants.PlaybackError
 
 interface TPStreamPlayerListener {
     fun onTracksChanged(tracks: Tracks) {}

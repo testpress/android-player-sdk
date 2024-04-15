@@ -28,10 +28,6 @@ internal class ExoPlayerListenerWrapper(var player: TpStreamPlayerImpl) : Player
         listener?.onIsPlayingChanged(isPlaying)
     }
 
-    override fun onMetadata(metadata: Metadata) {
-        listener?.onMetadata(metadata)
-    }
-
     override fun onEvents(exoplayer: Player, events: PlayerEvents) {
         listener?.onEvents(player, events)
     }
@@ -54,10 +50,6 @@ internal class ExoPlayerListenerWrapper(var player: TpStreamPlayerImpl) : Player
         reason: Int
     ) {
         listener?.onPositionDiscontinuity(oldPosition, newPosition, reason)
-    }
-
-    override fun onPlayerErrorChanged(error: PlaybackException?) {
-        listener?.onPlayerErrorChanged(error)
     }
 
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {

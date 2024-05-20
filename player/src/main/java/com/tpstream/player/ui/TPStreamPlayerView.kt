@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -216,7 +217,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun initializeSubtitleView() {
-        player.asset?.video?.tracks?.let {
+        player.asset?.video?.tracks?.takeIf { it.isNotEmpty() }?.let {
             playerView.setShowSubtitleButton(true)
             val density = resources.displayMetrics.density
             val bottomMarginInDp = 16

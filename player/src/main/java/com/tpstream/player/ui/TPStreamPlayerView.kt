@@ -7,7 +7,6 @@ import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*

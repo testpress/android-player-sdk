@@ -216,7 +216,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun initializeSubtitleView() {
-        player.asset?.video?.tracks?.let {
+        player.asset?.video?.tracks?.takeIf { it.isNotEmpty() }?.let {
             playerView.setShowSubtitleButton(true)
             val density = resources.displayMetrics.density
             val bottomMarginInDp = 16

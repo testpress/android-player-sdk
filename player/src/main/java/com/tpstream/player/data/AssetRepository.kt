@@ -48,6 +48,12 @@ internal class AssetRepository(context: Context) {
         }
     }
 
+    fun getAssetInLiveData(assetId: String):LiveData<Asset?>{
+        return Transformations.map(assetDao.getAssetById(assetId)) {
+            it?.asDomainAsset()
+        }
+    }
+
     fun getAsset(
         params: TpInitParams,
         callback : NetworkClient.TPResponse<Asset>

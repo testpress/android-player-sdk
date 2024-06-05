@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -250,6 +251,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
+            Toast.makeText(context,"${error.errorCode}/n${error.errorCodeName}",Toast.LENGTH_LONG).show()
             val errorPlayerId = SentryLogger.generatePlayerIdString()
             SentryLogger.logPlaybackException(error, player?.params, errorPlayerId)
             if (error.errorCode == PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED) {

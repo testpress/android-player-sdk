@@ -76,15 +76,15 @@ class PlayerActivity : AppCompatActivity() {
     private fun selectVideoParams(videoType: String?){
         when(videoType){
             "TP_DRM" -> {
-                accessToken = "a4c04ca8-9c0e-4c9c-a889-bd3bf8ea586a"
-                videoId = "ATJfRdHIUC9"
-                orgCode = "lmsdemo"
+                accessToken = "40e78d4e-fb37-48a9-a483-948dbffed9d0"
+                videoId = "QcgWYY2bKvu"
+                orgCode = "delhiias"
                 provider = TPStreamsSDK.Provider.TestPress
             }
             "TP_AES_Encrypt" -> {
-                accessToken = "5f6355d0-62ac-4bfd-98ca-4a1e9a2857e3"
-                videoId = "ZZb3S5OB3nY"
-                orgCode = "lmsdemo"
+                accessToken = "33fa2be9-b511-40f6-b26a-0e1d3c619eb9"
+                videoId = "qFEG4bjcDbi"
+                orgCode = "delhiias"
                 provider = TPStreamsSDK.Provider.TestPress
             }
             "TP_NON_DRM" -> {

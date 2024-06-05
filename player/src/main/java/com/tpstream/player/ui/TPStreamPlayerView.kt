@@ -465,10 +465,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
             it.repeatMode = ObjectAnimator.REVERSE
             it.repeatCount = ObjectAnimator.INFINITE
             it.addListener(object : Animator.AnimatorListener {
-                override fun onAnimationStart(p0: Animator?) {}
-                override fun onAnimationEnd(p0: Animator?) {}
-                override fun onAnimationCancel(p0: Animator?) {}
-                override fun onAnimationRepeat(p0: Animator?) {
+                override fun onAnimationStart(p0: Animator) {}
+                override fun onAnimationEnd(p0: Animator) {}
+                override fun onAnimationCancel(p0: Animator) {}
+                override fun onAnimationRepeat(p0: Animator) {
                     this@startAnimation.y =
                         Random().nextFloat() * (playerView.height - this@startAnimation.height)
                 }

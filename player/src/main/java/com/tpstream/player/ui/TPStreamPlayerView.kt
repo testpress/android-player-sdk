@@ -311,6 +311,14 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun hideRewindButton() = playerView.setShowRewindButton(false)
 
+    fun showFullscreenButton() {
+        findViewById<ImageButton>(R.id.fullscreen).visibility = View.VISIBLE
+    } 
+
+    fun hideFullscreenButton() {
+        findViewById<ImageButton>(R.id.fullscreen).visibility = View.GONE
+    }
+
     fun showResolutionButton() {
         resolutionButton?.isVisible = true
     }

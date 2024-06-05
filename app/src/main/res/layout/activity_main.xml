@@ -39,7 +39,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:onClick="buttonClick"
-            android:text="Video 1" />
+            android:text="Non-DRM Video" />
 
         <Button
             android:id="@+id/button2"
@@ -48,7 +48,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:onClick="buttonClick2"
-            android:text="Video 2" />
+            android:text="DRM Video" />
 
         <Button
             android:id="@+id/button3"

@@ -5,10 +5,10 @@ The Android Player SDK is a powerful video player library designed for seamless 
 - Check this Document for [Setup]
 
 # Published Maven library
-- Maven Library GitHub [Repository] (https://github.com/testpress/maven)
+- Maven Library GitHub [Repository](https://github.com/testpress/maven)
 
 # Sample Android App
-- Sample Android App GitHub [Repository] (https://github.com/testpress/sample-android-app)
+- Sample Android App GitHub [Repository](https://github.com/testpress/sample-android-app)
 - Sample Android App [Download link]
 
 [Setup]: https://github.com/testpress/android-player-sdk/blob/main/SETUP.md

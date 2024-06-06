@@ -14,6 +14,10 @@ class DownloadListViewModel(context: Context): ViewModel() {
         return tpStreamDownloadManager.getAllDownloads()
     }
 
+    fun getDownloadAsset(assetId: String): LiveData<Asset?> {
+        return tpStreamDownloadManager.getDownloadAsset(assetId)
+    }
+
     fun pauseDownload(asset: Asset) {
         tpStreamDownloadManager.pauseDownload(asset)
     }

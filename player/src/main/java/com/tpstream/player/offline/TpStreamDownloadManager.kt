@@ -17,6 +17,10 @@ class TpStreamDownloadManager(val context: Context) {
         return assetRepository.getAllDownloadsInLiveData()
     }
 
+    fun getDownloadAsset(assetId: String): LiveData<Asset?> {
+        return assetRepository.getAssetInLiveData(assetId)
+    }
+
     fun pauseDownload(asset: Asset) {
         DownloadTask(context).pause(asset)
     }

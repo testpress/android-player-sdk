@@ -1,16 +1,13 @@
 # Setup Documentation for Android Player SDK
 
 ## Introduction:
-The Android Player SDK is a powerful video player library designed for seamless integration into 
-your Android applications. It offers a robust set of features for playback control, event handling,
-and advanced functionalities (like DRM, subtitles, adaptive streaming). This documentation guides
-you through setting up the SDK and getting started with its core functionalities.
+The Android Player SDK is a powerful video player library designed for seamless integration into your Android applications. It offers a robust set of features for playback control, event handling, and advanced functionalities (like DRM, subtitles, adaptive streaming). This documentation guides you through setting up the SDK and getting started with its core functionalities.
 
 ## Prerequisites:
 
 To work with the Android Player SDK, you'll need the following software:
 
-- Android Studio Electric Eel | 2022.1.1 Patch 2 - [Download link]
+- Android Studio Electric Eel | 2022.1.1 Patch 2 [Download link]
 [Download link]: https://developer.android.com/studio/archive
 
 ## Project Setup:

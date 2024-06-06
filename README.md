@@ -8,7 +8,6 @@ The Android Player SDK is a powerful video player library designed for seamless 
 To work with the Android Player SDK, you'll need the following software:
 
 - Android Studio Electric Eel | 2022.1.1 Patch 2 [Download link]
-[Download link]: https://developer.android.com/studio/archive
 
 ## Project Setup:
 
@@ -25,3 +24,5 @@ git clone https://github.com/testpress/android-player-sdk.git
 - Go to "File" -> "Open."
 - Navigate to the cloned repository folder on your system.
 - Select "Import Project."
+
+[Download link]: https://developer.android.com/studio/archive

@@ -75,7 +75,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         if (Util.SDK_INT <= 23 || player == null) {
             initializePlayer()
         }
-        hideSystemUi()
     }
 
     override fun onPause() {
@@ -128,18 +127,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             } else {
                 showFullScreen()
             }
-        }
-    }
-
-    private fun hideSystemUi() {
-        activity?.let { activity ->
-            WindowCompat.setDecorFitsSystemWindows(activity.window, false)
-            WindowInsetsControllerCompat(activity.window, tpStreamPlayerView).let { controller ->
-                controller.hide(WindowInsetsCompat.Type.systemBars())
-                controller.systemBarsBehavior =
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
-            Log.d(TAG, "hideSystemUi: ")
         }
     }
 

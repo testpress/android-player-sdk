@@ -121,8 +121,8 @@ class AssetDaoTest {
 
     private fun insertData() = runBlocking {
         val asset1 = Asset(id = "VideoID_1", video = Video(url = "url_1"))
-        val asset2 = Asset(id = "VideoID_2", video = Video(url = "url_1"))
-        val asset3 = Asset(id = "VideoID_3", video = Video(url = "url_1"))
+        val asset2 = Asset(id = "VideoID_2", video = Video(url = "url_2"))
+        val asset3 = Asset(id = "VideoID_3", video = Video(url = "url_3"))
         // Add data to db
         assetDao.insert(asset1.asLocalAsset())
         assetDao.insert(asset2.asLocalAsset())

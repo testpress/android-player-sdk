@@ -7,7 +7,7 @@ import com.tpstream.player.data.source.local.migration.RoomMigration2To3.MIGRATI
 import com.tpstream.player.data.source.local.migration.RoomMigration3To4.MIGRATION_3_4
 
 @Database(
-    version = 4,
+    version = 5,
     entities = [LocalAsset::class],
     exportSchema = true
 )

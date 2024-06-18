@@ -1,16 +1,16 @@
 package com.tpstream.player.data.source.local
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 internal interface AssetDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(asset: LocalAsset)
+
+    @Update()
+    suspend fun update(asset: LocalAsset)
 
     @Query("DELETE FROM Asset WHERE videoId=:videoID")
     suspend fun delete(videoID:String)

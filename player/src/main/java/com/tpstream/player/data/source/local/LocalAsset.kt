@@ -21,7 +21,8 @@ internal class LocalAsset(
     var videoWidth: Int = 0,
     var videoHeight: Int = 0,
     var folderTree: String?,
-    var downloadStartTimeMs: Long = 0
+    var downloadStartTimeMs: Long = 0,
+    var metadata: String?
 )
 
 enum class DownloadStatus {

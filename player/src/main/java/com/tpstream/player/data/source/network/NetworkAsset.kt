@@ -31,7 +31,10 @@ internal data class NetworkAsset(
     val networkVideo: NetworkVideo?,
 
     @SerializedName("live_stream")
-    val networkLiveStream: NetworkLiveStream?
+    val networkLiveStream: NetworkLiveStream?,
+
+    @SerializedName("folder_tree")
+    val folderTree: String?
 ) {
 
     inner class NetworkVideo(
@@ -46,7 +49,8 @@ internal data class NetworkAsset(
         val video_codec: String?,
         val audio_codec: String?,
         val enable_drm: Boolean?,
-        val tracks: List<Track>?
+        val tracks: List<Track>?,
+        val duration: Long?
     ) {
         inner class Track(
             val type: String?,

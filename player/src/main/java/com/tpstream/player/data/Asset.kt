@@ -14,7 +14,9 @@ data class Asset(
     var thumbnail: String = "",
     var description: String = "",
     var video: Video = Video(),
-    var liveStream: LiveStream? = null
+    var liveStream: LiveStream? = null,
+    val folderTree: String? = null,
+    val downloadStartTimeMs: Long = 0
 ) {
     fun getLocalThumbnail(context: Context): Bitmap?{
         return ImageSaver(context).load(id)
@@ -63,7 +65,7 @@ data class Video(
     var width: Int = 0,
     var height: Int = 0,
     var transcodingStatus: String = "",
-    var duration: String = "",
+    var duration: Long = 0,
     var percentageDownloaded: Int = 0,
     var bytesDownloaded: Long = 0,
     var totalSize: Long = 0,

@@ -21,7 +21,9 @@ internal fun LocalAsset.asDomainAsset(): Asset {
             downloadState = this.downloadState,
             width = this.videoWidth,
             height = this.videoHeight,
-        )
+        ),
+        folderTree = this.folderTree,
+        downloadStartTimeMs = this.downloadStartTimeMs
     )
 }
 
@@ -45,7 +47,7 @@ internal fun NetworkAsset.asDomainAsset(): Asset {
         thumbnail = thumbnailUrl,
         video = Video(
             url = url,
-            duration = duration ?: "",
+            duration = networkVideo?.duration ?: 0,
             transcodingStatus = transcodingStatus ?: "",
             tracks = this.networkVideo?.tracks?.map {
                 it.asDomainTracks()
@@ -97,6 +99,8 @@ internal fun Asset.asLocalAsset(): LocalAsset {
         totalSize = this.video.totalSize,
         downloadState = this.video.downloadState,
         videoWidth = this.video.width,
-        videoHeight = this.video.height
+        videoHeight = this.video.height,
+        folderTree = this.folderTree,
+        downloadStartTimeMs = this.downloadStartTimeMs
     )
 }

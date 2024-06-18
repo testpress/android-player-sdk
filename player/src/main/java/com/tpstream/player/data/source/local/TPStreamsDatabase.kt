@@ -6,9 +6,10 @@ import com.tpstream.player.data.source.local.migration.RoomMigration1To2.MIGRATI
 import com.tpstream.player.data.source.local.migration.RoomMigration2To3.MIGRATION_2_3
 import com.tpstream.player.data.source.local.migration.RoomMigration3To4.MIGRATION_3_4
 import com.tpstream.player.data.source.local.migration.RoomMigration4To5.MIGRATION_4_5
+import com.tpstream.player.data.source.local.migration.RoomMigration5To6.MIGRATION_5_6
 
 @Database(
-    version = 5,
+    version = 6,
     entities = [LocalAsset::class],
     exportSchema = true
 )
@@ -19,7 +20,7 @@ internal abstract class TPStreamsDatabase : RoomDatabase() {
     companion object {
         private lateinit var INSTANCE: TPStreamsDatabase
 
-        private val MIGRATIONS = arrayOf(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5)
+        private val MIGRATIONS = arrayOf(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6)
 
         operator fun invoke(context: Context): TPStreamsDatabase {
             synchronized(TPStreamsDatabase::class.java) {

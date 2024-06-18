@@ -10,6 +10,7 @@ import com.tpstream.player.data.source.local.migration.RoomMigration1To2.MIGRATI
 import com.tpstream.player.data.source.local.migration.RoomMigration2To3.MIGRATION_2_3
 import com.tpstream.player.data.source.local.migration.RoomMigration3To4.MIGRATION_3_4
 import com.tpstream.player.data.source.local.migration.RoomMigration4To5.MIGRATION_4_5
+import com.tpstream.player.data.source.local.migration.RoomMigration5To6.MIGRATION_5_6
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -37,7 +38,7 @@ class RoomMigrationTest {
                 """INSERT INTO OfflineVideoInfo VALUES ('videoID', 'title', 'thumbnail', 'thumbnailSmall', 'thumbnailMedium', 'url', 'dashUrl', 'hlsUrl', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
             close()
         }
-        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+        db = helper.runMigrationsAndValidate(TEST_DB, 6, true, MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
 
         val versionDB = Room.databaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
@@ -52,7 +53,7 @@ class RoomMigrationTest {
 
     @Test
     @Throws(IOException::class)
-    fun testMigration2To5() {
+    fun testMigration2To6() {
         db = helper.createDatabase(TEST_DB, 2).apply {
             execSQL(
                 """INSERT INTO OfflineVideoInfo VALUES ('1', 'videoID1', 'title1', 'thumbnail1', 'url1', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
@@ -62,7 +63,7 @@ class RoomMigrationTest {
                 """INSERT INTO OfflineVideoInfo VALUES ('3', 'videoID3', 'title3', 'thumbnail3', 'url3', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
             close()
         }
-        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+        db = helper.runMigrationsAndValidate(TEST_DB, 6, true, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
 
         val versionDB = Room.databaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
@@ -79,7 +80,7 @@ class RoomMigrationTest {
 
     @Test
     @Throws(IOException::class)
-    fun testMigration3To5() {
+    fun testMigration3To6() {
         db = helper.createDatabase(TEST_DB, 3).apply {
             execSQL(
                 """INSERT INTO Video VALUES ('1', 'videoID1', 'title1', 'thumbnail1', 'url1', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
@@ -87,7 +88,7 @@ class RoomMigrationTest {
                 """INSERT INTO Video VALUES ('2', 'videoID2', 'title2', 'thumbnail2', 'url2', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim())
             close()
         }
-        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, MIGRATION_3_4, MIGRATION_4_5)
+        db = helper.runMigrationsAndValidate(TEST_DB, 6, true, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
 
         val versionDB = Room.databaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
@@ -104,7 +105,7 @@ class RoomMigrationTest {
 
     @Test
     @Throws(IOException::class)
-    fun testMigration4To5() {
+    fun testMigration4To6() {
         db = helper.createDatabase(TEST_DB, 4).apply {
             execSQL(
                 """INSERT INTO Asset VALUES (1, 'videoID1', 'title1', 'thumbnail1', 'url1', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim()
@@ -114,7 +115,7 @@ class RoomMigrationTest {
             )
             close()
         }
-        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, MIGRATION_4_5)
+        db = helper.runMigrationsAndValidate(TEST_DB, 6, true, MIGRATION_4_5, MIGRATION_5_6)
 
         val versionDB = Room.databaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
@@ -126,6 +127,34 @@ class RoomMigrationTest {
         val allVideos = versionDB.assetDao().getAllAsset()
         assertEquals("videoID2", video?.videoId)
         assertEquals(2, allVideos?.size)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun testMigration5To6() {
+        db = helper.createDatabase(TEST_DB, 5).apply {
+            execSQL(
+                """INSERT INTO Asset VALUES ('videoID1', 'title1', 'thumbnail1', 'url1', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim()
+            )
+            execSQL(
+                """INSERT INTO Asset VALUES ('videoID2', 'title2', 'thumbnail2', 'url2', 'duration', 'description', 'transcodingStatus', 100, 1000, 1000, null, 1920, 1080)""".trim()
+            )
+            close()
+        }
+        db = helper.runMigrationsAndValidate(TEST_DB, 6, true, MIGRATION_5_6)
+
+        val versionDB = Room.databaseBuilder(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            TPStreamsDatabase::class.java,
+            TEST_DB
+        ).build()
+
+        val video = versionDB.assetDao().getAssetByUrl("url2")
+        val allVideos = versionDB.assetDao().getAllAsset()
+        assertEquals("videoID2", video?.videoId)
+        assertEquals(2, allVideos?.size)
+        assertEquals(null, video?.folderTree)
+        assertEquals(0L, video?.duration)
     }
 
 }

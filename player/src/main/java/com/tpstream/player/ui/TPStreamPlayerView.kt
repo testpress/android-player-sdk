@@ -122,14 +122,14 @@ class TPStreamPlayerView @JvmOverloads constructor(
                     player.getTrackSelectionParameters(),
                 )
                 downloadResolutionSelectionSheet.show((context as FragmentActivity).supportFragmentManager, "DownloadSelectionSheet")
-                downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, video ->
+                downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, asset ->
                     DownloadTask(context).start(downloadRequest)
-                    video?.id = player.params.videoId!!
+                    asset?.id = player.params.videoId!!
                     ImageSaver(context).save(
-                        video?.thumbnail!!,
-                        video.id
+                        asset?.thumbnail!!,
+                        asset.id
                     )
-                    videoViewModel.insert(video)
+                    videoViewModel.insert(asset)
                 }
             }
         }

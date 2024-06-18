@@ -54,7 +54,8 @@ internal fun NetworkAsset.asDomainAsset(): Asset {
             }
         ),
         description = description ?: "",
-        liveStream = getDomainLiveStream(this)
+        liveStream = getDomainLiveStream(this),
+        folderTree = folderTree
     )
 }
 

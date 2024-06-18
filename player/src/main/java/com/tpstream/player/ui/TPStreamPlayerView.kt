@@ -125,6 +125,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, asset ->
                     DownloadTask(context).start(downloadRequest)
                     asset?.id = player.params.videoId!!
+                    asset?.downloadStartTimeMs = System.currentTimeMillis()
                     ImageSaver(context).save(
                         asset?.thumbnail!!,
                         asset.id

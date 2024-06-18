@@ -48,7 +48,7 @@ class AssetDaoTest {
     fun testGetOfflineVideoInfoByVideoId() {
         insertData()
         val result = assetDao.getAssetByVideoId("VideoID_1")
-        assertThat(result?.id, equalTo(1L))
+        assertThat(result?.videoId, equalTo("VideoID_1"))
     }
 
     @Test
@@ -64,7 +64,7 @@ class AssetDaoTest {
     fun testGetOfflineVideoInfoByUrl() {
         insertData()
         val result = assetDao.getAssetByUrl("url_2")
-        assertThat(result?.id, equalTo(2L))
+        assertThat(result?.url, equalTo("url_2"))
     }
 
     @Test

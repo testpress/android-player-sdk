@@ -17,7 +17,7 @@ internal class AssetRepository(context: Context) {
     private val assetDao = TPStreamsDatabase(context).assetDao()
 
     suspend fun update(asset: Asset){
-        assetDao.insert(asset.asLocalAsset())
+        assetDao.update(asset.asLocalAsset())
     }
 
     fun get(videoId: String): LiveData<Asset?> {

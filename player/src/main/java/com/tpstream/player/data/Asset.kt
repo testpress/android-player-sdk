@@ -16,7 +16,7 @@ data class Asset(
     var video: Video = Video(),
     var liveStream: LiveStream? = null,
     val folderTree: String? = null,
-    val downloadStartTimeMs: Long = 0
+    var downloadStartTimeMs: Long = 0
 ) {
     fun getLocalThumbnail(context: Context): Bitmap?{
         return ImageSaver(context).load(id)

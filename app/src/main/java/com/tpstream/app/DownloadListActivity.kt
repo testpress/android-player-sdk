@@ -65,7 +65,7 @@ class DownloadListActivity : AppCompatActivity() {
                 binding.title.text = asset.title
                 thumbnail.setImageBitmap(asset.getLocalThumbnail(applicationContext))
                 binding.downloadImage.setImageResource(getDownloadImage(asset.video.downloadState))
-                binding.duration.text = asset.video.duration
+                binding.duration.text = asset.video.duration.toString()
                 binding.percentage.text = "${asset.video.percentageDownloaded} %"
                 showOrHideButtons(asset.video.downloadState)
             }

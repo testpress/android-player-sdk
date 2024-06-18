@@ -11,7 +11,7 @@ internal class LocalAsset(
     var title: String = "",
     var thumbnail: String = "",
     var url: String = "",
-    var duration: String = "",
+    var duration: Long = 0L,
     var description: String = "",
     var transcodingStatus: String = "",
     var percentageDownloaded: Int = 0,
@@ -19,7 +19,9 @@ internal class LocalAsset(
     var totalSize: Long = 0,
     var downloadState: DownloadStatus? = null,
     var videoWidth: Int = 0,
-    var videoHeight: Int = 0
+    var videoHeight: Int = 0,
+    var folderTree: String?,
+    var downloadStartTimeMs: Long = 0
 )
 
 enum class DownloadStatus {

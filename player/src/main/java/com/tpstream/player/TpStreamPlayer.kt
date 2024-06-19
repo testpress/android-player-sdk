@@ -36,7 +36,7 @@ public interface TpStreamPlayer {
     fun setMaxResolution(resolution: Int)
     fun play()
     fun pause()
-    fun load(parameters: TpInitParams)
+    fun load(parameters: TpInitParams, metadata: String? = null)
     fun release()
     fun getPlayBackSpeed(): Float
     fun getPlayWhenReady(): Boolean
@@ -75,12 +75,13 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             }
     }
 
-    override fun load(parameters: TpInitParams) {
+    override fun load(parameters: TpInitParams, metadata: String?) {
         params = parameters
         exoPlayer.playWhenReady = parameters.autoPlay?:true
         assetRepository.getAsset(parameters, object : NetworkClient.TPResponse<Asset> {
             override fun onSuccess(result: Asset) {
                 asset = result
+                asset?.metadata = metadata
                 asset!!.getPlaybackURL()?.let {
                     playVideoInUIThread(it, parameters.startPositionInMilliSecs)
                 }

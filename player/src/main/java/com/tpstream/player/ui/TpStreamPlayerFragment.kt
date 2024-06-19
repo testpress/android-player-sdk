@@ -172,11 +172,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     @Deprecated("Deprecated",ReplaceWith("TpStreamPlayer.load()"),DeprecationLevel.ERROR)
-    fun load(parameters: TpInitParams) {
+    fun load(parameters: TpInitParams, metadata: String? = null) {
         if (player == null) {
             throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
         }
-        player?.load(parameters)
+        player?.load(parameters, metadata)
     }
 
     override fun onDownloadsSuccess(videoId:String?) {

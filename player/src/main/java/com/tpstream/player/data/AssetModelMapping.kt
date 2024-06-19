@@ -23,7 +23,8 @@ internal fun LocalAsset.asDomainAsset(): Asset {
             height = this.videoHeight,
         ),
         folderTree = this.folderTree,
-        downloadStartTimeMs = this.downloadStartTimeMs
+        downloadStartTimeMs = this.downloadStartTimeMs,
+        metadata = this.metadata
     )
 }
 
@@ -102,6 +103,7 @@ internal fun Asset.asLocalAsset(): LocalAsset {
         videoWidth = this.video.width,
         videoHeight = this.video.height,
         folderTree = this.folderTree,
-        downloadStartTimeMs = this.downloadStartTimeMs
+        downloadStartTimeMs = this.downloadStartTimeMs,
+        metadata = this.metadata
     )
 }

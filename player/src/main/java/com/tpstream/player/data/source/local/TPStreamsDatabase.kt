@@ -8,12 +8,14 @@ import com.tpstream.player.data.source.local.migration.RoomMigration3To4.MIGRATI
 import com.tpstream.player.data.source.local.migration.RoomMigration4To5.MIGRATION_4_5
 import com.tpstream.player.data.source.local.migration.RoomMigration5To6.MIGRATION_5_6
 import com.tpstream.player.data.source.local.migration.RoomMigration6To7.MIGRATION_6_7
+import com.tpstream.player.util.Converters
 
 @Database(
     version = 7,
     entities = [LocalAsset::class],
     exportSchema = true
 )
+@TypeConverters(Converters::class)
 internal abstract class TPStreamsDatabase : RoomDatabase() {
 
     abstract fun assetDao(): AssetDao

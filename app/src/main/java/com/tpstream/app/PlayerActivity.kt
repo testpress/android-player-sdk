@@ -36,7 +36,7 @@ class PlayerActivity : AppCompatActivity() {
         playerFragment.setOnInitializationListener(object: InitializationListener {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
                 tpStreamPlayer = player
-                tpStreamPlayer.load(buildParams(),"{\"videoID\":\"${buildParams().videoId}\"}")
+                tpStreamPlayer.load(buildParams())
                 tpStreamPlayer.setListener( object : TPStreamPlayerListener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         Log.d(TAG, "onPlaybackStateChanged: $playbackState")

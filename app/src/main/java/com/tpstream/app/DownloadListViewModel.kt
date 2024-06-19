@@ -14,6 +14,10 @@ class DownloadListViewModel(context: Context): ViewModel() {
         return tpStreamDownloadManager.getAllDownloads()
     }
 
+    fun getAssetsByMetadata(metadata: Map<String, String>): LiveData<List<Asset>?> {
+        return tpStreamDownloadManager.getAssetsByMetadata(metadata)
+    }
+
     fun getDownloadAsset(assetId: String): LiveData<Asset?> {
         return tpStreamDownloadManager.getDownloadAsset(assetId)
     }

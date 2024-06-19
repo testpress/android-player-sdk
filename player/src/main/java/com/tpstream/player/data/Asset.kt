@@ -17,7 +17,7 @@ data class Asset(
     var liveStream: LiveStream? = null,
     val folderTree: String? = null,
     var downloadStartTimeMs: Long = 0,
-    var metadata: String? = null
+    var metadata: Map<String, String>? = null
 ) {
     fun getLocalThumbnail(context: Context): Bitmap?{
         return ImageSaver(context).load(id)

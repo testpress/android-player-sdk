@@ -17,6 +17,10 @@ class TpStreamDownloadManager(val context: Context) {
         return assetRepository.getAllDownloadsInLiveData()
     }
 
+    fun getAssetsByMetadata(metadata: Map<String, String>): LiveData<List<Asset>?> {
+        return assetRepository.getAssetsByMetadata(metadata)
+    }
+
     fun getDownloadAsset(assetId: String): LiveData<Asset?> {
         return assetRepository.getAssetInLiveData(assetId)
     }

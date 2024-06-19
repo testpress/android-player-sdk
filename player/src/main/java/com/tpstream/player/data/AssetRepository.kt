@@ -54,6 +54,17 @@ internal class AssetRepository(context: Context) {
         }
     }
 
+    fun getAssetsByMetadata(metadata: Map<String, String>): LiveData<List<Asset>?> {
+        return Transformations.map(assetDao.getAllDownloadInLiveData()) { assets ->
+            assets?.filter { asset ->
+                // Check if asset's metadata contains all key-value pairs from the input metadata
+                metadata.all { (key, value) ->
+                    asset.metadata?.get(key) == value
+                }
+            }?.asDomainAssets()
+        }
+    }
+
     fun getAsset(
         params: TpInitParams,
         callback : NetworkClient.TPResponse<Asset>

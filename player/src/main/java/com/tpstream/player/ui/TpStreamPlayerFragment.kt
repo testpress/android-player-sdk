@@ -179,8 +179,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         player?.load(parameters, metadata)
     }
 
-    override fun onDownloadsSuccess(videoId:String?) {
-        if (videoId == player?.params?.videoId){
+    override fun onDownloadsSuccess(videoId: String?) {
+        if (!this.isVisible) return
+        if (player == null) return
+        if (player?.isParamsInitialized() == true && videoId == player?.params?.videoId) {
             reloadVideo()
         }
     }

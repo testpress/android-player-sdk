@@ -75,6 +75,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             }
     }
 
+    fun isParamsInitialized(): Boolean {
+        return this::params.isInitialized
+    }
+
     override fun load(parameters: TpInitParams, metadata: Map<String, String>?) {
         params = parameters
         exoPlayer.playWhenReady = parameters.autoPlay?:true

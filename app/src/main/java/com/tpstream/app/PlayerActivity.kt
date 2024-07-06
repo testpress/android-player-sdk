@@ -20,8 +20,8 @@ class PlayerActivity : AppCompatActivity() {
     private val TAG = "PlayerActivity"
     private lateinit var accessToken :String
     private lateinit var videoId :String
-    private lateinit var orgCode :String
-    private lateinit var provider: TPStreamsSDK.Provider
+    private var orgCode :String = "6eafqn"
+    private var provider: TPStreamsSDK.Provider = TPStreamsSDK.Provider.TPStreams
     private var parameters : TpInitParams? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

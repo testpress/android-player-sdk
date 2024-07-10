@@ -300,7 +300,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     private fun showNoticeScreen(asset: Asset) {
         displayNoticeMessage(asset)
-        handleDisconnectedLiveStream(asset)
         handleNotStartedLiveStream(asset)
     }
 
@@ -308,17 +307,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
         asset.getNoticeMessage()?.let {
             noticeMessage!!.text = it
             noticeScreenLayout!!.visibility = View.VISIBLE
-        }
-    }
-
-    private fun handleDisconnectedLiveStream(asset: Asset) {
-        if (asset.liveStream?.isDisconnected == true) {
-            coroutineScope.launch {
-                delay(15000)
-                withContext(Dispatchers.Main) {
-                    player.load(player.params)
-                }
-            }
         }
     }
 

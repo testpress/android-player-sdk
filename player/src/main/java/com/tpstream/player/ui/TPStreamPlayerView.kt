@@ -6,7 +6,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -30,8 +33,13 @@ import com.tpstream.player.util.MarkerState
 import com.tpstream.player.util.NetworkClient.Companion.makeHeadRequest
 import com.tpstream.player.util.getPlayedStatusArray
 import kotlinx.coroutines.*
+import kotlinx.coroutines.NonCancellable.isActive
+import java.net.HttpURLConnection
+import java.net.URL
+import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 class TPStreamPlayerView @JvmOverloads constructor(
     context: Context,

@@ -6,10 +6,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.os.Handler
-import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -39,7 +36,6 @@ import java.net.URL
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 class TPStreamPlayerView @JvmOverloads constructor(
     context: Context,
@@ -307,6 +303,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     private fun showNoticeScreen(asset: Asset) {
         displayNoticeMessage(asset)
+        handleDisconnectedLiveStream(asset)
         handleNotStartedLiveStream(asset)
     }
 
@@ -314,6 +311,17 @@ class TPStreamPlayerView @JvmOverloads constructor(
         asset.getNoticeMessage()?.let {
             noticeMessage!!.text = it
             noticeScreenLayout!!.visibility = View.VISIBLE
+        }
+    }
+
+    private fun handleDisconnectedLiveStream(asset: Asset) {
+        if (asset.liveStream?.isDisconnected == true) {
+            coroutineScope.launch {
+                delay(15000)
+                withContext(Dispatchers.Main) {
+                    player.load(player.params)
+                }
+            }
         }
     }
 

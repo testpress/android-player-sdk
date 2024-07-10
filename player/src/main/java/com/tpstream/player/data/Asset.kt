@@ -40,6 +40,7 @@ data class Asset(
         val livestream = this.liveStream!!
 
         if (livestream.isDisconnected) return true
+        if (livestream.isRecording) return true
 
         return !livestream.isStreaming &&
                 !(livestream.isEnded && livestream.recordingEnabled && video.isTranscodingCompleted)
@@ -56,6 +57,7 @@ data class Asset(
             liveStream?.isNotStarted == true ->
                 "Live stream will begin soon."
             liveStream?.isDisconnected == true -> "The live stream has been disconnected. Please try again later."
+            liveStream?.isRecording == true -> "The live stream has come to an end. Stay tuned, we'll have the recording ready for you shortly."
             liveStream?.isEnded == true && liveStream.recordingEnabled && !video.isTranscodingCompleted ->
                 "Live stream has ended. Recording will be available soon."
             liveStream?.isEnded == true && !liveStream.recordingEnabled ->
@@ -104,6 +106,9 @@ data class LiveStream(
 
     val isNotStarted: Boolean
         get() = status == "Not Started"
+
+    val isRecording: Boolean
+        get() = status == "Recording"
 
     fun getFormattedStartTime(): String {
         val outputFormat = SimpleDateFormat("MMMM d, yyyy, h:mm a", Locale.getDefault())

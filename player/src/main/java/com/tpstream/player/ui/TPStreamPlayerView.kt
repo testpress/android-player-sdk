@@ -6,10 +6,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.os.Handler
-import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -32,12 +29,10 @@ import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.util.MarkerState
 import com.tpstream.player.util.getPlayedStatusArray
 import kotlinx.coroutines.*
-import kotlinx.coroutines.NonCancellable.isActive
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 class TPStreamPlayerView @JvmOverloads constructor(
     context: Context,
@@ -64,6 +59,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var tPStreamPlayerViewCallBack: TPStreamPlayerViewCallBack? = null
     private var noticeScreenLayout: LinearLayout? = null
     private var noticeMessage: TextView? = null
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     init {
         registerDownloadListener()
@@ -302,48 +298,46 @@ class TPStreamPlayerView @JvmOverloads constructor(
         liveLabel.visibility = View.VISIBLE
     }
 
-    val co = CoroutineScope(Dispatchers.IO)
-
     private fun showNoticeScreen(asset: Asset) {
+        displayNoticeMessage(asset)
+        handleDisconnectedLiveStream(asset)
+        handleNotStartedLiveStream(asset)
+    }
+
+    private fun displayNoticeMessage(asset: Asset) {
         asset.getNoticeMessage()?.let {
             noticeMessage!!.text = it
             noticeScreenLayout!!.visibility = View.VISIBLE
         }
+    }
 
-        if (player.asset?.liveStream?.isDisconnected == true){
-            player.asset?.liveStream?.url?.let { url ->
-                co.launch {
-                    requestWithRetry(url,5000)
-                }
-            }
-        }
-
-        if(player.asset?.liveStream?.isNotStarted == true){
-            player.asset?.liveStream?.url?.let { url ->
-                co.launch {
-                    requestWithRetry(url,5000)
+    private fun handleDisconnectedLiveStream(asset: Asset) {
+        if (asset.liveStream?.isDisconnected == true) {
+            coroutineScope.launch {
+                delay(15000)
+                withContext(Dispatchers.Main) {
+                    player.load(player.params)
                 }
             }
         }
     }
 
-    private fun makeRequest(url: String): Int {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        return try {
-            connection.requestMethod = "GET"
-            connection.connect()
-            connection.responseCode
-        } finally {
-            connection.disconnect()
+    private fun handleNotStartedLiveStream(asset: Asset) {
+        if (asset.liveStream?.isNotStarted == true) {
+            asset.liveStream?.url?.let { url ->
+                coroutineScope.launch {
+                    requestWithRetry(url, 10000)
+                }
+            }
         }
     }
 
     private suspend fun requestWithRetry(url: String, delay: Long) {
-        while (isActive) { // Check if the coroutine is still active
+        while (coroutineScope.isActive) {
             try {
                 val responseCode = makeRequest(url)
                 if (responseCode == 200) {
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         player.load(player.params)
                     }
                     return
@@ -355,9 +349,17 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
+    private fun makeRequest(url: String): Int {
+        val request = Request.Builder().url(url).build()
+        OkHttpClient().newCall(request).execute().use { response ->
+            return response.code
+        }
+    }
+
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        co.cancel()
+        coroutineScope.cancel()
     }
 
     override fun getViewModelStore(): ViewModelStore {

@@ -6,7 +6,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -28,8 +31,13 @@ import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.util.MarkerState
 import com.tpstream.player.util.getPlayedStatusArray
+import kotlinx.coroutines.*
+import kotlinx.coroutines.NonCancellable.isActive
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 class TPStreamPlayerView @JvmOverloads constructor(
     context: Context,
@@ -288,16 +296,68 @@ class TPStreamPlayerView @JvmOverloads constructor(
         val durationSeparator: TextView = playerView.findViewById(R.id.exo_separator)
         val liveLabel: RelativeLayout = playerView.findViewById(R.id.live_label)
 
+        noticeScreenLayout?.visibility = View.GONE
         durationView.visibility = View.GONE
         durationSeparator.visibility = View.GONE
         liveLabel.visibility = View.VISIBLE
     }
+
+    val co = CoroutineScope(Dispatchers.IO)
 
     private fun showNoticeScreen(asset: Asset) {
         asset.getNoticeMessage()?.let {
             noticeMessage!!.text = it
             noticeScreenLayout!!.visibility = View.VISIBLE
         }
+
+        if (player.asset?.liveStream?.isDisconnected == true){
+            player.asset?.liveStream?.url?.let { url ->
+                co.launch {
+                    requestWithRetry(url,5000)
+                }
+            }
+        }
+
+        if(player.asset?.liveStream?.isNotStarted == true){
+            player.asset?.liveStream?.url?.let { url ->
+                co.launch {
+                    requestWithRetry(url,5000)
+                }
+            }
+        }
+    }
+
+    private fun makeRequest(url: String): Int {
+        val connection = URL(url).openConnection() as HttpURLConnection
+        return try {
+            connection.requestMethod = "GET"
+            connection.connect()
+            connection.responseCode
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    private suspend fun requestWithRetry(url: String, delay: Long) {
+        while (isActive) { // Check if the coroutine is still active
+            try {
+                val responseCode = makeRequest(url)
+                if (responseCode == 200) {
+                    withContext(Dispatchers.Main){
+                        player.load(player.params)
+                    }
+                    return
+                }
+            } catch (e: Exception) {
+                println("Request failed: ${e.message}")
+            }
+            delay(delay)
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        co.cancel()
     }
 
     override fun getViewModelStore(): ViewModelStore {

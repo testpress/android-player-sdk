@@ -239,6 +239,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
+            if (isDisconnectedLiveStream(error)){
+                player.load(player.params)
+                return
+            }
             val errorPlayerId = SentryLogger.generatePlayerIdString()
             SentryLogger.logPlaybackException(error, player?.params, errorPlayerId)
             if (error.errorCode == PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED) {
@@ -306,6 +310,13 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             return cause is DrmSessionException || cause is MediaCodec.CryptoException || cause is MediaDrmCallbackException
         }
 
+    }
+
+    private fun isDisconnectedLiveStream(error: PlaybackException): Boolean {
+        player.asset?.liveStream?.let {
+            return it.isNotEnded && error.errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED
+        }
+        return false
     }
 
     private fun showErrorMessage(message: String) {

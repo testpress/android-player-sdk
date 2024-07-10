@@ -69,7 +69,8 @@ internal fun getDomainLiveStream(asset: NetworkAsset): LiveStream? =
                 startTime = parseDateTime(startTime),
                 recordingEnabled = recordingEnabled,
                 enabledDRMForLive = enabledDRMForLive,
-                enabledDRMForRecording = enabledDRMForRecording
+                enabledDRMForRecording = enabledDRMForRecording,
+                noticeMessage = noticeMessage
             )
         }
     } else {

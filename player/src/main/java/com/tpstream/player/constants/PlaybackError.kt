@@ -52,3 +52,13 @@ internal fun PlaybackException.getErrorMessage(playerId: String): String {
         else -> "Oops! Something went wrong. Please contact support for assistance and provide details about the issue.\n Error code: 5100. Player Id: $playerId"
     }
 }
+
+internal fun TPException.getErrorMessageForDownload(): String {
+    return when {
+        this.isNetworkError() -> "Please check your connection and try again"
+        this.response?.code == 404 -> "The video is not available. Please try another one."
+        this.isUnauthenticated() -> "Sorry, you don't have permission to download this video"
+        this.isServerError() -> "We're sorry, but there's an issue on our server. Please try again later."
+        else -> "Oops! Something went wrong. Please contact support for assistance and provide details about the issue."
+    }
+}

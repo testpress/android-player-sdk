@@ -23,29 +23,17 @@ import kotlin.math.roundToInt
 
 internal typealias OnSubmitListener = (DownloadRequest, Asset?) -> Unit
 
-internal class DownloadResolutionSelectionSheet(
-    private val asset: Asset,
-    private val params: TpInitParams,
-) : BottomSheetDialogFragment(), VideoDownloadRequestCreationHandler.Listener {
+internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), VideoDownloadRequestCreationHandler.Listener {
 
     private var _binding: TpDownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
     private lateinit var overrides: MutableMap<TrackGroup, TrackSelectionOverride>
+    private lateinit var asset: Asset
+    private lateinit var params: TpInitParams
     var isResolutionSelected = false
     private var trackGroups: MutableList<TracksGroup> = mutableListOf()
     private var onSubmitListener: OnSubmitListener? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        videoDownloadRequestCreateHandler =
-            VideoDownloadRequestCreationHandler(
-                requireContext(),
-                asset = asset,
-                params = params
-            )
-        videoDownloadRequestCreateHandler.listener = this
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,6 +47,18 @@ internal class DownloadResolutionSelectionSheet(
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    fun initializeVideoDownloadRequestCreateHandler(context: Context, asset: Asset, params: TpInitParams) {
+        this.asset = asset
+        this.params = params
+        videoDownloadRequestCreateHandler =
+            VideoDownloadRequestCreationHandler(
+                context,
+                asset = asset,
+                params = params
+            )
+        videoDownloadRequestCreateHandler.listener = this
     }
 
     override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, downloadHelper: DownloadHelper) {

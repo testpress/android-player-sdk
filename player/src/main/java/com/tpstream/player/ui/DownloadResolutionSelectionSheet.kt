@@ -49,7 +49,7 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
         _binding = null
     }
 
-    fun add(context: Context, asset: Asset, params: TpInitParams) {
+    fun initializeVideoDownloadRequestCreateHandler(context: Context, asset: Asset, params: TpInitParams) {
         this.asset = asset
         this.params = params
         videoDownloadRequestCreateHandler =

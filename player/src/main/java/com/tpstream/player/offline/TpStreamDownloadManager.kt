@@ -82,7 +82,7 @@ class TpStreamDownloadManager(val context: Context) {
             params,
             asset.video.url
         )
-        downloadResolutionSelectionSheet.add(context, asset, params)
+        downloadResolutionSelectionSheet.initializeVideoDownloadRequestCreateHandler(context, asset, params)
         downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, asset ->
             DownloadTask(context).start(downloadRequest)
             asset?.id = params.videoId!!

@@ -2,6 +2,7 @@ package com.tpstream.player.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,16 +25,14 @@ import kotlin.math.roundToInt
 internal typealias OnSubmitListener = (DownloadRequest, Asset?) -> Unit
 
 internal class DownloadResolutionSelectionSheet(
-    val player: TpStreamPlayerImpl,
-    parameters: TrackSelectionParameters,
+    private val asset: Asset,
+    private val params: TpInitParams,
 ) : BottomSheetDialogFragment(), VideoDownloadRequestCreationHandler.Listener {
 
     private var _binding: TpDownloadTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
-    private val asset = player.asset
     private lateinit var videoDownloadRequestCreateHandler: VideoDownloadRequestCreationHandler
-    var overrides: MutableMap<TrackGroup, TrackSelectionOverride> =
-        parameters.overrides.toMutableMap()
+    private lateinit var overrides: MutableMap<TrackGroup, TrackSelectionOverride>
     var isResolutionSelected = false
     private var trackGroups: MutableList<TracksGroup> = mutableListOf()
     private var onSubmitListener: OnSubmitListener? = null
@@ -43,8 +42,8 @@ internal class DownloadResolutionSelectionSheet(
         videoDownloadRequestCreateHandler =
             VideoDownloadRequestCreationHandler(
                 requireContext(),
-                asset = asset!!,
-                params = player.params
+                asset = asset,
+                params = params
             )
         videoDownloadRequestCreateHandler.listener = this
     }
@@ -66,6 +65,7 @@ internal class DownloadResolutionSelectionSheet(
     override fun onDownloadRequestHandlerPrepared(isPrepared: Boolean, downloadHelper: DownloadHelper) {
         if (!this.isVisible) return
         prepareTrackGroup(downloadHelper)
+        prepareOverride()
         initializeDownloadResolutionSheet()
         showResolutions(isPrepared)
     }
@@ -77,6 +77,10 @@ internal class DownloadResolutionSelectionSheet(
     private fun prepareTrackGroup(helper: DownloadHelper){
          val tracks = helper.getTracks(0)
         trackGroups = tracks.groups
+    }
+
+    private fun prepareOverride(){
+        overrides = DownloadHelper.getDefaultTrackSelectorParameters(requireContext()).overrides.toMutableMap()
     }
 
     private fun initializeDownloadResolutionSheet(){
@@ -174,7 +178,8 @@ internal class DownloadResolutionSelectionSheet(
 
         private fun getVideoSize(trackInfo: TrackInfo): String {
             val mbps = (((trackInfo.format.bitrate).toFloat() / 8f / 1024f) / 1024f)
-            val videoLengthInSecond = (player.getDuration().toFloat() / 1000f)
+            val videoLengthInSecond = asset.video.duration
+            Log.d("TAG", "getVideoSize: $videoLengthInSecond")
             return "${((mbps * videoLengthInSecond)).roundToInt()} MB"            //Mbps
         }
 

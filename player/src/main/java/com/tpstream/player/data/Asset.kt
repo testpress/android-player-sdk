@@ -39,6 +39,8 @@ data class Asset(
 
         val livestream = this.liveStream!!
 
+        if (livestream.isDisconnected) return true
+
         return !livestream.isStreaming &&
                 !(livestream.isEnded && livestream.recordingEnabled && video.isTranscodingCompleted)
     }
@@ -53,6 +55,7 @@ data class Asset(
                 "Live stream is scheduled to start at ${liveStream.getFormattedStartTime()}"
             liveStream?.isNotStarted == true ->
                 "Live stream will begin soon."
+            liveStream?.isDisconnected == true -> "The live stream is temporarily interrupted. We'll be back shortly."
             liveStream?.isEnded == true && liveStream.recordingEnabled && !video.isTranscodingCompleted ->
                 "Live stream has ended. Recording will be available soon."
             liveStream?.isEnded == true && !liveStream.recordingEnabled ->

@@ -30,10 +30,6 @@ import com.tpstream.player.util.MarkerState
 import com.tpstream.player.util.NetworkClient.Companion.makeHeadRequest
 import com.tpstream.player.util.getPlayedStatusArray
 import kotlinx.coroutines.*
-import kotlinx.coroutines.NonCancellable.isActive
-import java.net.HttpURLConnection
-import java.net.URL
-import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 

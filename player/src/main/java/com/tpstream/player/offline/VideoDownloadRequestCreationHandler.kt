@@ -5,7 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import com.tpstream.player.*
 import com.tpstream.player.TPStreamsSDK
-import com.tpstream.player.TpStreamPlayerImpl
+import com.tpstream.player.data.Asset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,7 +13,8 @@ import java.io.IOException
 
 internal class VideoDownloadRequestCreationHandler(
     val context: Context,
-    private val player: TpStreamPlayerImpl
+    private val asset: Asset,
+    private val params: TpInitParams
 ) :
     DownloadHelperCallback, DRMLicenseFetchCallback {
     private val downloadHelper: DownloadHelper
@@ -23,9 +24,9 @@ internal class VideoDownloadRequestCreationHandler(
     private var keySetId: ByteArray? = null
 
     init {
-        val url = player.asset?.video?.url!!
+        val url = asset.video.url
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
-        val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(player.params.videoId, player.params.accessToken)
+        val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(params.videoId, params.accessToken)
         mediaItem = MediaItemBuilder()
             .setUri(url)
             .setDrmConfiguration(
@@ -40,7 +41,7 @@ internal class VideoDownloadRequestCreationHandler(
     }
 
     private fun getDownloadHelper(): DownloadHelper {
-        val dataSourceFactory = VideoDownloadManager(context).build(player.params)
+        val dataSourceFactory = VideoDownloadManager(context).build(params)
         val renderersFactory = DefaultRenderersFactory(context)
         return DownloadHelper.forMediaItem(
             mediaItem,
@@ -56,7 +57,7 @@ internal class VideoDownloadRequestCreationHandler(
         val isDRMProtectedVideo = videoOrAudioData != null
         if (isDRMProtectedVideo) {
             if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
-                OfflineDRMLicenseHelper.fetchLicense(context, player.params, downloadHelper, this)
+                OfflineDRMLicenseHelper.fetchLicense(context, params, downloadHelper, this)
             } else {
                 Toast.makeText(
                     context,
@@ -85,7 +86,7 @@ internal class VideoDownloadRequestCreationHandler(
 
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
         setSelectedTracks(overrides)
-        val name = player.asset?.title!!
+        val name = asset.title
         return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
     }
 

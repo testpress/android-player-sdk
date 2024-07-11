@@ -27,7 +27,9 @@ import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.util.MarkerState
+import com.tpstream.player.util.NetworkClient.Companion.makeHeadRequest
 import com.tpstream.player.util.getPlayedStatusArray
+import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -56,6 +58,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var tPStreamPlayerViewCallBack: TPStreamPlayerViewCallBack? = null
     private var noticeScreenLayout: LinearLayout? = null
     private var noticeMessage: TextView? = null
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     init {
         registerDownloadListener()
@@ -288,16 +291,54 @@ class TPStreamPlayerView @JvmOverloads constructor(
         val durationSeparator: TextView = playerView.findViewById(R.id.exo_separator)
         val liveLabel: RelativeLayout = playerView.findViewById(R.id.live_label)
 
+        noticeScreenLayout?.visibility = View.GONE
         durationView.visibility = View.GONE
         durationSeparator.visibility = View.GONE
         liveLabel.visibility = View.VISIBLE
     }
 
     private fun showNoticeScreen(asset: Asset) {
+        displayNoticeMessage(asset)
+        handleNotStartedLiveStream(asset)
+    }
+
+    private fun displayNoticeMessage(asset: Asset) {
         asset.getNoticeMessage()?.let {
             noticeMessage!!.text = it
             noticeScreenLayout!!.visibility = View.VISIBLE
         }
+    }
+
+    private fun handleNotStartedLiveStream(asset: Asset) {
+        if (asset.liveStream?.isNotStarted == true) {
+            asset.liveStream?.url?.let { url ->
+                coroutineScope.launch {
+                    requestWithRetry(url, 10000)
+                }
+            }
+        }
+    }
+
+    private suspend fun requestWithRetry(url: String, delay: Long) {
+        while (coroutineScope.isActive) {
+            try {
+                val responseCode = makeHeadRequest(url)
+                if (responseCode == 200) {
+                    withContext(Dispatchers.Main) {
+                        player.load(player.params)
+                    }
+                    return
+                }
+            } catch (e: Exception) {
+                println("Request failed: ${e.message}")
+            }
+            delay(delay)
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        coroutineScope.cancel()
     }
 
     override fun getViewModelStore(): ViewModelStore {

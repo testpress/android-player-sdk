@@ -77,6 +77,9 @@ internal data class NetworkAsset(
         val enabledDRMForLive: Boolean,
 
         @SerializedName("enable_drm_for_recording")
-        val enabledDRMForRecording: Boolean
+        val enabledDRMForRecording: Boolean,
+
+        @SerializedName("notice_message")
+        val noticeMessage: String?
     )
 }

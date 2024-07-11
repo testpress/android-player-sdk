@@ -23,9 +23,8 @@ import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
 import com.tpstream.player.constants.PlaybackSpeed
-import com.tpstream.player.offline.DownloadTask
+import com.tpstream.player.offline.TpStreamDownloadManager
 import com.tpstream.player.ui.viewmodel.VideoViewModel
-import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.util.MarkerState
 import com.tpstream.player.util.NetworkClient.Companion.makeHeadRequest
 import com.tpstream.player.util.getPlayedStatusArray
@@ -116,25 +115,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 Toast.makeText(context, "Downloading", Toast.LENGTH_SHORT).show()
             }
             else -> {
-                EncryptionKeyRepository(context).fetchAndStore(
-                    player.params,
-                    player.asset?.video?.url!!
-                )
-                val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
-                    player.asset!!,
-                    player.params
-                )
-                downloadResolutionSelectionSheet.show((context as FragmentActivity).supportFragmentManager, "DownloadSelectionSheet")
-                downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, asset ->
-                    DownloadTask(context).start(downloadRequest)
-                    asset?.id = player.params.videoId!!
-                    asset?.downloadStartTimeMs = System.currentTimeMillis()
-                    ImageSaver(context).save(
-                        asset?.thumbnail!!,
-                        asset.id
-                    )
-                    videoViewModel.insert(asset)
-                }
+                TpStreamDownloadManager(context).startDownload((context as FragmentActivity),player)
             }
         }
     }

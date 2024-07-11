@@ -4,6 +4,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.tpstream.player.TPStreamsSDK
+import com.tpstream.player.TpInitParams
+import com.tpstream.player.offline.TpStreamDownloadManager
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +47,15 @@ class MainActivity : AppCompatActivity() {
     fun downloadButton(view: View) {
         val myIntent = Intent(this, DownloadListActivity::class.java)
         startActivity(myIntent)
+    }
+
+    fun downloadDRMVideo(view: View) {
+        TPStreamsSDK.initialize(TPStreamsSDK.Provider.TPStreams, "6eafqn")
+        val parameters = TpInitParams.Builder()
+            .setVideoId("6suEBPy7EG4")
+            .setAccessToken("ab70caed-6168-497f-89c1-1e308da2c9aa")
+            .build()
+        TpStreamDownloadManager(applicationContext).startDownload(this,parameters)
     }
 
 }

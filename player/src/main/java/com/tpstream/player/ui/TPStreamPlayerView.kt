@@ -121,8 +121,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
                     player.asset?.video?.url!!
                 )
                 val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet(
-                    player,
-                    player.getTrackSelectionParameters(),
+                    player.asset!!,
+                    player.params
                 )
                 downloadResolutionSelectionSheet.show((context as FragmentActivity).supportFragmentManager, "DownloadSelectionSheet")
                 downloadResolutionSelectionSheet.setOnSubmitListener { downloadRequest, asset ->

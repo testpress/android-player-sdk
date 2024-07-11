@@ -2,7 +2,6 @@ package com.tpstream.player.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -179,7 +178,6 @@ internal class DownloadResolutionSelectionSheet(
         private fun getVideoSize(trackInfo: TrackInfo): String {
             val mbps = (((trackInfo.format.bitrate).toFloat() / 8f / 1024f) / 1024f)
             val videoLengthInSecond = asset.video.duration
-            Log.d("TAG", "getVideoSize: $videoLengthInSecond")
             return "${((mbps * videoLengthInSecond)).roundToInt()} MB"            //Mbps
         }
 

@@ -10,6 +10,13 @@ import java.net.URL
 internal class NetworkClient<T : Any>(val klass: Class<T>) {
     companion object {
         inline operator fun <reified T : Any>invoke() = NetworkClient(T::class.java)
+
+        fun makeHeadRequest(url: String): Int {
+            val request = Request.Builder().head().url(url).build()
+            OkHttpClient().newCall(request).execute().use { response ->
+                return response.code
+            }
+        }
     }
 
     private var client: OkHttpClient = OkHttpClient();
@@ -75,3 +82,4 @@ internal class NetworkClient<T : Any>(val klass: Class<T>) {
         fun onFailure(exception: TPException)
     }
 }
+

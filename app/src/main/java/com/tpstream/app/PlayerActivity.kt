@@ -99,10 +99,10 @@ class PlayerActivity : AppCompatActivity() {
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
-                "TPS_NON_DRM" -> {
-                accessToken = "30bd8416-f954-4e4a-a209-113ae66ee452"
-                videoId = "BKYbp9yN3NA"
-                orgCode = "6eafqn"
+            "TPS_NON_DRM" -> {
+                accessToken = "48a481d0-7a7f-465f-9d18-86f52129430b"
+                videoId = "C65BJzhj48k"
+                orgCode = "dcek2m"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             null ->{}

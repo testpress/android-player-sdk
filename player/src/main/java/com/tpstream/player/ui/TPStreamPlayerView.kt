@@ -27,10 +27,9 @@ import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.util.MarkerState
+import com.tpstream.player.util.NetworkClient.Companion.makeHeadRequest
 import com.tpstream.player.util.getPlayedStatusArray
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -323,7 +322,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private suspend fun requestWithRetry(url: String, delay: Long) {
         while (coroutineScope.isActive) {
             try {
-                val responseCode = makeRequest(url)
+                val responseCode = makeHeadRequest(url)
                 if (responseCode == 200) {
                     withContext(Dispatchers.Main) {
                         player.load(player.params)
@@ -336,14 +335,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
             delay(delay)
         }
     }
-
-    private fun makeRequest(url: String): Int {
-        val request = Request.Builder().url(url).build()
-        OkHttpClient().newCall(request).execute().use { response ->
-            return response.code
-        }
-    }
-
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()

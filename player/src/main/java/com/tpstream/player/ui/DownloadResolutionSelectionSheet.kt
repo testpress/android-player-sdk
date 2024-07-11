@@ -43,7 +43,8 @@ internal class DownloadResolutionSelectionSheet(
         videoDownloadRequestCreateHandler =
             VideoDownloadRequestCreationHandler(
                 requireContext(),
-                player
+                asset = asset!!,
+                params = player.params
             )
         videoDownloadRequestCreateHandler.listener = this
     }

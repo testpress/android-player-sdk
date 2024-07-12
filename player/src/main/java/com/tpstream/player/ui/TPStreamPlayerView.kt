@@ -255,11 +255,11 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
         videoViewModel.get(assetId).observe(fragmentActivity) { asset ->
             downloadState = when (asset?.video?.downloadState) {
-                DownloadStatus.DOWNLOADING -> {
+                DownloadStatus.DOWNLOADING ->{
                     downloadButton?.setImageResource(R.drawable.ic_baseline_downloading_24)
                     DownloadStatus.DOWNLOADING
                 }
-                DownloadStatus.COMPLETE -> {
+                DownloadStatus.COMPLETE ->{
                     downloadButton?.setImageResource(R.drawable.ic_baseline_file_download_done_24)
                     DownloadStatus.COMPLETE
                 }

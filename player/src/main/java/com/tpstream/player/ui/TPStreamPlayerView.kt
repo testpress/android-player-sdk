@@ -251,26 +251,26 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun updateDownloadButtonImage() {
         val assetId = player.asset?.id
         val fragmentActivity = context as? FragmentActivity
+        if (assetId == null || fragmentActivity == null || downloadButton == null) return
 
-        if (assetId != null && fragmentActivity != null && downloadButton != null) {
-            videoViewModel.get(assetId).observe(fragmentActivity) { asset ->
-                downloadState = when (asset?.video?.downloadState) {
-                    DownloadStatus.DOWNLOADING -> {
-                        downloadButton?.setImageResource(R.drawable.ic_baseline_downloading_24)
-                        DownloadStatus.DOWNLOADING
-                    }
-                    DownloadStatus.COMPLETE -> {
-                        downloadButton?.setImageResource(R.drawable.ic_baseline_file_download_done_24)
-                        DownloadStatus.COMPLETE
-                    }
-                    else -> {
-                        downloadButton?.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
-                        null
-                    }
+        videoViewModel.get(assetId).observe(fragmentActivity) { asset ->
+            downloadState = when (asset?.video?.downloadState) {
+                DownloadStatus.DOWNLOADING -> {
+                    downloadButton?.setImageResource(R.drawable.ic_baseline_downloading_24)
+                    DownloadStatus.DOWNLOADING
+                }
+                DownloadStatus.COMPLETE -> {
+                    downloadButton?.setImageResource(R.drawable.ic_baseline_file_download_done_24)
+                    DownloadStatus.COMPLETE
+                }
+                else -> {
+                    downloadButton?.setImageResource(R.drawable.ic_baseline_download_for_offline_24)
+                    null
                 }
             }
         }
     }
+
 
     private fun updatePlayerViewForLive(){
         val durationView: TextView = playerView.findViewById(ExoplayerResourceID.exo_duration)

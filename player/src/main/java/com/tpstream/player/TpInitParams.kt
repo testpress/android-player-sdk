@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TpInitParams (
-    var autoPlay: Boolean? = null,
+    var autoPlay: Boolean = false,
     var accessToken: String? = null,
     var videoId: String? = null,
     var isDownloadEnabled: Boolean = false,
@@ -13,7 +13,7 @@ data class TpInitParams (
 ): Parcelable {
     
     class Builder {
-        private var autoPlay: Boolean? = null
+        private var autoPlay: Boolean = false
         private var accessToken: String? = null
         private var videoId: String? = null
         private var isDownloadEnabled: Boolean = false
@@ -26,12 +26,15 @@ data class TpInitParams (
         fun enableDownloadSupport(isDownloadEnabled: Boolean) = apply { this.isDownloadEnabled = isDownloadEnabled }
 
         fun build(): TpInitParams {
+            require(!accessToken.isNullOrBlank()) { "accessToken must not be null or empty" }
+            require(!videoId.isNullOrBlank()) { "videoId must not be null or empty" }
+
             return TpInitParams(
-                autoPlay,
-                accessToken,
-                videoId,
-                isDownloadEnabled,
-                startAt
+                autoPlay = autoPlay,
+                accessToken = accessToken!!,
+                videoId = videoId!!,
+                isDownloadEnabled = isDownloadEnabled,
+                startAt = startAt
             )
         }
     }
@@ -54,7 +57,8 @@ data class TpInitParams (
             return TpInitParams(
                 videoId = videoId,
                 isDownloadEnabled = true,
-                autoPlay = true
+                autoPlay = true,
+                accessToken = "offlineVideo"
             )
         }
     }

@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TpInitParams (
-    var autoPlay: Boolean = false,
+    var autoPlay: Boolean = true,
     var accessToken: String? = null,
     var videoId: String? = null,
     var isDownloadEnabled: Boolean = false,
@@ -13,7 +13,7 @@ data class TpInitParams (
 ): Parcelable {
     
     class Builder {
-        private var autoPlay: Boolean = false
+        private var autoPlay: Boolean = true
         private var accessToken: String? = null
         private var videoId: String? = null
         private var isDownloadEnabled: Boolean = false

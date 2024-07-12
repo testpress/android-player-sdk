@@ -81,7 +81,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     override fun load(parameters: TpInitParams, metadata: Map<String, String>?) {
         params = parameters
-        exoPlayer.playWhenReady = parameters.autoPlay?:true
+        exoPlayer.playWhenReady = parameters.autoPlay
         assetRepository.getAsset(parameters, object : NetworkClient.TPResponse<Asset> {
             override fun onSuccess(result: Asset) {
                 asset = result

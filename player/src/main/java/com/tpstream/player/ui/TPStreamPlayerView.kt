@@ -248,8 +248,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
-    private fun updateDownloadButtonImage(){
-        videoViewModel.get(player.asset?.id!!).observe(context as FragmentActivity) { asset ->
+    private fun updateDownloadButtonImage() {
+        val assetId = player.asset?.id
+        val fragmentActivity = context as? FragmentActivity
+        if (assetId == null || fragmentActivity == null || downloadButton == null) return
+
+        videoViewModel.get(assetId).observe(fragmentActivity) { asset ->
             downloadState = when (asset?.video?.downloadState) {
                 DownloadStatus.DOWNLOADING ->{
                     downloadButton?.setImageResource(R.drawable.ic_baseline_downloading_24)

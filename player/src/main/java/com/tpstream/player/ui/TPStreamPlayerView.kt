@@ -249,6 +249,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun updateDownloadButtonImage(){
+        if (player.asset == null) return
+        if (player.asset?.id == null) return
         videoViewModel.get(player.asset?.id!!).observe(context as FragmentActivity) { asset ->
             downloadState = when (asset?.video?.downloadState) {
                 DownloadStatus.DOWNLOADING ->{

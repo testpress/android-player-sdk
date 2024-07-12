@@ -271,7 +271,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
-
     private fun updatePlayerViewForLive(){
         val durationView: TextView = playerView.findViewById(ExoplayerResourceID.exo_duration)
         val durationSeparator: TextView = playerView.findViewById(R.id.exo_separator)

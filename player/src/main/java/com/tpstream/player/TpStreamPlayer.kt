@@ -41,6 +41,7 @@ public interface TpStreamPlayer {
     fun getPlayBackSpeed(): Float
     fun getPlayWhenReady(): Boolean
     fun setPlayWhenReady(playWhenReady: Boolean)
+    fun getExoplayer(): ExoPlayer
 
     class Builder(private val context: Context) {
         fun build(): TpStreamPlayer {
@@ -180,6 +181,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     override fun setPlayWhenReady(playWhenReady: Boolean) {
         exoPlayer.playWhenReady = playWhenReady
+    }
+
+    override fun getExoplayer(): ExoPlayer {
+        return exoPlayer
     }
 
     fun getTrackSelectionParameters(): TrackSelectionParameters = exoPlayer.trackSelectionParameters

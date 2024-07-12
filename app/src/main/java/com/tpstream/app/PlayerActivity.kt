@@ -1,13 +1,18 @@
 package com.tpstream.app
 
 import android.content.pm.ActivityInfo
-import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
-import com.tpstream.player.*
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.util.DebugTextViewHelper
+import com.tpstream.player.TPStreamPlayerListener
+import com.tpstream.player.TPStreamsSDK
+import com.tpstream.player.TpInitParams
+import com.tpstream.player.TpStreamPlayer
 import com.tpstream.player.constants.PlaybackError
 import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
@@ -23,6 +28,8 @@ class PlayerActivity : AppCompatActivity() {
     private var orgCode :String = "6eafqn"
     private var provider: TPStreamsSDK.Provider = TPStreamsSDK.Provider.TPStreams
     private var parameters : TpInitParams? = null
+    private var debugTextView: TextView? = null
+    private var debugViewHelper: DebugTextViewHelper? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +37,7 @@ class PlayerActivity : AppCompatActivity() {
         parameters = intent.getParcelableExtra(TP_OFFLINE_PARAMS)
         selectVideoParams(intent.getStringExtra("VideoParameter"))
         TPStreamsSDK.initialize(provider, orgCode)
+        debugTextView = findViewById(R.id.debug_text_view);
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
         playerFragment.enableAutoFullScreenOnRotate()
@@ -37,6 +45,7 @@ class PlayerActivity : AppCompatActivity() {
             override fun onInitializationSuccess(player: TpStreamPlayer) {
                 tpStreamPlayer = player
                 tpStreamPlayer.load(buildParams())
+                initDebuggLogger(tpStreamPlayer.getExoplayer())
                 tpStreamPlayer.setListener( object : TPStreamPlayerListener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         Log.d(TAG, "onPlaybackStateChanged: $playbackState")
@@ -59,6 +68,11 @@ class PlayerActivity : AppCompatActivity() {
         });
         playerFragment.setPreferredFullscreenExitOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
         initializeSampleButtons();
+    }
+
+    fun initDebuggLogger(player: ExoPlayer){
+        debugViewHelper = DebugTextViewHelper(player, debugTextView!!)
+        debugViewHelper?.start()
     }
 
     fun buildParams(): TpInitParams {
@@ -100,9 +114,9 @@ class PlayerActivity : AppCompatActivity() {
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             "TPS_NON_DRM" -> {
-                accessToken = "48a481d0-7a7f-465f-9d18-86f52129430b"
-                videoId = "C65BJzhj48k"
-                orgCode = "dcek2m"
+                accessToken = "11a527f0-ab37-49c3-838a-5e712ccfe8c3"
+                videoId = "65aTNSEBuNG"
+                orgCode = "m9n4m6"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             null ->{}
@@ -119,6 +133,12 @@ class PlayerActivity : AppCompatActivity() {
         findViewById<Button>(R.id.enter_full_screen).setOnClickListener {
             playerFragment.showFullScreen()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        debugViewHelper?.stop()
+        debugViewHelper = null
     }
 
 }

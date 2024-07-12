@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Sample Videos"
+            android:visibility="gone"
             android:textColor="#000000"
             android:textSize="24sp" />
 
@@ -29,6 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Testpress"
+            android:visibility="gone"
             android:textColor="#000000"
             android:textSize="24sp" />
 
@@ -38,6 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             android:onClick="buttonClick"
             android:text="DRM Video" />
 
@@ -47,6 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             android:onClick="buttonClick2"
             android:text="AES Encrypted Video" />
 
@@ -56,6 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             android:onClick="buttonClick3"
             android:text="Non DRM" />
 
@@ -64,6 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="TP Streams"
+            android:visibility="gone"
             android:textColor="#000000"
             android:textSize="24sp" />
 
@@ -92,6 +98,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:orientation="vertical"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/video_sample_layout">
 
         <TextView

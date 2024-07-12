@@ -6,7 +6,7 @@ plugins {
 }
 
 ext {
-    useMedia3Library = true
+    useMedia3Library = false
 }
 
 android {

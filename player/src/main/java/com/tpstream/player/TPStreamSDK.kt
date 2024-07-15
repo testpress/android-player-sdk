@@ -29,6 +29,9 @@ object TPStreamsSDK {
     }
 
     fun constructDRMLicenseUrl(contentId: String?, accessToken: String?): String {
+        if (contentId in listOf("exoplayer_drm","exoplayer_non_drm")){
+            return "https://proxy.uat.widevine.com/proxy?video_id=2015_tears&provider=widevine_test"
+        }
         val url = when (provider) {
             Provider.TestPress -> "https://%s.testpress.in/api/v2.5/drm_license_key/%s/?access_token=%s"
             Provider.TPStreams -> "https://app.tpstreams.com/api/v1/%s/assets/%s/drm_license/?access_token=%s"

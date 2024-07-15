@@ -79,6 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             android:onClick="buttonClick4"
             android:text="DRM" />
 
@@ -88,6 +89,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             android:onClick="buttonClick5"
             android:text="Non DRM" />
 
@@ -126,6 +128,78 @@
             android:layout_marginTop="16dp"
             android:onClick="downloadDRMVideo"
             android:text="Download Sample Video" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/drm_sample_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/video_sample_layout">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="DRM"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/exoplayer_drm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:text="Sample HD" />
+
+        <Button
+            android:id="@+id/testpress_drm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:onClick="downloadDRMVideo"
+            android:text="Testpress Sample" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/non_drm_sample_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/drm_sample_container">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="NON-DRM"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/exoplayer_non_drm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:text="Sample HD" />
+
+        <Button
+            android:id="@+id/testpress_non_drm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:onClick="downloadDRMVideo"
+            android:text="Testpress Sample" />
 
     </LinearLayout>
 

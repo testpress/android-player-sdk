@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.offline.TpStreamDownloadManager
@@ -12,50 +13,48 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-    }
 
-    fun buttonClick(view: View) {
-        val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter","TP_DRM")
-        startActivity(myIntent)
-    }
+        this.findViewById<Button>(R.id.testpress_drm).setOnClickListener {
+            val parameters = TpInitParams.Builder()
+                .setVideoId("6suEBPy7EG4")
+                .setAccessToken("ab70caed-6168-497f-89c1-1e308da2c9aa")
+                .build()
+            val myIntent = Intent(this, PlayerActivity::class.java)
+            myIntent.putExtra(TP_OFFLINE_PARAMS,parameters)
+            startActivity(myIntent)
+        }
 
-    fun buttonClick2(view: View) {
-        val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter","TP_AES_Encrypt")
-        startActivity(myIntent)
-    }
+        this.findViewById<Button>(R.id.testpress_non_drm).setOnClickListener {
+            val parameters = TpInitParams.Builder()
+                .setVideoId("8DjR3FzHy4Z")
+                .setAccessToken("0cebd232-3699-4908-81f0-3cc2fa9497f8")
+                .build()
+            val myIntent = Intent(this, PlayerActivity::class.java)
+            myIntent.putExtra(TP_OFFLINE_PARAMS,parameters)
+            startActivity(myIntent)
+        }
 
-    fun buttonClick3(view: View) {
-        val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter","TP_NON_DRM")
-        startActivity(myIntent)
-    }
 
-    fun buttonClick4(view: View) {
-        val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter","TPS_DRM")
-        startActivity(myIntent)
-    }
+        this.findViewById<Button>(R.id.exoplayer_drm).setOnClickListener {
+            val parameters = TpInitParams.Builder()
+                .setVideoId("exoplayer_drm")
+                .setAccessToken("ab70caed-6168-497f-89c1-1e308da2c9aa")
+                .build()
+            val myIntent = Intent(this, PlayerActivity::class.java)
+            myIntent.putExtra(TP_OFFLINE_PARAMS,parameters)
+            startActivity(myIntent)
+        }
 
-    fun buttonClick5(view: View) {
-        val myIntent = Intent(this, PlayerActivity::class.java)
-        myIntent.putExtra("VideoParameter","TPS_NON_DRM")
-        startActivity(myIntent)
-    }
+        this.findViewById<Button>(R.id.exoplayer_non_drm).setOnClickListener {
+            val parameters = TpInitParams.Builder()
+                .setVideoId("exoplayer_non_drm")
+                .setAccessToken("0cebd232-3699-4908-81f0-3cc2fa9497f8")
+                .build()
+            val myIntent = Intent(this, PlayerActivity::class.java)
+            myIntent.putExtra(TP_OFFLINE_PARAMS,parameters)
+            startActivity(myIntent)
+        }
 
-    fun downloadButton(view: View) {
-        val myIntent = Intent(this, DownloadListActivity::class.java)
-        startActivity(myIntent)
-    }
-
-    fun downloadDRMVideo(view: View) {
-        TPStreamsSDK.initialize(TPStreamsSDK.Provider.TPStreams, "6eafqn")
-        val parameters = TpInitParams.Builder()
-            .setVideoId("6suEBPy7EG4")
-            .setAccessToken("ab70caed-6168-497f-89c1-1e308da2c9aa")
-            .build()
-        TpStreamDownloadManager(applicationContext).startDownload(this,parameters)
     }
 
 }

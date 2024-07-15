@@ -83,6 +83,14 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     override fun load(parameters: TpInitParams, metadata: Map<String, String>?) {
         params = parameters
         exoPlayer.playWhenReady = parameters.autoPlay
+        if (parameters.videoId == "exoplayer_drm"){
+            playVideoInUIThread("https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd")
+            return
+        }
+        if (parameters.videoId == "exoplayer_non_drm"){
+            playVideoInUIThread("https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8")
+            return
+        }
         assetRepository.getAsset(parameters, object : NetworkClient.TPResponse<Asset> {
             override fun onSuccess(result: Asset) {
                 asset = result

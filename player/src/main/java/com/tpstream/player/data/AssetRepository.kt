@@ -2,7 +2,7 @@ package com.tpstream.player.data
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.tpstream.player.TPException
 import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
@@ -21,7 +21,7 @@ internal class AssetRepository(context: Context) {
     }
 
     fun get(videoId: String): LiveData<Asset?> {
-        return Transformations.map(assetDao.getAssetById(videoId)) {
+        return assetDao.getAssetById(videoId).map {
             it?.asDomainAsset()
         }
     }
@@ -43,19 +43,19 @@ internal class AssetRepository(context: Context) {
     }
 
     fun getAllDownloadsInLiveData():LiveData<List<Asset>?>{
-        return Transformations.map(assetDao.getAllDownloadInLiveData()) {
+        return assetDao.getAllDownloadInLiveData().map {
             it?.asDomainAssets()
         }
     }
 
     fun getAssetInLiveData(assetId: String):LiveData<Asset?>{
-        return Transformations.map(assetDao.getAssetById(assetId)) {
+        return assetDao.getAssetById(assetId).map {
             it?.asDomainAsset()
         }
     }
 
     fun getAssetsByMetadata(metadata: Map<String, String>): LiveData<List<Asset>?> {
-        return Transformations.map(assetDao.getAllDownloadInLiveData()) { assets ->
+        return assetDao.getAllDownloadInLiveData().map { assets ->
             assets?.filter { asset ->
                 // Check if asset's metadata contains all key-value pairs from the input metadata
                 metadata.all { (key, value) ->

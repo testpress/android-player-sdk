@@ -11,12 +11,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import androidx.annotation.ColorInt
+import androidx.annotation.OptIn
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.media3.common.util.UnstableApi
 import com.tpstream.player.*
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
@@ -32,6 +34,7 @@ import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+@OptIn(UnstableApi::class)
 class TPStreamPlayerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -45,11 +48,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var resolutionButton : ImageButton? = null
     private var downloadState : DownloadStatus? = null
     private lateinit var videoViewModel: VideoViewModel
-    private lateinit var viewModelStore: ViewModelStore
+    override lateinit var viewModelStore: ViewModelStore
     private var selectedResolution = ResolutionOptions.AUTO
     private lateinit var simpleResolutionSheet:SimpleResolutionSelectionSheet
     private lateinit var advancedResolutionSheet:AdvancedResolutionSelectionSheet
     private val seekBar get() = playerView.findViewById<DefaultTimeBar>(ExoplayerResourceID.exo_progress)
+    @UnstableApi
     private var seekBarListener: OnScrubListener? = null
     private var markers: LinkedHashMap<Long, MarkerState>? = null
     private var animator: ObjectAnimator? = null
@@ -338,9 +342,9 @@ class TPStreamPlayerView @JvmOverloads constructor(
         coroutineScope.cancel()
     }
 
-    override fun getViewModelStore(): ViewModelStore {
-        return viewModelStore
-    }
+//    override fun getViewModelStore(): ViewModelStore {
+//        return viewModelStore
+//    }
 
     fun showFastForwardButton() = playerView.setShowFastForwardButton(true)
 

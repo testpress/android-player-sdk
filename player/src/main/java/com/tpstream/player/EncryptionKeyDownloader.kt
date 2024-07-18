@@ -1,9 +1,12 @@
 package com.tpstream.player
 
 import android.net.Uri
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
+@OptIn(UnstableApi::class)
 internal class EncryptionKeyDownloader {
 
     fun getEncryptionKeyUrl(playbackUrl: String) :String {

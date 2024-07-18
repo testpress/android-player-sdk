@@ -4,13 +4,20 @@ import android.content.Context
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.DecoderCounters
+import androidx.media3.exoplayer.DecoderReuseEvaluation
+import androidx.media3.exoplayer.analytics.AnalyticsListener
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
-import com.tpstream.player.util.NetworkClient
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
+import com.tpstream.player.util.NetworkClient
+import java.lang.Exception
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -41,6 +48,7 @@ public interface TpStreamPlayer {
     fun getPlayBackSpeed(): Float
     fun getPlayWhenReady(): Boolean
     fun setPlayWhenReady(playWhenReady: Boolean)
+    fun getExoplayer(): ExoPlayer
 
     class Builder(private val context: Context) {
         fun build(): TpStreamPlayer {
@@ -49,6 +57,7 @@ public interface TpStreamPlayer {
     }
 }
 
+@OptIn(UnstableApi::class)
 internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     lateinit var params: TpInitParams
     var asset: Asset? = null
@@ -66,9 +75,12 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun initializeExoplayer() {
+        val rf = DefaultRenderersFactory(context)
+        rf.setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
         exoPlayer = ExoPlayerBuilder(context)
             .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
             .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
+            .setRenderersFactory(rf)
             .build()
             .also { exoPlayer ->
                 exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
@@ -82,6 +94,14 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     override fun load(parameters: TpInitParams, metadata: Map<String, String>?) {
         params = parameters
         exoPlayer.playWhenReady = parameters.autoPlay
+        if (parameters.videoId == "exoplayer_drm"){
+            playVideoInUIThread("https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd")
+            return
+        }
+        if (parameters.videoId == "exoplayer_non_drm"){
+            playVideoInUIThread("https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8")
+            return
+        }
         assetRepository.getAsset(parameters, object : NetworkClient.TPResponse<Asset> {
             override fun onSuccess(result: Asset) {
                 asset = result
@@ -182,6 +202,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.playWhenReady = playWhenReady
     }
 
+    override fun getExoplayer(): ExoPlayer {
+        return exoPlayer
+    }
+
     fun getTrackSelectionParameters(): TrackSelectionParameters = exoPlayer.trackSelectionParameters
 
     fun setTrackSelectionParameters(parameters: TrackSelectionParameters){
@@ -228,6 +252,124 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         this.exoPlayerListener.listener = listener
         if (listener != null) {
             exoPlayer.addListener(exoPlayerListener)
+            exoPlayer.addAnalyticsListener(object : AnalyticsListener {
+                val TAG = "TAG"
+                override fun onVideoCodecError(
+                    eventTime: AnalyticsListener.EventTime,
+                    videoCodecError: Exception
+                ) {
+                    super.onVideoCodecError(eventTime, videoCodecError)
+                    Log.d(TAG, "onVideoCodecError: ")
+                }
+
+                override fun onVideoDecoderInitialized(
+                    eventTime: AnalyticsListener.EventTime,
+                    decoderName: String,
+                    initializedTimestampMs: Long,
+                    initializationDurationMs: Long
+                ) {
+                    super.onVideoDecoderInitialized(
+                        eventTime,
+                        decoderName,
+                        initializedTimestampMs,
+                        initializationDurationMs
+                    )
+                    Log.d(TAG, "onVideoDecoderInitialized: ")
+                }
+
+                override fun onVideoDecoderReleased(
+                    eventTime: AnalyticsListener.EventTime,
+                    decoderName: String
+                ) {
+                    super.onVideoDecoderReleased(eventTime, decoderName)
+                    Log.d(TAG, "onVideoDecoderReleased: ")
+                }
+
+                override fun onVideoDisabled(
+                    eventTime: AnalyticsListener.EventTime,
+                    decoderCounters: DecoderCounters
+                ) {
+                    super.onVideoDisabled(eventTime, decoderCounters)
+                    Log.d(TAG, "onVideoDisabled: ")
+                }
+
+                override fun onVideoEnabled(
+                    eventTime: AnalyticsListener.EventTime,
+                    decoderCounters: DecoderCounters
+                ) {
+                    super.onVideoEnabled(eventTime, decoderCounters)
+                    Log.d(TAG, "onVideoEnabled: ")
+                }
+
+                override fun onVideoFrameProcessingOffset(
+                    eventTime: AnalyticsListener.EventTime,
+                    totalProcessingOffsetUs: Long,
+                    frameCount: Int
+                ) {
+                    super.onVideoFrameProcessingOffset(
+                        eventTime,
+                        totalProcessingOffsetUs,
+                        frameCount
+                    )
+                    Log.d(TAG, "onVideoFrameProcessingOffset: ")
+                }
+
+                override fun onVideoInputFormatChanged(
+                    eventTime: AnalyticsListener.EventTime,
+                    format: Format,
+                    decoderReuseEvaluation: DecoderReuseEvaluation?
+                ) {
+                    super.onVideoInputFormatChanged(eventTime, format, decoderReuseEvaluation)
+                    Log.d(TAG, "onVideoInputFormatChanged: ")
+                }
+
+                override fun onVideoSizeChanged(
+                    eventTime: AnalyticsListener.EventTime,
+                    videoSize: VideoSize
+                ) {
+                    super.onVideoSizeChanged(eventTime, videoSize)
+                    Log.d(TAG, "onVideoSizeChanged: ")
+                }
+
+                override fun onVideoDecoderInitialized(
+                    eventTime: AnalyticsListener.EventTime,
+                    decoderName: String,
+                    initializationDurationMs: Long
+                ) {
+                    super.onVideoDecoderInitialized(
+                        eventTime,
+                        decoderName,
+                        initializationDurationMs
+                    )
+                    Log.d(TAG, "onVideoDecoderInitialized: $decoderName")
+                }
+
+                override fun onVideoSizeChanged(
+                    eventTime: AnalyticsListener.EventTime,
+                    width: Int,
+                    height: Int,
+                    unappliedRotationDegrees: Int,
+                    pixelWidthHeightRatio: Float
+                ) {
+                    super.onVideoSizeChanged(
+                        eventTime,
+                        width,
+                        height,
+                        unappliedRotationDegrees,
+                        pixelWidthHeightRatio
+                    )
+                    Log.d(TAG, "onVideoSizeChanged: ")
+                }
+
+                override fun onDroppedVideoFrames(
+                    eventTime: AnalyticsListener.EventTime,
+                    droppedFrames: Int,
+                    elapsedMs: Long
+                ) {
+                    super.onDroppedVideoFrames(eventTime, droppedFrames, elapsedMs)
+                    Log.d(TAG, "onDroppedVideoFrames: ")
+                }
+            })
         } else {
             exoPlayer.removeListener(exoPlayerListener)
         }

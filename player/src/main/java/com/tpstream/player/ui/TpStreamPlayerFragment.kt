@@ -281,7 +281,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         private fun fetchDRMLicence(error: PlaybackException){
             val errorPlayerId = SentryLogger.generatePlayerIdString()
             if (!InternetConnectivityChecker.isNetworkAvailable(requireContext())) {
-                showErrorMessage(TPException.networkError(IOException()).getErrorMessage(errorPlayerId))
+                showErrorMessage(getString(R.string.no_internet_to_sync_license))
                 return
             }
             val url = player?.asset?.video?.url
@@ -303,7 +303,9 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         override fun onLicenseFetchFailure() {
-            showErrorMessage(getString(R.string.license_error))
+            CoroutineScope(Dispatchers.Main).launch {
+                showErrorMessage(getString(R.string.license_error))
+            }
         }
 
         private fun isDRMException(cause: Throwable): Boolean {

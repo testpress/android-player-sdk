@@ -6,7 +6,7 @@
 
     <!-- Error message -->
     <string name="syncing_video">Please wait… We are syncing video</string>
-    <string name="no_internet_to_sync_license">Please turn on internet to fetch video license</string>
+    <string name="no_internet_to_sync_license">Playback license has expired. Please connect to the internet to renew the playback license.</string>
     <string name="license_error">Error in fetching video license. Please try again</string>
     <string name="license_request_failed">Couldn\'t fetch decryption key. Please try again</string>
     

@@ -39,6 +39,10 @@ data class TpInitParams (
         }
     }
 
+    internal fun setNewAccessToken(newAccessToken: String){
+        this.accessToken = newAccessToken
+    }
+
     val startPositionInMilliSecs: Long
         get() = startAt * 1000L
 

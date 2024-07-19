@@ -247,8 +247,15 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             val errorPlayerId = SentryLogger.generatePlayerIdString()
             SentryLogger.logPlaybackException(error, player?.params, errorPlayerId)
             if (error.errorCode == PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED) {
-                showErrorMessage(error.getErrorMessage(errorPlayerId))
-                player?._listener?.onPlayerError(error.toError())
+                player?._listener?.onAccessTokenExpired(player?.params?.videoId!!){ newAccessToken ->
+                    if (newAccessToken.isNotEmpty()) {
+                        player?.params?.setNewAccessToken(newAccessToken)
+                        player?.playVideoInUIThread(player.asset?.video?.url!!, player.getCurrentTime())
+                    } else {
+                        showErrorMessage(error.getErrorMessage(errorPlayerId))
+                        player?._listener?.onPlayerError(error.toError())
+                    }
+                }
                 return
             }
             if (isDRMException(error.cause!!)) {

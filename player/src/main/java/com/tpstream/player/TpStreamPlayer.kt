@@ -110,7 +110,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         }
     }
 
-    private fun playVideoInUIThread(url: String,startPosition: Long = 0) {
+    fun playVideoInUIThread(url: String,startPosition: Long = 0) {
         Handler(Looper.getMainLooper()).post {
             playVideo(url, startPosition)
         }

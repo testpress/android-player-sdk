@@ -1,6 +1,5 @@
 package com.tpstream.player
 
-import android.util.Log
 import com.tpstream.player.constants.PlaybackError
 
 interface TPStreamPlayerListener {

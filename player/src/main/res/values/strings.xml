@@ -7,7 +7,7 @@
     <!-- Error message -->
     <string name="syncing_video">Please wait… We are syncing video</string>
     <string name="no_internet_to_sync_license">Playback license has expired. Please connect to the internet to renew the playback license.</string>
-    <string name="license_error">Error in fetching video license. Please try again</string>
+    <string name="license_error">Error renewing playback license. Please try again.</string>
     <string name="license_request_failed">Couldn\'t fetch decryption key. Please try again</string>
     
     <string name="tp_streams_player_seek_forward_increment_ms">15000</string>

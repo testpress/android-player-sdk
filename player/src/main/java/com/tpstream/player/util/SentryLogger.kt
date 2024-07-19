@@ -1,9 +1,7 @@
 package com.tpstream.player.util
 
+import com.tpstream.player.*
 import com.tpstream.player.PlaybackException
-import com.tpstream.player.TPException
-import com.tpstream.player.TPStreamsSDK
-import com.tpstream.player.TpInitParams
 import io.sentry.Sentry
 
 internal object SentryLogger {
@@ -31,6 +29,17 @@ internal object SentryLogger {
             "Player error" +
                     " Code: ${error.errorCode}" +
                     " Code name: ${error.errorCodeName}" +
+                    " Message: ${error.message}" +
+                    " Video ID: ${params?.videoId}" +
+                    " AccessToken: ${params?.accessToken}" +
+                    " Org Code: ${TPStreamsSDK.orgCode}"
+        ) { scope -> scope.setTag("playerId", playerId) }
+    }
+
+    fun logDrmSessionException(error: DrmSessionException, params: TpInitParams?, playerId: String) {
+        Sentry.captureMessage(
+            "Player error" +
+                    " Code: ${error.errorCode}" +
                     " Message: ${error.message}" +
                     " Video ID: ${params?.videoId}" +
                     " AccessToken: ${params?.accessToken}" +

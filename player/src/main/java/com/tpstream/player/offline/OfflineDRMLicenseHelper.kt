@@ -21,31 +21,16 @@ internal object OfflineDRMLicenseHelper {
         callback: DRMLicenseFetchCallback
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val keySetId = downloadDRMKeySetId(context, tpInitParams, url)
-            replaceKeysInExistingDownloadedVideo(url, context, keySetId)
-            callback.onLicenseFetchSuccess(keySetId)
+            val dataSource =
+                VideoDownloadManager(context).getHttpDataSourceFactory().createDataSource()
+            val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
+            val drmInitData =
+                DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
+            fetchLicense(context,tpInitParams,drmInitData!!,callback)
         }
     }
 
-    private fun downloadDRMKeySetId(
-        context: Context,
-        tpInitParams: TpInitParams,
-        url: String
-    ): ByteArray {
-        val dataSource =
-            VideoDownloadManager(context).getHttpDataSourceFactory().createDataSource()
-        val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
-        val drmInitData =
-            DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
-        val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(tpInitParams.videoId,tpInitParams.accessToken)
-        return OfflineLicenseHelper.newWidevineInstance(
-            drmLicenseURL,
-            VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
-            DrmSessionEventListenerEventDispatcher()
-        ).downloadLicense(drmInitData!!)
-    }
-
-    private fun replaceKeysInExistingDownloadedVideo(
+    fun replaceKeysInExistingDownloadedVideo(
         url: String,
         context: Context,
         keySetId: ByteArray
@@ -110,7 +95,7 @@ internal object OfflineDRMLicenseHelper {
                 val keySetId = offlineLicenseHelper.downloadLicense(format)
                 callback.onLicenseFetchSuccess(keySetId)
             } catch (e: DrmSessionException) {
-                callback.onLicenseFetchFailure()
+                callback.onLicenseFetchFailure(e)
             } finally {
                 offlineLicenseHelper.release()
             }
@@ -142,7 +127,7 @@ internal object VideoPlayerUtil {
 
 internal interface DRMLicenseFetchCallback {
     fun onLicenseFetchSuccess(keySetId: ByteArray)
-    fun onLicenseFetchFailure()
+    fun onLicenseFetchFailure(error: DrmSessionException)
 }
 
 internal object InternetConnectivityChecker {

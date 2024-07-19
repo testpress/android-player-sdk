@@ -62,7 +62,7 @@ data class TpInitParams (
                 videoId = videoId,
                 isDownloadEnabled = true,
                 autoPlay = true,
-                accessToken = "offlineVideo"
+                accessToken = "dummyAccessToken"
             )
         }
     }

@@ -10,13 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import com.tpstream.player.*
 import com.tpstream.player.Util
-import com.tpstream.player.constants.PlaybackError
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.constants.getErrorMessage
 import com.tpstream.player.constants.toError
@@ -26,7 +22,6 @@ import com.tpstream.player.util.SentryLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.IOException
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val _playbackStateListener: PlayerListener = InternalPlayerListener()
@@ -292,26 +287,46 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 showErrorMessage(getString(R.string.no_internet_to_sync_license))
                 return
             }
-            val url = player?.asset?.video?.url
-            val downloadTask = DownloadTask(requireContext())
-            drmLicenseRetries += 1
-            if (drmLicenseRetries < 2 && downloadTask.isDownloaded(url!!)) {
-                OfflineDRMLicenseHelper.renewLicense(url, player?.params!!, activity!!, this)
-                showErrorMessage(getString(R.string.syncing_video))
-            } else {
-                showErrorMessage(error.getErrorMessage(errorPlayerId))
+            player._listener?.onAccessTokenExpired(player.params.videoId!!){ newAccessToken ->
+                if (newAccessToken.isNotEmpty()) {
+                    player.params.setNewAccessToken(newAccessToken)
+                    OfflineDRMLicenseHelper.renewLicense(player.asset?.video?.url!!, player.params, activity!!, this)
+                    showErrorMessage(getString(R.string.syncing_video))
+                } else {
+                    SentryLogger.logPlaybackException(error, player?.params, errorPlayerId)
+                    showErrorMessage(getString(R.string.license_error)+"\n Player Id: $errorPlayerId")
+                }
             }
         }
 
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {
+            if (!this@TpStreamPlayerFragment.isAdded) return
+            OfflineDRMLicenseHelper.replaceKeysInExistingDownloadedVideo(
+                player.asset?.video?.url!!,
+                requireContext(),
+                keySetId
+            )
             CoroutineScope(Dispatchers.Main).launch {
                 reloadVideo()
                 drmLicenseRetries = 0
             }
         }
 
-        override fun onLicenseFetchFailure() {
-            showErrorMessage(getString(R.string.license_error))
+        override fun onLicenseFetchFailure(error: DrmSessionException) {
+            if (!this@TpStreamPlayerFragment.isAdded) return
+            requireActivity().runOnUiThread{
+                player._listener?.onAccessTokenExpired(player.params.videoId!!){ newAccessToken ->
+                    if (newAccessToken.isNotEmpty()) {
+                        player.params.setNewAccessToken(newAccessToken)
+                        OfflineDRMLicenseHelper.renewLicense(player.asset?.video?.url!!, player.params, activity!!, this)
+                        showErrorMessage(getString(R.string.syncing_video))
+                    } else {
+                        val errorPlayerId = SentryLogger.generatePlayerIdString()
+                        SentryLogger.logDrmSessionException(error, player?.params, errorPlayerId)
+                        showErrorMessage(getString(R.string.license_error))
+                    }
+                }
+            }
         }
 
         private fun isDRMException(cause: Throwable): Boolean {

@@ -109,7 +109,7 @@ internal class VideoDownloadRequestCreationHandler(
         }
     }
 
-    override fun onLicenseFetchFailure() {
+    override fun onLicenseFetchFailure(error: DrmSessionException) {
         CoroutineScope(Dispatchers.Main).launch {
             Toast.makeText(
                 context,

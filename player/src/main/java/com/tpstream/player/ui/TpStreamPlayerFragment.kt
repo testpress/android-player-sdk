@@ -281,7 +281,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         private fun fetchDRMLicence(error: PlaybackException){
             val errorPlayerId = SentryLogger.generatePlayerIdString()
             if (!InternetConnectivityChecker.isNetworkAvailable(requireContext())) {
-                showErrorMessage(TPException.networkError(IOException()).getErrorMessage(errorPlayerId))
+                showErrorMessage(getString(R.string.no_internet_to_sync_license))
                 return
             }
             val url = player?.asset?.video?.url

@@ -303,9 +303,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         override fun onLicenseFetchFailure() {
-            CoroutineScope(Dispatchers.Main).launch {
-                showErrorMessage(getString(R.string.license_error))
-            }
+            showErrorMessage(getString(R.string.license_error))
         }
 
         private fun isDRMException(cause: Throwable): Boolean {

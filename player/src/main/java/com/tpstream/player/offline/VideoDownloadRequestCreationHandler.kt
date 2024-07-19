@@ -57,7 +57,7 @@ internal class VideoDownloadRequestCreationHandler(
         val isDRMProtectedVideo = videoOrAudioData != null
         if (isDRMProtectedVideo) {
             if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
-                OfflineDRMLicenseHelper.fetchLicense(context, params, downloadHelper, this)
+                OfflineDRMLicenseHelper.fetchLicense(context, params, videoOrAudioData, this)
             } else {
                 Toast.makeText(
                     context,

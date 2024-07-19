@@ -96,7 +96,7 @@ internal object OfflineDRMLicenseHelper {
     fun fetchLicense(
         context: Context,
         tpInitParams: TpInitParams,
-        downloadHelper: DownloadHelper,
+        format: Format,
         callback: DRMLicenseFetchCallback
     ) {
         val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(tpInitParams.videoId,tpInitParams.accessToken)
@@ -105,10 +105,9 @@ internal object OfflineDRMLicenseHelper {
             VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
             DrmSessionEventListenerEventDispatcher()
         )
-        val format = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val keySetId = offlineLicenseHelper.downloadLicense(format!!)
+                val keySetId = offlineLicenseHelper.downloadLicense(format)
                 callback.onLicenseFetchSuccess(keySetId)
             } catch (e: DrmSessionException) {
                 callback.onLicenseFetchFailure()

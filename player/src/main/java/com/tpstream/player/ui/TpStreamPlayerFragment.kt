@@ -300,6 +300,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {
+            if (!this@TpStreamPlayerFragment.isAdded) return
             OfflineDRMLicenseHelper.replaceKeysInExistingDownloadedVideo(
                 player.asset?.video?.url!!,
                 requireContext(),
@@ -312,6 +313,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         override fun onLicenseFetchFailure(error: DrmSessionException) {
+            if (!this@TpStreamPlayerFragment.isAdded) return
             requireActivity().runOnUiThread{
                 player._listener?.onAccessTokenExpired(player.params.videoId!!){ newAccessToken ->
                     if (newAccessToken.isNotEmpty()) {

@@ -31,6 +31,11 @@ data class Asset(
         }
     }
 
+    val isDownloadable: Boolean
+    get() {
+        return video != null && video.isTranscodingCompleted
+    }
+
     val isLiveStream: Boolean
         get() = type == "livestream"
 

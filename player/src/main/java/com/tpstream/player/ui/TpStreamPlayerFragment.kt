@@ -250,7 +250,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 player?._listener?.onAccessTokenExpired(player?.params?.videoId!!){ newAccessToken ->
                     if (newAccessToken.isNotEmpty()) {
                         player?.params?.setNewAccessToken(newAccessToken)
-                        player?.playVideoInUIThread(player.asset?.video?.url!!, player.params.startPositionInMilliSecs)
+                        player?.playVideoInUIThread(player.asset?.video?.url!!, player.getCurrentTime())
                     } else {
                         showErrorMessage(error.getErrorMessage(errorPlayerId))
                         player?._listener?.onPlayerError(error.toError())

@@ -42,8 +42,8 @@ class PlayerActivity : AppCompatActivity() {
                         Log.d(TAG, "onPlaybackStateChanged: $playbackState")
                     }
 
-                    override fun onAccessTokenExpired(videoId: String?, callback: (String) -> Unit) {
-                        val newAccessToken = getAccessToken(videoId!!)
+                    override fun onAccessTokenExpired(videoId: String, callback: (String) -> Unit) {
+                        val newAccessToken = getAccessToken(videoId)
                         callback.invoke(newAccessToken)
                     }
 

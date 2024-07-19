@@ -332,7 +332,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             requireActivity().runOnUiThread {
                 val errorPlayerId = SentryLogger.generatePlayerIdString()
                 if (exception.isUnauthenticated()) {
-                    player?._listener?.onAccessTokenExpired(parameters.videoId) { newAccessToken ->
+                    player?._listener?.onAccessTokenExpired(parameters.videoId!!) { newAccessToken ->
                         if (newAccessToken.isNotEmpty()) {
                             parameters.setNewAccessToken(newAccessToken)
                             player?.load(parameters)

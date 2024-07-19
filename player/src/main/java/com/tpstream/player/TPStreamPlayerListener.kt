@@ -1,5 +1,6 @@
 package com.tpstream.player
 
+import android.util.Log
 import com.tpstream.player.constants.PlaybackError
 
 interface TPStreamPlayerListener {
@@ -18,4 +19,7 @@ interface TPStreamPlayerListener {
     fun onPlayerError(playbackError: PlaybackError) {}
     fun onMarkerCallback(timesInSeconds: Long) {}
     fun onFullScreenChanged(isFullScreen: Boolean) {}
+    fun onAccessTokenExpired(videoId: String?, callback: (String) -> Unit) {
+        callback.invoke("")
+    }
 }

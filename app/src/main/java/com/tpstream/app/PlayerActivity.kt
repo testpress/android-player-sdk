@@ -42,6 +42,11 @@ class PlayerActivity : AppCompatActivity() {
                         Log.d(TAG, "onPlaybackStateChanged: $playbackState")
                     }
 
+                    override fun onAccessTokenExpired(videoId: String?, callback: (String) -> Unit) {
+                        val newAccessToken = getAccessToken(videoId!!)
+                        callback.invoke(newAccessToken)
+                    }
+
                     override fun onMarkerCallback(timesInSeconds: Long) {
                         Toast.makeText(this@PlayerActivity,"$timesInSeconds",Toast.LENGTH_SHORT).show()
                     }
@@ -94,7 +99,7 @@ class PlayerActivity : AppCompatActivity() {
                 provider = TPStreamsSDK.Provider.TestPress
             }
             "TPS_DRM" -> {
-                accessToken = "ab70caed-6168-497f-89c1-1e308da2c9aa"
+                accessToken = "ab70caed-6168-497f-89c1-1e308da2c9a"
                 videoId = "6suEBPy7EG4"
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
@@ -118,6 +123,17 @@ class PlayerActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.enter_full_screen).setOnClickListener {
             playerFragment.showFullScreen()
+        }
+    }
+
+    fun getAccessToken(videoId: String): String {
+        return when (videoId) {
+            "ATJfRdHIUC9" -> "a4c04ca8-9c0e-4c9c-a889-bd3bf8ea586a"
+            "ZZb3S5OB3nY" -> "5f6355d0-62ac-4bfd-98ca-4a1e9a2857e3"
+            "z1TLpfuZzXh" -> "5c49285b-0557-4cef-b214-66034d0b77c3"
+            "6suEBPy7EG4" -> "ab70caed-6168-497f-89c1-1e308da2c9a"
+            "C65BJzhj48k" -> "48a481d0-7a7f-465f-9d18-86f52129430b"
+            else -> ""
         }
     }
 

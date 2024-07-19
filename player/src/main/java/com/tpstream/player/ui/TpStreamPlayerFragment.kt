@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import com.tpstream.player.*
 import com.tpstream.player.Util
+import com.tpstream.player.constants.PlaybackError
 import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.constants.getErrorMessage
 import com.tpstream.player.constants.toError
@@ -328,11 +329,24 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onPlaybackError(parameters: TpInitParams, exception: TPException) {
             if (!isAdded) return
-            requireActivity().runOnUiThread{
+            requireActivity().runOnUiThread {
                 val errorPlayerId = SentryLogger.generatePlayerIdString()
-                showErrorMessage(exception.getErrorMessage(errorPlayerId))
-                player?._listener?.onPlayerError(exception.toError())
-                SentryLogger.logAPIException(exception,parameters, errorPlayerId)
+                if (exception.isUnauthenticated()) {
+                    player?._listener?.onAccessTokenExpired(parameters.videoId) { newAccessToken ->
+                        if (newAccessToken.isNotEmpty()) {
+                            parameters.setNewAccessToken(newAccessToken)
+                            player?.load(parameters)
+                        } else {
+                            showErrorMessage(exception.getErrorMessage(errorPlayerId))
+                            player?._listener?.onPlayerError(exception.toError())
+                            SentryLogger.logAPIException(exception, parameters, errorPlayerId)
+                        }
+                    }
+                } else {
+                    showErrorMessage(exception.getErrorMessage(errorPlayerId))
+                    player?._listener?.onPlayerError(exception.toError())
+                    SentryLogger.logAPIException(exception, parameters, errorPlayerId)
+                }
             }
         }
 

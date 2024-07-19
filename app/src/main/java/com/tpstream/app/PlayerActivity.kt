@@ -99,7 +99,7 @@ class PlayerActivity : AppCompatActivity() {
                 provider = TPStreamsSDK.Provider.TestPress
             }
             "TPS_DRM" -> {
-                accessToken = "ab70caed-6168-497f-89c1-1e308da2c9a"
+                accessToken = "ab70caed-6168-497f-89c1-1e308da2c9aa"
                 videoId = "6suEBPy7EG4"
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams

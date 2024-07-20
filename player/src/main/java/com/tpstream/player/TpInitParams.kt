@@ -3,6 +3,8 @@ package com.tpstream.player
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
+const val FIFTEEN_DAYS = 60 * 60 * 24 * 15
+
 @Parcelize
 data class TpInitParams (
     var autoPlay: Boolean = true,
@@ -10,7 +12,7 @@ data class TpInitParams (
     var videoId: String? = null,
     var isDownloadEnabled: Boolean = false,
     var startAt: Long = 0L,
-    var rentalDurationSeconds: Int = 0
+    var rentalDurationSeconds: Int = FIFTEEN_DAYS
 ): Parcelable {
 
     class Builder {
@@ -19,7 +21,7 @@ data class TpInitParams (
         private var videoId: String? = null
         private var isDownloadEnabled: Boolean = false
         private var startAt: Long = 0L
-        var rentalDurationSeconds: Int = 0
+        var rentalDurationSeconds: Int = FIFTEEN_DAYS
 
         fun setAutoPlay(autoPlay: Boolean) = apply { this.autoPlay = autoPlay }
         fun startAt(timeInSeconds: Long) = apply { this.startAt = timeInSeconds }

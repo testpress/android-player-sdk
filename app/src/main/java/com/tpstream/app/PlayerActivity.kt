@@ -13,7 +13,6 @@ import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
 
 const val TP_OFFLINE_PARAMS = "tp_offline_params"
-const val FIFTEEN_DAYS = 60 * 60 * 24 * 15
 
 class PlayerActivity : AppCompatActivity() {
     lateinit var playerFragment: TpStreamPlayerFragment;

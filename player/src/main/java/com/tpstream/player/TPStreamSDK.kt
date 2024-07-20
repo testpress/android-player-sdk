@@ -36,8 +36,17 @@ object TPStreamsSDK {
         return url.format(orgCode, contentId, accessToken)
     }
 
-    internal fun constructOfflineDRMLicenseUrl(contentId: String?, accessToken: String?): String {
-        return "${constructDRMLicenseUrl(contentId, accessToken)}&drm_type=widevine&download=true"
+    internal fun constructOfflineDRMLicenseUrl(
+        contentId: String?,
+        accessToken: String?,
+        rentalDurationSeconds: Int
+    ): String {
+        return "${
+            constructDRMLicenseUrl(
+                contentId,
+                accessToken
+            )
+        }&drm_type=widevine&download=true&rental_duration_seconds=$rentalDurationSeconds"
     }
 
     enum class Provider {

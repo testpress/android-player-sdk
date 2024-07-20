@@ -84,7 +84,7 @@ internal object OfflineDRMLicenseHelper {
         format: Format,
         callback: DRMLicenseFetchCallback
     ) {
-        val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(tpInitParams.videoId,tpInitParams.accessToken)
+        val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(tpInitParams.videoId,tpInitParams.accessToken, tpInitParams.rentalDurationSeconds)
         val offlineLicenseHelper = OfflineLicenseHelper.newWidevineInstance(
             drmLicenseURL,
             VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),

@@ -26,7 +26,7 @@ internal class VideoDownloadRequestCreationHandler(
     init {
         val url = asset.video.url
         trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
-        val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(params.videoId, params.accessToken)
+        val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(params.videoId, params.accessToken, params.rentalDurationSeconds)
         mediaItem = MediaItemBuilder()
             .setUri(url)
             .setDrmConfiguration(

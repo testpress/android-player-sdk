@@ -1,16 +1,24 @@
 package com.tpstream.app
 
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.pm.ActivityInfo
-import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.tpstream.player.*
 import com.tpstream.player.constants.PlaybackError
 import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
+import java.io.File
+import java.io.IOException
 
 const val TP_OFFLINE_PARAMS = "tp_offline_params"
 
@@ -23,6 +31,7 @@ class PlayerActivity : AppCompatActivity() {
     private var orgCode :String = "6eafqn"
     private var provider: TPStreamsSDK.Provider = TPStreamsSDK.Provider.TPStreams
     private var parameters : TpInitParams? = null
+    private var eventLog = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +39,8 @@ class PlayerActivity : AppCompatActivity() {
         parameters = intent.getParcelableExtra(TP_OFFLINE_PARAMS)
         selectVideoParams(intent.getStringExtra("VideoParameter"))
         TPStreamsSDK.initialize(provider, orgCode)
+        val eventLogTextView = findViewById<TextView>(R.id.event_log)
+        eventLogTextView.movementMethod = ScrollingMovementMethod.getInstance()
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
         playerFragment.enableAutoFullScreenOnRotate()
@@ -60,10 +71,59 @@ class PlayerActivity : AppCompatActivity() {
                         Log.d("TAG", "onPlayerError: ${playbackError}")
                     }
                 })
+
+                tpStreamPlayer.addTestpressAnalyticsListener(TestpressLogger {
+                    eventLog += it
+                    eventLogTextView.text = eventLog
+                })
             }
         });
         playerFragment.setPreferredFullscreenExitOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
         initializeSampleButtons();
+    }
+
+    private val REQUEST_WRITE_EXTERNAL_STORAGE = 1
+
+    private fun checkPermissions() {
+        if (ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
+        } else {
+            // Permission already granted
+            downloadLogFile()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_WRITE_EXTERNAL_STORAGE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                downloadLogFile()
+            } else {
+                // Permission denied
+                Toast.makeText(this, "Permission denied to write to external storage", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun downloadLogFile() {
+        val eventLogTextView = findViewById<TextView>(R.id.event_log)
+        val logContent = eventLogTextView.text.toString()
+
+        if (logContent.isNotEmpty()) {
+            val fileName = "event_log.txt"
+            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val file = File(downloadsDir, fileName)
+
+            try {
+                file.writeText(logContent)
+                Toast.makeText(this, "Log file saved: ${file.absolutePath}", Toast.LENGTH_LONG).show()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Toast.makeText(this, "Failed to save log file", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(this, "No events to log", Toast.LENGTH_SHORT).show()
+        }
     }
 
     fun buildParams(): TpInitParams {
@@ -106,9 +166,9 @@ class PlayerActivity : AppCompatActivity() {
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             "TPS_NON_DRM" -> {
-                accessToken = "48a481d0-7a7f-465f-9d18-86f52129430b"
-                videoId = "C65BJzhj48k"
-                orgCode = "dcek2m"
+                accessToken = "020c75d2-87ed-4171-8d8a-048a2ad12276"
+                videoId = "3cX2G3c9QMd"
+                orgCode = "m9n4m6"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             null ->{}
@@ -124,6 +184,10 @@ class PlayerActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.enter_full_screen).setOnClickListener {
             playerFragment.showFullScreen()
+        }
+        val downloadButton = findViewById<Button>(R.id.download_log)
+        downloadButton.setOnClickListener {
+            checkPermissions()
         }
     }
 

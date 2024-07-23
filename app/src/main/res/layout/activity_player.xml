@@ -64,6 +64,42 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/log_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left|bottom"
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="Player Event Log"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/event_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:gravity="bottom"
+            android:hint="No events yet"
+            android:maxLines="10"
+            android:requiresFadingEdge="vertical"
+            android:scrollbars="vertical"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <Button
+            android:id="@+id/download_log"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Download Log"/>
+
+    </LinearLayout>
 
 
 </LinearLayout>

@@ -1,15 +1,22 @@
 package com.tpstream.app
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
+import android.provider.Settings
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -53,10 +60,10 @@ class PlayerActivity : AppCompatActivity() {
                         Log.d(TAG, "onPlaybackStateChanged: $playbackState")
                     }
 
-                    override fun onAccessTokenExpired(videoId: String, callback: (String) -> Unit) {
-                        val newAccessToken = getAccessToken(videoId)
-                        callback.invoke(newAccessToken)
-                    }
+//                    override fun onAccessTokenExpired(videoId: String, callback: (String) -> Unit) {
+//                        val newAccessToken = getAccessToken(videoId)
+//                        callback.invoke(newAccessToken)
+//                    }
 
                     override fun onMarkerCallback(timesInSeconds: Long) {
                         Toast.makeText(this@PlayerActivity,"$timesInSeconds",Toast.LENGTH_SHORT).show()
@@ -64,6 +71,10 @@ class PlayerActivity : AppCompatActivity() {
 
                     override fun onFullScreenChanged(isFullScreen: Boolean) {
                         Toast.makeText(this@PlayerActivity, isFullScreen.toString(), Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onAccessTokenExpired(videoId: String, callback: (String) -> Unit) {
+
                     }
 
                     override fun onPlayerError(playbackError: PlaybackError) {
@@ -82,17 +93,27 @@ class PlayerActivity : AppCompatActivity() {
         initializeSampleButtons();
     }
 
-    private val REQUEST_WRITE_EXTERNAL_STORAGE = 1
-
     private fun checkPermissions() {
-        if (ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.data = Uri.parse("package:$packageName")
+                startActivityForResult(intent, REQUEST_MANAGE_EXTERNAL_STORAGE)
+            } else {
+                // Permission already granted
+                downloadLogFile()
+            }
         } else {
-            // Permission already granted
-            downloadLogFile()
+            if (ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
+            } else {
+                // Permission already granted
+                downloadLogFile()
+            }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_WRITE_EXTERNAL_STORAGE) {
@@ -105,25 +126,61 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_MANAGE_EXTERNAL_STORAGE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    // Permission granted
+                    downloadLogFile()
+                } else {
+                    // Permission denied
+                    Toast.makeText(this, "Permission denied to manage external storage", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     private fun downloadLogFile() {
         val eventLogTextView = findViewById<TextView>(R.id.event_log)
         val logContent = eventLogTextView.text.toString()
 
         if (logContent.isNotEmpty()) {
             val fileName = "event_log.txt"
-            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val file = File(downloadsDir, fileName)
+            val resolver = applicationContext.contentResolver
+            val downloadsUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            } else {
+                MediaStore.Files.getContentUri("external")
+            }
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                put(MediaStore.Downloads.MIME_TYPE, "text/plain")
+                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            }
 
-            try {
-                file.writeText(logContent)
-                Toast.makeText(this, "Log file saved: ${file.absolutePath}", Toast.LENGTH_LONG).show()
-            } catch (e: IOException) {
-                e.printStackTrace()
-                Toast.makeText(this, "Failed to save log file", Toast.LENGTH_SHORT).show()
+            val uri = resolver.insert(downloadsUri, contentValues)
+            if (uri != null) {
+                try {
+                    resolver.openOutputStream(uri)?.use { outputStream ->
+                        outputStream.write(logContent.toByteArray())
+                        Toast.makeText(this, "Log file saved: $fileName", Toast.LENGTH_LONG).show()
+                    } ?: throw IOException("Failed to get output stream")
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    Toast.makeText(this, "Failed to save log file", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "Failed to create log file", Toast.LENGTH_SHORT).show()
             }
         } else {
             Toast.makeText(this, "No events to log", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    companion object {
+        private const val REQUEST_WRITE_EXTERNAL_STORAGE = 1
+        private const val REQUEST_MANAGE_EXTERNAL_STORAGE = 2
     }
 
     fun buildParams(): TpInitParams {

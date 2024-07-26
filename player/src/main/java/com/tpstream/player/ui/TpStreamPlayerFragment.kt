@@ -17,6 +17,7 @@ import com.tpstream.player.databinding.FragmentTpStreamPlayerBinding
 import com.tpstream.player.constants.getErrorMessage
 import com.tpstream.player.constants.toError
 import com.tpstream.player.offline.*
+import com.tpstream.player.offline.VideoDownload.getDownload
 import com.tpstream.player.util.OrientationListener
 import com.tpstream.player.util.SentryLogger
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +35,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private var isFullScreen = false
     private lateinit var orientationEventListener: OrientationListener
     private var startPosition : Long = -1L
-    private var drmLicenseRetries = 0
+    private var drmLicenseError = 0
     lateinit var tpStreamPlayerView: TPStreamPlayerView
     private var preferredFullscreenExitOrientation  = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
@@ -235,30 +236,56 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
-            if (isDisconnectedLiveStream(error)){
+            val errorPlayerId = SentryLogger.generatePlayerIdString()
+
+            if (isDisconnectedLiveStream(error)) {
                 player.load(player.params)
                 return
             }
-            val errorPlayerId = SentryLogger.generatePlayerIdString()
+
             SentryLogger.logPlaybackException(error, player?.params, errorPlayerId)
-            if (error.errorCode == PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED) {
-                player?._listener?.onAccessTokenExpired(player?.params?.videoId!!){ newAccessToken ->
-                    if (newAccessToken.isNotEmpty()) {
-                        player?.params?.setNewAccessToken(newAccessToken)
-                        player?.playVideoInUIThread(player.asset?.video?.url!!, player.getCurrentTime())
-                    } else {
-                        showErrorMessage(error.getErrorMessage(errorPlayerId))
-                        player?._listener?.onPlayerError(error.toError())
-                    }
+
+            when (error.errorCode) {
+                PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED -> handleDrmLicenseAcquisitionFailed(error, errorPlayerId)
+                else -> handleOtherErrors(error, errorPlayerId)
+            }
+        }
+
+        private fun handleDrmLicenseAcquisitionFailed(error: PlaybackException, errorPlayerId: String) {
+            player?._listener?.onAccessTokenExpired(player?.params?.videoId!!) { newAccessToken ->
+                if (newAccessToken.isNotEmpty()) {
+                    player?.params?.setNewAccessToken(newAccessToken)
+                    player?.playVideoInUIThread(player.asset?.video?.url!!, player.getCurrentTime())
+                } else {
+                    showErrorAndNotifyListener(error, errorPlayerId)
                 }
-                return
             }
+        }
+
+        private fun handleOtherErrors(error: PlaybackException, errorPlayerId: String) {
             if (isDRMException(error.cause!!)) {
-                fetchDRMLicence(error)
+                handleDrmException(error, errorPlayerId)
             } else {
-                showErrorMessage(error.getErrorMessage(errorPlayerId))
-                player?._listener?.onPlayerError(error.toError())
+                showErrorAndNotifyListener(error, errorPlayerId)
             }
+        }
+
+        private fun handleDrmException(error: PlaybackException, errorPlayerId: String) {
+            if (isOfflineLicenseExpired()) {
+                renewDRMLicence(error)
+            } else {
+                if (drmLicenseError < 2) {
+                    drmLicenseError++
+                    reloadVideo()
+                } else {
+                    showErrorAndNotifyListener(error, errorPlayerId)
+                }
+            }
+        }
+
+        private fun showErrorAndNotifyListener(error: PlaybackException, errorPlayerId: String) {
+            showErrorMessage(error.getErrorMessage(errorPlayerId))
+            player?._listener?.onPlayerError(error.toError())
         }
 
         override fun onIsLoadingChanged(isLoading: Boolean) {
@@ -281,7 +308,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
-        private fun fetchDRMLicence(error: PlaybackException){
+        private fun renewDRMLicence(error: PlaybackException){
             val errorPlayerId = SentryLogger.generatePlayerIdString()
             if (!InternetConnectivityChecker.isNetworkAvailable(requireContext())) {
                 showErrorMessage(getString(R.string.no_internet_to_sync_license))
@@ -308,7 +335,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             )
             CoroutineScope(Dispatchers.Main).launch {
                 reloadVideo()
-                drmLicenseRetries = 0
             }
         }
 
@@ -333,6 +359,16 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             return cause is DrmSessionException || cause is MediaCodec.CryptoException || cause is MediaDrmCallbackException
         }
 
+    }
+
+    private fun isOfflineLicenseExpired(): Boolean {
+        val download =
+            getDownload(player.asset?.getPlaybackURL()!!, requireActivity()) ?: return false
+        return OfflineDRMLicenseHelper.isOfflineLicenseExpired(
+            player.params,
+            requireContext(),
+            download.request
+        )
     }
 
     private fun isDisconnectedLiveStream(error: PlaybackException): Boolean {

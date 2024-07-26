@@ -5,12 +5,11 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
 import com.tpstream.player.*
-import com.tpstream.player.TPStreamsSDK
-import com.tpstream.player.TpInitParams
 import com.tpstream.player.offline.VideoDownload.getDownloadRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.Long.min
 
 internal object OfflineDRMLicenseHelper {
 
@@ -76,6 +75,28 @@ internal object OfflineDRMLicenseHelper {
             download.stopReason,
             download.failureReason
         )
+    }
+
+    fun isOfflineLicenseExpired(
+        tpInitParams: TpInitParams,
+        context: Context,
+        downloadRequest: DownloadRequest
+    ): Boolean {
+        val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(
+            tpInitParams.videoId,
+            tpInitParams.accessToken,
+            tpInitParams.rentalDurationSeconds
+        )
+        val offlineLicenseHelper = OfflineLicenseHelper.newWidevineInstance(
+            drmLicenseURL,
+            VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
+            DrmSessionEventListenerEventDispatcher()
+        )
+        val licenseDurationRemainingSec =
+            offlineLicenseHelper.getLicenseDurationRemainingSec(downloadRequest.keySetId!!)
+        offlineLicenseHelper.release()
+        return min(licenseDurationRemainingSec.first, licenseDurationRemainingSec.second) <= 60
+
     }
 
     fun fetchLicense(

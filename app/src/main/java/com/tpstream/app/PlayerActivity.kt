@@ -72,6 +72,7 @@ class PlayerActivity : AppCompatActivity() {
                 .setVideoId(videoId)
                 .setAccessToken(accessToken)
                 .setAutoPlay(true)
+                .setUserId("testUser")
                 .setOfflineLicenseExpireTime(FIFTEEN_DAYS)
                 .enableDownloadSupport(true)
                 .build()

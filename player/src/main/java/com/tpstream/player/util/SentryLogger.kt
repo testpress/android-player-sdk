@@ -21,7 +21,10 @@ internal object SentryLogger {
                     " Video ID: ${params?.videoId}" +
                     " AccessToken: ${params?.accessToken}" +
                     " Org Code: ${TPStreamsSDK.orgCode}"
-        ) { scope -> scope.setTag("playerId", playerId) }
+        ) { scope ->
+            scope.setTag("playerId", playerId)
+            scope.setTag("userId", params?.userId ?: "")
+        }
     }
 
     fun logPlaybackException(error: PlaybackException, params: TpInitParams?, playerId: String) {
@@ -33,7 +36,10 @@ internal object SentryLogger {
                     " Video ID: ${params?.videoId}" +
                     " AccessToken: ${params?.accessToken}" +
                     " Org Code: ${TPStreamsSDK.orgCode}"
-        ) { scope -> scope.setTag("playerId", playerId) }
+        ) { scope ->
+            scope.setTag("playerId", playerId)
+            scope.setTag("userId", params?.userId ?: "")
+        }
     }
 
     fun logDrmSessionException(error: DrmSessionException, params: TpInitParams?, playerId: String) {
@@ -44,6 +50,9 @@ internal object SentryLogger {
                     " Video ID: ${params?.videoId}" +
                     " AccessToken: ${params?.accessToken}" +
                     " Org Code: ${TPStreamsSDK.orgCode}"
-        ) { scope -> scope.setTag("playerId", playerId) }
+        ) { scope ->
+            scope.setTag("playerId", playerId)
+            scope.setTag("userId", params?.userId ?: "")
+        }
     }
 }

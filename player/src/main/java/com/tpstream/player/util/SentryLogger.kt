@@ -1,6 +1,7 @@
 package com.tpstream.player.util
 
 import com.tpstream.player.*
+import com.tpstream.player.BuildConfig.TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME
 import com.tpstream.player.PlaybackException
 import io.sentry.Sentry
 
@@ -22,6 +23,7 @@ internal object SentryLogger {
                     " AccessToken: ${params?.accessToken}" +
                     " Org Code: ${TPStreamsSDK.orgCode}"
         ) { scope ->
+            scope.setTag("TPStreamsAndroidPlayerSDKVersion",TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME)
             scope.setTag("playerId", playerId)
             scope.setTag("userId", params?.userId ?: "")
         }
@@ -37,6 +39,7 @@ internal object SentryLogger {
                     " AccessToken: ${params?.accessToken}" +
                     " Org Code: ${TPStreamsSDK.orgCode}"
         ) { scope ->
+            scope.setTag("TPStreamsAndroidPlayerSDKVersion",TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME)
             scope.setTag("playerId", playerId)
             scope.setTag("userId", params?.userId ?: "")
         }
@@ -51,6 +54,7 @@ internal object SentryLogger {
                     " AccessToken: ${params?.accessToken}" +
                     " Org Code: ${TPStreamsSDK.orgCode}"
         ) { scope ->
+            scope.setTag("TPStreamsAndroidPlayerSDKVersion",TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME)
             scope.setTag("playerId", playerId)
             scope.setTag("userId", params?.userId ?: "")
         }

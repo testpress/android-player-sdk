@@ -12,7 +12,8 @@ data class TpInitParams (
     var videoId: String? = null,
     var isDownloadEnabled: Boolean = false,
     var startAt: Long = 0L,
-    var rentalDurationSeconds: Int = FIFTEEN_DAYS
+    var rentalDurationSeconds: Int = FIFTEEN_DAYS,
+    var userId: String? = null
 ): Parcelable {
 
     class Builder {
@@ -22,6 +23,7 @@ data class TpInitParams (
         private var isDownloadEnabled: Boolean = false
         private var startAt: Long = 0L
         var rentalDurationSeconds: Int = FIFTEEN_DAYS
+        var userId: String? = null
 
         fun setAutoPlay(autoPlay: Boolean) = apply { this.autoPlay = autoPlay }
         fun startAt(timeInSeconds: Long) = apply { this.startAt = timeInSeconds }
@@ -30,6 +32,7 @@ data class TpInitParams (
         fun enableDownloadSupport(isDownloadEnabled: Boolean) = apply { this.isDownloadEnabled = isDownloadEnabled }
         fun setOfflineLicenseExpireTime(@androidx.annotation.IntRange(from = 300) expireTimeInSecond: Int) =
             apply { this.rentalDurationSeconds = expireTimeInSecond }
+        fun setUserId(userId: String) = apply { this.userId = userId }
 
         fun build(): TpInitParams {
             require(!accessToken.isNullOrBlank()) { "accessToken must not be null or empty" }
@@ -41,7 +44,8 @@ data class TpInitParams (
                 videoId = videoId!!,
                 isDownloadEnabled = isDownloadEnabled,
                 startAt = startAt,
-                rentalDurationSeconds = rentalDurationSeconds
+                rentalDurationSeconds = rentalDurationSeconds,
+                userId = userId
             )
         }
     }
@@ -70,6 +74,16 @@ data class TpInitParams (
                 isDownloadEnabled = true,
                 autoPlay = true,
                 accessToken = "dummyAccessToken"
+            )
+        }
+
+        fun createOfflineParams(videoId: String, userId: String):TpInitParams{
+            return TpInitParams(
+                videoId = videoId,
+                isDownloadEnabled = true,
+                autoPlay = true,
+                accessToken = "dummyAccessToken",
+                userId = userId
             )
         }
     }

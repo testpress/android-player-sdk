@@ -12,7 +12,7 @@ data class TpInitParams (
     var videoId: String? = null,
     var isDownloadEnabled: Boolean = false,
     var startAt: Long = 0L,
-    var rentalDurationSeconds: Int = FIFTEEN_DAYS,
+    var licenseDurationSeconds: Int = FIFTEEN_DAYS,
     var userId: String? = null
 ): Parcelable {
 
@@ -22,7 +22,7 @@ data class TpInitParams (
         private var videoId: String? = null
         private var isDownloadEnabled: Boolean = false
         private var startAt: Long = 0L
-        var rentalDurationSeconds: Int = FIFTEEN_DAYS
+        var licenseDurationSeconds: Int = FIFTEEN_DAYS
         var userId: String? = null
 
         fun setAutoPlay(autoPlay: Boolean) = apply { this.autoPlay = autoPlay }
@@ -31,7 +31,7 @@ data class TpInitParams (
         fun setVideoId(videoId: String) = apply { this.videoId = videoId }
         fun enableDownloadSupport(isDownloadEnabled: Boolean) = apply { this.isDownloadEnabled = isDownloadEnabled }
         fun setOfflineLicenseExpireTime(@androidx.annotation.IntRange(from = 300) expireTimeInSecond: Int) =
-            apply { this.rentalDurationSeconds = expireTimeInSecond }
+            apply { this.licenseDurationSeconds = expireTimeInSecond }
         fun setUserId(userId: String) = apply { this.userId = userId }
 
         fun build(): TpInitParams {
@@ -44,7 +44,7 @@ data class TpInitParams (
                 videoId = videoId!!,
                 isDownloadEnabled = isDownloadEnabled,
                 startAt = startAt,
-                rentalDurationSeconds = rentalDurationSeconds,
+                licenseDurationSeconds = licenseDurationSeconds,
                 userId = userId
             )
         }

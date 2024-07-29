@@ -39,14 +39,14 @@ object TPStreamsSDK {
     internal fun constructOfflineDRMLicenseUrl(
         contentId: String?,
         accessToken: String?,
-        rentalDurationSeconds: Int
+        licenseDurationSeconds: Int
     ): String {
         return "${
             constructDRMLicenseUrl(
                 contentId,
                 accessToken
             )
-        }&drm_type=widevine&download=true&rental_duration_seconds=$rentalDurationSeconds"
+        }&drm_type=widevine&download=true&rental_duration_seconds=$licenseDurationSeconds&license_duration_seconds=$licenseDurationSeconds"
     }
 
     enum class Provider {

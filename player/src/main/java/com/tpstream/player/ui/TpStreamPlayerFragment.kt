@@ -35,9 +35,12 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private var isFullScreen = false
     private lateinit var orientationEventListener: OrientationListener
     private var startPosition : Long = -1L
-    private var drmLicenseError = 0
+    private var drmLicenseErrorCount = 0
     lateinit var tpStreamPlayerView: TPStreamPlayerView
     private var preferredFullscreenExitOrientation  = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    private var assetApiCallCount = 0
+    private var drmLicenseApiCallCount = 0
+    private var offlineLicenseApiCallCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -252,8 +255,9 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         private fun handleDrmLicenseAcquisitionFailed(error: PlaybackException, errorPlayerId: String) {
+            drmLicenseApiCallCount++
             player?._listener?.onAccessTokenExpired(player?.params?.videoId!!) { newAccessToken ->
-                if (newAccessToken.isNotEmpty()) {
+                if (newAccessToken.isNotEmpty() && drmLicenseApiCallCount < 2) {
                     player?.params?.setNewAccessToken(newAccessToken)
                     player?.playVideoInUIThread(player.asset?.video?.url!!, player.getCurrentTime())
                 } else {
@@ -274,8 +278,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             if (isOfflineLicenseExpired()) {
                 renewDRMLicence(error)
             } else {
-                if (drmLicenseError < 2) {
-                    drmLicenseError++
+                if (drmLicenseErrorCount < 2) {
+                    drmLicenseErrorCount++
                     reloadVideo()
                 } else {
                     showErrorAndNotifyListener(error, errorPlayerId)
@@ -340,9 +344,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onLicenseFetchFailure(error: DrmSessionException) {
             if (!this@TpStreamPlayerFragment.isAdded) return
+            offlineLicenseApiCallCount++
             requireActivity().runOnUiThread{
                 player._listener?.onAccessTokenExpired(player.params.videoId!!){ newAccessToken ->
-                    if (newAccessToken.isNotEmpty()) {
+                    if (newAccessToken.isNotEmpty() && offlineLicenseApiCallCount < 2) {
                         player.params.setNewAccessToken(newAccessToken)
                         OfflineDRMLicenseHelper.renewLicense(player.asset?.video?.url!!, player.params, activity!!, this)
                         showErrorMessage(getString(R.string.syncing_video))
@@ -388,11 +393,12 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onPlaybackError(parameters: TpInitParams, exception: TPException) {
             if (!isAdded) return
+            assetApiCallCount++
             requireActivity().runOnUiThread {
                 val errorPlayerId = SentryLogger.generatePlayerIdString()
                 if (exception.isUnauthenticated()) {
                     player?._listener?.onAccessTokenExpired(parameters.videoId!!) { newAccessToken ->
-                        if (newAccessToken.isNotEmpty()) {
+                        if (newAccessToken.isNotEmpty() && assetApiCallCount < 2) {
                             parameters.setNewAccessToken(newAccessToken)
                             player?.load(parameters)
                         } else {

@@ -72,6 +72,7 @@ dependencies {
     api 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     api "com.google.code.gson:gson:2.10"
     api "androidx.room:room-runtime:$room_version"
+    implementation 'androidx.test:core-ktx:1.6.1'
     kapt "androidx.room:room-compiler:$room_version"
     api "androidx.room:room-ktx:$room_version"
     api 'androidx.fragment:fragment-ktx:1.5.4'

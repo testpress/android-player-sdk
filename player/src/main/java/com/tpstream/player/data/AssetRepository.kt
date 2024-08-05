@@ -90,7 +90,7 @@ internal class AssetRepository(val context: Context) {
         callback : NetworkClient.TPResponse<Asset>
     ) {
         val url = TPStreamsSDK.constructVideoInfoUrl(params.videoId, params.accessToken)
-        NetworkClient<NetworkAsset>(context).get(url, object : NetworkClient.TPResponse<NetworkAsset> {
+        NetworkClient<NetworkAsset>(NetworkClient.getOkHttpClient(context)).get(url, object : NetworkClient.TPResponse<NetworkAsset> {
             override fun onSuccess(result: NetworkAsset) {
                 val asset = result.asDomainAsset()
                 asset.id = params.videoId!!

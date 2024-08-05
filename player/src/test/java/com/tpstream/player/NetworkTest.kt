@@ -1,16 +1,22 @@
 package com.tpstream.player
 
+import android.content.Context
+import android.content.res.Resources
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.tpstream.player.data.source.network.NetworkAsset
 import com.tpstream.player.util.NetworkClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.*
 import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
+import java.io.ByteArrayInputStream
 
 @RunWith(JUnit4::class)
 class NetworkTest {
@@ -19,7 +25,7 @@ class NetworkTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var mockWebServer: MockWebServer
-    private val networkClient: NetworkClient<NetworkAsset> = NetworkClient(NetworkAsset::class.java)
+    private val networkClient: NetworkClient<NetworkAsset> = NetworkClient(NetworkAsset::class.java, OkHttpClient())
 
     private lateinit var callbackResponse: NetworkClient.TPResponse<NetworkAsset>
     private var callbackResult: NetworkAsset? = null

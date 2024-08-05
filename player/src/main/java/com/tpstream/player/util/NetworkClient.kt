@@ -7,12 +7,13 @@ import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.tpstream.player.TPException
 import okhttp3.*
+import okhttp3.internal.EMPTY_REQUEST
 import java.io.IOException
 import java.net.URL
 
-internal class NetworkClient<T : Any>(val klass: Class<T>,val context: Context) {
+internal class NetworkClient<T : Any>(val klass: Class<T>, private val client: OkHttpClient) {
     companion object {
-        inline operator fun <reified T : Any>invoke(context: Context) = NetworkClient(T::class.java, context = context)
+        inline operator fun <reified T : Any>invoke(client: OkHttpClient) = NetworkClient(T::class.java, client = client)
 
         fun makeHeadRequest(url: String): Int {
             val request = Request.Builder().head().url(url).build()
@@ -20,22 +21,29 @@ internal class NetworkClient<T : Any>(val klass: Class<T>,val context: Context) 
                 return response.code
             }
         }
-    }
 
-    private val client: OkHttpClient get() {
-        val okHttpClient = OkHttpClient()
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            val (socketFactory, trustManager) = TrustFactory.getTrustFactoryManager(context)
-            return okHttpClient.newBuilder().sslSocketFactory(socketFactory, trustManager).build()
+        fun getOkHttpClient(context: Context): OkHttpClient {
+            val okHttpClient = OkHttpClient()
+            return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                val (socketFactory, trustManager) = TrustFactory.getTrustFactoryManager(context)
+                okHttpClient.newBuilder().sslSocketFactory(socketFactory, trustManager).build()
+            } else {
+                okHttpClient
+            }
         }
-        return okHttpClient
-
     }
+
     private val gson = Gson()
 
     fun get(url: String, callback: TPResponse<T>) {
         val request = Request.Builder().url(URL(url)).build()
         return makeRequest(request, callback)
+    }
+
+    fun fetchDRMKey(url: String): ByteArray? {
+        val request = Request.Builder().url(URL(url)).post(EMPTY_REQUEST).build()
+        val response = client.newCall(request).execute()
+        return response.body?.bytes()
     }
 
     private fun makeRequest(request: Request, callback: TPResponse<T>) {
@@ -63,6 +71,8 @@ internal class NetworkClient<T : Any>(val klass: Class<T>,val context: Context) 
             }
         })
     }
+
+
 
     interface TPResponse<T> {
         fun onSuccess(result: T)

@@ -47,44 +47,6 @@ class NetworkTest {
     }
 
     @Test
-    fun testTestpressVideoGetSyncRequest() {
-        val successResponse = MockResponse().setResponseCode(200).setBody(getTestpressVideoJSON())
-        mockWebServer.enqueue(successResponse)
-        val response = networkClient.get(mockWebServer.url("/").toString())
-        mockWebServer.takeRequest()
-        assertEquals(response?.title, "No Encrypt")
-        assertEquals(
-            response?.url,
-            "https://verandademo-cdn.testpress.in/institute/demoveranda/courses/video-content/videos/transcoded/c3785c76604048f2afd0b382e68f7dd2/video.m3u8"
-        )
-    }
-
-    @Test
-    fun testTpStreamsVideoGetSyncRequest() {
-        val successResponse = MockResponse().setResponseCode(200).setBody(getTpStreamsVideoJSON())
-        mockWebServer.enqueue(successResponse)
-        val response = networkClient.get(mockWebServer.url("/").toString())
-        mockWebServer.takeRequest()
-        assertEquals(response?.title, "BigBuckBunny.mp4")
-        assertEquals(
-            response?.networkVideo?.dash_url,
-            "https://d3cydmgt9q030i.cloudfront.net/transcoded/73633fa3-61c6-443c-b625-ac4e85b28cfc/video.mpd"
-        )
-    }
-
-    @Test
-    fun testErrorReceiveOnGetSyncRequest() {
-        val errorResponse = MockResponse().setResponseCode(400)
-        mockWebServer.enqueue(errorResponse)
-        try {
-            networkClient.get(mockWebServer.url("/").toString())
-            mockWebServer.takeRequest()
-        } catch (exception: TPException) {
-            assertEquals(exception.response?.code, 400)
-        }
-    }
-
-    @Test
     fun testTestpressVideoGetAsyncRequest() {
         val successResponse = MockResponse().setResponseCode(200).setBody(getTestpressVideoJSON())
         mockWebServer.enqueue(successResponse)

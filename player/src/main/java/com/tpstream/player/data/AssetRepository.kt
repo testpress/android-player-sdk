@@ -12,7 +12,7 @@ import com.tpstream.player.util.NetworkClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
-internal class AssetRepository(context: Context) {
+internal class AssetRepository(val context: Context) {
 
     private val assetDao = TPStreamsDatabase(context).assetDao()
 
@@ -90,7 +90,7 @@ internal class AssetRepository(context: Context) {
         callback : NetworkClient.TPResponse<Asset>
     ) {
         val url = TPStreamsSDK.constructVideoInfoUrl(params.videoId, params.accessToken)
-        NetworkClient<NetworkAsset>().get(url, object : NetworkClient.TPResponse<NetworkAsset> {
+        NetworkClient<NetworkAsset>(context).get(url, object : NetworkClient.TPResponse<NetworkAsset> {
             override fun onSuccess(result: NetworkAsset) {
                 val asset = result.asDomainAsset()
                 asset.id = params.videoId!!

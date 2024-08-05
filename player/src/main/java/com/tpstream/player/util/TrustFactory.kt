@@ -18,7 +18,8 @@ import javax.net.ssl.X509TrustManager
  * by IdenTrust's DST Root CA X3, which affects older Android versions.
  *
  * For more information on the expiration of the cross-signature, refer to:
- * [Let’s Encrypt Cross-Sign Expiration](https://letsencrypt.org/2023/07/10/cross-sign-expiration)
+ * [Let’s Encrypt Cross-Sign Expiration](https://letsencrypt.org/2023/07/10/cross-sign-expiration),
+ * [Stackoverflow](https://stackoverflow.com/questions/64844311/certpathvalidatorexception-connecting-to-a-lets-encrypt-host-on-android-m-or-ea/78309587#78309587)
  */
 
 class TrustFactory {

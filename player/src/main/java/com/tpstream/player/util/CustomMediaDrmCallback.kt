@@ -7,6 +7,9 @@ import androidx.media3.exoplayer.drm.HttpMediaDrmCallback
 import androidx.media3.exoplayer.drm.MediaDrmCallback
 import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
 
 class CustomHttpDrmMediaCallback(val context: Context,val params: TpInitParams):MediaDrmCallback {
@@ -21,6 +24,15 @@ class CustomHttpDrmMediaCallback(val context: Context,val params: TpInitParams):
 
     override fun executeKeyRequest(uuid: UUID, request: ExoMediaDrm.KeyRequest): ByteArray {
         val drmLicenseURL = TPStreamsSDK.constructDRMLicenseUrl(params.videoId, params.accessToken)
-        return NetworkClient<ByteArray>(NetworkClient.getOkHttpClient(context)).fetchDRMKey(drmLicenseURL) ?: byteArrayOf()
+        return try {
+            val requestBody = request.data.toRequestBody("application/octet-stream".toMediaTypeOrNull())
+            NetworkClient<ByteArray>(NetworkClient.getOkHttpClient(context)).fetchDRMKey(
+                drmLicenseURL,
+                requestBody
+            ) ?: byteArrayOf()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            byteArrayOf()
+        }
     }
 }

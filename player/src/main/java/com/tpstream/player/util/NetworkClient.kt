@@ -40,8 +40,8 @@ internal class NetworkClient<T : Any>(val klass: Class<T>, private val client: O
         return makeRequest(request, callback)
     }
 
-    fun fetchDRMKey(url: String): ByteArray? {
-        val request = Request.Builder().url(URL(url)).post(EMPTY_REQUEST).build()
+    fun fetchDRMKey(url: String, requestBody: RequestBody): ByteArray? {
+        val request = Request.Builder().url(URL(url)).post(requestBody).build()
         val response = client.newCall(request).execute()
         return response.body?.bytes()
     }

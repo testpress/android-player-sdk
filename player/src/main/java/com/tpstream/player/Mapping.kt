@@ -78,6 +78,7 @@ internal typealias ExoMediaDrmProvisionRequest = androidx.media3.exoplayer.drm.E
 internal typealias ExoMediaDrmKeyRequest = androidx.media3.exoplayer.drm.ExoMediaDrm.KeyRequest
 internal typealias HttpMediaDrmCallback = androidx.media3.exoplayer.drm.HttpMediaDrmCallback
 internal typealias MediaDrmCallback = androidx.media3.exoplayer.drm.MediaDrmCallback
+internal typealias FrameworkMediaDrm = androidx.media3.exoplayer.drm.FrameworkMediaDrm
 
 // androidx.media3.database
 internal typealias DatabaseProvider = androidx.media3.database.DatabaseProvider

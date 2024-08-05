@@ -4,8 +4,10 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
+import android.os.Build
 import com.tpstream.player.*
 import com.tpstream.player.offline.VideoDownload.getDownloadRequest
+import com.tpstream.player.util.CustomHttpDrmMediaCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -106,11 +108,21 @@ internal object OfflineDRMLicenseHelper {
         callback: DRMLicenseFetchCallback
     ) {
         val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(tpInitParams.videoId,tpInitParams.accessToken, tpInitParams.licenseDurationSeconds)
-        val offlineLicenseHelper = OfflineLicenseHelper.newWidevineInstance(
+        var offlineLicenseHelper = OfflineLicenseHelper.newWidevineInstance(
             drmLicenseURL,
             VideoDownloadManager.invoke(context).getHttpDataSourceFactory(),
             DrmSessionEventListenerEventDispatcher()
         )
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            val drmSessionManager = DefaultDrmSessionManagerBuilder()
+                .setUuidAndExoMediaDrmProvider(C.WIDEVINE_UUID) { FrameworkMediaDrm.newInstance(C.WIDEVINE_UUID) }
+                .setMultiSession(true)
+                .build(CustomHttpDrmMediaCallback(context, drmLicenseURL))
+            offlineLicenseHelper = OfflineLicenseHelper(
+                drmSessionManager,
+                DrmSessionEventListenerEventDispatcher()
+            )
+        }
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val keySetId = offlineLicenseHelper.downloadLicense(format)

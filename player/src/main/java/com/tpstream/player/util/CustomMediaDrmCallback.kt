@@ -8,7 +8,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
 
-class CustomHttpDrmMediaCallback(val context: Context,val params: TpInitParams):MediaDrmCallback {
+class CustomHttpDrmMediaCallback(val context: Context, private val drmLicenseURL: String):MediaDrmCallback {
     private val httpMediaDrmCallback = HttpMediaDrmCallback("", DefaultHttpDataSourceFactory())
 
     override fun executeProvisionRequest(
@@ -19,7 +19,6 @@ class CustomHttpDrmMediaCallback(val context: Context,val params: TpInitParams):
     }
 
     override fun executeKeyRequest(uuid: UUID, request: ExoMediaDrmKeyRequest): ByteArray {
-        val drmLicenseURL = TPStreamsSDK.constructDRMLicenseUrl(params.videoId, params.accessToken)
         return try {
             val requestBody = request.data.toRequestBody("application/octet-stream".toMediaTypeOrNull())
             NetworkClient<ByteArray>(NetworkClient.getOkHttpClient(context)).fetchDRMKey(

@@ -131,7 +131,8 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             .setDataSourceFactory(VideoDownloadManager(context).build(params))
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             mediaSourceFactory.setDrmSessionManagerProvider {
-                DefaultDrmSessionManagerBuilder().build(CustomHttpDrmMediaCallback(context, params))
+                val drmLicenseURL = TPStreamsSDK.constructDRMLicenseUrl(params.videoId, params.accessToken)
+                DefaultDrmSessionManagerBuilder().build(CustomHttpDrmMediaCallback(context, drmLicenseURL))
             }
         }
         return mediaSourceFactory

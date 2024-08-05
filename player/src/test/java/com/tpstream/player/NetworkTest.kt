@@ -1,7 +1,5 @@
 package com.tpstream.player
 
-import android.content.Context
-import android.content.res.Resources
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.tpstream.player.data.source.network.NetworkAsset
 import com.tpstream.player.util.NetworkClient
@@ -14,9 +12,6 @@ import org.junit.*
 import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import java.io.ByteArrayInputStream
 
 @RunWith(JUnit4::class)
 class NetworkTest {

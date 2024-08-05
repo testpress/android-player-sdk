@@ -2,12 +2,10 @@ package com.tpstream.player.util
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.tpstream.player.TPException
 import okhttp3.*
-import okhttp3.internal.EMPTY_REQUEST
 import java.io.IOException
 import java.net.URL
 
@@ -66,13 +64,10 @@ internal class NetworkClient<T : Any>(val klass: Class<T>, private val client: O
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                Log.d("TAG", "onFailure: $e")
                 callback.onFailure(TPException.networkError(e))
             }
         })
     }
-
-
 
     interface TPResponse<T> {
         fun onSuccess(result: T)

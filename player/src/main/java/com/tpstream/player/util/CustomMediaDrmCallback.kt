@@ -1,28 +1,24 @@
 package com.tpstream.player.util
 
 import android.content.Context
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.exoplayer.drm.ExoMediaDrm
-import androidx.media3.exoplayer.drm.HttpMediaDrmCallback
-import androidx.media3.exoplayer.drm.MediaDrmCallback
-import com.tpstream.player.TPStreamsSDK
-import com.tpstream.player.TpInitParams
+import com.tpstream.player.*
+import com.tpstream.player.HttpMediaDrmCallback
+import com.tpstream.player.MediaDrmCallback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
 
 class CustomHttpDrmMediaCallback(val context: Context,val params: TpInitParams):MediaDrmCallback {
-    private val httpMediaDrmCallback = HttpMediaDrmCallback("", DefaultHttpDataSource.Factory())
+    private val httpMediaDrmCallback = HttpMediaDrmCallback("", DefaultHttpDataSourceFactory())
 
     override fun executeProvisionRequest(
         uuid: UUID,
-        request: ExoMediaDrm.ProvisionRequest
+        request: ExoMediaDrmProvisionRequest
     ): ByteArray {
         return httpMediaDrmCallback.executeProvisionRequest(uuid, request)
     }
 
-    override fun executeKeyRequest(uuid: UUID, request: ExoMediaDrm.KeyRequest): ByteArray {
+    override fun executeKeyRequest(uuid: UUID, request: ExoMediaDrmKeyRequest): ByteArray {
         val drmLicenseURL = TPStreamsSDK.constructDRMLicenseUrl(params.videoId, params.accessToken)
         return try {
             val requestBody = request.data.toRequestBody("application/octet-stream".toMediaTypeOrNull())

@@ -5,8 +5,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
-import androidx.media3.exoplayer.util.EventLogger
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
@@ -124,7 +122,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.playWhenReady = params.autoPlay?: true
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.seekTo(startPosition)
-        exoPlayer.addAnalyticsListener(EventLogger("TPStreamsLogger"))
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
     }
@@ -134,7 +131,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             .setDataSourceFactory(VideoDownloadManager(context).build(params))
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             mediaSourceFactory.setDrmSessionManagerProvider {
-                DefaultDrmSessionManager.Builder().build(CustomHttpDrmMediaCallback(context, params))
+                DefaultDrmSessionManagerBuilder().build(CustomHttpDrmMediaCallback(context, params))
             }
         }
         return mediaSourceFactory

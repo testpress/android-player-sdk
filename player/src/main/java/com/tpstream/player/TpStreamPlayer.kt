@@ -124,7 +124,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.playWhenReady = params.autoPlay?: true
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.seekTo(startPosition)
-        exoPlayer.addAnalyticsListener(EventLogger())
+        exoPlayer.addAnalyticsListener(EventLogger("TPStreamsLogger"))
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
     }

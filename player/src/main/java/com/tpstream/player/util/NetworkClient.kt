@@ -1,5 +1,7 @@
 package com.tpstream.player.util
 
+import android.content.Context
+import android.os.Build
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.tpstream.player.TPException
@@ -7,9 +9,9 @@ import okhttp3.*
 import java.io.IOException
 import java.net.URL
 
-internal class NetworkClient<T : Any>(val klass: Class<T>) {
+internal class NetworkClient<T : Any>(val klass: Class<T>, private val client: OkHttpClient) {
     companion object {
-        inline operator fun <reified T : Any>invoke() = NetworkClient(T::class.java)
+        inline operator fun <reified T : Any>invoke(client: OkHttpClient) = NetworkClient(T::class.java, client = client)
 
         fun makeHeadRequest(url: String): Int {
             val request = Request.Builder().head().url(url).build()
@@ -17,14 +19,29 @@ internal class NetworkClient<T : Any>(val klass: Class<T>) {
                 return response.code
             }
         }
+
+        fun getOkHttpClient(context: Context): OkHttpClient {
+            val okHttpClient = OkHttpClient()
+            return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                val (socketFactory, trustManager) = TrustFactory.getTrustFactoryManager(context)
+                okHttpClient.newBuilder().sslSocketFactory(socketFactory, trustManager).build()
+            } else {
+                okHttpClient
+            }
+        }
     }
 
-    private var client: OkHttpClient = OkHttpClient();
     private val gson = Gson()
 
     fun get(url: String, callback: TPResponse<T>) {
         val request = Request.Builder().url(URL(url)).build()
         return makeRequest(request, callback)
+    }
+
+    fun fetchDRMKey(url: String, requestBody: RequestBody): ByteArray? {
+        val request = Request.Builder().url(URL(url)).post(requestBody).build()
+        val response = client.newCall(request).execute()
+        return response.body?.bytes()
     }
 
     private fun makeRequest(request: Request, callback: TPResponse<T>) {

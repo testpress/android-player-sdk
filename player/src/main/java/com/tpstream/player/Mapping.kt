@@ -73,6 +73,12 @@ internal typealias OfflineLicenseHelper =  androidx.media3.exoplayer.drm.Offline
 internal typealias DrmSessionEventListenerEventDispatcher =  androidx.media3.exoplayer.drm.DrmSessionEventListener.EventDispatcher
 internal typealias DrmSessionException = androidx.media3.exoplayer.drm.DrmSession.DrmSessionException
 internal typealias MediaDrmCallbackException = androidx.media3.exoplayer.drm.MediaDrmCallbackException
+internal typealias DefaultDrmSessionManagerBuilder = androidx.media3.exoplayer.drm.DefaultDrmSessionManager.Builder
+internal typealias ExoMediaDrmProvisionRequest = androidx.media3.exoplayer.drm.ExoMediaDrm.ProvisionRequest
+internal typealias ExoMediaDrmKeyRequest = androidx.media3.exoplayer.drm.ExoMediaDrm.KeyRequest
+internal typealias HttpMediaDrmCallback = androidx.media3.exoplayer.drm.HttpMediaDrmCallback
+internal typealias MediaDrmCallback = androidx.media3.exoplayer.drm.MediaDrmCallback
+internal typealias FrameworkMediaDrm = androidx.media3.exoplayer.drm.FrameworkMediaDrm
 
 // androidx.media3.database
 internal typealias DatabaseProvider = androidx.media3.database.DatabaseProvider
@@ -81,6 +87,7 @@ internal typealias StandaloneDatabaseProvider = androidx.media3.database.Standal
 // androidx.media3.datasource
 internal typealias DataSource =  androidx.media3.datasource.DataSource
 internal typealias DataSourceFactory =  androidx.media3.datasource.DataSource.Factory
+internal typealias DefaultHttpDataSourceFactory =  androidx.media3.datasource.DefaultHttpDataSource.Factory
 
 // androidx.media3.datasource.cache
 internal typealias Cache =  androidx.media3.datasource.cache.Cache

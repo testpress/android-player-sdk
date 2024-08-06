@@ -5,6 +5,7 @@ import com.tpstream.player.data.source.network.NetworkAsset
 import com.tpstream.player.util.NetworkClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.*
@@ -19,7 +20,7 @@ class NetworkTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var mockWebServer: MockWebServer
-    private val networkClient: NetworkClient<NetworkAsset> = NetworkClient(NetworkAsset::class.java)
+    private val networkClient: NetworkClient<NetworkAsset> = NetworkClient(NetworkAsset::class.java, OkHttpClient())
 
     private lateinit var callbackResponse: NetworkClient.TPResponse<NetworkAsset>
     private var callbackResult: NetworkAsset? = null

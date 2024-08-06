@@ -2,6 +2,7 @@ package com.tpstream.player
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import com.google.common.collect.ImmutableList
@@ -11,6 +12,7 @@ import com.tpstream.player.util.NetworkClient
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
+import com.tpstream.player.util.CustomHttpDrmMediaCallback
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -125,8 +127,15 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun getMediaSourceFactory(): MediaSourceFactory {
-        return DefaultMediaSourceFactory(context)
+        val mediaSourceFactory = DefaultMediaSourceFactory(context)
             .setDataSourceFactory(VideoDownloadManager(context).build(params))
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            mediaSourceFactory.setDrmSessionManagerProvider {
+                val drmLicenseURL = TPStreamsSDK.constructDRMLicenseUrl(params.videoId, params.accessToken)
+                DefaultDrmSessionManagerBuilder().build(CustomHttpDrmMediaCallback(context, drmLicenseURL))
+            }
+        }
+        return mediaSourceFactory
     }
 
     private fun getMediaItem(url: String): MediaItem {
@@ -139,15 +148,17 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     private fun buildMediaItem(url: String): MediaItem {
         val drmLicenseURL = TPStreamsSDK.constructDRMLicenseUrl(params.videoId, params.accessToken)
-        return MediaItemBuilder()
+        val mediaItemBuilder = MediaItemBuilder()
             .setUri(url)
             .setSubtitleConfigurations(buildSubTitleConfiguration())
-            .setDrmConfiguration(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mediaItemBuilder.setDrmConfiguration(
                 DrmConfigurationBuilder(C.WIDEVINE_UUID)
                     .setMultiSession(true)
                     .setLicenseUri(drmLicenseURL)
-                    .build()
-            ).build()
+                    .build())
+        }
+        return mediaItemBuilder.build()
     }
 
     private fun buildSubTitleConfiguration(): List<SubtitleConfiguration> {

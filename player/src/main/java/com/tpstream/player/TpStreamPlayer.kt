@@ -121,9 +121,25 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     internal fun playVideo(url: String,startPosition: Long = 0) {
         exoPlayer.playWhenReady = params.autoPlay?: true
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
+        exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
+    }
+
+    private fun getInitialTrackSelectionParameter(): TrackSelectionParameters {
+        if (!this::params.isInitialized || params.initialResolutionHeight == null) {
+            return getTrackSelectionParameters()
+        }
+        val height = params.initialResolutionHeight!!
+        // Set minimum and maximum video height to filter available tracks.
+        // If a track with the exact specified height is available, it will be selected.
+        // If no exact match is found, the player will select the smallest available resolution
+        // that is less than or equal to the specified height.
+        return TrackSelectionParametersBuilder(context)
+            .setMinVideoSize(Int.MIN_VALUE, height)
+            .setMaxVideoSize(Int.MAX_VALUE, height)
+            .build()
     }
 
     private fun getMediaSourceFactory(): MediaSourceFactory {

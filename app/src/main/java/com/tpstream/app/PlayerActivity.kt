@@ -74,6 +74,7 @@ class PlayerActivity : AppCompatActivity() {
                 .setAutoPlay(true)
                 .setUserId("testUser")
                 .setOfflineLicenseExpireTime(FIFTEEN_DAYS)
+                .setInitialResolution(1080)
                 .enableDownloadSupport(true)
                 .build()
         }

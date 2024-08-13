@@ -198,6 +198,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
                     showNoticeScreen(it)
                 }
                 initializeSubtitleView()
+                updateSelectedResolution()
             }
         }
     }
@@ -210,6 +211,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
             val bottomMarginInPx = (bottomMarginInDp * density).toInt()
             (playerView.subtitleView?.layoutParams as? MarginLayoutParams)?.bottomMargin =
                 bottomMarginInPx
+        }
+    }
+
+    private fun updateSelectedResolution() {
+        player.params.initialResolutionHeight?.let {
+            selectedResolution = ResolutionOptions.ADVANCED
         }
     }
 

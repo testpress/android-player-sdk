@@ -24,6 +24,7 @@ import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
 import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.offline.TpStreamDownloadManager
+import com.tpstream.player.ui.AdvancedResolutionSelectionSheet.OnAdvanceResolutionClickListener
 import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.MarkerState
 import com.tpstream.player.util.NetworkClient.Companion.makeHeadRequest
@@ -134,9 +135,9 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     private fun initializeResolutionSelectionSheets() {
         simpleResolutionSheet = SimpleResolutionSelectionSheet(player!!, selectedResolution)
-        advancedResolutionSheet = AdvancedResolutionSelectionSheet(player!!, player!!.getTrackSelectionParameters())
+        advancedResolutionSheet = AdvancedResolutionSelectionSheet(player!!)
         simpleResolutionSheet.onClickListener = onSimpleResolutionSelection()
-        advancedResolutionSheet.onClickListener = onAdvancedVideoResolutionSelection()
+        advancedResolutionSheet.onAdvanceResolutionClickListener = onAdvancedVideoResolutionSelection()
     }
 
     private fun onSimpleResolutionSelection() = DialogInterface.OnClickListener { p0, p1 ->
@@ -155,14 +156,15 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
-    private fun onAdvancedVideoResolutionSelection() = DialogInterface.OnClickListener { p0, p1 ->
-        val mappedTrackInfo = (player?.getTrackSelector() as DefaultTrackSelector).currentMappedTrackInfo
-        mappedTrackInfo?.let {
-            val rendererIndex = Util.getRendererIndex(C.TRACK_TYPE_VIDEO, mappedTrackInfo)
-            if (advancedResolutionSheet.overrides.isNotEmpty()) {
-                val params = TrackSelectionParametersBuilder(context)
-                    .clearOverridesOfType(rendererIndex)
-                    .addOverride(advancedResolutionSheet.overrides.values.elementAt(0))
+    private fun onAdvancedVideoResolutionSelection() = object : OnAdvanceResolutionClickListener {
+        override fun onClick(index: Int) {
+            player.getCurrentTrackGroups().firstOrNull {
+                it.type == C.TRACK_TYPE_VIDEO
+            }?.let {
+                val params = player.getTrackSelectionParameters()
+                    .buildUpon()
+                    .clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                    .addOverride(TrackSelectionOverride(it.mediaTrackGroup, index))
                     .build()
                 player?.setTrackSelectionParameters(params)
             }

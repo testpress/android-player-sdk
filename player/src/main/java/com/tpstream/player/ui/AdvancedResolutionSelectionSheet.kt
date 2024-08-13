@@ -1,7 +1,6 @@
 package com.tpstream.player.ui
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,25 +8,20 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import com.tpstream.player.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.common.collect.ImmutableList
-import com.tpstream.player.R
-import com.tpstream.player.TpStreamPlayer
+import com.tpstream.player.*
 import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
 
 internal class AdvancedResolutionSelectionSheet(
-    private val player: TpStreamPlayer,
-    parameters: TrackSelectionParameters,
+    private val player: TpStreamPlayer
 ): BottomSheetDialogFragment() {
 
     private var _binding: TpTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
-    var onClickListener: DialogInterface.OnClickListener? = null
-    var overrides: MutableMap<TrackGroup, TrackSelectionOverride> = parameters.overrides.toMutableMap()
-    private val trackGroups = player.getCurrentTrackGroups()
+    var onAdvanceResolutionClickListener: OnAdvanceResolutionClickListener? = null
+    private val tracksGroups = player.getCurrentTrackGroups()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,43 +54,40 @@ internal class AdvancedResolutionSelectionSheet(
     }
 
     private fun initializeList() {
-        val trackInfos = getTrackInfos()
-        binding.listview.also { it ->
-            it.adapter = Adapter(requireContext(), trackInfos, overrides)
-            it.setOnItemClickListener { _, _, index, _ ->
-                val resolution = trackInfos[index]
-                val mediaTrackGroup: TrackGroup = resolution.trackGroup.mediaTrackGroup
-                overrides.clear()
-                overrides[mediaTrackGroup] = TrackSelectionOverride(mediaTrackGroup, ImmutableList.of(resolution.trackIndex))
-                onClickListener?.onClick(dialog, DialogInterface.BUTTON_POSITIVE)
+        val trackGroup = tracksGroups.firstOrNull { it.type == C.TRACK_TYPE_VIDEO }
+        trackGroup?.let { group ->
+            val filteredTracksInfo = getTracksInfo(group).filterTracksInfoBelowMaxResolution()
+            setupListView(filteredTracksInfo)
+        } ?: dismiss()
+    }
+
+    private fun getTracksInfo(trackGroup: TracksGroup): ArrayList<TrackInfo> {
+        val isMultipleTrackSelected = isMultipleTrackSelected(trackGroup)
+
+        return (0 until trackGroup.length).mapTo(ArrayList()) { trackIndex ->
+            TrackInfo(
+                trackGroup.getTrackFormat(trackIndex),
+                !isMultipleTrackSelected && trackGroup.isTrackSelected(trackIndex)
+            )
+        }
+    }
+
+    private fun ArrayList<TrackInfo>.filterTracksInfoBelowMaxResolution(): ArrayList<TrackInfo> {
+        val maxResolution = player.getMaxResolution() ?: return this
+        return filterTo(ArrayList()) { it.format.height <= maxResolution }
+    }
+
+    private fun setupListView(tracksInfo: ArrayList<TrackInfo>) {
+        binding.listview.apply {
+            adapter = Adapter(requireContext(), tracksInfo)
+            setOnItemClickListener { _, _, index, _ ->
+                onAdvanceResolutionClickListener?.onClick(index)
                 dismiss()
             }
         }
     }
-
-    private fun getTrackInfos(): ArrayList<TrackInfo> {
-        if (trackGroups.none { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }) {
-            return arrayListOf()
-        }
-
-        val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
-        return if (player.getMaxResolution() == null) {
-            getAllTracks(trackGroup)
-        } else {
-            getTracksBelowMaxResolution(trackGroup)
-        }
-    }
-
-    private fun getAllTracks(trackGroup: TracksGroup): ArrayList<TrackInfo> {
-        return (0 until trackGroup.length).mapTo(arrayListOf()) { TrackInfo(trackGroup, it) }
-    }
-
-    private fun getTracksBelowMaxResolution(trackGroup: TracksGroup): ArrayList<TrackInfo> {
-        val maxResolution = player.getMaxResolution()!!
-
-        return (0 until trackGroup.length)
-            .filter { maxResolution >= trackGroup.mediaTrackGroup.getFormat(it).height }
-            .mapTo(arrayListOf()) { TrackInfo(trackGroup, it) }
+    private fun isMultipleTrackSelected(trackGroup: TracksGroup): Boolean {
+        return (0 until trackGroup.length).count { trackGroup.isTrackSelected(it) } > 1
     }
 
     private fun configureBottomSheetBehaviour() {
@@ -106,26 +97,27 @@ internal class AdvancedResolutionSelectionSheet(
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    inner class Adapter(context1: Context, dataSource: ArrayList<TrackInfo>, overrides: Map<TrackGroup, TrackSelectionOverride>): ArrayAdapter<TrackInfo>(context1,
-        R.layout.tp_resolution_data, dataSource) {
-        private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val values = overrides.values.map { trackSelection ->
-            trackSelection.trackIndices[0]
-        }
+    inner class Adapter(context1: Context, dataSource: ArrayList<TrackInfo>) :
+        ArrayAdapter<TrackInfo>(
+            context1,
+            R.layout.tp_resolution_data, dataSource
+        ) {
+        private val inflater =
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val resolution = getItem(position)!!
+            val trackInfo = getItem(position)!!
             var view = convertView
             if (convertView == null) {
-                view =  inflater.inflate(R.layout.tp_resolution_data, parent, false)
+                view = inflater.inflate(R.layout.tp_resolution_data, parent, false)
             }
-            view!!.findViewById<TextView>(R.id.title).text = "${resolution.format.height}p"
-            showOrHideCheckMark(view, resolution)
+            view!!.findViewById<TextView>(R.id.title).text = "${trackInfo.format.height}p"
+            showOrHideCheckMark(view, trackInfo)
             return view
         }
 
-        private fun showOrHideCheckMark(view: View, resolution: TrackInfo) {
-            if (resolution.trackIndex in values) {
+        private fun showOrHideCheckMark(view: View, trackInfo: TrackInfo) {
+            if (trackInfo.isSelected) {
                 view.findViewById<ImageView>(R.id.auto_icon).visibility = View.VISIBLE
             } else {
                 view.findViewById<ImageView>(R.id.auto_icon).visibility = View.GONE
@@ -133,8 +125,9 @@ internal class AdvancedResolutionSelectionSheet(
         }
     }
 
-    inner class TrackInfo(val trackGroup: TracksGroup, val trackIndex: Int) {
-        val format: Format
-            get() = trackGroup.getTrackFormat(trackIndex)
+    interface OnAdvanceResolutionClickListener {
+        fun onClick(index: Int)
     }
+
+    data class TrackInfo(val format: Format, val isSelected: Boolean)
 }

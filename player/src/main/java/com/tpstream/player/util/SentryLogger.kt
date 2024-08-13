@@ -30,6 +30,7 @@ internal object SentryLogger {
                 "TPStreamsSDK",
                 mapOf(
                     "SDK Version" to TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME,
+                    "Provider" to TPStreamsSDK.provider.name,
                     "Player Id" to playerId,
                     "Error Type" to "Server error",
                     "Error Code" to exception.response?.code,
@@ -60,6 +61,7 @@ internal object SentryLogger {
                 "TPStreamsSDK",
                 mapOf(
                     "SDK Version" to TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME,
+                    "Provider" to TPStreamsSDK.provider.name,
                     "Player Id" to playerId,
                     "Error Type" to "Player error",
                     "Error Code" to error.errorCode,
@@ -89,6 +91,7 @@ internal object SentryLogger {
                 "TPStreamsSDK",
                 mapOf(
                     "SDK Version" to TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME,
+                    "Provider" to TPStreamsSDK.provider.name,
                     "Player Id" to playerId,
                     "Error Type" to "Player DRM error",
                     "Error Code" to error.errorCode,

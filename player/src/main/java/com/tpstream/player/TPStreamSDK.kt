@@ -1,8 +1,9 @@
 package com.tpstream.player
 
 object TPStreamsSDK {
-    private var provider: Provider = Provider.TPStreams
+    private var _provider: Provider = Provider.TPStreams
     private var _orgCode: String? = null
+    val provider : Provider get() = _provider
     val orgCode: String
         get() {
             if (_orgCode == null) {
@@ -17,7 +18,7 @@ object TPStreamsSDK {
         }
 
         this._orgCode = orgCode
-        this.provider = provider
+        this._provider = provider
     }
 
     fun constructVideoInfoUrl(contentId: String?, accessToken: String?): String {

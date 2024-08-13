@@ -56,30 +56,30 @@ internal class AdvancedResolutionSelectionSheet(
     private fun initializeList() {
         val trackGroup = tracksGroups.firstOrNull { it.type == C.TRACK_TYPE_VIDEO }
         trackGroup?.let { group ->
-            val filteredTracksDetail = getTracksDetail(group).filterTracksDetailBelowMaxResolution()
-            setupListView(filteredTracksDetail)
+            val filteredTracksInfo = getTracksInfo(group).filterTracksInfoBelowMaxResolution()
+            setupListView(filteredTracksInfo)
         } ?: dismiss()
     }
 
-    private fun getTracksDetail(trackGroup: TracksGroup): ArrayList<TrackDetail> {
+    private fun getTracksInfo(trackGroup: TracksGroup): ArrayList<TrackInfo> {
         val isMultipleTrackSelected = isMultipleTrackSelected(trackGroup)
 
         return (0 until trackGroup.length).mapTo(ArrayList()) { trackIndex ->
-            TrackDetail(
+            TrackInfo(
                 trackGroup.getTrackFormat(trackIndex),
                 !isMultipleTrackSelected && trackGroup.isTrackSelected(trackIndex)
             )
         }
     }
 
-    private fun ArrayList<TrackDetail>.filterTracksDetailBelowMaxResolution(): ArrayList<TrackDetail> {
+    private fun ArrayList<TrackInfo>.filterTracksInfoBelowMaxResolution(): ArrayList<TrackInfo> {
         val maxResolution = player.getMaxResolution() ?: return this
         return filterTo(ArrayList()) { it.format.height <= maxResolution }
     }
 
-    private fun setupListView(tracksDetail: ArrayList<TrackDetail>) {
+    private fun setupListView(tracksInfo: ArrayList<TrackInfo>) {
         binding.listview.apply {
-            adapter = Adapter(requireContext(), tracksDetail)
+            adapter = Adapter(requireContext(), tracksInfo)
             setOnItemClickListener { _, _, index, _ ->
                 onAdvanceResolutionClickListener?.onClick(index)
                 dismiss()
@@ -97,8 +97,8 @@ internal class AdvancedResolutionSelectionSheet(
         bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    inner class Adapter(context1: Context, dataSource: ArrayList<TrackDetail>) :
-        ArrayAdapter<TrackDetail>(
+    inner class Adapter(context1: Context, dataSource: ArrayList<TrackInfo>) :
+        ArrayAdapter<TrackInfo>(
             context1,
             R.layout.tp_resolution_data, dataSource
         ) {
@@ -106,18 +106,18 @@ internal class AdvancedResolutionSelectionSheet(
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val trackDetail = getItem(position)!!
+            val trackInfo = getItem(position)!!
             var view = convertView
             if (convertView == null) {
                 view = inflater.inflate(R.layout.tp_resolution_data, parent, false)
             }
-            view!!.findViewById<TextView>(R.id.title).text = "${trackDetail.format.height}p"
-            showOrHideCheckMark(view, trackDetail)
+            view!!.findViewById<TextView>(R.id.title).text = "${trackInfo.format.height}p"
+            showOrHideCheckMark(view, trackInfo)
             return view
         }
 
-        private fun showOrHideCheckMark(view: View, trackDetail: TrackDetail) {
-            if (trackDetail.isSelected) {
+        private fun showOrHideCheckMark(view: View, trackInfo: TrackInfo) {
+            if (trackInfo.isSelected) {
                 view.findViewById<ImageView>(R.id.auto_icon).visibility = View.VISIBLE
             } else {
                 view.findViewById<ImageView>(R.id.auto_icon).visibility = View.GONE
@@ -129,5 +129,5 @@ internal class AdvancedResolutionSelectionSheet(
         fun onClick(index: Int)
     }
 
-    data class TrackDetail(val format: Format, val isSelected: Boolean)
+    data class TrackInfo(val format: Format, val isSelected: Boolean)
 }

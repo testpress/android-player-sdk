@@ -112,7 +112,15 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun initializeDebugOverlay(){
-        if (!enableDebugOverLay) return
+        if (enableDebugOverLay) {
+            showAssetDetails()
+            if (true){
+                showDRMDetails()
+            }
+        }
+    }
+
+    private fun showAssetDetails() {
         binding.debugOverlay.root.isVisible = true
         binding.debugOverlay.provider.text = "Provider: ${TPStreamsSDK.provider.name}"
         binding.debugOverlay.orgcode.text = "Org Code: ${TPStreamsSDK.orgCode}"
@@ -121,6 +129,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
         binding.debugOverlay.closeButton.setOnClickListener {
             binding.debugOverlay.root.isVisible = false
         }
+    }
+
+    private fun showDRMDetails() {
+        binding.debugOverlay.drmDetailContainer.isVisible = true
         try {
             val mediaDrm = MediaDrm(C.WIDEVINE_UUID)
             binding.debugOverlay.widevineLevel.text = "Level: ${mediaDrm.getPropertyString("securityLevel")}"
@@ -132,7 +144,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 mediaDrm.release()
             }
         } catch (e: Exception) {
-            Log.d("TAG", "error, $e")
+            binding.debugOverlay.drmDetailContainer.isVisible = false
         }
     }
 

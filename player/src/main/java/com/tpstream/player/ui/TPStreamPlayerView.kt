@@ -10,6 +10,7 @@ import android.media.MediaDrm
 import android.os.Build
 import android.os.CountDownTimer
 import android.util.AttributeSet
+import android.util.Log
 import android.view.GestureDetector
 import com.tpstream.player.Util
 import android.view.LayoutInflater
@@ -181,11 +182,9 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun showAssetDetails() {
         binding.debugOverlay.root.isVisible = true
         binding.debugOverlay.assetDetailContainer.isClickable = false
-        binding.debugOverlay.provider.text = "Provider: ${TPStreamsSDK.provider.name}"
-        binding.debugOverlay.orgcode.text = "Org Code: ${TPStreamsSDK.orgCode}"
+        binding.debugOverlay.providerAndOrgcode.text = "${TPStreamsSDK.provider.name}/${TPStreamsSDK.orgCode}"
         binding.debugOverlay.assetId.text = "Asset ID: ${player.asset?.id}"
         binding.debugOverlay.accessToken.text = "Access Token: ${player.params.accessToken}"
-        binding.debugOverlay.drmVideo.text = "Is DRM: ${player.asset?.video?.isDrmProtected}"
         binding.debugOverlay.closeButton.setOnClickListener {
             binding.debugOverlay.root.isVisible = false
         }
@@ -197,7 +196,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
             val mediaDrm = MediaDrm(C.WIDEVINE_UUID)
             binding.debugOverlay.widevineLevel.text = "Level: ${mediaDrm.getPropertyString("securityLevel")}"
             binding.debugOverlay.widevineVersion.text = "Version: ${mediaDrm.getPropertyString(MediaDrm.PROPERTY_VERSION)}"
-            binding.debugOverlay.widevineSystemId.text = "System ID: ${mediaDrm.getPropertyString("systemId")}"
             if (Build.VERSION.SDK_INT >= 28) {
                 mediaDrm.close()
             } else {
@@ -221,12 +219,16 @@ class TPStreamPlayerView @JvmOverloads constructor(
             append("Supported:${getSupportedValue(true) ?: "Unknown"}")
         }
 
+        Log.d("TAG", "showVideoDetails: $videoFormatString")
+
         val audioFormatString = buildString {
             append("Audio Format:")
             append("Track:${audioFormat?.id ?: "N/A"}/")
             append("Bitrate:${audioFormat?.bitrate ?: "N/A"}/")
             append("Supported:${getSupportedValue(false) ?: "Unknown"}")
         }
+
+        Log.d("TAG", "showVideoDetails: $audioFormatString")
 
         binding.debugOverlay.videoFormat.text = videoFormatString
         binding.debugOverlay.audioFormat.text = audioFormatString

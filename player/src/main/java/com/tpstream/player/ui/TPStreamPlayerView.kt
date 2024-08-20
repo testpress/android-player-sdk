@@ -8,9 +8,12 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.media.MediaDrm
 import android.os.Build
+import android.os.CountDownTimer
 import android.util.AttributeSet
-import android.util.Log
+import android.view.GestureDetector
+import com.tpstream.player.Util
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.annotation.ColorInt
@@ -44,6 +47,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private val binding: TpStreamPlayerViewBinding =
         TpStreamPlayerViewBinding.inflate(LayoutInflater.from(context), this, true)
     private var playerView: PlayerView = binding.root.findViewById(R.id.player_view)
+    private val exoCurrentPosition: TextView = playerView.findViewById(ExoplayerResourceID.exo_position)
     private lateinit var player: TpStreamPlayerImpl
     private var downloadButton: ImageButton? = null
     private var resolutionButton : ImageButton? = null
@@ -62,13 +66,17 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var noticeScreenLayout: LinearLayout? = null
     private var noticeMessage: TextView? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private val enableDebugOverLay = true
+    private var isDebugOverLayEnable = false
+    private var tapCount = 0
+    private val maxTapCount = 5
+    private var isCountingTaps = false
 
     init {
         registerDownloadListener()
         registerResolutionChangeListener()
         initializeViewModel()
         initializeNoticeScreen()
+        addClickListener()
     }
 
     private fun registerDownloadListener() {
@@ -105,27 +113,79 @@ class TPStreamPlayerView @JvmOverloads constructor(
         addView(noticeScreenLayout)
     }
 
+    private fun addClickListener() {
+        exoCurrentPosition.isClickable = true
+        exoCurrentPosition.setOnClickListener {
+            startTapCounting()
+        }
+    }
+
+    private fun startTapCounting() {
+        if (isCountingTaps) return
+        isCountingTaps = true
+        Toast.makeText(context,".",Toast.LENGTH_SHORT).show()
+
+        playerView.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            false
+        }
+
+        startTapCountResetTimer()
+    }
+
+    private fun startTapCountResetTimer() {
+        object : CountDownTimer(5000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+            }
+
+            override fun onFinish() {
+                resetTapCount()
+            }
+        }.start()
+    }
+
+    private val gestureDetector = GestureDetector(playerView.context, object : GestureDetector.SimpleOnGestureListener() {
+        override fun onSingleTapUp(e: MotionEvent): Boolean {
+            if (isCountingTaps) {
+                tapCount++
+                if (tapCount == maxTapCount) {
+                    initializeDebugOverlay() // Called when the user taps 5 times
+                    resetTapCount()
+                }
+            }
+            return super.onSingleTapUp(e)
+        }
+    })
+
+    private fun resetTapCount() {
+        tapCount = 0
+        isCountingTaps = false
+        playerView.setOnTouchListener(null)
+    }
+
     internal fun setPlaybackSpeedText(speed: Float) {
         val playbackSpeedButton = playerView.findViewById<Button>(ExoplayerResourceID.exo_playback_speed)
         val playbackSpeed = PlaybackSpeed.values().find { it.value == speed }
         playbackSpeedButton.text = playbackSpeed?.text
     }
 
-    private fun initializeDebugOverlay(){
-        if (enableDebugOverLay) {
-            showAssetDetails()
-            if (true){
-                showDRMDetails()
-            }
+    private fun initializeDebugOverlay() {
+        isDebugOverLayEnable = true
+        showAssetDetails()
+        if (player.asset?.video?.isDrmProtected == true) {
+            showDRMDetails()
         }
+        showVideoDetails()
     }
 
     private fun showAssetDetails() {
         binding.debugOverlay.root.isVisible = true
+        binding.debugOverlay.assetDetailContainer.isClickable = false
         binding.debugOverlay.provider.text = "Provider: ${TPStreamsSDK.provider.name}"
         binding.debugOverlay.orgcode.text = "Org Code: ${TPStreamsSDK.orgCode}"
         binding.debugOverlay.assetId.text = "Asset ID: ${player.asset?.id}"
         binding.debugOverlay.accessToken.text = "Access Token: ${player.params.accessToken}"
+        binding.debugOverlay.drmVideo.text = "Is DRM: ${player.asset?.video?.isDrmProtected}"
         binding.debugOverlay.closeButton.setOnClickListener {
             binding.debugOverlay.root.isVisible = false
         }
@@ -146,6 +206,44 @@ class TPStreamPlayerView @JvmOverloads constructor(
         } catch (e: Exception) {
             binding.debugOverlay.drmDetailContainer.isVisible = false
         }
+    }
+
+    private fun showVideoDetails() {
+        binding.debugOverlay.videoDetailContainer.isVisible = true
+
+        val videoFormat = player.exoPlayer.videoFormat
+        val audioFormat = player.exoPlayer.audioFormat
+
+        val videoFormatString = buildString {
+            append("Video Format:")
+            append("Track:${videoFormat?.id ?: "N/A"}/${videoFormat?.width}x${videoFormat?.height}@${videoFormat?.frameRate}/")
+            append("Bitrate:${videoFormat?.bitrate ?: "N/A"}/")
+            append("Supported:${getSupportedValue(true) ?: "Unknown"}")
+        }
+
+        val audioFormatString = buildString {
+            append("Audio Format:")
+            append("Track:${audioFormat?.id ?: "N/A"}/")
+            append("Bitrate:${audioFormat?.bitrate ?: "N/A"}/")
+            append("Supported:${getSupportedValue(false) ?: "Unknown"}")
+        }
+
+        binding.debugOverlay.videoFormat.text = videoFormatString
+        binding.debugOverlay.audioFormat.text = audioFormatString
+    }
+
+    private fun getSupportedValue(isVideo: Boolean): String? {
+        val trackType = if (isVideo) C.TRACK_TYPE_VIDEO else C.TRACK_TYPE_AUDIO
+
+        player.exoPlayer.currentTracks.groups.firstOrNull { it.type == trackType }
+            ?.let { group ->
+                for (trackIndex in 0 until group.length) {
+                    if (group.isTrackSelected(trackIndex)) {
+                        return Util.getFormatSupportString(group.getTrackSupport(trackIndex))
+                    }
+                }
+            }
+        return null
     }
 
     private fun onDownloadButtonClick() {
@@ -240,7 +338,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 }
                 initializeSubtitleView()
                 updateSelectedResolution()
-                initializeDebugOverlay()
+                addInternalPlayerListener()
             }
         }
     }
@@ -260,6 +358,16 @@ class TPStreamPlayerView @JvmOverloads constructor(
         player.params.initialResolutionHeight?.let {
             selectedResolution = ResolutionOptions.ADVANCED
         }
+    }
+
+    private fun addInternalPlayerListener() {
+        player.exoPlayer.addListener(object : PlayerListener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if (playbackState == Player.STATE_READY && isDebugOverLayEnable) {
+                    showVideoDetails()
+                }
+            }
+        })
     }
 
     internal fun showPlayButton() {

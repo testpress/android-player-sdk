@@ -107,10 +107,11 @@ class PlayerActivity : AppCompatActivity() {
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
+            //https://app.tpstreams.com/embed/m9n4m6/4njhH5G8g6F/?access_token=e3d90e9e-970f-4bc2-afa3-171a4bd5e0cd
             "TPS_NON_DRM" -> {
-                accessToken = "48a481d0-7a7f-465f-9d18-86f52129430b"
-                videoId = "C65BJzhj48k"
-                orgCode = "dcek2m"
+                accessToken = "e3d90e9e-970f-4bc2-afa3-171a4bd5e0cd"
+                videoId = "4njhH5G8g6F"
+                orgCode = "m9n4m6"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             null ->{}

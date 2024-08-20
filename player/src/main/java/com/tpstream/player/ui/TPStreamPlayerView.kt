@@ -10,7 +10,6 @@ import android.media.MediaDrm
 import android.os.Build
 import android.os.CountDownTimer
 import android.util.AttributeSet
-
 import android.view.GestureDetector
 import com.tpstream.player.Util
 import android.view.LayoutInflater

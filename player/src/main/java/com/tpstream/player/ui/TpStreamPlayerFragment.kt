@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.tpstream.player.*
@@ -230,6 +231,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 tpStreamPlayerView.hidePlayButton()
                 tpStreamPlayerView.showReplayButton()
             }
+
+            Toast.makeText(requireContext(),player.asset?.video?.isDrmProtected.toString(),Toast.LENGTH_SHORT).show()
         }
 
         override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {

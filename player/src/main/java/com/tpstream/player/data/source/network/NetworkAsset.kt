@@ -48,7 +48,8 @@ internal data class NetworkAsset(
         val resolutions: Array<String>?,
         val video_codec: String?,
         val audio_codec: String?,
-        val enable_drm: Boolean?,
+        @SerializedName("enable_drm")
+        val isDrmProtected : Boolean?,
         val tracks: List<Track>?,
         val duration: Long?
     ) {

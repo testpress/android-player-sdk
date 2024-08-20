@@ -21,7 +21,7 @@ internal fun LocalAsset.asDomainAsset(): Asset {
             downloadState = this.downloadState,
             width = this.videoWidth,
             height = this.videoHeight,
-            enableDRM = this.url.isDRMVideo()
+            isDrmProtected = this.url.isDrmProtected()
         ),
         folderTree = this.folderTree,
         downloadStartTimeMs = this.downloadStartTimeMs,
@@ -37,7 +37,7 @@ internal fun NetworkAsset.asDomainAsset(): Asset {
     val thumbnailUrl = if (networkVideo != null) networkVideo.preview_thumbnail_url
         ?: "" else thumbnail ?: ""
     val url = if (networkVideo != null) {
-        if (networkVideo.enable_drm == true) networkVideo.dash_url
+        if (networkVideo.isDrmProtected == true) networkVideo.dash_url
             ?: "" else networkVideo.playback_url ?: ""
     } else {
         dashUrl ?: url ?: ""
@@ -54,7 +54,7 @@ internal fun NetworkAsset.asDomainAsset(): Asset {
             tracks = this.networkVideo?.tracks?.map {
                 it.asDomainTracks()
             },
-            enableDRM = networkVideo?.enable_drm
+            isDrmProtected = networkVideo?.isDrmProtected
         ),
         description = description ?: "",
         liveStream = getDomainLiveStream(this),
@@ -111,4 +111,4 @@ internal fun Asset.asLocalAsset(): LocalAsset {
     )
 }
 
-internal fun String.isDRMVideo() = this.contains(".mpd")
+internal fun String.isDrmProtected() = this.contains(".mpd")

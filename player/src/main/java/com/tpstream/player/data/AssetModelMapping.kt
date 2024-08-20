@@ -21,6 +21,7 @@ internal fun LocalAsset.asDomainAsset(): Asset {
             downloadState = this.downloadState,
             width = this.videoWidth,
             height = this.videoHeight,
+            enableDRM = this.url.isDRMVideo()
         ),
         folderTree = this.folderTree,
         downloadStartTimeMs = this.downloadStartTimeMs,
@@ -52,7 +53,8 @@ internal fun NetworkAsset.asDomainAsset(): Asset {
             transcodingStatus = transcodingStatus ?: "",
             tracks = this.networkVideo?.tracks?.map {
                 it.asDomainTracks()
-            }
+            },
+            enableDRM = networkVideo?.enable_drm
         ),
         description = description ?: "",
         liveStream = getDomainLiveStream(this),
@@ -108,3 +110,5 @@ internal fun Asset.asLocalAsset(): LocalAsset {
         metadata = this.metadata
     )
 }
+
+internal fun String.isDRMVideo() = this.contains(".mpd")

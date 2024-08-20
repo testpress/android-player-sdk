@@ -6,7 +6,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.media.MediaDrm
+import android.os.Build
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -59,6 +62,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var noticeScreenLayout: LinearLayout? = null
     private var noticeMessage: TextView? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val enableDebugOverLay = true
 
     init {
         registerDownloadListener()
@@ -105,6 +109,31 @@ class TPStreamPlayerView @JvmOverloads constructor(
         val playbackSpeedButton = playerView.findViewById<Button>(ExoplayerResourceID.exo_playback_speed)
         val playbackSpeed = PlaybackSpeed.values().find { it.value == speed }
         playbackSpeedButton.text = playbackSpeed?.text
+    }
+
+    private fun initializeDebugOverlay(){
+        if (!enableDebugOverLay) return
+        binding.debugOverlay.root.isVisible = true
+        binding.debugOverlay.provider.text = "Provider: ${TPStreamsSDK.provider.name}"
+        binding.debugOverlay.orgcode.text = "Org Code: ${TPStreamsSDK.orgCode}"
+        binding.debugOverlay.assetId.text = "Asset ID: ${player.asset?.id}"
+        binding.debugOverlay.accessToken.text = "Access Token: ${player.params.accessToken}"
+        binding.debugOverlay.closeButton.setOnClickListener {
+            binding.debugOverlay.root.isVisible = false
+        }
+        try {
+            val mediaDrm = MediaDrm(C.WIDEVINE_UUID)
+            binding.debugOverlay.widevineLevel.text = "Level: ${mediaDrm.getPropertyString("securityLevel")}"
+            binding.debugOverlay.widevineVersion.text = "Version: ${mediaDrm.getPropertyString(MediaDrm.PROPERTY_VERSION)}"
+            binding.debugOverlay.widevineSystemId.text = "System ID: ${mediaDrm.getPropertyString("systemId")}"
+            if (Build.VERSION.SDK_INT >= 28) {
+                mediaDrm.close()
+            } else {
+                mediaDrm.release()
+            }
+        } catch (e: Exception) {
+            Log.d("TAG", "error, $e")
+        }
     }
 
     private fun onDownloadButtonClick() {
@@ -199,6 +228,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 }
                 initializeSubtitleView()
                 updateSelectedResolution()
+                initializeDebugOverlay()
             }
         }
     }

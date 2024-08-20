@@ -10,7 +10,7 @@ import android.media.MediaDrm
 import android.os.Build
 import android.os.CountDownTimer
 import android.util.AttributeSet
-import android.util.Log
+
 import android.view.GestureDetector
 import com.tpstream.player.Util
 import android.view.LayoutInflater
@@ -219,16 +219,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
             append("Supported:${getSupportedValue(true) ?: "Unknown"}")
         }
 
-        Log.d("TAG", "showVideoDetails: $videoFormatString")
-
         val audioFormatString = buildString {
             append("Audio Format:")
             append("Track:${audioFormat?.id ?: "N/A"}/")
             append("Bitrate:${audioFormat?.bitrate ?: "N/A"}/")
             append("Supported:${getSupportedValue(false) ?: "Unknown"}")
         }
-
-        Log.d("TAG", "showVideoDetails: $audioFormatString")
 
         binding.debugOverlay.videoFormat.text = videoFormatString
         binding.debugOverlay.audioFormat.text = audioFormatString

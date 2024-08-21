@@ -90,6 +90,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun registerDebugOverlayListener() {
         debugOverlayButton = playerView.findViewById(R.id.debug_overlay_button)
         debugOverlayButton?.setOnClickListener {
+            if (popupWindow?.isShowing == true) return@setOnClickListener
             showSDKVersionPopup()
         }
         debugOverlayButton?.setOnLongClickListener {

@@ -27,13 +27,14 @@
                 android:id="@+id/asset_detail_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Asset Details"
+                    android:textColor="@color/tp_white"
                     android:textSize="11sp"
                     android:textStyle="bold" />
 
@@ -42,6 +43,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Testpress/m9n4m6/C65BJzhj48k"
+                    android:textColor="@color/tp_white"
                     android:textSize="11sp" />
 
             </LinearLayout>
@@ -51,13 +53,14 @@
                 android:id="@+id/drm_detail_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Device Widevine DRM Info"
+                    android:textColor="@color/tp_white"
                     android:textSize="11sp"
                     android:textStyle="bold" />
 
@@ -66,6 +69,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="L1/16.0.0/12562"
+                    android:textColor="@color/tp_white"
                     android:textSize="11sp" />
 
             </LinearLayout>
@@ -75,13 +79,14 @@
                 android:id="@+id/video_detail_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Video Playback Details"
+                    android:textColor="@color/tp_white"
                     android:textSize="11sp"
                     android:textStyle="bold" />
 
@@ -90,6 +95,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Video Format:Track:3/1280x720@60.0/Bitrate:1023832/Supported:NO_EXCEEDS_CAPABILITIES"
+                    android:textColor="@color/tp_white"
                     android:textSize="11sp" />
 
                 <TextView
@@ -97,6 +103,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Audio Format:Track:2/Bitrate:139165/Supported:NO_EXCEEDS_CAPABILITIES"
+                    android:textColor="@color/tp_white"
                     android:textSize="11sp" />
 
             </LinearLayout>

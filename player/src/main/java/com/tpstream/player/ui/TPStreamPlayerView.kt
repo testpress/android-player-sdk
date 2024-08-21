@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -19,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.media3.exoplayer.analytics.AnalyticsListener
 import com.tpstream.player.*
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
@@ -258,9 +260,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun addInternalPlayerListener() {
-        player.exoPlayer.addListener(object : PlayerListener {
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                if (playbackState == Player.STATE_READY) {
+        player.exoPlayer.addAnalyticsListener(object : AnalyticsListener {
+            override fun onPlaybackStateChanged(
+                eventTime: AnalyticsListener.EventTime,
+                state: Int
+            ) {
+                if (state == Player.STATE_READY) {
                     debugOverlay?.updateVideoDetails()
                 }
             }

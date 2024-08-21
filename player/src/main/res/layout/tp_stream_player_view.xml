@@ -17,6 +17,6 @@
 
     <include
         android:id="@+id/debug_overlay"
-        layout="@layout/debug_info_layout"/>
+        layout="@layout/debug_overlay_layout"/>
 
 </FrameLayout>

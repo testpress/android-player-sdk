@@ -6,15 +6,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.media.MediaDrm
-import android.os.Build
-import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
-import android.view.GestureDetector
-import com.tpstream.player.Util
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
@@ -24,11 +19,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.tpstream.player.*
+import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
-import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.offline.TpStreamDownloadManager
 import com.tpstream.player.ui.AdvancedResolutionSelectionSheet.OnAdvanceResolutionClickListener
 import com.tpstream.player.ui.viewmodel.VideoViewModel
@@ -47,11 +42,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private val binding: TpStreamPlayerViewBinding =
         TpStreamPlayerViewBinding.inflate(LayoutInflater.from(context), this, true)
     private var playerView: PlayerView = binding.root.findViewById(R.id.player_view)
-    private val exoCurrentPosition: TextView = playerView.findViewById(ExoplayerResourceID.exo_position)
     private lateinit var player: TpStreamPlayerImpl
     private var downloadButton: ImageButton? = null
     private var resolutionButton : ImageButton? = null
+    private var debugOverlayButton: ImageButton? = null
     private var downloadState : DownloadStatus? = null
+    private var popupWindow: PopupWindow? = null
     private lateinit var videoViewModel: VideoViewModel
     private lateinit var viewModelStore: ViewModelStore
     private var selectedResolution = ResolutionOptions.AUTO
@@ -66,17 +62,14 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var noticeScreenLayout: LinearLayout? = null
     private var noticeMessage: TextView? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private var isDebugOverLayEnable = false
-    private var tapCount = 0
-    private val maxTapCount = 5
-    private var isCountingTaps = false
+    private var debugOverlay: DebugOverlay? = null
 
     init {
         registerDownloadListener()
         registerResolutionChangeListener()
+        registerDebugOverlayListener()
         initializeViewModel()
         initializeNoticeScreen()
-        addClickListener()
     }
 
     private fun registerDownloadListener() {
@@ -91,6 +84,35 @@ class TPStreamPlayerView @JvmOverloads constructor(
         resolutionButton?.setOnClickListener {
             onResolutionButtonClick()
         }
+    }
+
+    private fun registerDebugOverlayListener() {
+        debugOverlayButton = playerView.findViewById(R.id.debug_overlay_button)
+        debugOverlayButton?.setOnClickListener {
+            showSDKVersionPopup()
+        }
+        debugOverlayButton?.setOnLongClickListener {
+            popupWindow?.dismiss()
+            debugOverlay = DebugOverlay(player,binding.debugOverlay)
+            true
+        }
+    }
+
+    private fun showSDKVersionPopup() {
+        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val popupView = inflater.inflate(R.layout.popup_window_layout, null)
+        val textView: TextView = popupView.findViewById(R.id.popup_text)
+        textView.text = "SDK Version: ${BuildConfig.TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME}"
+        popupWindow = PopupWindow(
+            popupView,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        val height = debugOverlayButton?.height ?: 0
+        popupWindow?.showAsDropDown(debugOverlayButton, - height , - (height * 2))
+        Handler(Looper.getMainLooper()).postDelayed({
+            popupWindow?.dismiss()
+        }, 1000)
     }
 
     private fun initializeViewModel() {
@@ -113,139 +135,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
         addView(noticeScreenLayout)
     }
 
-    private fun addClickListener() {
-        exoCurrentPosition.isClickable = true
-        exoCurrentPosition.setOnClickListener {
-            startTapCounting()
-        }
-    }
-
-    private fun startTapCounting() {
-        if (isCountingTaps) return
-        isCountingTaps = true
-        Toast.makeText(context,".",Toast.LENGTH_SHORT).show()
-
-        playerView.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
-            false
-        }
-
-        startTapCountResetTimer()
-    }
-
-    private fun startTapCountResetTimer() {
-        object : CountDownTimer(5000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-            }
-
-            override fun onFinish() {
-                resetTapCount()
-            }
-        }.start()
-    }
-
-    private val gestureDetector = GestureDetector(playerView.context, object : GestureDetector.SimpleOnGestureListener() {
-        override fun onSingleTapUp(e: MotionEvent): Boolean {
-            if (isCountingTaps) {
-                tapCount++
-                if (tapCount == maxTapCount) {
-                    initializeDebugOverlay() // Called when the user taps 5 times
-                    resetTapCount()
-                }
-            }
-            return super.onSingleTapUp(e)
-        }
-    })
-
-    private fun resetTapCount() {
-        tapCount = 0
-        isCountingTaps = false
-        playerView.setOnTouchListener(null)
-    }
-
     internal fun setPlaybackSpeedText(speed: Float) {
         val playbackSpeedButton = playerView.findViewById<Button>(ExoplayerResourceID.exo_playback_speed)
         val playbackSpeed = PlaybackSpeed.values().find { it.value == speed }
         playbackSpeedButton.text = playbackSpeed?.text
-    }
-
-    private fun initializeDebugOverlay() {
-        isDebugOverLayEnable = true
-        showAssetDetails()
-        if (player.asset?.video?.isDrmProtected == true) {
-            showDRMDetails()
-        }
-        showVideoDetails()
-    }
-
-    private fun showAssetDetails() {
-        binding.debugOverlay.root.isVisible = true
-        binding.debugOverlay.closeButton.setOnClickListener {
-            binding.debugOverlay.root.isVisible = false
-        }
-        try {
-            binding.debugOverlay.assetDetailContainer.isVisible = true
-            binding.debugOverlay.assetDetailContainer.isClickable = false
-            binding.debugOverlay.providerAndOrgcode.text = "${TPStreamsSDK.provider.name}/${TPStreamsSDK.orgCode}"
-            binding.debugOverlay.assetId.text = "Asset ID: ${player.asset?.id}"
-            binding.debugOverlay.accessToken.text = "Access Token: ${player.params.accessToken}"
-        } catch (e: Exception) {
-            binding.debugOverlay.assetDetailContainer.isVisible = false
-        }
-    }
-
-    private fun showDRMDetails() {
-        try {
-            binding.debugOverlay.drmDetailContainer.isVisible = true
-            val mediaDrm = MediaDrm(C.WIDEVINE_UUID)
-            binding.debugOverlay.widevineLevel.text = "Level: ${mediaDrm.getPropertyString("securityLevel")}"
-            binding.debugOverlay.widevineVersion.text = "Version: ${mediaDrm.getPropertyString(MediaDrm.PROPERTY_VERSION)}"
-            if (Build.VERSION.SDK_INT >= 28) {
-                mediaDrm.close()
-            } else {
-                mediaDrm.release()
-            }
-        } catch (e: Exception) {
-            binding.debugOverlay.drmDetailContainer.isVisible = false
-        }
-    }
-
-    private fun showVideoDetails() {
-        binding.debugOverlay.videoDetailContainer.isVisible = true
-
-        val videoFormat = player.exoPlayer.videoFormat
-        val audioFormat = player.exoPlayer.audioFormat
-
-        val videoFormatString = buildString {
-            append("Video Format:")
-            append("Track:${videoFormat?.id ?: "N/A"}/${videoFormat?.width}x${videoFormat?.height}@${videoFormat?.frameRate}/")
-            append("Bitrate:${videoFormat?.bitrate ?: "N/A"}/")
-            append("Supported:${getSupportedValue(true) ?: "Unknown"}")
-        }
-
-        val audioFormatString = buildString {
-            append("Audio Format:")
-            append("Track:${audioFormat?.id ?: "N/A"}/")
-            append("Bitrate:${audioFormat?.bitrate ?: "N/A"}/")
-            append("Supported:${getSupportedValue(false) ?: "Unknown"}")
-        }
-
-        binding.debugOverlay.videoFormat.text = videoFormatString
-        binding.debugOverlay.audioFormat.text = audioFormatString
-    }
-
-    private fun getSupportedValue(isVideo: Boolean): String? {
-        val trackType = if (isVideo) C.TRACK_TYPE_VIDEO else C.TRACK_TYPE_AUDIO
-
-        player.exoPlayer.currentTracks.groups.firstOrNull { it.type == trackType }
-            ?.let { group ->
-                for (trackIndex in 0 until group.length) {
-                    if (group.isTrackSelected(trackIndex)) {
-                        return Util.getFormatSupportString(group.getTrackSupport(trackIndex))
-                    }
-                }
-            }
-        return null
     }
 
     private fun onDownloadButtonClick() {
@@ -365,8 +258,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun addInternalPlayerListener() {
         player.exoPlayer.addListener(object : PlayerListener {
             override fun onPlaybackStateChanged(playbackState: Int) {
-                if (playbackState == Player.STATE_READY && isDebugOverLayEnable) {
-                    showVideoDetails()
+                if (playbackState == Player.STATE_READY) {
+                    debugOverlay?.updateVideoDetails()
                 }
             }
         })

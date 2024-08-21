@@ -38,24 +38,10 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/providerAndOrgcode"
+                    android:id="@+id/provider_and_org_code_and_video_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Testpress/m9n4m6"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/assetId"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Asset ID: 4njhH5G8g6F"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/accessToken"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Access Token: e3d90e9e-970f-4bc2-afa3-171a4bd5e0cd"
+                    android:text="Testpress/m9n4m6/C65BJzhj48k"
                     android:textSize="11sp" />
 
             </LinearLayout>
@@ -76,17 +62,10 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/widevine_level"
+                    android:id="@+id/level_and_version_and_system_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Level: L1"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/widevine_version"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Version: 16.0.0"
+                    android:text="L1/16.0.0/12562"
                     android:textSize="11sp" />
 
             </LinearLayout>

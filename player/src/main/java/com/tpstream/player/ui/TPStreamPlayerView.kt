@@ -180,18 +180,23 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     private fun showAssetDetails() {
         binding.debugOverlay.root.isVisible = true
-        binding.debugOverlay.assetDetailContainer.isClickable = false
-        binding.debugOverlay.providerAndOrgcode.text = "${TPStreamsSDK.provider.name}/${TPStreamsSDK.orgCode}"
-        binding.debugOverlay.assetId.text = "Asset ID: ${player.asset?.id}"
-        binding.debugOverlay.accessToken.text = "Access Token: ${player.params.accessToken}"
         binding.debugOverlay.closeButton.setOnClickListener {
             binding.debugOverlay.root.isVisible = false
+        }
+        try {
+            binding.debugOverlay.assetDetailContainer.isVisible = true
+            binding.debugOverlay.assetDetailContainer.isClickable = false
+            binding.debugOverlay.providerAndOrgcode.text = "${TPStreamsSDK.provider.name}/${TPStreamsSDK.orgCode}"
+            binding.debugOverlay.assetId.text = "Asset ID: ${player.asset?.id}"
+            binding.debugOverlay.accessToken.text = "Access Token: ${player.params.accessToken}"
+        } catch (e: Exception) {
+            binding.debugOverlay.assetDetailContainer.isVisible = false
         }
     }
 
     private fun showDRMDetails() {
-        binding.debugOverlay.drmDetailContainer.isVisible = true
         try {
+            binding.debugOverlay.drmDetailContainer.isVisible = true
             val mediaDrm = MediaDrm(C.WIDEVINE_UUID)
             binding.debugOverlay.widevineLevel.text = "Level: ${mediaDrm.getPropertyString("securityLevel")}"
             binding.debugOverlay.widevineVersion.text = "Version: ${mediaDrm.getPropertyString(MediaDrm.PROPERTY_VERSION)}"

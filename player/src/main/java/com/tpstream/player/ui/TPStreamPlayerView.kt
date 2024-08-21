@@ -9,7 +9,8 @@ import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
@@ -19,11 +20,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.tpstream.player.*
-import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
+import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.offline.TpStreamDownloadManager
 import com.tpstream.player.ui.AdvancedResolutionSelectionSheet.OnAdvanceResolutionClickListener
 import com.tpstream.player.ui.viewmodel.VideoViewModel
@@ -45,9 +46,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private lateinit var player: TpStreamPlayerImpl
     private var downloadButton: ImageButton? = null
     private var resolutionButton : ImageButton? = null
-    private var debugOverlayButton: ImageButton? = null
     private var downloadState : DownloadStatus? = null
-    private var popupWindow: PopupWindow? = null
     private lateinit var videoViewModel: VideoViewModel
     private lateinit var viewModelStore: ViewModelStore
     private var selectedResolution = ResolutionOptions.AUTO
@@ -62,6 +61,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var noticeScreenLayout: LinearLayout? = null
     private var noticeMessage: TextView? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private var debugOverlayButton: ImageButton? = null
+    private var popupWindow: PopupWindow? = null
     private var debugOverlay: DebugOverlay? = null
 
     init {

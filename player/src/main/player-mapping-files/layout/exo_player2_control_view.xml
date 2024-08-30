@@ -94,6 +94,10 @@
             <ImageButton android:id="@id/exo_repeat_toggle"
                 style="@style/ExoStyledControls.Button.Bottom.RepeatToggle"/>
 
+            <ImageButton android:id="@+id/debug_overlay_button"
+                style="@style/ExoStyledControls.Button.Bottom"
+                android:src="@drawable/outline_info_24"/>
+
             <ImageButton android:id="@id/exo_subtitle"
                 style="@style/ExoStyledControls.Button.Bottom.CC"/>
 
@@ -102,6 +106,7 @@
                 style="@style/PlayBackSpeedButtonTheme"
                 android:layout_width="36dp"
                 android:layout_height="18dp"
+                android:layout_marginStart="12dp"
                 android:layout_marginEnd="12dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"

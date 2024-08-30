@@ -1,0 +1,129 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    android:background="#B3000000"
+    android:visibility="gone">
+
+    <!-- Close Button -->
+    <ImageButton
+        android:id="@+id/closeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Close"
+        android:padding="8dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Asset Details Section -->
+            <LinearLayout
+                android:id="@+id/asset_detail_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Asset Details"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/provider_and_org_code_and_video_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Testpress/m9n4m6/C65BJzhj48k"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+            <!-- Device Widevine DRM Info Section -->
+            <LinearLayout
+                android:id="@+id/drm_detail_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Device Widevine DRM Info"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/level_and_version_and_system_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="L1/16.0.0/12562"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+            <!-- Video Details Section -->
+            <LinearLayout
+                android:id="@+id/video_detail_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Video Playback Details"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/video_format"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Video Format:Track:3/1280x720@60.0/Bitrate:1023832/Supported:NO_EXCEEDS_CAPABILITIES"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/audio_format"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Audio Format:Track:2/Bitrate:139165/Supported:NO_EXCEEDS_CAPABILITIES"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/selected_video_codec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OMX.MTK.VIDEO.DECODER.AVC"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/selected_audio_codec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="c2.android.aac.decoder"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+</RelativeLayout>

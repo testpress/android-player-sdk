@@ -6,7 +6,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -17,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.media3.exoplayer.analytics.AnalyticsListener
 import com.tpstream.player.*
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
@@ -59,10 +63,16 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var noticeScreenLayout: LinearLayout? = null
     private var noticeMessage: TextView? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private var debugOverlayButton: ImageButton? = null
+    private var popupWindow: PopupWindow? = null
+    private var debugOverlay: DebugOverlay? = null
+    private var audioDecoderName = "Not Selected"
+    private var videoDecoderName = "Not Selected"
 
     init {
         registerDownloadListener()
         registerResolutionChangeListener()
+        registerDebugOverlayListener()
         initializeViewModel()
         initializeNoticeScreen()
     }
@@ -79,6 +89,37 @@ class TPStreamPlayerView @JvmOverloads constructor(
         resolutionButton?.setOnClickListener {
             onResolutionButtonClick()
         }
+    }
+
+    private fun registerDebugOverlayListener() {
+        debugOverlayButton = playerView.findViewById(R.id.debug_overlay_button)
+        debugOverlayButton?.setOnClickListener {
+            if (popupWindow?.isShowing == true) return@setOnClickListener
+            showSDKVersionPopup()
+        }
+        debugOverlayButton?.setOnLongClickListener {
+            popupWindow?.dismiss()
+            debugOverlay = DebugOverlay(player,binding.debugOverlay)
+            debugOverlay?.showSelectedCodecName(audioDecoderName, videoDecoderName)
+            true
+        }
+    }
+
+    private fun showSDKVersionPopup() {
+        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val popupView = inflater.inflate(R.layout.popup_window_layout, null)
+        val textView: TextView = popupView.findViewById(R.id.popup_text)
+        textView.text = "SDK Version: ${BuildConfig.TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME}"
+        popupWindow = PopupWindow(
+            popupView,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        val height = debugOverlayButton?.height ?: 0
+        popupWindow?.showAsDropDown(debugOverlayButton, - height , - (height * 2))
+        Handler(Looper.getMainLooper()).postDelayed({
+            popupWindow?.dismiss()
+        }, 1000)
     }
 
     private fun initializeViewModel() {
@@ -199,6 +240,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 }
                 initializeSubtitleView()
                 updateSelectedResolution()
+                addInternalPlayerListener()
             }
         }
     }
@@ -218,6 +260,37 @@ class TPStreamPlayerView @JvmOverloads constructor(
         player.params.initialResolutionHeight?.let {
             selectedResolution = ResolutionOptions.ADVANCED
         }
+    }
+
+    private fun addInternalPlayerListener() {
+        player.exoPlayer.addAnalyticsListener(object : AnalyticsListener {
+            override fun onPlaybackStateChanged(
+                eventTime: AnalyticsListener.EventTime,
+                state: Int
+            ) {
+                if (state == Player.STATE_READY) {
+                    debugOverlay?.updateVideoDetails()
+                }
+            }
+
+            override fun onVideoDecoderInitialized(
+                eventTime: AnalyticsListener.EventTime,
+                decoderName: String,
+                initializedTimestampMs: Long,
+                initializationDurationMs: Long
+            ) {
+                videoDecoderName = decoderName
+            }
+
+            override fun onAudioDecoderInitialized(
+                eventTime: AnalyticsListener.EventTime,
+                decoderName: String,
+                initializedTimestampMs: Long,
+                initializationDurationMs: Long
+            ) {
+                audioDecoderName = decoderName
+            }
+        })
     }
 
     internal fun showPlayButton() {

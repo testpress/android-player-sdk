@@ -23,13 +23,15 @@ class PlayerActivity : AppCompatActivity() {
     private var orgCode :String = "6eafqn"
     private var provider: TPStreamsSDK.Provider = TPStreamsSDK.Provider.TPStreams
     private var parameters : TpInitParams? = null
+    private var codec: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
         parameters = intent.getParcelableExtra(TP_OFFLINE_PARAMS)
+        codec = intent.getIntExtra("codec", -1)
         selectVideoParams(intent.getStringExtra("VideoParameter"))
-        TPStreamsSDK.initialize(provider, orgCode)
+        TPStreamsSDK.initialize(provider, orgCode, codec)
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
         playerFragment.enableAutoFullScreenOnRotate()
@@ -84,22 +86,22 @@ class PlayerActivity : AppCompatActivity() {
     private fun selectVideoParams(videoType: String?){
         when(videoType){
             "TP_DRM" -> {
-                accessToken = "a4c04ca8-9c0e-4c9c-a889-bd3bf8ea586a"
-                videoId = "ATJfRdHIUC9"
-                orgCode = "lmsdemo"
-                provider = TPStreamsSDK.Provider.TestPress
+                accessToken = "6a2990fa-163c-43d9-b27b-9901b884c1a2"
+                videoId = "4DsDrQcpPQn"
+                orgCode = "6eafqn"
+                provider = TPStreamsSDK.Provider.TPStreams
             }
             "TP_AES_Encrypt" -> {
-                accessToken = "5f6355d0-62ac-4bfd-98ca-4a1e9a2857e3"
-                videoId = "ZZb3S5OB3nY"
-                orgCode = "lmsdemo"
-                provider = TPStreamsSDK.Provider.TestPress
+                accessToken = "6a2990fa-163c-43d9-b27b-9901b884c1a2"
+                videoId = "4DsDrQcpPQn"
+                orgCode = "6eafqn"
+                provider = TPStreamsSDK.Provider.TPStreams
             }
             "TP_NON_DRM" -> {
-                accessToken = "5c49285b-0557-4cef-b214-66034d0b77c3"
-                videoId = "z1TLpfuZzXh"
-                orgCode = "lmsdemo"
-                provider = TPStreamsSDK.Provider.TestPress
+                accessToken = "6a2990fa-163c-43d9-b27b-9901b884c1a2"
+                videoId = "4DsDrQcpPQn"
+                orgCode = "6eafqn"
+                provider = TPStreamsSDK.Provider.TPStreams
             }
             "TPS_DRM" -> {
                 accessToken = "ab70caed-6168-497f-89c1-1e308da2c9aa"

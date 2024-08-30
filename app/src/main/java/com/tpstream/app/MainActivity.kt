@@ -4,8 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import com.tpstream.player.TPStreamsSDK
-import com.tpstream.player.TpInitParams
+import com.tpstream.player.*
 import com.tpstream.player.offline.TpStreamDownloadManager
 
 class MainActivity : AppCompatActivity() {
@@ -17,18 +16,21 @@ class MainActivity : AppCompatActivity() {
     fun buttonClick(view: View) {
         val myIntent = Intent(this, PlayerActivity::class.java)
         myIntent.putExtra("VideoParameter","TP_DRM")
+        myIntent.putExtra("codec", HARDWARE_SECURE)
         startActivity(myIntent)
     }
 
     fun buttonClick2(view: View) {
         val myIntent = Intent(this, PlayerActivity::class.java)
         myIntent.putExtra("VideoParameter","TP_AES_Encrypt")
+        myIntent.putExtra("codec", HARDWARE_NON_SECURE)
         startActivity(myIntent)
     }
 
     fun buttonClick3(view: View) {
         val myIntent = Intent(this, PlayerActivity::class.java)
         myIntent.putExtra("VideoParameter","TP_NON_DRM")
+        myIntent.putExtra("codec", SOFTWARE)
         startActivity(myIntent)
     }
 

@@ -5,15 +5,18 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import androidx.media3.exoplayer.RenderersFactory
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
+import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
 import androidx.media3.exoplayer.util.EventLogger
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
-import com.tpstream.player.util.NetworkClient
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
 import com.tpstream.player.util.CustomHttpDrmMediaCallback
+import com.tpstream.player.util.NetworkClient
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -69,14 +72,43 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun initializeExoplayer() {
-        exoPlayer = ExoPlayerBuilder(context)
+        val exoplayerBuilder = ExoPlayerBuilder(context)
             .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
             .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
+        if (TPStreamsSDK.codec != -1){
+            exoplayerBuilder.setRenderersFactory(getRenderSettings())
+        }
+        exoPlayer = exoplayerBuilder
             .build()
             .also { exoPlayer ->
                 exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
             }
     }
+
+    private fun getRenderSettings(): RenderersFactory {
+        val softwareOnlyCodecSelector = MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
+            val decoderInfos = MediaCodecUtil.getDecoderInfos(mimeType, requiresSecureDecoder, requiresTunnelingDecoder)
+
+            // Return filtered decoders based on the codec type for "avc" MIME types
+            if (mimeType.contains("avc")) {
+                return@MediaCodecSelector when (TPStreamsSDK.codec) {
+                    HARDWARE_SECURE -> decoderInfos.filter { it.name.contains("secure") && it.hardwareAccelerated }
+                    HARDWARE_NON_SECURE -> decoderInfos.filter { !it.name.contains("secure") && it.hardwareAccelerated }
+                    SOFTWARE -> decoderInfos.filter { it.softwareOnly }
+                    else -> decoderInfos
+                }
+            }
+
+            // Return all decoders if MIME type is not "avc"
+            decoderInfos
+        }
+
+        // Create and configure the RenderersFactory with the selected codec settings
+        return DefaultRenderersFactory(context)
+            .setEnableDecoderFallback(true)
+            .setMediaCodecSelector(softwareOnlyCodecSelector)
+    }
+
 
     fun isParamsInitialized(): Boolean {
         return this::params.isInitialized

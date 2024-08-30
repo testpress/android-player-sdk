@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Testpress"
+            android:visibility="gone"
             android:textColor="#000000"
             android:textSize="24sp" />
 
@@ -39,7 +40,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:onClick="buttonClick"
-            android:text="DRM Video" />
+            android:text="HWS" />
 
         <Button
             android:id="@+id/button2"
@@ -48,7 +49,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:onClick="buttonClick2"
-            android:text="AES Encrypted Video" />
+            android:text="HW" />
 
         <Button
             android:id="@+id/button3"
@@ -57,13 +58,14 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:onClick="buttonClick3"
-            android:text="Non DRM" />
+            android:text="SW" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="TP Streams"
+            android:visibility="gone"
             android:textColor="#000000"
             android:textSize="24sp" />
 
@@ -73,6 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             android:onClick="buttonClick4"
             android:text="DRM" />
 
@@ -82,6 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             android:onClick="buttonClick5"
             android:text="Non DRM" />
 
@@ -91,6 +95,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:visibility="gone"
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@id/video_sample_layout">
 

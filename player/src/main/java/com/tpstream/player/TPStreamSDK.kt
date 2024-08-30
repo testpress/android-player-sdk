@@ -1,8 +1,12 @@
 package com.tpstream.player
 
+const val HARDWARE_SECURE = 1
+const val HARDWARE_NON_SECURE = 2
+const val SOFTWARE = 3
 object TPStreamsSDK {
     private var _provider: Provider = Provider.TPStreams
     private var _orgCode: String? = null
+    private var _codec: Int = -1
     val provider : Provider get() = _provider
     val orgCode: String
         get() {
@@ -11,14 +15,16 @@ object TPStreamsSDK {
             }
             return _orgCode!!
         }
+    val codec: Int get() = _codec
 
-    fun initialize(provider: Provider = Provider.TPStreams, orgCode: String) {
+    fun initialize(provider: Provider = Provider.TPStreams, orgCode: String, codec: Int = -1) {
         if (orgCode.isEmpty()) {
             throw IllegalArgumentException("orgCode cannot be empty.")
         }
 
         this._orgCode = orgCode
         this._provider = provider
+        this._codec = codec
     }
 
     fun constructVideoInfoUrl(contentId: String?, accessToken: String?): String {

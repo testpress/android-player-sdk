@@ -106,6 +106,22 @@
                     android:textColor="@color/tp_white"
                     android:textSize="11sp" />
 
+                <TextView
+                    android:id="@+id/selected_video_codec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OMX.MTK.VIDEO.DECODER.AVC"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/selected_audio_codec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="c2.android.aac.decoder"
+                    android:textColor="@color/tp_white"
+                    android:textSize="11sp" />
+
             </LinearLayout>
 
         </LinearLayout>

@@ -153,4 +153,9 @@ internal class DebugOverlay(
     fun updateVideoDetails() {
         showVideoDetails()
     }
+
+    fun showSelectedCodecName(audio: String, video: String) {
+        debugOverlayLayout.selectedAudioCodec.text = audio
+        debugOverlayLayout.selectedVideoCodec.text = video
+    }
 }

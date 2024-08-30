@@ -66,6 +66,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var debugOverlayButton: ImageButton? = null
     private var popupWindow: PopupWindow? = null
     private var debugOverlay: DebugOverlay? = null
+    private var audioDecoderName = "Not Selected"
+    private var videoDecoderName = "Not Selected"
 
     init {
         registerDownloadListener()
@@ -98,6 +100,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         debugOverlayButton?.setOnLongClickListener {
             popupWindow?.dismiss()
             debugOverlay = DebugOverlay(player,binding.debugOverlay)
+            debugOverlay?.showSelectedCodecName(audioDecoderName, videoDecoderName)
             true
         }
     }
@@ -268,6 +271,24 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 if (state == Player.STATE_READY) {
                     debugOverlay?.updateVideoDetails()
                 }
+            }
+
+            override fun onVideoDecoderInitialized(
+                eventTime: AnalyticsListener.EventTime,
+                decoderName: String,
+                initializedTimestampMs: Long,
+                initializationDurationMs: Long
+            ) {
+                videoDecoderName = decoderName
+            }
+
+            override fun onAudioDecoderInitialized(
+                eventTime: AnalyticsListener.EventTime,
+                decoderName: String,
+                initializedTimestampMs: Long,
+                initializationDurationMs: Long
+            ) {
+                audioDecoderName = decoderName
             }
         })
     }

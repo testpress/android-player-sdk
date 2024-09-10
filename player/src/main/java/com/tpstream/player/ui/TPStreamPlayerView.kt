@@ -188,7 +188,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun initializeLoadCompleteListener() {
         player.setLoadCompleteListener {
             (context as FragmentActivity).runOnUiThread {
-                if (player.params.isDownloadEnabled && it.isDownloadable) {
+                if (player.isParamsInitialized() && player.params.isDownloadEnabled && it.isDownloadable) {
                     downloadButton?.isVisible = true
                     updateDownloadButtonImage()
                 }

@@ -6,8 +6,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.SurfaceView
 import android.view.View
 import android.widget.*
 import androidx.annotation.ColorInt
@@ -176,6 +178,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     fun setPlayer(player: TpStreamPlayer) {
         this.player = player as TpStreamPlayerImpl
         playerView.player = this.player.exoPlayer
+        (playerView.videoSurfaceView as SurfaceView).setSecure(true)
         initializeLoadCompleteListener()
         initializeMarkerListener()
         setPlaybackSpeedText(player.getPlayBackSpeed())

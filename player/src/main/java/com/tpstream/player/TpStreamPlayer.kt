@@ -5,16 +5,31 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
+import androidx.media3.exoplayer.Renderer
+import androidx.media3.exoplayer.analytics.AnalyticsListener
+import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
+import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
+import androidx.media3.exoplayer.source.LoadEventInfo
+import androidx.media3.exoplayer.source.MediaLoadData
+import androidx.media3.exoplayer.util.EventLogger
+import androidx.media3.exoplayer.video.MediaCodecVideoRenderer
+import androidx.media3.exoplayer.video.VideoRendererEventListener
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
-import com.tpstream.player.util.NetworkClient
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
 import com.tpstream.player.util.CustomHttpDrmMediaCallback
+import com.tpstream.player.util.NetworkClient
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
+import kotlin.math.log
 
 public interface TpStreamPlayer {
     object PLAYBACK_STATE {
@@ -67,14 +82,64 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         initializeExoplayer()
     }
 
-    private fun initializeExoplayer() {
-        exoPlayer = ExoPlayerBuilder(context)
-            .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
-            .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
-            .build()
-            .also { exoPlayer ->
-                exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
+    private fun initializeExoplayer(codec: String? = null) {
+        val softwareOnlyCodecSelector = MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
+
+            val mc = MediaCodecUtil.getDecoderInfos(
+                mimeType,
+                requiresSecureDecoder,
+                requiresTunnelingDecoder
+            )
+
+            if (mimeType.contains("avc")){
+                mc.filter { !it.name.contains("secure") && it.hardwareAccelerated }
+            } else {
+                mc
             }
+            //mc.filter { it.softwareOnly }
+        }
+
+        val renderersFactory = DefaultRenderersFactory(context)
+            .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF)
+            .setMediaCodecSelector(softwareOnlyCodecSelector)
+
+//        val loadControl = DefaultLoadControl.Builder()
+//            .setBufferDurationsMs(
+//                50_000,  // Keep the minimum buffer as default
+//                200_000, // Increase the max buffer to 200 seconds
+//                2500,
+//                 5000
+//            )
+//            .build()
+
+        if (codec != null){
+            exoPlayer = ExoPlayerBuilder(context)
+                .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
+                .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
+                .setRenderersFactory(renderersFactory)
+                .build()
+                .also { exoPlayer ->
+                    exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
+                }
+        } else {
+            exoPlayer = ExoPlayerBuilder(context)
+                .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
+                .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
+                .setRenderersFactory(renderersFactory)
+                //.setLoadControl(loadControl)
+                .build()
+                .also { exoPlayer ->
+                    exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
+                }
+        }
+//        exoPlayer = ExoPlayerBuilder(context)
+//            .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
+//            .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
+//            .setRenderersFactory(renderersFactory)
+//            .build()
+//            .also { exoPlayer ->
+//                exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
+//            }
     }
 
     fun isParamsInitialized(): Boolean {
@@ -123,8 +188,53 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
+        exoPlayer.addAnalyticsListener(EventLogger("TAG"))
+        exoPlayer.addAnalyticsListener(ls)
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
+    }
+
+    private var droppedFrameThreshold = 500 // Set a threshold for dropped frames
+    private var droppedFrameCount = 0 // Keep track of the dropped frames
+
+    val ls = object: AnalyticsListener {
+        override fun onPlaybackStateChanged(eventTime: AnalyticsListener.EventTime, state: Int) {
+
+            if (state == Player.STATE_READY){
+                Log.d("TAG", "rendererCount: ${exoPlayer.rendererCount}")
+                Log.d("TAG", "videoDecoderCounters: ${exoPlayer.videoDecoderCounters}")
+            }
+        }
+
+        override fun onDroppedVideoFrames(
+            eventTime: AnalyticsListener.EventTime,
+            droppedFrames: Int,
+            elapsedMs: Long
+        ) {
+            Log.d("TAG", "onDroppedVideoFrames: $droppedFrames")
+            droppedFrameCount += droppedFrames // Update dropped frame count
+
+//            if (droppedFrameCount > droppedFrameThreshold) {
+//                droppedFrameCount = 0
+//                val lastPosition = exoPlayer.currentPosition
+//                initializeExoplayer("hw")
+//                playVideoInUIThread(asset!!.getPlaybackURL()!!)
+//                asset!!.getPlaybackURL()?.let {
+//                    playVideoInUIThread(it, lastPosition)
+//                    exoPlayer.play()
+//                }
+//            }
+        }
+
+        override fun onLoadCompleted(
+            eventTime: AnalyticsListener.EventTime,
+            loadEventInfo: LoadEventInfo,
+            mediaLoadData: MediaLoadData
+        ) {
+            Log.d("TAG", "droppedBufferCount: ${exoPlayer.videoDecoderCounters?.droppedBufferCount}")
+            Log.d("TAG", "skippedInputBufferCount: ${exoPlayer.videoDecoderCounters?.skippedInputBufferCount}")
+        }
+
     }
 
     private fun getInitialTrackSelectionParameter(): TrackSelectionParameters {

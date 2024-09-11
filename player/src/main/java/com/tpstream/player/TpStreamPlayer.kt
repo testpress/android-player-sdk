@@ -5,14 +5,17 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import androidx.media3.exoplayer.analytics.AnalyticsListener
+import androidx.media3.exoplayer.util.EventLogger
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
-import com.tpstream.player.util.NetworkClient
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
 import com.tpstream.player.util.CustomHttpDrmMediaCallback
+import com.tpstream.player.util.NetworkClient
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -123,8 +126,34 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
+        exoPlayer.addAnalyticsListener(EventLogger("TAG"))
+        exoPlayer.addAnalyticsListener(internalAnalyticsListener)
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
+    }
+
+    private val internalAnalyticsListener = object : AnalyticsListener {
+
+        override fun onVideoDecoderInitialized(
+            eventTime: AnalyticsListener.EventTime,
+            decoderName: String,
+            initializedTimestampMs: Long,
+            initializationDurationMs: Long
+        ) {
+            Log.d("TAG", "decoderName: $decoderName")
+            TPStreamsSDK.codecCapabilitiesList.firstOrNull { it.codecName == decoderName }?.let {
+                it.isSelected = true
+                Log.d("TAG", "codecName: ${it.codecName}")
+                Log.d("TAG", "is720pSupported: ${it.is720pSupported}")
+                Log.d("TAG", "is1080pSupported: ${it.is1080pSupported}")
+                Log.d("TAG", "is4KSupported: ${it.is4KSupported}")
+                Log.d("TAG", "is720pSupportedAt2xSpeed: ${it.is720pSupportedAt2xSpeed}")
+                Log.d("TAG", "is1080pSupportedAt2xSpeed: ${it.is1080pSupportedAt2xSpeed}")
+                Log.d("TAG", "is4KSupportedAt2xSpeed: ${it.is4KSupportedAt2xSpeed}")
+                Log.d("TAG", "hardwareAcceleration: ${it.hardwareAcceleration}")
+                Log.d("TAG", "isSelected: ${it.isSelected}")
+            }
+        }
     }
 
     private fun getInitialTrackSelectionParameter(): TrackSelectionParameters {

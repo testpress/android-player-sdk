@@ -106,6 +106,8 @@ internal typealias OkHttpDataSourceFactory = androidx.media3.datasource.okhttp.O
 internal typealias DefaultRenderersFactory = androidx.media3.exoplayer.DefaultRenderersFactory
 internal typealias ExoPlayer = androidx.media3.exoplayer.ExoPlayer
 internal typealias ExoPlayerBuilder = androidx.media3.exoplayer.ExoPlayer.Builder
+internal typealias AnalyticsListener = androidx.media3.exoplayer.analytics.AnalyticsListener
+internal typealias AnalyticsListenerEventTime = androidx.media3.exoplayer.analytics.AnalyticsListener.EventTime
 
 // androidx.media3.exoplayer.scheduler
 internal typealias PlatformScheduler = androidx.media3.exoplayer.scheduler.PlatformScheduler

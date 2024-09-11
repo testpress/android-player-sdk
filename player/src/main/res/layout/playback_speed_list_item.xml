@@ -22,7 +22,7 @@
         android:layout_marginEnd="4dp"
         android:layout_marginRight="4dp"
         android:gravity="center|start"
-        android:textColor="#ffffff"
+        android:textColor="@color/tp_white"
         android:textSize="14sp"/>
 
 </LinearLayout>

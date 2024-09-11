@@ -3,8 +3,6 @@
     android:id="@+id/recycler_view"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
     android:background="#B3000000"
     android:scrollbars="vertical"
-    android:overScrollMode="always"/>
-
+    android:scrollbarThumbVertical="@color/tp_white"/>

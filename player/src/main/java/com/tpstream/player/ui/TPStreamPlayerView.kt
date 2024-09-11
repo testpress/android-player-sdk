@@ -8,6 +8,7 @@ import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.annotation.ColorInt
@@ -129,26 +130,19 @@ class TPStreamPlayerView @JvmOverloads constructor(
         val inflater = anchor.context.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val popupView = inflater.inflate(R.layout.popup_window_layout, null)
 
-        // Create the PopupWindow
         popupWindow = PopupWindow(popupView,
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT,
             true)
 
-        // Set up the RecyclerView
         val recyclerView: RecyclerView = popupView.findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(anchor.context)
-        //recyclerView.layoutParams.height =
 
         val adapter = CustomAdapter(anchor.context, PlaybackSpeed.values().toList())
         recyclerView.adapter = adapter
 
         popupWindow?.height = (playerView.height * 0.75).toInt()
-
-        // Show the PopupWindow
-        //popupWindow?.showAsDropDown(anchor)
-
-        popupWindow?.showAsDropDown(this, Int.MAX_VALUE,- (popupWindow?.height?: 0))
+        popupWindow?.showAsDropDown(this, Int.MAX_VALUE,- (popupWindow!!.height + 16))
     }
 
     private fun setPlaybackSpeedText(speed: Float) {
@@ -158,8 +152,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun dismissPopupMenu() {
-        //popupWindow?.dismiss()
-        //popupWindow = null
+        popupWindow?.dismiss()
+        popupWindow = null
     }
 
     private fun onDownloadButtonClick() {
@@ -605,9 +599,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val playbackSpeed = items[position]
-            holder.text.text = playbackSpeed.text
-            // Set up the check visibility or any other logic here if needed
-
+            holder.text.text = if (playbackSpeed.value == 1.0f) "Normal" else playbackSpeed.text
             if (player.exoPlayer.playbackParameters.speed == playbackSpeed.value) {
                 holder.itemView.isSelected = true;
                 holder.check.visibility = VISIBLE;
@@ -615,7 +607,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 holder.itemView.isSelected = false;
                 holder.check.visibility = INVISIBLE;
             }
-
             holder.itemView.setOnClickListener {
                 player.exoPlayer.playbackParameters =
                     player.exoPlayer.playbackParameters.withSpeed(playbackSpeed.value)

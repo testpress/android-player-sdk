@@ -1,13 +1,13 @@
 package com.tpstream.player
 
 import android.content.Context
+import android.media.MediaCodecList
+import android.media.MediaFormat
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.media3.exoplayer.analytics.AnalyticsListener
-import androidx.media3.exoplayer.util.EventLogger
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
@@ -65,9 +65,11 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private var loadCompleteListener : LoadCompleteListener? = null
     private var markerListener: MarkerListener? = null
     var maximumResolution: Int? = null
+    var codecCapabilitiesList = listOf<CodecCapabilities>()
 
     init {
         initializeExoplayer()
+        codecCapabilitiesList = fetchAVCCodecCapabilities()
     }
 
     private fun initializeExoplayer() {
@@ -78,6 +80,56 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             .also { exoPlayer ->
                 exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
             }
+    }
+
+    private fun fetchAVCCodecCapabilities(): List<CodecCapabilities> {
+        val codecList = MediaCodecList(MediaCodecList.ALL_CODECS)
+        val codecCapabilitiesList = mutableListOf<CodecCapabilities>()
+
+        for (codecInfo in codecList.codecInfos) {
+            // Check if the codec is a decoder and supports AVC (H.264)
+            if (!codecInfo.isEncoder && MediaFormat.MIMETYPE_VIDEO_AVC in codecInfo.supportedTypes) {
+                val videoCapabilities =
+                    codecInfo.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC).videoCapabilities
+
+                if (videoCapabilities != null) {
+                    // Check support for different resolutions
+                    val is720pSupported = videoCapabilities.isSizeSupported(1280, 720)
+                    val is1080pSupported = videoCapabilities.isSizeSupported(1920, 1080)
+                    val is4KSupported = videoCapabilities.isSizeSupported(3840, 2160)
+
+                    // Check support for resolutions at 2x speed (48 fps)
+                    val is720pSupportedAt2xSpeed =
+                        is720pSupported && videoCapabilities.areSizeAndRateSupported(
+                            1280,
+                            720,
+                            48.0
+                        )
+                    val is1080pSupportedAt2xSpeed =
+                        is1080pSupported && videoCapabilities.areSizeAndRateSupported(
+                            1920,
+                            1080,
+                            48.0
+                        )
+                    val is4KSupportedAt2xSpeed =
+                        is4KSupported && videoCapabilities.areSizeAndRateSupported(3840, 2160, 48.0)
+
+                    codecCapabilitiesList.add(
+                        CodecCapabilities(
+                            codecName = codecInfo.name,
+                            is720pSupported = is720pSupported,
+                            is1080pSupported = is1080pSupported,
+                            is4KSupported = is4KSupported,
+                            is720pSupportedAt2xSpeed = is720pSupportedAt2xSpeed,
+                            is1080pSupportedAt2xSpeed = is1080pSupportedAt2xSpeed,
+                            is4KSupportedAt2xSpeed = is4KSupportedAt2xSpeed,
+                            hardwareAcceleration = codecInfo.isHardwareAccelerated
+                        )
+                    )
+                }
+            }
+        }
+        return codecCapabilitiesList
     }
 
     fun isParamsInitialized(): Boolean {
@@ -126,7 +178,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
-        exoPlayer.addAnalyticsListener(EventLogger("TAG"))
         exoPlayer.addAnalyticsListener(internalAnalyticsListener)
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
@@ -140,19 +191,9 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             initializedTimestampMs: Long,
             initializationDurationMs: Long
         ) {
-            Log.d("TAG", "decoderName: $decoderName")
-            TPStreamsSDK.codecCapabilitiesList.firstOrNull { it.codecName == decoderName }?.let {
-                it.isSelected = true
-                Log.d("TAG", "codecName: ${it.codecName}")
-                Log.d("TAG", "is720pSupported: ${it.is720pSupported}")
-                Log.d("TAG", "is1080pSupported: ${it.is1080pSupported}")
-                Log.d("TAG", "is4KSupported: ${it.is4KSupported}")
-                Log.d("TAG", "is720pSupportedAt2xSpeed: ${it.is720pSupportedAt2xSpeed}")
-                Log.d("TAG", "is1080pSupportedAt2xSpeed: ${it.is1080pSupportedAt2xSpeed}")
-                Log.d("TAG", "is4KSupportedAt2xSpeed: ${it.is4KSupportedAt2xSpeed}")
-                Log.d("TAG", "hardwareAcceleration: ${it.hardwareAcceleration}")
-                Log.d("TAG", "isSelected: ${it.isSelected}")
-            }
+            codecCapabilitiesList.takeIf { it.isNotEmpty() }
+                ?.firstOrNull { it.codecName == decoderName }
+                ?.apply { isSelected = true }
         }
     }
 
@@ -399,3 +440,15 @@ internal fun interface LoadCompleteListener {
 internal fun interface MarkerListener {
     fun onMarkerCall(timeInMs: Long)
 }
+
+internal data class CodecCapabilities(
+    val codecName: String,
+    val is720pSupported: Boolean = false,
+    val is1080pSupported: Boolean = false,
+    val is4KSupported: Boolean = false,
+    val is720pSupportedAt2xSpeed: Boolean = false,
+    val is1080pSupportedAt2xSpeed: Boolean = false,
+    val is4KSupportedAt2xSpeed: Boolean = false,
+    val hardwareAcceleration: Boolean = false,
+    var isSelected: Boolean = false
+)

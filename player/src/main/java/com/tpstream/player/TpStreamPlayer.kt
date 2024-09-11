@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.media3.exoplayer.util.EventLogger
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
@@ -127,8 +128,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
                                 is4KSupported = is4KSupported,
                                 is720pSupportedAt2xSpeed = is720pSupportedAt2xSpeed,
                                 is1080pSupportedAt2xSpeed = is1080pSupportedAt2xSpeed,
-                                is4KSupportedAt2xSpeed = is4KSupportedAt2xSpeed,
-                                hardwareAcceleration = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) codecInfo.isHardwareAccelerated else false
+                                is4KSupportedAt2xSpeed = is4KSupportedAt2xSpeed
                             )
                         )
                     }
@@ -188,6 +188,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
+        exoPlayer.addAnalyticsListener(EventLogger("TAG"))
         exoPlayer.addAnalyticsListener(InternalAnalyticsListener())
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
@@ -458,6 +459,5 @@ internal data class CodecCapabilities(
     val is720pSupportedAt2xSpeed: Boolean = false,
     val is1080pSupportedAt2xSpeed: Boolean = false,
     val is4KSupportedAt2xSpeed: Boolean = false,
-    val hardwareAcceleration: Boolean = false,
     var isSelected: Boolean = false
 )

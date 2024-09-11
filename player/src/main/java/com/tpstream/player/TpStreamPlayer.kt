@@ -375,3 +375,15 @@ internal fun interface LoadCompleteListener {
 internal fun interface MarkerListener {
     fun onMarkerCall(timeInMs: Long)
 }
+
+internal data class CodecCapabilities(
+    val codecName: String,
+    val is720pSupported: Boolean = false,
+    val is1080pSupported: Boolean = false,
+    val is4KSupported: Boolean = false,
+    val is720pSupportedAt2xSpeed: Boolean = false,
+    val is1080pSupportedAt2xSpeed: Boolean = false,
+    val is4KSupportedAt2xSpeed: Boolean = false,
+    val hardwareAcceleration: Boolean = false,
+    var isSelected: Boolean = false
+)

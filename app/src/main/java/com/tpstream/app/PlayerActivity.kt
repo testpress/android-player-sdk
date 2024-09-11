@@ -101,10 +101,9 @@ class PlayerActivity : AppCompatActivity() {
                 orgCode = "lmsdemo"
                 provider = TPStreamsSDK.Provider.TestPress
             }
-            // https://app.tpstreams.com/embed/6eafqn/7RKQZj4gB2T/?access_token=d4986429-20e2-4b21-93ae-c70630a37e06
             "TPS_DRM" -> {
-                accessToken = "d4986429-20e2-4b21-93ae-c70630a37e06"
-                videoId = "7RKQZj4gB2T"
+                accessToken = "ab70caed-6168-497f-89c1-1e308da2c9aa"
+                videoId = "6suEBPy7EG4"
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }

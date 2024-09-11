@@ -11,8 +11,9 @@ import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
+import com.tpstream.player.util.*
 import com.tpstream.player.util.CodecCapabilities
-import com.tpstream.player.util.CustomHttpDrmMediaCallback
+import com.tpstream.player.util.InternalAnalyticsListener
 import com.tpstream.player.util.NetworkClient
 import com.tpstream.player.util.fetchAVCCodecCapabilities
 import java.util.concurrent.TimeUnit
@@ -127,22 +128,9 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
-        exoPlayer.addAnalyticsListener(InternalAnalyticsListener())
+        exoPlayer.addAnalyticsListener(InternalAnalyticsListener(this))
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
-    }
-
-    inner class InternalAnalyticsListener: AnalyticsListener {
-        override fun onVideoDecoderInitialized(
-            eventTime: AnalyticsListenerEventTime,
-            decoderName: String,
-            initializedTimestampMs: Long,
-            initializationDurationMs: Long
-        ) {
-            codecCapabilitiesList.takeIf { it.isNotEmpty() }
-                ?.firstOrNull { it.codecName == decoderName }
-                ?.apply { isSelected = true }
-        }
     }
 
     private fun getInitialTrackSelectionParameter(): TrackSelectionParameters {

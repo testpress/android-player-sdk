@@ -15,7 +15,7 @@ import com.tpstream.player.*
 import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
 
 internal class AdvancedResolutionSelectionSheet(
-    private val player: TpStreamPlayer
+    private val player: TpStreamPlayerImpl
 ): BottomSheetDialogFragment() {
 
     private var _binding: TpTrackSelectionDialogBinding? = null
@@ -29,7 +29,7 @@ internal class AdvancedResolutionSelectionSheet(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        codecCapabilities = TPStreamsSDK.codecCapabilitiesList.firstOrNull { it.isSelected }
+        codecCapabilities = player.codecCapabilitiesList.firstOrNull { it.isSelected }
         _binding = TpTrackSelectionDialogBinding.inflate(inflater, container, false)
         return binding.root
     }

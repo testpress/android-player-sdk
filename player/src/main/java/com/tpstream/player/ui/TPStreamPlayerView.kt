@@ -3,12 +3,12 @@ package com.tpstream.player.ui
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.content.Context.LAYOUT_INFLATER_SERVICE
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.View
+import android.view.*
 import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
@@ -17,12 +17,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2.ScrollState
 import com.tpstream.player.*
+import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
-import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.offline.TpStreamDownloadManager
 import com.tpstream.player.ui.AdvancedResolutionSelectionSheet.OnAdvanceResolutionClickListener
 import com.tpstream.player.ui.viewmodel.VideoViewModel
@@ -60,11 +63,13 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var noticeMessage: TextView? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
+
     init {
         registerDownloadListener()
         registerResolutionChangeListener()
         initializeViewModel()
         initializeNoticeScreen()
+        initializeControllerVisibilityListener()
     }
 
     private fun registerDownloadListener() {
@@ -101,10 +106,60 @@ class TPStreamPlayerView @JvmOverloads constructor(
         addView(noticeScreenLayout)
     }
 
-    internal fun setPlaybackSpeedText(speed: Float) {
-        val playbackSpeedButton = playerView.findViewById<Button>(ExoplayerResourceID.exo_playback_speed)
+    private var popupMenu: PopupMenu? = null
+
+    private fun initializeControllerVisibilityListener(){
+        playerView.setControllerVisibilityListener(androidx.media3.ui.PlayerView.ControllerVisibilityListener {
+            if(!playerView.isControllerFullyVisible){
+                dismissPopupMenu()
+            }
+        })
+    }
+
+    private fun initializePlaybackSpeedButton() {
+        val playbackSpeedButton = playerView.findViewById<Button>(R.id.playback_speed)
+        playbackSpeedButton.setOnClickListener { view ->
+            showPlaybackSpeedPopupWindow(view)
+        }
+    }
+
+    var popupWindow: PopupWindow? = null
+
+    private fun showPlaybackSpeedPopupWindow(anchor: View) {
+        val inflater = anchor.context.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val popupView = inflater.inflate(R.layout.popup_window_layout, null)
+
+        // Create the PopupWindow
+        popupWindow = PopupWindow(popupView,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            true)
+
+        // Set up the RecyclerView
+        val recyclerView: RecyclerView = popupView.findViewById(R.id.recycler_view)
+        recyclerView.layoutManager = LinearLayoutManager(anchor.context)
+        //recyclerView.layoutParams.height =
+
+        val adapter = CustomAdapter(anchor.context, PlaybackSpeed.values().toList())
+        recyclerView.adapter = adapter
+
+        popupWindow?.height = (playerView.height * 0.75).toInt()
+
+        // Show the PopupWindow
+        //popupWindow?.showAsDropDown(anchor)
+
+        popupWindow?.showAsDropDown(this, Int.MAX_VALUE,- (popupWindow?.height?: 0))
+    }
+
+    private fun setPlaybackSpeedText(speed: Float) {
+        val playbackSpeedButton = playerView.findViewById<Button>(R.id.playback_speed)
         val playbackSpeed = PlaybackSpeed.values().find { it.value == speed }
         playbackSpeedButton.text = playbackSpeed?.text
+    }
+
+    private fun dismissPopupMenu() {
+        //popupWindow?.dismiss()
+        //popupWindow = null
     }
 
     private fun onDownloadButtonClick() {
@@ -178,7 +233,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         playerView.player = this.player.exoPlayer
         initializeLoadCompleteListener()
         initializeMarkerListener()
-        setPlaybackSpeedText(player.getPlayBackSpeed())
+        initializePlaybackSpeedButton()
     }
 
     internal fun setTPStreamPlayerViewCallBack(callBack: TPStreamPlayerViewCallBack) {
@@ -533,9 +588,51 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
+    inner class CustomAdapter(
+        private val context: Context,
+        private val items: List<PlaybackSpeed>
+    ) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
+
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val check: ImageView = itemView.findViewById(R.id.check)
+            val text: TextView = itemView.findViewById(R.id.text)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(context).inflate(R.layout.playback_speed_list_item, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val playbackSpeed = items[position]
+            holder.text.text = playbackSpeed.text
+            // Set up the check visibility or any other logic here if needed
+
+            if (player.exoPlayer.playbackParameters.speed == playbackSpeed.value) {
+                holder.itemView.isSelected = true;
+                holder.check.visibility = VISIBLE;
+            } else {
+                holder.itemView.isSelected = false;
+                holder.check.visibility = INVISIBLE;
+            }
+
+            holder.itemView.setOnClickListener {
+                player.exoPlayer.playbackParameters =
+                    player.exoPlayer.playbackParameters.withSpeed(playbackSpeed.value)
+                setPlaybackSpeedText(playbackSpeed.value)
+                popupWindow?.dismiss()
+            }
+        }
+
+        override fun getItemCount(): Int = items.size
+    }
+
 }
 
 internal interface TPStreamPlayerViewCallBack {
     fun hideErrorView()
     fun showErrorMessage(message: String)
 }
+
+
+

@@ -1,22 +1,20 @@
 package com.tpstream.player
 
 import android.content.Context
-import android.media.MediaCodecList
-import android.media.MediaFormat
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import androidx.media3.exoplayer.util.EventLogger
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
+import com.tpstream.player.util.CodecCapabilities
 import com.tpstream.player.util.CustomHttpDrmMediaCallback
 import com.tpstream.player.util.NetworkClient
+import com.tpstream.player.util.fetchAVCCodecCapabilities
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -83,65 +81,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
             }
     }
 
-    private fun fetchAVCCodecCapabilities(): List<CodecCapabilities> {
-        val codecCapabilitiesList = mutableListOf<CodecCapabilities>()
-
-        try {
-            val codecList = MediaCodecList(MediaCodecList.ALL_CODECS)
-
-            for (codecInfo in codecList.codecInfos) {
-                if (!codecInfo.isEncoder && MediaFormat.MIMETYPE_VIDEO_AVC in codecInfo.supportedTypes) {
-                    val videoCapabilities =
-                        codecInfo.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC).videoCapabilities
-
-                    if (videoCapabilities != null) {
-                        // Check support for different resolutions
-                        val is720pSupported = videoCapabilities.isSizeSupported(1280, 720)
-                        val is1080pSupported = videoCapabilities.isSizeSupported(1920, 1080)
-                        val is4KSupported = videoCapabilities.isSizeSupported(3840, 2160)
-
-                        // Check support for resolutions at 2x speed (48 fps)
-                        val is720pSupportedAt2xSpeed =
-                            is720pSupported && videoCapabilities.areSizeAndRateSupported(
-                                1280,
-                                720,
-                                48.0
-                            )
-                        val is1080pSupportedAt2xSpeed =
-                            is1080pSupported && videoCapabilities.areSizeAndRateSupported(
-                                1920,
-                                1080,
-                                48.0
-                            )
-                        val is4KSupportedAt2xSpeed =
-                            is4KSupported && videoCapabilities.areSizeAndRateSupported(
-                                3840,
-                                2160,
-                                48.0
-                            )
-
-                        codecCapabilitiesList.add(
-                            CodecCapabilities(
-                                codecName = codecInfo.name,
-                                is720pSupported = is720pSupported,
-                                is1080pSupported = is1080pSupported,
-                                is4KSupported = is4KSupported,
-                                is720pSupportedAt2xSpeed = is720pSupportedAt2xSpeed,
-                                is1080pSupportedAt2xSpeed = is1080pSupportedAt2xSpeed,
-                                is4KSupportedAt2xSpeed = is4KSupportedAt2xSpeed
-                            )
-                        )
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("CodecCapabilities", "Error fetching codec capabilities: ${e.message}")
-            return emptyList()
-        }
-
-        return codecCapabilitiesList
-    }
-
     fun isParamsInitialized(): Boolean {
         return this::params.isInitialized
     }
@@ -188,7 +127,6 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
-        exoPlayer.addAnalyticsListener(EventLogger("TAG"))
         exoPlayer.addAnalyticsListener(InternalAnalyticsListener())
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
@@ -450,14 +388,3 @@ internal fun interface LoadCompleteListener {
 internal fun interface MarkerListener {
     fun onMarkerCall(timeInMs: Long)
 }
-
-internal data class CodecCapabilities(
-    val codecName: String,
-    val is720pSupported: Boolean = false,
-    val is1080pSupported: Boolean = false,
-    val is4KSupported: Boolean = false,
-    val is720pSupportedAt2xSpeed: Boolean = false,
-    val is1080pSupportedAt2xSpeed: Boolean = false,
-    val is4KSupportedAt2xSpeed: Boolean = false,
-    var isSelected: Boolean = false
-)

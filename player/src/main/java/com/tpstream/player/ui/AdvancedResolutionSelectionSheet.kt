@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tpstream.player.*
 import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
+import com.tpstream.player.util.CodecCapabilities
 
 internal class AdvancedResolutionSelectionSheet(
     private val player: TpStreamPlayerImpl
@@ -85,7 +86,6 @@ internal class AdvancedResolutionSelectionSheet(
             // Check if the track resolution is supported by the codec capabilities
             val codecSupport = codecCapabilities?.let { codecCapabilities ->
                 when (height) {
-                    720 -> codecCapabilities.is720pSupported
                     1080 -> codecCapabilities.is1080pSupported
                     2160 -> codecCapabilities.is4KSupported
                     else -> true // Allow all resolutions lower than 720p

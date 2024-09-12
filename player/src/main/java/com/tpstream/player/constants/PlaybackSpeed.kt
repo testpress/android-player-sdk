@@ -1,6 +1,6 @@
 package com.tpstream.player.constants
 
-enum class PlaybackSpeed(val value: Float, val text: String) {
+internal enum class PlaybackSpeed(val value: Float, val text: String) {
     PLAYBACK_SPEED_0_25(0.25f, "0.25x"),
     PLAYBACK_SPEED_0_5(0.5f, "0.5x"),
     PLAYBACK_SPEED_0_75(0.75f, "0.75x"),

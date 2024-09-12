@@ -10,7 +10,6 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
@@ -114,53 +113,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 dismissPopupMenu()
             }
         })
-    }
-
-    private fun initializePlaybackSpeedButton() {
-        val playbackSpeedButton = playerView.findViewById<Button>(R.id.playback_speed)
-        playbackSpeedButton.setOnClickListener { view ->
-            showPlaybackSpeedPopupWindow(view)
-        }
-    }
-
-    private fun showPlaybackSpeedPopupWindow(anchor: View) {
-        val inflater = anchor.context.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val popupView = inflater.inflate(R.layout.popup_window_layout, null)
-
-        popupWindow = PopupWindow(popupView,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            true)
-
-        val recyclerView: RecyclerView = popupView.findViewById(R.id.recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(anchor.context)
-
-        val adapter = PlaybackSpeedAdapter(
-            anchor.context,
-            player.exoPlayer.playbackParameters.speed,
-            PlaybackSpeed.values().toList()
-        ) { playbackSpeed ->
-            player.exoPlayer.playbackParameters =
-                player.exoPlayer.playbackParameters.withSpeed(playbackSpeed.value)
-            setPlaybackSpeedText(playbackSpeed.value)
-            popupWindow?.dismiss()
-        }
-
-        recyclerView.adapter = adapter
-
-        popupWindow?.height = (playerView.height * 0.75).toInt()
-        popupWindow?.showAsDropDown(this, Int.MAX_VALUE,- (popupWindow!!.height + 16))
-    }
-
-    private fun setPlaybackSpeedText(speed: Float) {
-        val playbackSpeedButton = playerView.findViewById<Button>(R.id.playback_speed)
-        val playbackSpeed = PlaybackSpeed.values().find { it.value == speed }
-        playbackSpeedButton.text = playbackSpeed?.text
-    }
-
-    private fun dismissPopupMenu() {
-        popupWindow?.dismiss()
-        popupWindow = null
     }
 
     private fun onDownloadButtonClick() {
@@ -311,6 +263,60 @@ class TPStreamPlayerView @JvmOverloads constructor(
         if (this[time]?.shouldDeleteAfterDelivery == true) {
             this[time]?.isPlayed = true
         }
+    }
+
+    private fun initializePlaybackSpeedButton() {
+        val playbackSpeedButton = playerView.findViewById<Button>(R.id.playback_speed)
+        playbackSpeedButton.setOnClickListener { view ->
+            showPlaybackSpeedPopupWindow(view)
+        }
+    }
+
+    private fun showPlaybackSpeedPopupWindow(anchor: View) {
+        val inflater = anchor.context.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val popupView = inflater.inflate(R.layout.popup_window_layout, null)
+
+        popupWindow = createPopupWindow(popupView)
+        setupRecyclerView(popupView, anchor.context)
+
+        popupWindow?.height = (playerView.height * 0.75).toInt()
+        popupWindow?.showAsDropDown(this, Int.MAX_VALUE,- (popupWindow!!.height + 16))
+    }
+
+    private fun createPopupWindow(popupView: View): PopupWindow {
+        return PopupWindow(popupView,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            true
+        )
+    }
+
+    private fun setupRecyclerView(popupView: View, context: Context) {
+        val recyclerView: RecyclerView = popupView.findViewById(R.id.recycler_view)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+
+        val adapter = PlaybackSpeedAdapter(
+            context,
+            player.exoPlayer.playbackParameters.speed,
+            PlaybackSpeed.values().toList()
+        ) { playbackSpeed ->
+            player.exoPlayer.playbackParameters = player.exoPlayer.playbackParameters.withSpeed(playbackSpeed.value)
+            setPlaybackSpeedText(playbackSpeed.value)
+            dismissPopupMenu()
+        }
+
+        recyclerView.adapter = adapter
+    }
+
+    private fun setPlaybackSpeedText(speed: Float) {
+        val playbackSpeedButton = playerView.findViewById<Button>(R.id.playback_speed)
+        val playbackSpeed = PlaybackSpeed.values().find { it.value == speed }
+        playbackSpeedButton.text = playbackSpeed?.text
+    }
+
+    private fun dismissPopupMenu() {
+        popupWindow?.dismiss()
+        popupWindow = null
     }
 
     private fun updateDownloadButtonImage() {
@@ -588,12 +594,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
             it.start()
         }
     }
+
 }
 
 internal interface TPStreamPlayerViewCallBack {
     fun hideErrorView()
     fun showErrorMessage(message: String)
 }
-
-
-

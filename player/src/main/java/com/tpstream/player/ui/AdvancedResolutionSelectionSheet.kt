@@ -13,7 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tpstream.player.*
 import com.tpstream.player.databinding.TpTrackSelectionDialogBinding
-import com.tpstream.player.util.CodecDetails
+import com.tpstream.player.util.DeviceUtil
 
 internal class AdvancedResolutionSelectionSheet(
     private val player: TpStreamPlayerImpl
@@ -23,7 +23,7 @@ internal class AdvancedResolutionSelectionSheet(
     private val binding get() = _binding!!
     var onAdvanceResolutionClickListener: OnAdvanceResolutionClickListener? = null
     private val tracksGroups = player.getCurrentTrackGroups()
-    private var codecDetails: CodecDetails? = null
+    private var codecDetails: DeviceUtil.CodecDetails? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,

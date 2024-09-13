@@ -1,64 +1,60 @@
 package com.tpstream.player.util
 
+import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.media.MediaFormat
 import android.util.Log
 
-internal data class CodecDetails(
-    val codecName: String,
-    val is1080pSupported: Boolean = false,
-    val is4KSupported: Boolean = false,
-    val is1080pAt2xSupported: Boolean = false,
-    val is4KAt2xSupported: Boolean = false,
-    var isSelected: Boolean = false
-)
+internal class DeviceUtil {
+    data class CodecDetails(
+        val codecName: String,
+        val is1080pSupported: Boolean = false,
+        val is4KSupported: Boolean = false,
+        val is1080pAt2xSupported: Boolean = false,
+        val is4KAt2xSupported: Boolean = false,
+        var isSelected: Boolean = false
+    )
 
-internal fun getAvailableAVCCodecs(): List<CodecDetails> {
-    val codecs = mutableListOf<CodecDetails>()
-
-    try {
-        val codecList = MediaCodecList(MediaCodecList.ALL_CODECS)
-
-        for (codecInfo in codecList.codecInfos) {
-            if (!codecInfo.isEncoder && MediaFormat.MIMETYPE_VIDEO_AVC in codecInfo.supportedTypes) {
-                val videoCapabilities =
-                    codecInfo.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC).videoCapabilities
-
-                if (videoCapabilities != null) {
-                    // Check support for different resolutions
-                    val is1080pSupported = videoCapabilities.isSizeSupported(1920, 1080)
-                    val is4KSupported = videoCapabilities.isSizeSupported(3840, 2160)
-
-                    // Check support for resolutions at 2x speed (48 fps)
-                    val is1080pSupportedAt2xSpeed =
-                        is1080pSupported && videoCapabilities.areSizeAndRateSupported(
-                            1920,
-                            1080,
-                            48.0
-                        )
-                    val is4KSupportedAt2xSpeed =
-                        is4KSupported && videoCapabilities.areSizeAndRateSupported(
-                            3840,
-                            2160,
-                            48.0
-                        )
-
-                    codecs.add(
-                        CodecDetails(
-                            codecName = codecInfo.name,
-                            is1080pSupported = is1080pSupported,
-                            is4KSupported = is4KSupported,
-                            is1080pAt2xSupported = is1080pSupportedAt2xSpeed,
-                            is4KAt2xSupported = is4KSupportedAt2xSpeed
-                        )
-                    )
-                }
+    companion object {
+        fun getAvailableAVCCodecs(): List<CodecDetails> {
+            return try {
+                val codecList = MediaCodecList(MediaCodecList.ALL_CODECS)
+                codecList.codecInfos
+                    .filterNot { it.isEncoder }
+                    .filter { MediaFormat.MIMETYPE_VIDEO_AVC in it.supportedTypes }
+                    .mapNotNull { createCodecDetails(it) }
+            } catch (e: Exception) {
+                Log.e("DeviceUtils", "Error fetching codec capabilities: ${e.message}")
+                emptyList()
             }
         }
-    } catch (e: Exception) {
-        Log.e("CodecCapabilities", "Error fetching codec capabilities: ${e.message}")
-        return emptyList()
-    }
 
-    return codecs
+        private fun createCodecDetails(codecInfo: MediaCodecInfo): CodecDetails? {
+            val videoCapabilities =
+                codecInfo.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC)?.videoCapabilities
+            return videoCapabilities?.let {
+                CodecDetails(
+                    codecName = codecInfo.name,
+                    is1080pSupported = it.isSizeSupported(1920, 1080),
+                    is4KSupported = it.isSizeSupported(3840, 2160),
+                    is1080pAt2xSupported = it.isSizeSupported(
+                        1920,
+                        1080
+                    ) && it.areSizeAndRateSupported(
+                        1920,
+                        1080,
+                        48.0
+                    ),
+                    is4KAt2xSupported = it.isSizeSupported(
+                        3840,
+                        2160
+                    ) && it.areSizeAndRateSupported(
+                        3840,
+                        2160,
+                        48.0
+                    )
+                )
+            }
+        }
+    }
 }

@@ -8,14 +8,13 @@ import android.os.Looper
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
+import com.tpstream.player.util.NetworkClient
 import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
-import com.tpstream.player.util.*
-import com.tpstream.player.util.CodecDetails
+import com.tpstream.player.util.CustomHttpDrmMediaCallback
+import com.tpstream.player.util.DeviceUtil
 import com.tpstream.player.util.PlayerAnalyticsListener
-import com.tpstream.player.util.NetworkClient
-import com.tpstream.player.util.getAvailableAVCCodecs
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -65,11 +64,11 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private var loadCompleteListener : LoadCompleteListener? = null
     private var markerListener: MarkerListener? = null
     var maximumResolution: Int? = null
-    var codecs = listOf<CodecDetails>()
+    var codecs = listOf<DeviceUtil.CodecDetails>()
 
     init {
         initializeExoplayer()
-        codecs = getAvailableAVCCodecs()
+        codecs = DeviceUtil.getAvailableAVCCodecs()
     }
 
     private fun initializeExoplayer() {

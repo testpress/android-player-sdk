@@ -39,7 +39,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr), ViewModelStoreOwner {
     private val binding: TpStreamPlayerViewBinding =
         TpStreamPlayerViewBinding.inflate(LayoutInflater.from(context), this, true)
-    private var playerView: PlayerView = binding.root.findViewById(R.id.player_view)
+    internal var playerView: PlayerView = binding.root.findViewById(R.id.player_view)
     private lateinit var player: TpStreamPlayerImpl
     private var downloadButton: ImageButton? = null
     private var resolutionButton : ImageButton? = null
@@ -105,6 +105,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun setupPlayerControlsVisibilityListener() {
         playerView.setControllerVisibilityListener(ControllerVisibilityListener {
             if (!playerView.isControllerFullyVisible) {
+                // Reset Controller show timeout to default
+                playerView.controllerShowTimeoutMs = PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS
                 playbackSpeedPopupWindow?.dismiss()
             }
         })
@@ -264,6 +266,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
         playbackSpeedPopupWindow = PlaybackSpeedPopupWindow(player, this)
         val playbackSpeedButton = playerView.findViewById<Button>(R.id.playback_speed)
         playbackSpeedButton.setOnClickListener {
+            // Set Controller show timeout to 10 Sec
+            playerView.controllerShowTimeoutMs = PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS * 2
             playbackSpeedPopupWindow?.show()
         }
     }

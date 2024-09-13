@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.tpstream.player.PlayerControlView
 import com.tpstream.player.R
 import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.ui.adapter.PlaybackSpeedAdapter
@@ -52,6 +53,8 @@ internal class PlaybackSpeedPopupWindow(
             player.exoPlayer.playbackParameters =
                 player.exoPlayer.playbackParameters.withSpeed(playbackSpeed.value)
             setPlaybackSpeedText(playbackSpeed.value)
+            // Reset Controller show timeout to default
+            playerView.playerView.controllerShowTimeoutMs = PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS
             dismiss()
         }
 

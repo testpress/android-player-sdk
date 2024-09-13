@@ -102,9 +102,9 @@ class TPStreamPlayerView @JvmOverloads constructor(
         addView(noticeScreenLayout)
     }
 
-    private fun setupPlayerControlsVisibilityListener(){
+    private fun setupPlayerControlsVisibilityListener() {
         playerView.setControllerVisibilityListener(ControllerVisibilityListener {
-            if(!playerView.isControllerFullyVisible){
+            if (!playerView.isControllerFullyVisible) {
                 playbackSpeedPopupWindow?.dismiss()
             }
         })

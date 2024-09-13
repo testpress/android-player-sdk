@@ -6,6 +6,7 @@ internal typealias TimeBar = com.google.android.exoplayer2.ui.TimeBar
 internal typealias OnScrubListener = com.google.android.exoplayer2.ui.TimeBar.OnScrubListener
 internal typealias FullscreenButtonClickListener =  com.google.android.exoplayer2.ui.StyledPlayerView.FullscreenButtonClickListener
 internal typealias ExoplayerResourceID = com.google.android.exoplayer2.ui.R.id
+internal typealias ControllerVisibilityListener = com.google.android.exoplayer2.ui.StyledPlayerView.ControllerVisibilityListener
 internal typealias DefaultTrackSelector = com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 internal typealias DefaultTrackSelectorParameters = com.google.android.exoplayer2.trackselection.DefaultTrackSelector.Parameters
 internal typealias TrackSelector = com.google.android.exoplayer2.trackselection.TrackSelector

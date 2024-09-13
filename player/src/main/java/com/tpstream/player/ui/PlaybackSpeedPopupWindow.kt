@@ -16,20 +16,22 @@ import com.tpstream.player.ui.adapter.PlaybackSpeedAdapter
 
 internal class PlaybackSpeedPopupWindow(
     private val player: TpStreamPlayerImpl,
-    private val playerView: TPStreamPlayerView
+    private val TPStreamPlayerView: TPStreamPlayerView
 ) {
     private var popupWindow: PopupWindow? = null
 
     fun show() {
-        val inflater =
-            playerView.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val popupView = inflater.inflate(R.layout.popup_window_layout, null)
-
+        val popupView = inflatePopupView(TPStreamPlayerView.context)
         popupWindow = createPopupWindow(popupView)
-        setupRecyclerView(popupView, playerView.context)
+        setupRecyclerView(popupView, TPStreamPlayerView.context)
+        adjustPopupWindowHeight()
+        extendControllerShowTimeout()
+        showPopupWindow()
+    }
 
-        popupWindow?.height = (playerView.height * 0.75).toInt()
-        popupWindow?.showAsDropDown(playerView, Int.MAX_VALUE, -((popupWindow?.height ?: 0) + 16))
+    private fun inflatePopupView(context: Context): View {
+        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        return inflater.inflate(R.layout.popup_window_layout, null)
     }
 
     private fun createPopupWindow(popupView: View): PopupWindow {
@@ -44,31 +46,70 @@ internal class PlaybackSpeedPopupWindow(
     private fun setupRecyclerView(popupView: View, context: Context) {
         val recyclerView: RecyclerView = popupView.findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = createAdapter(context)
+    }
 
-        val adapter = PlaybackSpeedAdapter(
+    private fun createAdapter(context: Context): PlaybackSpeedAdapter {
+        return PlaybackSpeedAdapter(
             context,
             player.exoPlayer.playbackParameters.speed,
             PlaybackSpeed.values().toList()
         ) { playbackSpeed ->
-            player.exoPlayer.playbackParameters =
-                player.exoPlayer.playbackParameters.withSpeed(playbackSpeed.value)
-            setPlaybackSpeedText(playbackSpeed.value)
-            // Reset Controller show timeout to default
-            playerView.playerView.controllerShowTimeoutMs = PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS
+            setPlayerPlaybackSpeed(playbackSpeed.value)
+            updatePlaybackSpeedText(playbackSpeed.value)
             dismiss()
         }
-
-        recyclerView.adapter = adapter
     }
 
-    private fun setPlaybackSpeedText(speed: Float) {
-        val playbackSpeedButton = playerView.findViewById<Button>(R.id.playback_speed)
+    private fun setPlayerPlaybackSpeed(speed: Float) {
+        player.exoPlayer.playbackParameters =
+            player.exoPlayer.playbackParameters.withSpeed(speed)
+    }
+
+    private fun updatePlaybackSpeedText(speed: Float) {
+        val playbackSpeedButton = TPStreamPlayerView.findViewById<Button>(R.id.playback_speed)
         val playbackSpeed = PlaybackSpeed.values().find { it.value == speed }
         playbackSpeedButton.text = playbackSpeed?.text
     }
 
+    private fun adjustPopupWindowHeight() {
+        popupWindow?.height = (TPStreamPlayerView.height * POPUP_WINDOW_HEIGHT_RATIO).toInt()
+    }
+
+    private fun extendControllerShowTimeout() {
+        // Since we are adding the custom playback speed selection option, we don't have access
+        // to control the player controller auto-hide option. So whenever the user clicks the
+        // playback speed option, we set the player controller timeout duration to 10 seconds.
+        // This helps the user select the speed option without interruption.
+        TPStreamPlayerView.playerView.controllerShowTimeoutMs =
+            PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS * EXTENDED_SHOW_TIMEOUT_MULTIPLIER
+    }
+
+    private fun showPopupWindow() {
+        popupWindow?.showAsDropDown(
+            TPStreamPlayerView,
+            Int.MAX_VALUE,
+            -((popupWindow?.height ?: 0) + POPUP_WINDOW_OFFSET)
+        )
+    }
+
     fun dismiss() {
+        resetControllerTimeout()
         popupWindow?.dismiss()
         popupWindow = null
+    }
+
+    private fun resetControllerTimeout() {
+        // We set 10 seconds for the player controller hide timeout when opening the
+        // playback speed option. We reset the value to the default when dismissing the
+        // playback speed options.
+        TPStreamPlayerView.playerView.controllerShowTimeoutMs =
+            PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS
+    }
+
+    companion object {
+        private const val POPUP_WINDOW_HEIGHT_RATIO = 0.75
+        private const val EXTENDED_SHOW_TIMEOUT_MULTIPLIER = 2
+        private const val POPUP_WINDOW_OFFSET = 16
     }
 }

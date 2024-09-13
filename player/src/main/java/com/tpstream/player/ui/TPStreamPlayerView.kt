@@ -105,8 +105,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun setupPlayerControlsVisibilityListener() {
         playerView.setControllerVisibilityListener(ControllerVisibilityListener {
             if (!playerView.isControllerFullyVisible) {
-                // Reset Controller show timeout to default
-                playerView.controllerShowTimeoutMs = PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS
                 playbackSpeedPopupWindow?.dismiss()
             }
         })
@@ -266,8 +264,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
         playbackSpeedPopupWindow = PlaybackSpeedPopupWindow(player, this)
         val playbackSpeedButton = playerView.findViewById<Button>(R.id.playback_speed)
         playbackSpeedButton.setOnClickListener {
-            // Set Controller show timeout to 10 Sec
-            playerView.controllerShowTimeoutMs = PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS * 2
             playbackSpeedPopupWindow?.show()
         }
     }

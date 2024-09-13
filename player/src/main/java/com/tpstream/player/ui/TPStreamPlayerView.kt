@@ -70,7 +70,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         registerResolutionChangeListener()
         initializeViewModel()
         initializeNoticeScreen()
-        initializeControllerVisibilityListener()
+        setupPlayerControlsVisibilityListener()
     }
 
     private fun registerDownloadListener() {
@@ -107,10 +107,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
         addView(noticeScreenLayout)
     }
 
-    private fun initializeControllerVisibilityListener(){
-        playerView.setControllerVisibilityListener(androidx.media3.ui.PlayerView.ControllerVisibilityListener {
+    private fun setupPlayerControlsVisibilityListener(){
+        playerView.setControllerVisibilityListener(ControllerVisibilityListener {
             if(!playerView.isControllerFullyVisible){
-                dismissPopupMenu()
+                dismissPlaybackSpeedPopupMenu()
             }
         })
     }
@@ -302,7 +302,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         ) { playbackSpeed ->
             player.exoPlayer.playbackParameters = player.exoPlayer.playbackParameters.withSpeed(playbackSpeed.value)
             setPlaybackSpeedText(playbackSpeed.value)
-            dismissPopupMenu()
+            dismissPlaybackSpeedPopupMenu()
         }
 
         recyclerView.adapter = adapter
@@ -314,7 +314,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         playbackSpeedButton.text = playbackSpeed?.text
     }
 
-    private fun dismissPopupMenu() {
+    private fun dismissPlaybackSpeedPopupMenu() {
         popupWindow?.dismiss()
         popupWindow = null
     }

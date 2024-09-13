@@ -12,10 +12,10 @@ import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
 import com.tpstream.player.util.*
-import com.tpstream.player.util.CodecCapabilities
-import com.tpstream.player.util.InternalAnalyticsListener
+import com.tpstream.player.util.CodecDetails
+import com.tpstream.player.util.PlayerAnalyticsListener
 import com.tpstream.player.util.NetworkClient
-import com.tpstream.player.util.fetchAVCCodecCapabilities
+import com.tpstream.player.util.getAvailableAVCCodecs
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -65,11 +65,11 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private var loadCompleteListener : LoadCompleteListener? = null
     private var markerListener: MarkerListener? = null
     var maximumResolution: Int? = null
-    var codecCapabilitiesList = listOf<CodecCapabilities>()
+    var codecs = listOf<CodecDetails>()
 
     init {
         initializeExoplayer()
-        codecCapabilitiesList = fetchAVCCodecCapabilities()
+        codecs = getAvailableAVCCodecs()
     }
 
     private fun initializeExoplayer() {
@@ -128,7 +128,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
-        exoPlayer.addAnalyticsListener(InternalAnalyticsListener(this))
+        exoPlayer.addAnalyticsListener(PlayerAnalyticsListener(this))
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
     }

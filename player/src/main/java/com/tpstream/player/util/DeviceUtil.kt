@@ -4,17 +4,17 @@ import android.media.MediaCodecList
 import android.media.MediaFormat
 import android.util.Log
 
-internal data class CodecCapabilities(
+internal data class CodecDetails(
     val codecName: String,
     val is1080pSupported: Boolean = false,
     val is4KSupported: Boolean = false,
-    val is1080pSupportedAt2xSpeed: Boolean = false,
-    val is4KSupportedAt2xSpeed: Boolean = false,
+    val is1080pAt2xSupported: Boolean = false,
+    val is4KAt2xSupported: Boolean = false,
     var isSelected: Boolean = false
 )
 
-internal fun fetchAVCCodecCapabilities(): List<CodecCapabilities> {
-    val codecCapabilitiesList = mutableListOf<CodecCapabilities>()
+internal fun getAvailableAVCCodecs(): List<CodecDetails> {
+    val codecs = mutableListOf<CodecDetails>()
 
     try {
         val codecList = MediaCodecList(MediaCodecList.ALL_CODECS)
@@ -43,13 +43,13 @@ internal fun fetchAVCCodecCapabilities(): List<CodecCapabilities> {
                             48.0
                         )
 
-                    codecCapabilitiesList.add(
-                        CodecCapabilities(
+                    codecs.add(
+                        CodecDetails(
                             codecName = codecInfo.name,
                             is1080pSupported = is1080pSupported,
                             is4KSupported = is4KSupported,
-                            is1080pSupportedAt2xSpeed = is1080pSupportedAt2xSpeed,
-                            is4KSupportedAt2xSpeed = is4KSupportedAt2xSpeed
+                            is1080pAt2xSupported = is1080pSupportedAt2xSpeed,
+                            is4KAt2xSupported = is4KSupportedAt2xSpeed
                         )
                     )
                 }
@@ -60,5 +60,5 @@ internal fun fetchAVCCodecCapabilities(): List<CodecCapabilities> {
         return emptyList()
     }
 
-    return codecCapabilitiesList
+    return codecs
 }

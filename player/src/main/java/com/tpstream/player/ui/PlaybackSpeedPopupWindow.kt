@@ -25,7 +25,7 @@ internal class PlaybackSpeedPopupWindow(
         popupWindow = createPopupWindow(popupView)
         setupRecyclerView(popupView, TPStreamPlayerView.context)
         adjustPopupWindowHeight()
-        extendControllerShowTimeout()
+        extendControllerTimeout()
         showPopupWindow()
     }
 
@@ -76,13 +76,13 @@ internal class PlaybackSpeedPopupWindow(
         popupWindow?.height = (TPStreamPlayerView.height * POPUP_WINDOW_HEIGHT_RATIO).toInt()
     }
 
-    private fun extendControllerShowTimeout() {
+    private fun extendControllerTimeout() {
         // Since we are adding the custom playback speed selection option, we don't have access
         // to control the player controller auto-hide option. So whenever the user clicks the
         // playback speed option, we set the player controller timeout duration to 10 seconds.
         // This helps the user select the speed option without interruption.
         TPStreamPlayerView.playerView.controllerShowTimeoutMs =
-            PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS * EXTENDED_SHOW_TIMEOUT_MULTIPLIER
+            PlayerControlView.DEFAULT_SHOW_TIMEOUT_MS * INCREASED_TIMEOUT_TWICE
     }
 
     private fun showPopupWindow() {
@@ -109,7 +109,7 @@ internal class PlaybackSpeedPopupWindow(
 
     companion object {
         private const val POPUP_WINDOW_HEIGHT_RATIO = 0.75
-        private const val EXTENDED_SHOW_TIMEOUT_MULTIPLIER = 2
+        private const val INCREASED_TIMEOUT_TWICE   = 2
         private const val POPUP_WINDOW_OFFSET = 16
     }
 }

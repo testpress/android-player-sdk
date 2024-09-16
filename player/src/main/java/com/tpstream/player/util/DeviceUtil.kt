@@ -16,42 +16,47 @@ internal class DeviceUtil {
     )
 
     companion object {
-        fun getAvailableAVCCodecs(): List<CodecDetails> {
+        private const val WIDTH_1080P = 1920
+        private const val HEIGHT_1080P = 1080
+        private const val WIDTH_4K = 3840
+        private const val HEIGHT_4K = 2160
+        private const val FRAME_RATE_2X = 48.0
+
+        fun getAvailableAVCCodecs(codecList: MediaCodecList = MediaCodecList(MediaCodecList.ALL_CODECS)): List<CodecDetails> {
             return try {
-                val codecList = MediaCodecList(MediaCodecList.ALL_CODECS)
                 codecList.codecInfos
-                    .filterNot { it.isEncoder }
-                    .filter { MediaFormat.MIMETYPE_VIDEO_AVC in it.supportedTypes }
-                    .mapNotNull { createCodecDetails(it) }
+                    .filterNot { codecInfo -> codecInfo.isEncoder }
+                    .filter { codecInfo -> MediaFormat.MIMETYPE_VIDEO_AVC in codecInfo.supportedTypes }
+                    .mapNotNull { it.toCodecDetails() }
             } catch (e: Exception) {
-                Log.e("DeviceUtils", "Error fetching codec capabilities: ${e.message}")
+                Log.d("DeviceUtils", "Error fetching codec capabilities: ${e.message}")
                 emptyList()
             }
         }
 
-        private fun createCodecDetails(codecInfo: MediaCodecInfo): CodecDetails? {
+        fun MediaCodecInfo.toCodecDetails(): CodecDetails? {
             val videoCapabilities =
-                codecInfo.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC)?.videoCapabilities
+                this.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC)?.videoCapabilities
             return videoCapabilities?.let {
                 CodecDetails(
-                    codecName = codecInfo.name,
-                    is1080pSupported = it.isSizeSupported(1920, 1080),
-                    is4KSupported = it.isSizeSupported(3840, 2160),
+                    codecName = this.name,
+                    is1080pSupported = it.isSizeSupported(WIDTH_1080P, HEIGHT_1080P),
+                    is4KSupported = it.isSizeSupported(WIDTH_4K, HEIGHT_4K),
                     is1080pAt2xSupported = it.isSizeSupported(
-                        1920,
-                        1080
+                        WIDTH_1080P,
+                        HEIGHT_1080P
                     ) && it.areSizeAndRateSupported(
-                        1920,
-                        1080,
-                        48.0
+                        WIDTH_1080P,
+                        HEIGHT_1080P,
+                        FRAME_RATE_2X
                     ),
                     is4KAt2xSupported = it.isSizeSupported(
-                        3840,
-                        2160
+                        WIDTH_4K,
+                        HEIGHT_4K
                     ) && it.areSizeAndRateSupported(
-                        3840,
-                        2160,
-                        48.0
+                        WIDTH_4K,
+                        HEIGHT_4K,
+                        FRAME_RATE_2X
                     )
                 )
             }

@@ -74,27 +74,31 @@ internal class AdvancedResolutionSelectionSheet(
             )
         }
     }
+
     private fun ArrayList<TrackInfo>.filterTracksInfo(): ArrayList<TrackInfo> {
         val maxResolution = player.getMaxResolution()
 
         return filterTo(ArrayList()) { trackInfo ->
             val height = trackInfo.format.height
-
-            // Check if the track resolution is within the maximum allowed resolution
-            val resolutionSupport = maxResolution?.let { height <= it } ?: true
-
-            // Check if the track resolution is supported by the codec capabilities
-            val codecSupport = codecDetails?.let { codecCapabilities ->
-                when (height) {
-                    1080 -> codecCapabilities.is1080pSupported
-                    2160 -> codecCapabilities.is4KSupported
-                    else -> true // Allow all resolutions lower than 720p
-                }
-            } ?: true
-
             // Keep the track if it meets both resolution and codec support criteria
-            resolutionSupport && codecSupport
+            isResolutionSupported(height, maxResolution) && isCodecSupported(height)
         }
+    }
+
+    private fun isResolutionSupported(height: Int, maxResolution: Int?): Boolean {
+        // Check if the track resolution is within the maximum allowed resolution
+        return maxResolution?.let { height <= it } ?: true
+    }
+
+    private fun isCodecSupported(height: Int): Boolean {
+        // Check if the track resolution is supported by the codec capabilities
+        return codecDetails?.let { codecCapabilities ->
+            when (height) {
+                1080 -> codecCapabilities.is1080pSupported
+                2160 -> codecCapabilities.is4KSupported
+                else -> true
+            }
+        } ?: true
     }
 
     private fun setupListView(tracksInfo: ArrayList<TrackInfo>) {

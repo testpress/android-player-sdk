@@ -4,7 +4,7 @@ import com.tpstream.player.AnalyticsListener
 import com.tpstream.player.AnalyticsListenerEventTime
 import com.tpstream.player.TpStreamPlayerImpl
 
-internal class PlayerAnalyticsListener(private val playerImpl: TpStreamPlayerImpl) :
+internal class PlayerAnalyticsListener(private val streamPlayer: TpStreamPlayerImpl) :
     AnalyticsListener {
     override fun onVideoDecoderInitialized(
         eventTime: AnalyticsListenerEventTime,
@@ -17,7 +17,7 @@ internal class PlayerAnalyticsListener(private val playerImpl: TpStreamPlayerImp
 
     private fun updateSelectedCodec(decoderName: String) {
         // Iterate over all codecs to update their selection status
-        playerImpl.codecs.forEach { codec ->
+        streamPlayer.codecs.forEach { codec ->
             codec.isSelected = (codec.codecName == decoderName)
         }
     }

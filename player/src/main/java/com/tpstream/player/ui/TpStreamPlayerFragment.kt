@@ -232,11 +232,6 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             }
         }
 
-        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
-            super.onPlaybackParametersChanged(playbackParameters)
-            tpStreamPlayerView.setPlaybackSpeedText(playbackParameters.speed)
-        }
-
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
             val errorPlayerId = SentryLogger.generatePlayerIdString()

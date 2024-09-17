@@ -22,7 +22,6 @@ import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.data.source.local.DownloadStatus
 import com.tpstream.player.databinding.TpStreamPlayerViewBinding
-import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.offline.TpStreamDownloadManager
 import com.tpstream.player.ui.AdvancedResolutionSelectionSheet.OnAdvanceResolutionClickListener
 import com.tpstream.player.ui.viewmodel.VideoViewModel
@@ -40,7 +39,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr), ViewModelStoreOwner {
     private val binding: TpStreamPlayerViewBinding =
         TpStreamPlayerViewBinding.inflate(LayoutInflater.from(context), this, true)
-    private var playerView: PlayerView = binding.root.findViewById(R.id.player_view)
+    internal var playerView: PlayerView = binding.root.findViewById(R.id.player_view)
     private lateinit var player: TpStreamPlayerImpl
     private var downloadButton: ImageButton? = null
     private var resolutionButton : ImageButton? = null
@@ -59,12 +58,14 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private var noticeScreenLayout: LinearLayout? = null
     private var noticeMessage: TextView? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private var playbackSpeedPopupWindow: PlaybackSpeedPopupWindow? = null
 
     init {
         registerDownloadListener()
         registerResolutionChangeListener()
         initializeViewModel()
         initializeNoticeScreen()
+        setupPlayerControlsVisibilityListener()
     }
 
     private fun registerDownloadListener() {
@@ -101,10 +102,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
         addView(noticeScreenLayout)
     }
 
-    internal fun setPlaybackSpeedText(speed: Float) {
-        val playbackSpeedButton = playerView.findViewById<Button>(ExoplayerResourceID.exo_playback_speed)
-        val playbackSpeed = PlaybackSpeed.values().find { it.value == speed }
-        playbackSpeedButton.text = playbackSpeed?.text
+    private fun setupPlayerControlsVisibilityListener() {
+        playerView.setControllerVisibilityListener(ControllerVisibilityListener {
+            if (!playerView.isControllerFullyVisible) {
+                playbackSpeedPopupWindow?.dismiss()
+            }
+        })
     }
 
     private fun onDownloadButtonClick() {
@@ -178,7 +181,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         playerView.player = this.player.exoPlayer
         initializeLoadCompleteListener()
         initializeMarkerListener()
-        setPlaybackSpeedText(player.getPlayBackSpeed())
+        initializePlaybackSpeedButton()
     }
 
     internal fun setTPStreamPlayerViewCallBack(callBack: TPStreamPlayerViewCallBack) {
@@ -254,6 +257,14 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun LinkedHashMap<Long, MarkerState>.updatePlayedMarker(time: Long) {
         if (this[time]?.shouldDeleteAfterDelivery == true) {
             this[time]?.isPlayed = true
+        }
+    }
+
+    private fun initializePlaybackSpeedButton() {
+        playbackSpeedPopupWindow = PlaybackSpeedPopupWindow(player, this)
+        val playbackSpeedButton = playerView.findViewById<Button>(R.id.playback_speed)
+        playbackSpeedButton.setOnClickListener {
+            playbackSpeedPopupWindow?.show()
         }
     }
 

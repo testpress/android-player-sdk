@@ -98,7 +98,7 @@
                 style="@style/ExoStyledControls.Button.Bottom.CC"/>
 
             <Button
-                android:id="@id/exo_playback_speed"
+                android:id="@+id/playback_speed"
                 style="@style/PlayBackSpeedButtonTheme"
                 android:layout_width="36dp"
                 android:layout_height="18dp"

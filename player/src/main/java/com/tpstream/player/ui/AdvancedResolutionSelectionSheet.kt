@@ -23,14 +23,15 @@ internal class AdvancedResolutionSelectionSheet(
     private val binding get() = _binding!!
     var onAdvanceResolutionClickListener: OnAdvanceResolutionClickListener? = null
     private val tracksGroups = player.getCurrentTrackGroups()
-    private var codecDetails: DeviceUtil.CodecDetails? = null
+    private var selectedCodecDetails: DeviceUtil.CodecDetails? = null
+    private val maxResolution: Int? by lazy { player.getMaxResolution() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        codecDetails = player.codecs.firstOrNull { it.isSelected }
+        selectedCodecDetails = player.codecs.firstOrNull { it.isSelected }
         _binding = TpTrackSelectionDialogBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -59,7 +60,7 @@ internal class AdvancedResolutionSelectionSheet(
     private fun initializeList() {
         val trackGroup = tracksGroups.firstOrNull { it.type == C.TRACK_TYPE_VIDEO }
         trackGroup?.let { group ->
-            val filteredTracksInfo = getTracksInfo(group).filterTracksInfo()
+            val filteredTracksInfo = getTracksInfo(group).filterSupportedTracks()
             setupListView(filteredTracksInfo)
         } ?: dismiss()
     }
@@ -75,28 +76,27 @@ internal class AdvancedResolutionSelectionSheet(
         }
     }
 
-    private fun ArrayList<TrackInfo>.filterTracksInfo(): ArrayList<TrackInfo> {
-        val maxResolution = player.getMaxResolution()
-
+    private fun ArrayList<TrackInfo>.filterSupportedTracks(): ArrayList<TrackInfo> {
         return filterTo(ArrayList()) { trackInfo ->
-            val height = trackInfo.format.height
+            val resolutionHeight = trackInfo.format.height
             // Keep the track if it meets both resolution and codec support criteria
-            isResolutionSupported(height, maxResolution) && isCodecSupported(height)
+            isResolutionWithinMaxResolution(resolutionHeight) && isCodecSupported(resolutionHeight)
         }
     }
 
-    private fun isResolutionSupported(height: Int, maxResolution: Int?): Boolean {
+    private fun isResolutionWithinMaxResolution(resolutionHeight: Int): Boolean {
         // Check if the track resolution is within the maximum allowed resolution
-        return maxResolution?.let { height <= it } ?: true
+        return maxResolution?.let { resolutionHeight <= it } ?: true
     }
 
-    private fun isCodecSupported(height: Int): Boolean {
+    private fun isCodecSupported(resolutionHeight: Int): Boolean {
         // Check if the track resolution is supported by the codec capabilities
-        return codecDetails?.let { codecCapabilities ->
-            when (height) {
+        return selectedCodecDetails?.let { codecCapabilities ->
+            when (resolutionHeight) {
+                in 0 .. 1079 -> true // Assuming anything below 1080p is supported
                 1080 -> codecCapabilities.is1080pSupported
                 2160 -> codecCapabilities.is4KSupported
-                else -> true
+                else -> false // Anything above 4K is not supported
             }
         } ?: true
     }

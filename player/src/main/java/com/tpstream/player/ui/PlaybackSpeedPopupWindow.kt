@@ -13,6 +13,7 @@ import com.tpstream.player.PlayerControlView
 import com.tpstream.player.R
 import com.tpstream.player.constants.PlaybackSpeed
 import com.tpstream.player.ui.adapter.PlaybackSpeedAdapter
+import com.tpstream.player.util.DeviceUtil
 
 internal class PlaybackSpeedPopupWindow(
     private val player: TpStreamPlayerImpl,
@@ -52,11 +53,33 @@ internal class PlaybackSpeedPopupWindow(
     private fun createAdapter(context: Context) = PlaybackSpeedAdapter(
         context,
         player.exoPlayer.playbackParameters.speed,
-        PlaybackSpeed.values().toList()
+        getSupportedPlaybackSpeeds()
     ) { playbackSpeed ->
         setPlayerPlaybackSpeed(playbackSpeed.value)
         updatePlaybackSpeedText(playbackSpeed.value)
         dismiss()
+    }
+
+    private fun getSupportedPlaybackSpeeds(): List<PlaybackSpeed> {
+        val videoHeight = player.exoPlayer.videoFormat?.height ?: PlaybackSpeed.values().asList()
+        val selectedCodec = player.codecs.firstOrNull { it.isSelected }
+        if (selectedCodec == null) {
+            return PlaybackSpeed.values().asList()
+        }
+
+        val (is1_75xPlaybackSpeedSupported, is2xPlaybackSpeedSupported) = when (videoHeight) {
+            DeviceUtil.RESOLUTION_1080P.height -> selectedCodec.is1080pAt1_75xSupported to selectedCodec.is1080pAt2xSupported
+            DeviceUtil.RESOLUTION_4K.height -> selectedCodec.is4KAtAt1_75xSupported to selectedCodec.is4KAt2xSupported
+            else -> true to true
+        }
+
+        return PlaybackSpeed.values().filter { speed ->
+            when (speed) {
+                PlaybackSpeed.PLAYBACK_SPEED_2_0 -> is2xPlaybackSpeedSupported
+                PlaybackSpeed.PLAYBACK_SPEED_1_75 -> is1_75xPlaybackSpeedSupported
+                else -> true
+            }
+        }
     }
 
     private fun setPlayerPlaybackSpeed(speed: Float) {

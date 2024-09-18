@@ -56,7 +56,6 @@ internal class PlaybackSpeedPopupWindow(
         getSupportedPlaybackSpeeds()
     ) { playbackSpeed ->
         setPlayerPlaybackSpeed(playbackSpeed.value)
-        updatePlaybackSpeedText(playbackSpeed.value)
         dismiss()
     }
 
@@ -85,12 +84,6 @@ internal class PlaybackSpeedPopupWindow(
     private fun setPlayerPlaybackSpeed(speed: Float) {
         player.exoPlayer.playbackParameters =
             player.exoPlayer.playbackParameters.withSpeed(speed)
-    }
-
-    private fun updatePlaybackSpeedText(speed: Float) {
-        val playbackSpeedButton = tpStreamPlayerView.findViewById<Button>(R.id.playback_speed)
-        val playbackSpeedText = PlaybackSpeed.values().find { it.value == speed }
-        playbackSpeedButton.text = playbackSpeedText?.text
     }
 
     private fun adjustPopupWindowHeight() {

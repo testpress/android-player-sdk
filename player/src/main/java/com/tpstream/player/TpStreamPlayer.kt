@@ -13,6 +13,8 @@ import com.tpstream.player.offline.DownloadTask
 import com.tpstream.player.offline.VideoDownload
 import com.tpstream.player.offline.VideoDownloadManager
 import com.tpstream.player.util.CustomHttpDrmMediaCallback
+import com.tpstream.player.util.DeviceUtil
+import com.tpstream.player.util.PlayerAnalyticsListener
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -62,9 +64,11 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private var loadCompleteListener : LoadCompleteListener? = null
     private var markerListener: MarkerListener? = null
     var maximumResolution: Int? = null
+    var codecs = listOf<DeviceUtil.CodecDetails>()
 
     init {
         initializeExoplayer()
+        codecs = DeviceUtil.getAvailableAVCCodecs()
     }
 
     private fun initializeExoplayer() {
@@ -123,6 +127,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.setMediaSource(getMediaSourceFactory().createMediaSource(getMediaItem(url)))
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
+        exoPlayer.addAnalyticsListener(PlayerAnalyticsListener(this))
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
     }

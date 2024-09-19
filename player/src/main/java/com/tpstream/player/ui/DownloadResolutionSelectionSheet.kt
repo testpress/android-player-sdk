@@ -141,11 +141,8 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
             trackInfos.add(TrackInfo(trackGroup, trackIndex))
         }
 
-        val totalTrackInfo = trackInfos.filterSupportedTracks()
-
-
-
-        return totalTrackInfo
+        val supportedTrackInfos = trackInfos.filterSupportedTracks()
+        return supportedTrackInfos
     }
 
     private fun ArrayList<DownloadResolutionSelectionSheet.TrackInfo>.filterSupportedTracks(): ArrayList<DownloadResolutionSelectionSheet.TrackInfo> {
@@ -157,10 +154,23 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
     }
 
     private fun isCodecSupported(resolutionHeight: Int): Boolean {
-        val selectedCodecDetails = if (asset.video.isDrmProtected == true) {
+        val selectedCodecDetails = getRelevantCodecDetails()
+        // Check if the track resolution is supported by the selected codec capabilities
+        return selectedCodecDetails?.let { codecCapabilities ->
+            when (resolutionHeight) {
+                in 0..1079 -> true // Assuming anything below 1080p is supported
+                1080 -> codecCapabilities.is1080pSupported
+                2160 -> codecCapabilities.is4KSupported
+                else -> false // Anything above 4K is not supported
+            }
+        } ?: true
+    }
+
+    private fun getRelevantCodecDetails(): DeviceUtil.CodecDetails? {
+        return if (asset.video.isDrmProtected == true) {
             codec.firstOrNull { it.isSecure }
         } else {
-            // For non-DRM videos, find the codec with the maximum resolution.
+            // For non-DRM videos, return the codec with the maximum resolution support.
             codec
                 .filter { !it.isSecure }
                 .maxByOrNull {
@@ -171,16 +181,6 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
                     }
                 }
         }
-
-        // Check if the track resolution is supported by the codec capabilities
-        return selectedCodecDetails?.let { codecCapabilities ->
-            when (resolutionHeight) {
-                in 0..1079 -> true // Assuming anything below 1080p is supported
-                1080 -> codecCapabilities.is1080pSupported
-                2160 -> codecCapabilities.is4KSupported
-                else -> false // Anything above 4K is not supported
-            }
-        } ?: true
     }
 
     private fun configureBottomSheetBehaviour() {

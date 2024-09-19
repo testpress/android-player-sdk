@@ -146,29 +146,37 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
 
 
 
-        return trackInfos
+        return totalTrackInfo
     }
 
     private fun ArrayList<DownloadResolutionSelectionSheet.TrackInfo>.filterSupportedTracks(): ArrayList<DownloadResolutionSelectionSheet.TrackInfo> {
         return filterTo(ArrayList()) { trackInfo ->
             val resolutionHeight = trackInfo.format.height
-            // Keep the track if it meets both resolution and codec support criteria
+            // Keep the track if codec support
             isCodecSupported(resolutionHeight)
         }
     }
 
     private fun isCodecSupported(resolutionHeight: Int): Boolean {
-        var selectedCodecDetails: DeviceUtil.CodecDetails? = null
-        if (asset.video.isDrmProtected == true){
-            selectedCodecDetails = codec.firstOrNull { it.isSecure }
+        val selectedCodecDetails = if (asset.video.isDrmProtected == true) {
+            codec.firstOrNull { it.isSecure }
         } else {
-            selectedCodecDetails = codec.firstOrNull { !it.isSecure }
+            // For non-DRM videos, find the codec with the maximum resolution.
+            codec
+                .filter { !it.isSecure }
+                .maxByOrNull {
+                    when {
+                        it.is4KSupported -> 2
+                        it.is1080pSupported -> 1
+                        else -> 0
+                    }
+                }
         }
 
         // Check if the track resolution is supported by the codec capabilities
         return selectedCodecDetails?.let { codecCapabilities ->
             when (resolutionHeight) {
-                in 0 .. 1079 -> true // Assuming anything below 1080p is supported
+                in 0..1079 -> true // Assuming anything below 1080p is supported
                 1080 -> codecCapabilities.is1080pSupported
                 2160 -> codecCapabilities.is4KSupported
                 else -> false // Anything above 4K is not supported

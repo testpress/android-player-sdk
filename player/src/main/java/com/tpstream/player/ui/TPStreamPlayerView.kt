@@ -7,7 +7,6 @@ import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
@@ -69,7 +68,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
         initializeViewModel()
         initializeNoticeScreen()
         setupPlayerControlsVisibilityListener()
-        Log.d("TAG", "TPStreamPlayerView: init")
     }
 
     private fun registerDownloadListener() {
@@ -84,12 +82,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
         resolutionButton?.setOnClickListener {
             onResolutionButtonClick()
         }
-    }
-
-    override fun onAttachedToWindow() {
-        //(playerView.videoSurfaceView as SurfaceView).setSecure(true)
-        Log.d("TAG", "onAttachedToWindow: ")
-        super.onAttachedToWindow()
     }
 
     private fun initializeViewModel() {

@@ -41,6 +41,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private var assetApiCallCount = 0
     private var drmLicenseApiCallCount = 0
     private var offlineLicenseApiCallCount = 0
+    private var enableSecureView = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +59,9 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tpStreamPlayerView = viewBinding.tpStreamPlayerView
+        if (enableSecureView) {
+            tpStreamPlayerView.setSecureSurfaceView()
+        }
         tpStreamPlayerView.setTPStreamPlayerViewCallBack(tPStreamPlayerViewCallBack)
         registerFullScreenListener()
         DownloadCallback.invoke().callback = this
@@ -177,6 +181,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             throw Exception("Player is not initialized yet. `load` method should be called onInitializationSuccess")
         }
         player?.load(parameters, metadata)
+    }
+
+    fun enableSecureView() {
+        enableSecureView = true
     }
 
     override fun onDownloadsSuccess(videoId: String?) {

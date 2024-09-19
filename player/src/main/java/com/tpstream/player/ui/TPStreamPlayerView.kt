@@ -213,7 +213,6 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 }
                 initializeSubtitleView()
                 updateSelectedResolution()
-                secureScreenForDRMVideo()
             }
         }
     }
@@ -235,14 +234,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
-    private fun secureScreenForDRMVideo() {
-        if (player.asset == null) return
-        player.asset?.video?.isDrmProtected?.let {
-            Log.d("TAG", "secureScreenForDRMVideo: $it")
-            if (it) {
-                (playerView.videoSurfaceView as SurfaceView).setSecure(true)
-            }
-        }
+    internal fun setSecureSurfaceView() {
+        (playerView.videoSurfaceView as? SurfaceView)?.setSecure(true)
     }
 
     internal fun showPlayButton() {

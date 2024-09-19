@@ -18,7 +18,8 @@ internal class DeviceUtil {
         val is4KAtAt1_75xSupported: Boolean = false,
         val is1080pAt2xSupported: Boolean = false,
         val is4KAt2xSupported: Boolean = false,
-        var isSelected: Boolean = false
+        var isSelected: Boolean = false,
+        val isSecure: Boolean = false
     )
 
     companion object {
@@ -52,7 +53,8 @@ internal class DeviceUtil {
                     is1080pAt1_75xSupported = it.isSupported(RESOLUTION_1080P, FRAME_RATE_1_75X),
                     is4KAtAt1_75xSupported = it.isSupported(RESOLUTION_4K, FRAME_RATE_1_75X),
                     is1080pAt2xSupported = it.isSupported(RESOLUTION_1080P, FRAME_RATE_2X),
-                    is4KAt2xSupported = it.isSupported(RESOLUTION_4K, FRAME_RATE_2X)
+                    is4KAt2xSupported = it.isSupported(RESOLUTION_4K, FRAME_RATE_2X),
+                    isSecure = this.name.contains("secure")
                 )
             }
         }

@@ -18,7 +18,6 @@ import com.tpstream.player.R
 import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
 import com.tpstream.player.data.Asset
 import com.tpstream.player.offline.VideoDownloadRequestCreationHandler
-import com.tpstream.player.ui.AdvancedResolutionSelectionSheet.TrackInfo
 import com.tpstream.player.util.DeviceUtil
 import okio.IOException
 import kotlin.math.roundToInt

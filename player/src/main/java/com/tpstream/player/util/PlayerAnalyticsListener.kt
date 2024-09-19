@@ -1,6 +1,5 @@
 package com.tpstream.player.util
 
-import android.util.Log
 import com.tpstream.player.AnalyticsListener
 import com.tpstream.player.AnalyticsListenerEventTime
 import com.tpstream.player.TpStreamPlayer.PLAYBACK_STATE.STATE_READY
@@ -15,7 +14,6 @@ internal class PlayerAnalyticsListener(private val streamPlayer: TpStreamPlayerI
         initializedTimestampMs: Long,
         initializationDurationMs: Long
     ) {
-        Log.d("TAG", "onVideoDecoderInitialized: $decoderName")
         updateSelectedCodec(decoderName)
     }
 

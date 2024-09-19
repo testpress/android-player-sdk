@@ -102,15 +102,15 @@ class PlayerActivity : AppCompatActivity() {
                 provider = TPStreamsSDK.Provider.TestPress
             }
             "TPS_DRM" -> {
-                accessToken = "d4986429-20e2-4b21-93ae-c70630a37e06"
-                videoId = "7RKQZj4gB2T"
+                accessToken = "ab70caed-6168-497f-89c1-1e308da2c9aa"
+                videoId = "6suEBPy7EG4"
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             "TPS_NON_DRM" -> {
-                accessToken = "d52d1681-8a5f-4d00-a4b0-9e1849e5b73a"
-                videoId = "5hd8nA3eHSg"
-                orgCode = "6eafqn"
+                accessToken = "48a481d0-7a7f-465f-9d18-86f52129430b"
+                videoId = "C65BJzhj48k"
+                orgCode = "dcek2m"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             null ->{}

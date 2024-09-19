@@ -7,7 +7,9 @@ import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.SurfaceView
 import android.view.View
 import android.widget.*
 import androidx.annotation.ColorInt
@@ -67,6 +69,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         initializeViewModel()
         initializeNoticeScreen()
         setupPlayerControlsVisibilityListener()
+        Log.d("TAG", "TPStreamPlayerView: init")
     }
 
     private fun registerDownloadListener() {
@@ -81,6 +84,12 @@ class TPStreamPlayerView @JvmOverloads constructor(
         resolutionButton?.setOnClickListener {
             onResolutionButtonClick()
         }
+    }
+
+    override fun onAttachedToWindow() {
+        //(playerView.videoSurfaceView as SurfaceView).setSecure(true)
+        Log.d("TAG", "onAttachedToWindow: ")
+        super.onAttachedToWindow()
     }
 
     private fun initializeViewModel() {
@@ -204,6 +213,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 }
                 initializeSubtitleView()
                 updateSelectedResolution()
+                secureScreenForDRMVideo()
             }
         }
     }
@@ -222,6 +232,16 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun updateSelectedResolution() {
         player.params.initialResolutionHeight?.let {
             selectedResolution = ResolutionOptions.ADVANCED
+        }
+    }
+
+    private fun secureScreenForDRMVideo() {
+        if (player.asset == null) return
+        player.asset?.video?.isDrmProtected?.let {
+            Log.d("TAG", "secureScreenForDRMVideo: $it")
+            if (it) {
+                (playerView.videoSurfaceView as SurfaceView).setSecure(true)
+            }
         }
     }
 

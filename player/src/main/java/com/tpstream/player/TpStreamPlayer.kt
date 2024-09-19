@@ -5,6 +5,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
+import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
+import androidx.media3.exoplayer.util.EventLogger
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
@@ -72,9 +76,33 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun initializeExoplayer() {
+        val softwareOnlyCodecSelector = MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
+            // Select only software codecs by filtering out hardware-accelerated codecs
+
+            val mc = MediaCodecUtil.getDecoderInfos(
+                mimeType,
+                requiresSecureDecoder,
+                requiresTunnelingDecoder
+            )
+
+            if (mimeType.contains("avc")){
+                mc.filter { it.hardwareAccelerated && !it.name.contains("secure") }
+            } else {
+                mc
+            }
+
+        }
+
+
+        val renderersFactory = DefaultRenderersFactory(context)
+            //.setEnableDecoderFallback(true) // Allow fallback to software decoders.
+            //.setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF)
+            .setMediaCodecSelector(softwareOnlyCodecSelector)
+
         exoPlayer = ExoPlayerBuilder(context)
             .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
             .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
+            .setRenderersFactory(renderersFactory)
             .build()
             .also { exoPlayer ->
                 exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
@@ -91,6 +119,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         assetRepository.getAsset(parameters, object : NetworkClient.TPResponse<Asset> {
             override fun onSuccess(result: Asset) {
                 asset = result
+                Log.d("TAG", "onSuccess: asset")
                 asset?.metadata = metadata
                 asset!!.getPlaybackURL()?.let {
                     playVideoInUIThread(it, parameters.startPositionInMilliSecs)
@@ -128,6 +157,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
         exoPlayer.addAnalyticsListener(PlayerAnalyticsListener(this))
+        exoPlayer.addAnalyticsListener(EventLogger("TAG"))
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
     }

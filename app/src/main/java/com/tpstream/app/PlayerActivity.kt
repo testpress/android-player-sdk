@@ -101,16 +101,18 @@ class PlayerActivity : AppCompatActivity() {
                 orgCode = "lmsdemo"
                 provider = TPStreamsSDK.Provider.TestPress
             }
+            // https://app.tpstreams.com/embed/6eafqn/7RKQZj4gB2T/?access_token=d4986429-20e2-4b21-93ae-c70630a37e06
             "TPS_DRM" -> {
-                accessToken = "ab70caed-6168-497f-89c1-1e308da2c9aa"
-                videoId = "6suEBPy7EG4"
+                accessToken = "d4986429-20e2-4b21-93ae-c70630a37e06"
+                videoId = "7RKQZj4gB2T"
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
+            // https://app.tpstreams.com/embed/6eafqn/98bPDTEfJeg/?access_token=80b313e3-0c1b-414d-9158-76af8f6fabb4
             "TPS_NON_DRM" -> {
-                accessToken = "48a481d0-7a7f-465f-9d18-86f52129430b"
-                videoId = "C65BJzhj48k"
-                orgCode = "dcek2m"
+                accessToken = "80b313e3-0c1b-414d-9158-76af8f6fabb4"
+                videoId = "98bPDTEfJeg"
+                orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             null ->{}

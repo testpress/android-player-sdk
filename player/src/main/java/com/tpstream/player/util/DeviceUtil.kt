@@ -3,6 +3,7 @@ package com.tpstream.player.util
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.media.MediaFormat
+import android.os.Build
 import android.util.Log
 
 internal class DeviceUtil {
@@ -27,6 +28,7 @@ internal class DeviceUtil {
                 codecList.codecInfos
                     .filterNot { codecInfo -> codecInfo.isEncoder }
                     .filter { codecInfo -> MediaFormat.MIMETYPE_VIDEO_AVC in codecInfo.supportedTypes }
+                    .filter { codecInfo -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !codecInfo.isAlias }
                     .mapNotNull { it.toCodecDetails() }
             } catch (e: Exception) {
                 Log.d("DeviceUtils", "Error fetching codec capabilities: ${e.message}")

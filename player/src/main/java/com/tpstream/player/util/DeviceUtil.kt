@@ -6,21 +6,26 @@ import android.media.MediaFormat
 import android.util.Log
 
 internal class DeviceUtil {
+
+    data class Resolution(val width: Int, val height: Int)
+
     data class CodecDetails(
         val codecName: String,
         val is1080pSupported: Boolean = false,
         val is4KSupported: Boolean = false,
+        val is1080pAt1_75xSupported: Boolean = false,
+        val is4KAtAt1_75xSupported: Boolean = false,
         val is1080pAt2xSupported: Boolean = false,
         val is4KAt2xSupported: Boolean = false,
         var isSelected: Boolean = false
     )
 
     companion object {
-        private const val WIDTH_1080P = 1920
-        private const val HEIGHT_1080P = 1080
-        private const val WIDTH_4K = 3840
-        private const val HEIGHT_4K = 2160
-        private const val FRAME_RATE_2X = 48.0
+        val RESOLUTION_1080P = Resolution(1920, 1080)
+        val RESOLUTION_4K = Resolution(3840, 2160)
+        const val BASE_FRAME_RATE = 24.0
+        const val FRAME_RATE_1_75X = BASE_FRAME_RATE * 1.75
+        const val FRAME_RATE_2X = BASE_FRAME_RATE * 2
 
         fun getAvailableAVCCodecs(codecList: MediaCodecList = MediaCodecList(MediaCodecList.ALL_CODECS)): List<CodecDetails> {
             return try {
@@ -40,24 +45,27 @@ internal class DeviceUtil {
             return videoCapabilities?.let {
                 CodecDetails(
                     codecName = this.name,
-                    is1080pSupported = it.isSizeSupported(WIDTH_1080P, HEIGHT_1080P),
-                    is4KSupported = it.isSizeSupported(WIDTH_4K, HEIGHT_4K),
-                    is1080pAt2xSupported = it.isSizeSupported(
-                        WIDTH_1080P,
-                        HEIGHT_1080P
-                    ) && it.areSizeAndRateSupported(
-                        WIDTH_1080P,
-                        HEIGHT_1080P,
-                        FRAME_RATE_2X
-                    ),
-                    is4KAt2xSupported = it.isSizeSupported(
-                        WIDTH_4K,
-                        HEIGHT_4K
-                    ) && it.areSizeAndRateSupported(
-                        WIDTH_4K,
-                        HEIGHT_4K,
-                        FRAME_RATE_2X
-                    )
+                    is1080pSupported = it.isSupported(RESOLUTION_1080P),
+                    is4KSupported = it.isSupported(RESOLUTION_4K),
+                    is1080pAt1_75xSupported = it.isSupported(RESOLUTION_1080P, FRAME_RATE_1_75X),
+                    is4KAtAt1_75xSupported = it.isSupported(RESOLUTION_4K, FRAME_RATE_1_75X),
+                    is1080pAt2xSupported = it.isSupported(RESOLUTION_1080P, FRAME_RATE_2X),
+                    is4KAt2xSupported = it.isSupported(RESOLUTION_4K, FRAME_RATE_2X)
+                )
+            }
+        }
+
+        private fun MediaCodecInfo.VideoCapabilities.isSupported(
+            resolution: Resolution,
+            frameRate: Double? = null
+        ): Boolean {
+            return if (frameRate == null) {
+                isSizeSupported(resolution.width, resolution.height)
+            } else {
+                isSizeSupported(resolution.width, resolution.height) && areSizeAndRateSupported(
+                    resolution.width,
+                    resolution.height,
+                    frameRate
                 )
             }
         }

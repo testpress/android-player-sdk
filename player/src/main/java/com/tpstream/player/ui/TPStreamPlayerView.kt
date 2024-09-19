@@ -27,6 +27,7 @@ import com.tpstream.player.ui.AdvancedResolutionSelectionSheet.OnAdvanceResoluti
 import com.tpstream.player.ui.viewmodel.VideoViewModel
 import com.tpstream.player.util.MarkerState
 import com.tpstream.player.util.NetworkClient.Companion.makeHeadRequest
+import com.tpstream.player.util.PlayerViewAnalyticsListener
 import com.tpstream.player.util.getPlayedStatusArray
 import kotlinx.coroutines.*
 import java.util.*
@@ -179,6 +180,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     fun setPlayer(player: TpStreamPlayer) {
         this.player = player as TpStreamPlayerImpl
         playerView.player = this.player.exoPlayer
+        player.exoPlayer.addAnalyticsListener(PlayerViewAnalyticsListener(this))
         initializeLoadCompleteListener()
         initializeMarkerListener()
         initializePlaybackSpeedButton()

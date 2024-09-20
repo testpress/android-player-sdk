@@ -18,6 +18,7 @@ import com.tpstream.player.R
 import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
 import com.tpstream.player.data.Asset
 import com.tpstream.player.offline.VideoDownloadRequestCreationHandler
+import com.tpstream.player.util.DeviceUtil
 import okio.IOException
 import kotlin.math.roundToInt
 
@@ -34,6 +35,7 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
     var isResolutionSelected = false
     private var trackGroups: MutableList<TracksGroup> = mutableListOf()
     private var onSubmitListener: OnSubmitListener? = null
+    private var codec: List<DeviceUtil.CodecDetails> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,6 +52,7 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
     }
 
     fun initializeVideoDownloadRequestCreateHandler(context: Context, asset: Asset, params: TpInitParams) {
+        codec = DeviceUtil.getAvailableAVCCodecs()
         this.asset = asset
         this.params = params
         videoDownloadRequestCreateHandler =
@@ -137,7 +140,47 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
         for (trackIndex in 0 until trackGroup.length) {
             trackInfos.add(TrackInfo(trackGroup, trackIndex))
         }
-        return trackInfos
+
+        val supportedTrackInfos = trackInfos.filterSupportedTracks()
+        return supportedTrackInfos
+    }
+
+    private fun ArrayList<DownloadResolutionSelectionSheet.TrackInfo>.filterSupportedTracks(): ArrayList<DownloadResolutionSelectionSheet.TrackInfo> {
+        return filterTo(ArrayList()) { trackInfo ->
+            val resolutionHeight = trackInfo.format.height
+            // Keep the track if codec support
+            isCodecSupported(resolutionHeight)
+        }
+    }
+
+    private fun isCodecSupported(resolutionHeight: Int): Boolean {
+        val selectedCodecDetails = getRelevantCodecDetails()
+        // Check if the track resolution is supported by the selected codec capabilities
+        return selectedCodecDetails?.let { codecCapabilities ->
+            when (resolutionHeight) {
+                in 0..1079 -> true // Assuming anything below 1080p is supported
+                1080 -> codecCapabilities.is1080pSupported
+                2160 -> codecCapabilities.is4KSupported
+                else -> false // Anything above 4K is not supported
+            }
+        } ?: true
+    }
+
+    private fun getRelevantCodecDetails(): DeviceUtil.CodecDetails? {
+        return if (asset.video.isDrmProtected == true) {
+            codec.firstOrNull { it.isSecure }
+        } else {
+            // For non-DRM videos, return the codec with the maximum resolution support.
+            codec
+                .filter { !it.isSecure }
+                .maxByOrNull {
+                    when {
+                        it.is4KSupported -> 2
+                        it.is1080pSupported -> 1
+                        else -> 0
+                    }
+                }
+        }
     }
 
     private fun configureBottomSheetBehaviour() {

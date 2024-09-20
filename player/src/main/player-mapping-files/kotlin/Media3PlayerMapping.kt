@@ -117,3 +117,7 @@ internal typealias Scheduler = androidx.media3.exoplayer.scheduler.Scheduler
 internal typealias DefaultMediaSourceFactory = androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 internal typealias MediaSource = androidx.media3.exoplayer.source.MediaSource
 internal typealias MediaSourceFactory = androidx.media3.exoplayer.source.MediaSource.Factory
+
+// androidx.media3.exoplayer.upstream
+internal typealias DefaultBandwidthMeter = androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
+internal typealias DefaultBandwidthMeterBuilder = androidx.media3.exoplayer.upstream.DefaultBandwidthMeter.Builder

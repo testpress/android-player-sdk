@@ -8,6 +8,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.SurfaceView
 import android.view.View
 import android.widget.*
 import androidx.annotation.ColorInt
@@ -223,6 +224,10 @@ class TPStreamPlayerView @JvmOverloads constructor(
         player.params.initialResolutionHeight?.let {
             selectedResolution = ResolutionOptions.ADVANCED
         }
+    }
+
+    internal fun setSecureSurfaceView() {
+        (playerView.videoSurfaceView as? SurfaceView)?.setSecure(true)
     }
 
     internal fun showPlayButton() {

@@ -75,7 +75,6 @@ class PlayerActivity : AppCompatActivity() {
                 .setAutoPlay(true)
                 .setUserId("testUser")
                 .setOfflineLicenseExpireTime(FIFTEEN_DAYS)
-                .setInitialResolution(1080)
                 .enableDownloadSupport(true)
                 .build()
         }
@@ -103,15 +102,15 @@ class PlayerActivity : AppCompatActivity() {
                 provider = TPStreamsSDK.Provider.TestPress
             }
             "TPS_DRM" -> {
-                accessToken = "ab70caed-6168-497f-89c1-1e308da2c9aa"
-                videoId = "6suEBPy7EG4"
+                accessToken = "d4986429-20e2-4b21-93ae-c70630a37e06"
+                videoId = "7RKQZj4gB2T"
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             "TPS_NON_DRM" -> {
-                accessToken = "48a481d0-7a7f-465f-9d18-86f52129430b"
-                videoId = "C65BJzhj48k"
-                orgCode = "dcek2m"
+                accessToken = "47c686d7-a50b-41f9-b2cd-0660960c357f"
+                videoId = "72c9RRHj3M8"
+                orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             null ->{}

@@ -121,3 +121,7 @@ internal typealias MediaSourceFactory = androidx.media3.exoplayer.source.MediaSo
 // androidx.media3.exoplayer.upstream
 internal typealias DefaultBandwidthMeter = androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
 internal typealias DefaultBandwidthMeterBuilder = androidx.media3.exoplayer.upstream.DefaultBandwidthMeter.Builder
+
+// androidx.media3.exoplayer.mediacodec
+internal typealias MediaCodecSelector = androidx.media3.exoplayer.mediacodec.MediaCodecSelector
+internal typealias MediaCodecUtil = androidx.media3.exoplayer.mediacodec.MediaCodecUtil

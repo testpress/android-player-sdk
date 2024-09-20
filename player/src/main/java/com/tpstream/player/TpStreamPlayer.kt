@@ -75,11 +75,17 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer = ExoPlayerBuilder(context)
             .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
             .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
+            .setRenderersFactory(getRenderersFactory())
             .setBandwidthMeter(getBandwidthMeter())
             .build()
             .also { exoPlayer ->
                 exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
             }
+    }
+
+    private fun getRenderersFactory(): DefaultRenderersFactory {
+        return DefaultRenderersFactory(context)
+            .setEnableDecoderFallback(true)
     }
 
     private fun getBandwidthMeter(): DefaultBandwidthMeter {

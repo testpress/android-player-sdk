@@ -194,6 +194,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     private fun initializeLoadCompleteListener() {
         player.setLoadCompleteListener {
             (context as FragmentActivity).runOnUiThread {
+                playerView.player = this.player.exoPlayer
                 if (player.isParamsInitialized() && player.params.isDownloadEnabled && it.isDownloadable) {
                     downloadButton?.isVisible = true
                     updateDownloadButtonImage()

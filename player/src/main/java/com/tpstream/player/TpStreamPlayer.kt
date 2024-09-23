@@ -1,6 +1,7 @@
 package com.tpstream.player
 
 import android.content.Context
+import android.media.MediaFormat
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
@@ -90,21 +91,24 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
 
     private fun getRenderersFactory(): DefaultRenderersFactory {
         val renderersFactory = DefaultRenderersFactory(context).setEnableDecoderFallback(true)
-        return when (useSoftwareDecoder) {
-            true -> {
-                val softwareOnlyCodecSelector =
-                    MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
-                        val decoderInfos = MediaCodecUtil.getDecoderInfos(
-                            mimeType,
-                            requiresSecureDecoder,
-                            requiresTunnelingDecoder
-                        )
-                        decoderInfos.filter { it.softwareOnly }
+        if (useSoftwareDecoder) {
+            val softwareOnlyCodecSelector =
+                MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
+                    val availableDecoders = MediaCodecUtil.getDecoderInfos(
+                        mimeType,
+                        requiresSecureDecoder,
+                        requiresTunnelingDecoder
+                    )
+                    if (mimeType.contains(MediaFormat.MIMETYPE_VIDEO_AVC, ignoreCase = true)) {
+                        // Filtering is applied only for video codecs
+                        availableDecoders.filter { it.softwareOnly }
+                    } else {
+                        availableDecoders
                     }
-                renderersFactory.setMediaCodecSelector(softwareOnlyCodecSelector)
-            }
-            false -> renderersFactory
+                }
+            return renderersFactory.setMediaCodecSelector(softwareOnlyCodecSelector)
         }
+        return renderersFactory
     }
 
     private fun getBandwidthMeter(): DefaultBandwidthMeter {

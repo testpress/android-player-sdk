@@ -5,6 +5,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import androidx.lifecycle.liveData
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
+import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
+import androidx.media3.exoplayer.util.EventLogger
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
@@ -71,6 +75,22 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         codecs = DeviceUtil.getAvailableAVCCodecs()
     }
 
+    fun initializeExoplayer(forceSoftwareCodec: Boolean = false) {
+        exoPlayer = ExoPlayerBuilder(context)
+            .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
+            .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
+            .setRenderersFactory(getRenderersFactory(forceSoftwareCodec))
+            .setBandwidthMeter(getBandwidthMeter())
+            .build()
+            .also { exoPlayer ->
+                exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
+            }
+        asset!!.getPlaybackURL()?.let {
+            playVideoInUIThread(it, params.startPositionInMilliSecs)
+        }
+        loadCompleteListener?.onComplete(asset!!)
+    }
+
     private fun initializeExoplayer() {
         exoPlayer = ExoPlayerBuilder(context)
             .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
@@ -84,8 +104,50 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun getRenderersFactory(): DefaultRenderersFactory {
-        return DefaultRenderersFactory(context)
-            .setEnableDecoderFallback(true)
+        val renderersFactory = DefaultRenderersFactory(context).setEnableDecoderFallback(true)
+        return when (true) {
+            true -> {
+                val softwareOnlyCodecSelector =
+                    MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
+                        val decoderInfos = MediaCodecUtil.getDecoderInfos(
+                            mimeType,
+                            requiresSecureDecoder,
+                            requiresTunnelingDecoder
+                        )
+                        if (mimeType.contains("avc", ignoreCase = true)){
+                            decoderInfos.filter { it.softwareOnly }
+                            listOf()
+                        } else {
+                            decoderInfos
+                        }
+                    }
+                renderersFactory.setMediaCodecSelector(softwareOnlyCodecSelector)
+            }
+            false -> renderersFactory
+        }
+    }
+
+    private fun getRenderersFactory(forceSoftwareCodec: Boolean): DefaultRenderersFactory {
+        val renderersFactory = DefaultRenderersFactory(context).setEnableDecoderFallback(true)
+        return when (forceSoftwareCodec) {
+            true -> {
+                val softwareOnlyCodecSelector =
+                    MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
+                        val decoderInfos = MediaCodecUtil.getDecoderInfos(
+                            mimeType,
+                            requiresSecureDecoder,
+                            requiresTunnelingDecoder
+                        )
+                        if (mimeType.contains("avc", ignoreCase = true)){
+                            decoderInfos.filter { it.softwareOnly }
+                        } else {
+                            decoderInfos
+                        }
+                    }
+                renderersFactory.setMediaCodecSelector(softwareOnlyCodecSelector)
+            }
+            false -> renderersFactory
+        }
     }
 
     private fun getBandwidthMeter(): DefaultBandwidthMeter {
@@ -142,6 +204,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
         exoPlayer.addAnalyticsListener(PlayerAnalyticsListener(this))
+        exoPlayer.addAnalyticsListener(EventLogger("TAG"))
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
     }

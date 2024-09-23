@@ -1,7 +1,10 @@
 package com.tpstream.player.util
 
+import android.util.Log
+import androidx.media3.common.Tracks
 import com.tpstream.player.AnalyticsListener
 import com.tpstream.player.AnalyticsListenerEventTime
+import com.tpstream.player.C
 import com.tpstream.player.TpStreamPlayer.PLAYBACK_STATE.STATE_READY
 import com.tpstream.player.TpStreamPlayerImpl
 import com.tpstream.player.constants.PlaybackSpeed
@@ -30,6 +33,7 @@ internal class PlayerAnalyticsListener(private val streamPlayer: TpStreamPlayerI
     ) {
         if (state == STATE_READY) {
             updatePlaybackSpeedIfNecessary()
+            isVideoPlaying()
         }
     }
 
@@ -116,5 +120,40 @@ internal class PlayerAnalyticsListener(private val streamPlayer: TpStreamPlayerI
     private fun setPlayerPlaybackSpeed(playbackSpeed: Float) {
         val playbackParameters = streamPlayer.exoPlayer.playbackParameters.withSpeed(playbackSpeed)
         streamPlayer.exoPlayer.playbackParameters = playbackParameters
+    }
+
+    fun isVideoPlaying() {
+        if (streamPlayer.exoPlayer.videoFormat==null){
+            Log.d("TAG", "isVideoPlaying: false")
+            streamPlayer.exoPlayer.pause()
+            streamPlayer.exoPlayer.stop()
+            streamPlayer.exoPlayer.release()
+            streamPlayer.initializeExoplayer(true)
+        } else {
+            Log.d("TAG", "isVideoPlaying: true")
+        }
+    }
+
+    override fun onTracksChanged(
+        eventTime: AnalyticsListenerEventTime,
+        tracks: Tracks
+    ) {
+        var isTrackSelected = false
+        tracks.groups.firstOrNull { it.type == C.TRACK_TYPE_VIDEO }?.let { group ->
+            (0 until group.length).map { trackIndex ->
+                if (group.isTrackSelected(trackIndex)){
+                    isTrackSelected = true
+                }
+            }
+        }
+
+//        if (!isTrackSelected) {
+//            streamPlayer.exoPlayer.pause()
+//            streamPlayer.exoPlayer.stop()
+//            streamPlayer.exoPlayer.release()
+//            streamPlayer.initializeExoplayer(true)
+//        }
+
+        Log.d("TAG", "onTracksChanged: $isTrackSelected")
     }
 }

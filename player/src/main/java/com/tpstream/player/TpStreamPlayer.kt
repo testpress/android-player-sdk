@@ -1,6 +1,7 @@
 package com.tpstream.player
 
 import android.content.Context
+import android.media.MediaFormat
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
@@ -65,10 +66,15 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private var markerListener: MarkerListener? = null
     var maximumResolution: Int? = null
     var codecs = listOf<DeviceUtil.CodecDetails>()
+    private var useSoftwareDecoder: Boolean = false
 
     init {
-        initializeExoplayer()
         codecs = DeviceUtil.getAvailableAVCCodecs()
+    }
+
+    fun init(useSoftwareDecoder: Boolean) {
+        this.useSoftwareDecoder = useSoftwareDecoder
+        initializeExoplayer()
     }
 
     private fun initializeExoplayer() {
@@ -84,8 +90,25 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun getRenderersFactory(): DefaultRenderersFactory {
-        return DefaultRenderersFactory(context)
-            .setEnableDecoderFallback(true)
+        val renderersFactory = DefaultRenderersFactory(context).setEnableDecoderFallback(true)
+        if (useSoftwareDecoder) {
+            val softwareOnlyCodecSelector =
+                MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
+                    val availableDecoders = MediaCodecUtil.getDecoderInfos(
+                        mimeType,
+                        requiresSecureDecoder,
+                        requiresTunnelingDecoder
+                    )
+                    if (mimeType.contains(MediaFormat.MIMETYPE_VIDEO_AVC, ignoreCase = true)) {
+                        // Filtering is applied only for video codecs
+                        availableDecoders.filter { it.softwareOnly }
+                    } else {
+                        availableDecoders
+                    }
+                }
+            return renderersFactory.setMediaCodecSelector(softwareOnlyCodecSelector)
+        }
+        return renderersFactory
     }
 
     private fun getBandwidthMeter(): DefaultBandwidthMeter {

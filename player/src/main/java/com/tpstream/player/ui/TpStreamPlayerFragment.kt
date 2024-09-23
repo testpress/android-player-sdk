@@ -42,6 +42,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private var drmLicenseApiCallCount = 0
     private var offlineLicenseApiCallCount = 0
     private var enableSecureView = false
+    private var useSoftwareDecoder = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -165,6 +166,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     private fun initializePlayer() {
         player = TpStreamPlayerImpl(requireContext())
+        player.init(useSoftwareDecoder)
         player.setTpStreamPlayerImplCallBack(tpStreamPlayerImplCallBack)
         tpStreamPlayerView.setPlayer(player)
         player.exoPlayer.addListener(_playbackStateListener)
@@ -185,6 +187,10 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     fun enableSecureView() {
         enableSecureView = true
+    }
+
+    fun useSoftwareDecoder() {
+        useSoftwareDecoder = true
     }
 
     override fun onDownloadsSuccess(videoId: String?) {

@@ -92,3 +92,5 @@ internal typealias DefaultDrmSessionManagerBuilder = com.google.android.exoplaye
 internal typealias FrameworkMediaDrm = com.google.android.exoplayer2.drm.FrameworkMediaDrm
 internal typealias DefaultBandwidthMeter = com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 internal typealias DefaultBandwidthMeterBuilder = com.google.android.exoplayer2.upstream.DefaultBandwidthMeter.Builder
+internal typealias MediaCodecSelector = com.google.android.exoplayer2.mediacodec.MediaCodecSelector
+internal typealias MediaCodecUtil = com.google.android.exoplayer2.mediacodec.MediaCodecUtil

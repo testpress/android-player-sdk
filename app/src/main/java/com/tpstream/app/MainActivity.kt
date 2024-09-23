@@ -1,17 +1,23 @@
 package com.tpstream.app
 
 import android.content.Intent
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
+import android.Manifest.permission.POST_NOTIFICATIONS
 import com.tpstream.player.offline.TpStreamDownloadManager
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        askPushNotificationPermission()
     }
 
     fun buttonClick(view: View) {
@@ -58,4 +64,19 @@ class MainActivity : AppCompatActivity() {
         TpStreamDownloadManager(applicationContext).startDownload(this,parameters)
     }
 
+    private fun askPushNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    POST_NOTIFICATIONS
+                ) != PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(POST_NOTIFICATIONS),
+                    1000
+                )
+            }
+        }
+    }
 }

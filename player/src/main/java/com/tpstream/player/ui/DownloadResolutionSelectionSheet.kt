@@ -106,14 +106,19 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
             it.setOnItemClickListener { _, _, index, _ ->
                 adapter.trackPosition = index
                 adapter.notifyDataSetChanged()
+                overrides.clear()
                 val resolution = trackInfos[index]
                 val videoTrackGroup: TrackGroup = resolution.videoTrackGroup.mediaTrackGroup
-                val audioTrackGroup: TrackGroup = resolution.audioTrackGroup.mediaTrackGroup
-                overrides.clear()
+                // Add selected Video track
                 overrides[videoTrackGroup] =
-                    TrackSelectionOverride(videoTrackGroup, ImmutableList.of(resolution.trackIndex))
-                overrides[audioTrackGroup] =
-                    TrackSelectionOverride(audioTrackGroup, ImmutableList.of(resolution.trackIndex))
+                    TrackSelectionOverride(videoTrackGroup, resolution.trackIndex)
+                // Add selected Audio track only if multiple track available
+                // for non- drm video multiple track are not available
+                val audioTrackGroup: TrackGroup = resolution.audioTrackGroup.mediaTrackGroup
+                if (audioTrackGroup.length > 1){
+                    overrides[audioTrackGroup] =
+                        TrackSelectionOverride(audioTrackGroup, resolution.trackIndex)
+                }
             }
         }
     }

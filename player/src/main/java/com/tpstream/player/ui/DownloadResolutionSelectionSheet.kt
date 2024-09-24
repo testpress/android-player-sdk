@@ -107,10 +107,13 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
                 adapter.trackPosition = index
                 adapter.notifyDataSetChanged()
                 val resolution = trackInfos[index]
-                val mediaTrackGroup: TrackGroup = resolution.trackGroup.mediaTrackGroup
+                val videoTrackGroup: TrackGroup = resolution.videoTrackGroup.mediaTrackGroup
+                val audioTrackGroup: TrackGroup = resolution.audioTrackGroup.mediaTrackGroup
                 overrides.clear()
-                overrides[mediaTrackGroup] =
-                    TrackSelectionOverride(mediaTrackGroup, ImmutableList.of(resolution.trackIndex))
+                overrides[videoTrackGroup] =
+                    TrackSelectionOverride(videoTrackGroup, ImmutableList.of(resolution.trackIndex))
+                overrides[audioTrackGroup] =
+                    TrackSelectionOverride(audioTrackGroup, ImmutableList.of(resolution.trackIndex))
             }
         }
     }
@@ -136,9 +139,10 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
             return trackInfos
         }
 
-        val trackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
-        for (trackIndex in 0 until trackGroup.length) {
-            trackInfos.add(TrackInfo(trackGroup, trackIndex))
+        val videoTracksGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_VIDEO }
+        val audioTrackGroup = trackGroups.first { it.mediaTrackGroup.type == C.TRACK_TYPE_AUDIO }
+        for (trackIndex in 0 until videoTracksGroup.length) {
+            trackInfos.add(TrackInfo(videoTracksGroup, audioTrackGroup, trackIndex))
         }
 
         val supportedTrackInfos = trackInfos.filterSupportedTracks()
@@ -147,7 +151,7 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
 
     private fun ArrayList<DownloadResolutionSelectionSheet.TrackInfo>.filterSupportedTracks(): ArrayList<DownloadResolutionSelectionSheet.TrackInfo> {
         return filterTo(ArrayList()) { trackInfo ->
-            val resolutionHeight = trackInfo.format.height
+            val resolutionHeight = trackInfo.videoFormat.height
             // Keep the track if codec support
             isCodecSupported(resolutionHeight)
         }
@@ -205,7 +209,7 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
                 view = inflater.inflate(R.layout.tp_download_resulotion_data, parent, false)
             }
             val track = view!!.findViewById<CheckedTextView>(R.id.track_selecting)
-            track.text = getResolution(resolution.format.height)
+            track.text = getResolution(resolution.videoFormat.height)
 
             track.isChecked = trackPosition == position
 
@@ -213,15 +217,26 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
                 isResolutionSelected = true
             }
 
-            view.findViewById<TextView>(R.id.track_size).text = getVideoSize(resolution)
+            view.findViewById<TextView>(R.id.track_size).text = getTotalMediaSize(resolution)
 
             return view
         }
 
-        private fun getVideoSize(trackInfo: TrackInfo): String {
-            val mbps = (((trackInfo.format.bitrate).toFloat() / 8f / 1024f) / 1024f)
+        private fun getTotalMediaSize(trackInfo: TrackInfo): String {
+            return "${(getVideoSizeInMB(trackInfo) + getAudioSizeInMB(trackInfo))} MB"
+        }
+
+        private fun getVideoSizeInMB(trackInfo: TrackInfo): Int {
+            val mbps = (((trackInfo.videoFormat.bitrate).toFloat() / 8f / 1024f) / 1024f)
             val videoLengthInSecond = asset.video.duration
-            return "${((mbps * videoLengthInSecond)).roundToInt()} MB"            //Mbps
+            return (mbps * videoLengthInSecond).roundToInt()            //Mbps
+        }
+
+        private fun getAudioSizeInMB(trackInfo: TrackInfo): Int {
+            if (trackInfo.audioFormat == null) return 0
+            val mbps = (((trackInfo.audioFormat!!.bitrate).toFloat() / 8f / 1024f) / 1024f)
+            val videoLengthInSecond = asset.video.duration
+            return (mbps * videoLengthInSecond).roundToInt()           //Mbps
         }
 
         private fun getResolution(height: Int): String {
@@ -236,9 +251,24 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
         }
     }
 
-    inner class TrackInfo(val trackGroup: TracksGroup, val trackIndex: Int) {
-        val format: Format
-            get() = trackGroup.getTrackFormat(trackIndex)
+    inner class TrackInfo(
+        val videoTrackGroup: TracksGroup,
+        val audioTrackGroup: TracksGroup,
+        val trackIndex: Int
+    ) {
+        val videoFormat: Format
+            get() = videoTrackGroup.getTrackFormat(trackIndex)
+        val audioFormat: Format?
+            get() {
+                return try {
+                    audioTrackGroup.getTrackFormat(trackIndex)
+                } catch (e: ArrayIndexOutOfBoundsException) {
+                    // If an invalid track index is encountered (e.g.,
+                    // for non-DRM videos where only one audio track is available),
+                    // return the first audio track format as a fallback.
+                    audioTrackGroup.getTrackFormat(0)
+                }
+            }
     }
 
     fun setOnSubmitListener(listener: OnSubmitListener) {

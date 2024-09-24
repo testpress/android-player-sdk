@@ -93,8 +93,9 @@ internal class VideoDownloadRequestCreationHandler(
     private fun setSelectedTracks(overrides: MutableMap<TrackGroup, TrackSelectionOverride>) {
         val builder = trackSelectionParameters.buildUpon()
         builder.clearOverrides()
-        builder.addOverride(overrides.values.first())
-
+        overrides.values.forEach {
+            builder.addOverride(it)
+        }
         for (index in 0 until downloadHelper.periodCount) {
             downloadHelper.clearTrackSelections(index)
             downloadHelper.addTrackSelection(index, builder.build())

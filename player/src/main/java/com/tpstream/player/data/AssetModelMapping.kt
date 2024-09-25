@@ -2,6 +2,7 @@ package com.tpstream.player.data
 
 import com.tpstream.player.data.source.local.LocalAsset
 import com.tpstream.player.data.source.network.NetworkAsset
+import com.tpstream.player.data.source.network.TestpressNetworkAsset
 import com.tpstream.player.util.parseDateTime
 
 // LocalVideo to Video
@@ -86,6 +87,45 @@ internal fun NetworkAsset.NetworkVideo.Track.asDomainTracks(): Track {
         url = this.url ?: "",
         language = this.language ?: "",
         duration = this.duration ?: 0
+    )
+}
+
+
+// TestpressNetworkAsset to Asset
+internal fun TestpressNetworkAsset.asDomainAsset(): Asset {
+
+    fun getLivestream(): LiveStream? {
+        return if (this.networkLiveStream == null) {
+            null
+        } else {
+            LiveStream(
+                url = this.networkLiveStream.url,
+                status = this.networkLiveStream.status ?: "",
+                startTime = null,
+                recordingEnabled = this.networkLiveStream.recordingEnabled ?: false,
+                enabledDRMForRecording = false, // this field is not need will remove in future until default value is false
+                enabledDRMForLive = this.networkLiveStream.enabledDRMForLive ?: false,
+                noticeMessage = this.networkLiveStream.noticeMessage ?: ""
+            )
+        }
+    }
+
+    return Asset(
+        id = this.id ?: "",
+        type = this.type ?: "",
+        title = this.title ?: "",
+        thumbnail = this.networkVideo?.thumbnail ?: "",
+        video = Video(
+            url = (if (this.networkVideo?.isDrmProtected == true) this.networkVideo.dashUrl else this.networkVideo?.playbackUrl)
+                ?: "",
+            duration = networkVideo?.duration ?: 0,
+            transcodingStatus = this.networkVideo?.status ?: "",
+            tracks = null,
+            isDrmProtected = networkVideo?.isDrmProtected
+        ),
+        description = this.networkVideo?.description ?: "",
+        liveStream = getLivestream(),
+        folderTree = null
     )
 }
 

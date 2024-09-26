@@ -26,7 +26,15 @@ data class TPStreamsNetworkAsset(
             @SerializedName("url") val url: String?,
             @SerializedName("language") val language: String?,
             @SerializedName("duration") val duration: Long?,
-        )
+            @SerializedName("playlists") val playlists: List<Playlist>?
+        ) {
+            data class Playlist(
+                @SerializedName("name") val name: String?,
+                @SerializedName("bytes") val bytes: Long?,
+                @SerializedName("width") val width: Int?,
+                @SerializedName("height") val height: Int?
+            )
+        }
     }
 
     data class LiveStream(

@@ -137,5 +137,13 @@ data class Track(
     val name: String,
     val url: String,
     val language: String,
-    val duration: Long
+    val duration: Long,
+    val playlists: List<Playlist>
+)
+
+data class Playlist(
+    val name: String,
+    val bytes: Long,
+    val width: Int,
+    val height: Int
 )

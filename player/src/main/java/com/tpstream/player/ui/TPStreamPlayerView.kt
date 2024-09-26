@@ -221,6 +221,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun updateSelectedResolution() {
+        if (!player.isParamsInitialized()) return
         player.params.initialResolutionHeight?.let {
             selectedResolution = ResolutionOptions.ADVANCED
         }

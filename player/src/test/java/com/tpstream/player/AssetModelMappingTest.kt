@@ -29,7 +29,17 @@ class AssetModelMappingTest {
                         name = "English",
                         url = "http://example.com/track_en.vtt",
                         language = "en",
-                        duration = 300L
+                        duration = 300L,
+                        playlists = listOf()
+                    ),
+                    TPStreamsNetworkAsset.Video.Track(
+                        id = 1,
+                        type = "Playlist",
+                        name = null,
+                        url = null,
+                        language = null,
+                        duration = null,
+                        playlists = getPlaylist()
                     )
                 ),
                 duration = 3600L
@@ -57,13 +67,53 @@ class AssetModelMappingTest {
         assertEquals("http://example.com/dash", domainAsset.video.url)
         assertEquals(3600L, domainAsset.video.duration)
         assertEquals("Completed", domainAsset.video.transcodingStatus)
-        assertEquals(1, domainAsset.video.tracks?.size)
+        assertEquals(2, domainAsset.video.tracks?.size)
         assertEquals("subtitles", domainAsset.video.tracks?.get(0)?.type)
         assertEquals("http://example.com/thumbnail.jpg", domainAsset.thumbnail)
         assertEquals("http://example.com/live", domainAsset.liveStream?.url)
         assertEquals("Streaming", domainAsset.liveStream?.status)
         assertEquals("folder1/folder2", domainAsset.folderTree)
+        assertEquals(6,domainAsset.video.tracks?.first { it.type == "Playlist" }?.playlists?.size)
     }
+
+    private fun getPlaylist() = listOf(
+        TPStreamsNetworkAsset.Video.Track.Playlist(
+            name = "4k",
+            bytes = 291433715,
+            width = 3840,
+            height = 2160
+        ),
+        TPStreamsNetworkAsset.Video.Track.Playlist(
+            name = "1080p",
+            bytes = 143993774,
+            width = 1920,
+            height = 1080
+        ),
+        TPStreamsNetworkAsset.Video.Track.Playlist(
+            name = "240p",
+            bytes = 19372332,
+            width = 426,
+            height = 240
+        ),
+        TPStreamsNetworkAsset.Video.Track.Playlist(
+            name = "360p",
+            bytes = 29839983,
+            width = 640,
+            height = 360
+        ),
+        TPStreamsNetworkAsset.Video.Track.Playlist(
+            name = "480p",
+            bytes = 42297052,
+            width = 854,
+            height = 480
+        ),
+        TPStreamsNetworkAsset.Video.Track.Playlist(
+            name = "720p",
+            bytes = 70430690,
+            width = 1280,
+            height = 720
+        )
+    )
 
     @Test
     fun `test TestpressNetworkAsset to Asset Mapping`() {

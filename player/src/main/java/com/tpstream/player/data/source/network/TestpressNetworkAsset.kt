@@ -3,49 +3,35 @@ package com.tpstream.player.data.source.network
 import com.google.gson.annotations.SerializedName
 
 internal data class TestpressNetworkAsset(
-    val title: String?,
-    val id: String?,
-
-    @SerializedName("content_type")
-    val type: String?,
-
-    @SerializedName("video")
-    val networkVideo: Video?,
-
-    @SerializedName("live_stream")
-    val networkLiveStream: LiveStream?
+    @SerializedName("id") val id: String?,
+    @SerializedName("title") val title: String?,
+    @SerializedName("content_type") val contentType: String?,
+    @SerializedName("video") val video: Video?,
+    @SerializedName("live_stream") val liveStream: LiveStream?
 ) {
-
-    inner class Video(
-        @SerializedName("url")
-        val playbackUrl: String?,
-
-        @SerializedName("dash_url")
-        val dashUrl: String?,
-        val duration: Long?,
-        val thumbnail: String?,
-        val description:String?,
-
-        @SerializedName("transcoding_status")
-        val status: String?,
-
-        @SerializedName("enable_drm")
-        val isDrmProtected: Boolean?,
+    data class Video(
+        @SerializedName("id") val id: String?,
+        @SerializedName("title") val title: String?,
+        @SerializedName("thumbnail") val thumbnail: String?,
+        @SerializedName("thumbnail_small") val thumbnailSmall: String?,
+        @SerializedName("thumbnail_medium") val thumbnailMedium: String?,
+        @SerializedName("url") val url: String?,
+        @SerializedName("dash_url") val dashUrl: String?,
+        @SerializedName("hls_url") val hlsUrl: String?,
+        @SerializedName("duration") val duration: Long?,
+        @SerializedName("description") val description: String?,
+        @SerializedName("transcoding_status") val transcodingStatus: String?,
+        @SerializedName("drm_enabled") val drmEnabled: Boolean?
     )
 
-    inner class LiveStream(
-        @SerializedName("stream_url")
-        val url: String,
-        val duration: String?,
-
-        @SerializedName("show_recorded_video")
-        val recordingEnabled: Boolean,
-        val status: String,
-
-        @SerializedName("enable_drm")
-        val enabledDRMForLive: Boolean,
-
-        @SerializedName("notice_message")
-        val noticeMessage: String?
+    data class LiveStream(
+        @SerializedName("id")  val id: Long?,
+        @SerializedName("title")  val title: String?,
+        @SerializedName("stream_url") val streamUrl: String?,
+        @SerializedName("duration")  val duration: Long?,
+        @SerializedName("show_recorded_video") val showRecordedVideo: Boolean?,
+        @SerializedName("status") val status: String?,
+        @SerializedName("chat_embed_url") val chatEmbedUrl: String?,
+        @SerializedName("notice_message") val noticeMessage: String?
     )
 }

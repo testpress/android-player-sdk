@@ -7,7 +7,8 @@ import com.tpstream.player.TPException
 import com.tpstream.player.TPStreamsSDK
 import com.tpstream.player.TpInitParams
 import com.tpstream.player.data.source.local.TPStreamsDatabase
-import com.tpstream.player.data.source.network.NetworkAsset
+import com.tpstream.player.data.source.network.TPStreamsNetworkAsset
+import com.tpstream.player.data.source.network.TestpressNetworkAsset
 import com.tpstream.player.util.NetworkClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -90,17 +91,31 @@ internal class AssetRepository(val context: Context) {
         callback : NetworkClient.TPResponse<Asset>
     ) {
         val url = TPStreamsSDK.constructVideoInfoUrl(params.videoId, params.accessToken)
-        NetworkClient<NetworkAsset>(NetworkClient.getOkHttpClient(context)).get(url, object : NetworkClient.TPResponse<NetworkAsset> {
-            override fun onSuccess(result: NetworkAsset) {
-                val asset = result.asDomainAsset()
-                asset.id = params.videoId!!
-                callback.onSuccess(asset)
-            }
+        if (TPStreamsSDK.provider == TPStreamsSDK.Provider.TPStreams){
+            NetworkClient<TPStreamsNetworkAsset>(NetworkClient.getOkHttpClient(context)).get(url, object : NetworkClient.TPResponse<TPStreamsNetworkAsset> {
+                override fun onSuccess(result: TPStreamsNetworkAsset) {
+                    val asset = result.asDomainAsset()
+                    asset.id = params.videoId!!
+                    callback.onSuccess(asset)
+                }
 
-            override fun onFailure(exception: TPException) {
-                callback.onFailure(exception)
-            }
-        })
+                override fun onFailure(exception: TPException) {
+                    callback.onFailure(exception)
+                }
+            })
+        } else {
+            NetworkClient<TestpressNetworkAsset>(NetworkClient.getOkHttpClient(context)).get(url, object : NetworkClient.TPResponse<TestpressNetworkAsset> {
+                override fun onSuccess(result: TestpressNetworkAsset) {
+                    val asset = result.asDomainAsset()
+                    asset.id = params.videoId!!
+                    callback.onSuccess(asset)
+                }
+
+                override fun onFailure(exception: TPException) {
+                    callback.onFailure(exception)
+                }
+            })
+        }
     }
 
 }

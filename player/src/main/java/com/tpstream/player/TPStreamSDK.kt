@@ -23,7 +23,7 @@ object TPStreamsSDK {
 
     fun constructVideoInfoUrl(contentId: String?, accessToken: String?): String {
         val url = when (provider) {
-            Provider.TestPress -> "https://%s.testpress.in/api/v2.5/video_info/%s/?access_token=%s"
+            Provider.TestPress -> "https://%s.testpress.in/api/v2.5/video_info/%s/?v=2&access_token=%s"
             Provider.TPStreams -> "https://app.tpstreams.com/api/v1/%s/assets/%s/?access_token=%s"
         }
         return url.format(orgCode, contentId, accessToken)

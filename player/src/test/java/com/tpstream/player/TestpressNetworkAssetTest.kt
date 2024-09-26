@@ -145,40 +145,6 @@ class TestpressNetworkAssetTest {
         """.trimIndent()
     }
 
-    private fun getTpStreamsVideoJSON(): String {
-        return """
-            {
-                "title": "BigBuckBunny.mp4",
-                "bytes": null,
-                "type": "video",
-                "video": {
-                            "progress": 0,
-                            "thumbnails": [],
-                            "status": "Completed",
-                            "playback_url": "https://d3cydmgt9q030i.cloudfront.net/transcoded/73633fa3-61c6-443c-b625-ac4e85b28cfc/video.m3u8",
-                            "dash_url": "https://d3cydmgt9q030i.cloudfront.net/transcoded/73633fa3-61c6-443c-b625-ac4e85b28cfc/video.mpd",
-                            "preview_thumbnail_url": null,
-                            "format": "abr",
-                            "resolutions": [
-                                "480p",
-                                "720p"
-                            ],
-                            "video_codec": "h264",
-                            "audio_codec": "aac",
-                            "enable_drm": false,
-                            "tracks": [],
-                            "inputs": [
-                                {
-                                    "url": "private/ef58aefdf4394661ab032a30c30b83ae.mp4"
-                                }
-                            ]
-                          },
-                "id": "73633fa3-61c6-443c-b625-ac4e85b28cfc",
-                "live_stream": null
-            }
-        """.trimIndent()
-    }
-
     private fun getInvalidResponse(): String {
         return """
             <html>

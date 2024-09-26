@@ -86,19 +86,6 @@ class TestpressNetworkAssetTest {
         assertEquals(liveStream?.noticeMessage, "The live stream has come to an end. Stay tuned, we'll have the recording readyfor you shortly.")
     }
 
-//    @Test
-//    fun testTpStreamsVideoGetAsyncRequest() {
-//        val successResponse = MockResponse().setResponseCode(200).setBody(getTpStreamsVideoJSON())
-//        mockWebServer.enqueue(successResponse)
-//        runBlocking {
-//            networkClient.get(mockWebServer.url("/").toString(), callbackResponse)
-//            mockWebServer.takeRequest()
-//            delay(50)
-//        }
-//        assertEquals(callbackResult?.title, "BigBuckBunny.mp4")
-//        assertEquals(callbackResult?.id, "73633fa3-61c6-443c-b625-ac4e85b28cfc")
-//    }
-
     @Test
     fun testErrorReceiveOnGetAsyncRequest() {
         val errorResponse = MockResponse().setResponseCode(400)

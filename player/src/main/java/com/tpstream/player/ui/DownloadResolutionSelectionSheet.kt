@@ -2,6 +2,7 @@ package com.tpstream.player.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -232,6 +233,7 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
         private fun getTotalMediaSize(trackInfo: TrackInfo): String {
             val track = asset.video.tracks?.firstOrNull { it.type == "Playlist" }
             val playlistSize = getPlaylistSize(track, trackInfo)
+            Log.d("TAG", "getTotalMediaSize: $playlistSize")
             val size = playlistSize ?: (getVideoSizeInMB(trackInfo) + getAudioSizeInMB(trackInfo))
             return "$size MB"
         }
@@ -246,7 +248,7 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
                     }
                 }
                 ?.firstOrNull { it.height == trackInfo.videoFormat.height }
-                ?.bytes?.let { it / 1024L / 1024L }
+                ?.bytes?.let { (it / 1024L) / 1024L }
         }
 
         private fun getVideoSizeInMB(trackInfo: TrackInfo): Int {

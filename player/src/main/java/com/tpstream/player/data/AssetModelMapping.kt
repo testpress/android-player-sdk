@@ -92,6 +92,18 @@ internal fun TPStreamsNetworkAsset.asDomainAsset(): Asset {
         }
     }
 
+    fun TPStreamsNetworkAsset.Video.Track.getPlayLists(): List<Playlist> {
+        if (this.playlists.isNullOrEmpty()) return listOf()
+        return this.playlists.map { playlist ->
+            Playlist(
+                playlist.name ?: "",
+                playlist.bytes ?: 0,
+                playlist.width ?: 0,
+                playlist.height ?: 0
+            )
+        }
+    }
+
     fun getVideoTracks(): List<Track>? {
         return this.video?.tracks?.map { track ->
             Track(
@@ -99,7 +111,8 @@ internal fun TPStreamsNetworkAsset.asDomainAsset(): Asset {
                 track.name ?: "",
                 track.url ?: "",
                 track.language ?: "",
-                track.duration ?: 0
+                track.duration ?: 0,
+                track.getPlayLists()
             )
         }
     }

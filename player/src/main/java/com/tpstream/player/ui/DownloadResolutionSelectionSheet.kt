@@ -2,6 +2,7 @@ package com.tpstream.player.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,8 @@ import com.tpstream.player.*
 import com.tpstream.player.R
 import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
 import com.tpstream.player.data.Asset
+import com.tpstream.player.data.Track
+import com.tpstream.player.data.source.network.TPStreamsNetworkAsset
 import com.tpstream.player.offline.VideoDownloadRequestCreationHandler
 import com.tpstream.player.util.DeviceUtil
 import okio.IOException
@@ -228,7 +231,23 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
         }
 
         private fun getTotalMediaSize(trackInfo: TrackInfo): String {
-            return "${(getVideoSizeInMB(trackInfo) + getAudioSizeInMB(trackInfo))} MB"
+            val track = asset.video.tracks?.firstOrNull { it.type == "Playlist" }
+            val playlistSize = getPlaylistSize(track, trackInfo)
+            val size = playlistSize ?: (getVideoSizeInMB(trackInfo) + getAudioSizeInMB(trackInfo))
+            return "$size MB"
+        }
+
+        private fun getPlaylistSize(track: Track?, trackInfo: TrackInfo): Long? {
+            return track?.playlists
+                ?.filter { // Filter based on DRM protection
+                    if (asset.video.isDrmProtected == true) {
+                        it.name.contains("dash")
+                    } else {
+                        true // No filtering for non-DRM, allow all playlists
+                    }
+                }
+                ?.firstOrNull { it.height == trackInfo.videoFormat.height }
+                ?.bytes?.let { (it / 1024L) / 1024L }
         }
 
         private fun getVideoSizeInMB(trackInfo: TrackInfo): Int {

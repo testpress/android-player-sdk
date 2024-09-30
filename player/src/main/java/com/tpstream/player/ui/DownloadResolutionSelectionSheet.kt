@@ -233,7 +233,6 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
         private fun getTotalMediaSize(trackInfo: TrackInfo): String {
             val track = asset.video.tracks?.firstOrNull { it.type == "Playlist" }
             val playlistSize = getPlaylistSize(track, trackInfo)
-            Log.d("TAG", "getTotalMediaSize: $playlistSize")
             val size = playlistSize ?: (getVideoSizeInMB(trackInfo) + getAudioSizeInMB(trackInfo))
             return "$size MB"
         }

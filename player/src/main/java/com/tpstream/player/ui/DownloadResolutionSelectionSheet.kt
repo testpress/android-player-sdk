@@ -179,19 +179,26 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
     }
 
     private fun getRelevantCodecDetails(): DeviceUtil.CodecDetails? {
-        return if (asset.video.isDrmProtected == true) {
-            codec.firstOrNull { it.isSecure }
-        } else {
-            // For non-DRM videos, return the codec with the maximum resolution support.
-            codec
-                .filter { !it.isSecure }
-                .maxByOrNull {
-                    when {
-                        it.is4KSupported -> 2
-                        it.is1080pSupported -> 1
-                        else -> 0
-                    }
+        val isDrmProtected = asset.video.isDrmProtected == true
+
+        // Function to get the codec based on resolution support
+        fun selectBestCodec(codecs: List<DeviceUtil.CodecDetails>): DeviceUtil.CodecDetails? {
+            return codecs.maxByOrNull {
+                when {
+                    it.is4KSupported -> 2
+                    it.is1080pSupported -> 1
+                    else -> 0
                 }
+            }
+        }
+
+        return if (isDrmProtected) {
+            // For DRM-protected content, choose secure codec if available; otherwise, fallback to non-secure codec
+            codec.firstOrNull { it.isSecure }
+                ?: selectBestCodec(codec.filter { !it.isSecure }) // For L3 devices, where secure codecs are unavailable, fallback to non-secure codec
+        } else {
+            // For non-DRM content, return the non-secure codec with maximum resolution support
+            selectBestCodec(codec.filter { !it.isSecure })
         }
     }
 

@@ -20,7 +20,14 @@ internal class DeviceUtil {
         val is4KAt2xSupported: Boolean = false,
         var isSelected: Boolean = false,
         val isSecure: Boolean = false
-    )
+    ) {
+        val priority: Int
+            get() = when {
+                is4KSupported -> 2
+                is1080pSupported -> 1
+                else -> 0
+            }
+    }
 
     companion object {
         val RESOLUTION_1080P = Resolution(1920, 1080)

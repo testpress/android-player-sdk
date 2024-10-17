@@ -42,7 +42,17 @@ class AssetModelMappingTest {
                         playlists = getPlaylist()
                     )
                 ),
-                duration = 3600L
+                duration = 3600L,
+                outputURLs = mapOf(
+                    "h264" to TPStreamsNetworkAsset.Video.OutputUrl(
+                        hlsUrl = "https://d28qihy7z761lk.cloudfront.net/transcoded/66RQCnD8u63/video.m3u8",
+                        dashUrl = "https://d28qihy7z761lk.cloudfront.net/transcoded/66RQCnD8u63/video.mpd"
+                    ),
+                    "h265" to TPStreamsNetworkAsset.Video.OutputUrl(
+                        hlsUrl = "https://d28qihy7z761lk.cloudfront.net/transcoded/66RQCnD8u63/video_h265.m3u8",
+                        dashUrl = "https://d28qihy7z761lk.cloudfront.net/transcoded/66RQCnD8u63/video_h265.mpd"
+                    )
+                )
             ),
             id = "12345",
             liveStream = TPStreamsNetworkAsset.LiveStream(
@@ -64,7 +74,7 @@ class AssetModelMappingTest {
         // Validate the result
         assertEquals("Sample Video", domainAsset.title)
         assertEquals("video", domainAsset.type)
-        assertEquals("http://example.com/dash", domainAsset.video.url)
+        assertEquals("https://d28qihy7z761lk.cloudfront.net/transcoded/66RQCnD8u63/video_h265.mpd", domainAsset.video.url)
         assertEquals(3600L, domainAsset.video.duration)
         assertEquals("Completed", domainAsset.video.transcodingStatus)
         assertEquals(2, domainAsset.video.tracks?.size)
@@ -74,6 +84,7 @@ class AssetModelMappingTest {
         assertEquals("Streaming", domainAsset.liveStream?.status)
         assertEquals("folder1/folder2", domainAsset.folderTree)
         assertEquals(6,domainAsset.video.tracks?.first { it.type == "Playlist" }?.playlists?.size)
+        assertEquals(true, domainAsset.video.hasH265Tracks)
     }
 
     private fun getPlaylist() = listOf(

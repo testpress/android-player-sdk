@@ -84,13 +84,10 @@ data class Video(
     var downloadState: DownloadStatus? = null,
     val tracks: List<Track>? = null,
     val isDrmProtected: Boolean? = false,
-    val outputURLs: Map<String, OutputUrl>? = null
+    val isH265VideoCodec: Boolean = false,
 ){
     val isTranscodingCompleted: Boolean
         get() = transcodingStatus == "Completed"
-
-    val hasH265Tracks: Boolean
-        get() =  outputURLs?.keys?.contains("h265") ?: false
 }
 
 data class LiveStream(
@@ -150,9 +147,4 @@ data class Playlist(
     val bytes: Long,
     val width: Int,
     val height: Int
-)
-
-data class OutputUrl(
-    val hlsUrl: String?,
-    val dashUrl: String?,
 )

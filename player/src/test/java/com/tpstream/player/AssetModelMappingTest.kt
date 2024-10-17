@@ -84,7 +84,7 @@ class AssetModelMappingTest {
         assertEquals("Streaming", domainAsset.liveStream?.status)
         assertEquals("folder1/folder2", domainAsset.folderTree)
         assertEquals(6,domainAsset.video.tracks?.first { it.type == "Playlist" }?.playlists?.size)
-        assertEquals(true, domainAsset.video.hasH265Tracks)
+        assertEquals(true, domainAsset.video.isH265VideoCodec)
     }
 
     private fun getPlaylist() = listOf(

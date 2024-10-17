@@ -22,7 +22,8 @@ internal fun LocalAsset.asDomainAsset(): Asset {
             downloadState = this.downloadState,
             width = this.videoWidth,
             height = this.videoHeight,
-            isDrmProtected = this.url.isDrmProtected()
+            isDrmProtected = this.url.isDrmProtected(),
+            isH265VideoCodec = this.url.isH265VideoCodec()
         ),
         folderTree = this.folderTree,
         downloadStartTimeMs = this.downloadStartTimeMs,
@@ -126,17 +127,6 @@ internal fun TPStreamsNetworkAsset.asDomainAsset(): Asset {
         }
     }
 
-    fun getOutputULRs(): Map<String, OutputUrl>? {
-        val map = mutableMapOf<String, OutputUrl>()
-        this.video?.outputURLs?.forEach {
-            map[it.key] = OutputUrl(
-                hlsUrl = it.value.hlsUrl,
-                dashUrl = it.value.dashUrl
-            )
-        }
-        return if (map.isEmpty()) null else map
-    }
-
     fun getVideo(): Video {
         return Video(
             url = getPlayVideoPlayBackUrl() ?: "",
@@ -144,7 +134,7 @@ internal fun TPStreamsNetworkAsset.asDomainAsset(): Asset {
             transcodingStatus = this.video?.status ?: "",
             tracks = getVideoTracks(),
             isDrmProtected = video?.enableDrm,
-            outputURLs = getOutputULRs()
+            isH265VideoCodec = video?.hasH265Tracks ?: false,
         )
     }
 
@@ -199,3 +189,5 @@ internal fun Asset.asLocalAsset(): LocalAsset {
 }
 
 internal fun String.isDrmProtected() = this.contains(".mpd")
+
+internal fun String.isH265VideoCodec() = this.contains("h265.mpd")

@@ -245,7 +245,7 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
                     }
                 }
                 ?.filter { // Filter based on DRM protection
-                    if (asset.video.hasH265Tracks) {
+                    if (asset.video.isH265VideoCodec) {
                         it.name.contains("h265_dash")
                     } else {
                         true // No filtering for non-DRM, allow all playlists

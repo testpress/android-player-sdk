@@ -18,6 +18,7 @@ data class TPStreamsNetworkAsset(
         @SerializedName("enable_drm") val enableDrm: Boolean?,
         @SerializedName("tracks") val tracks: List<Track>?,
         @SerializedName("duration") val duration: Long?,
+        @SerializedName("output_urls") val outputURLs: Map<String, OutputUrl>?
     ) {
         data class Track(
             @SerializedName("id") val id: Int?,
@@ -35,6 +36,12 @@ data class TPStreamsNetworkAsset(
                 @SerializedName("height") val height: Int?
             )
         }
+        data class OutputUrl(
+            @SerializedName("hls_url") val hlsUrl: String?,
+            @SerializedName("dash_url") val dashUrl: String?,
+        )
+        val hasH265Tracks: Boolean
+            get() =  outputURLs?.keys?.contains("h265") ?: false
     }
 
     data class LiveStream(

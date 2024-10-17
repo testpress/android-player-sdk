@@ -101,10 +101,11 @@ class PlayerActivity : AppCompatActivity() {
                 orgCode = "lmsdemo"
                 provider = TPStreamsSDK.Provider.TestPress
             }
+            // https://relative-urgently-lizard.ngrok-free.app/embed/4tn35u/66RQCnD8u63/?access_token=d0a7ac19-6677-4faa-b6b6-46c30fe95265
             "TPS_DRM" -> {
-                accessToken = "d4986429-20e2-4b21-93ae-c70630a37e06"
-                videoId = "7RKQZj4gB2T"
-                orgCode = "6eafqn"
+                accessToken = "d0a7ac19-6677-4faa-b6b6-46c30fe95265"
+                videoId = "66RQCnD8u63"
+                orgCode = "4tn35u"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
             "TPS_NON_DRM" -> {

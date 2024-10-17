@@ -24,7 +24,7 @@ object TPStreamsSDK {
     fun constructVideoInfoUrl(contentId: String?, accessToken: String?): String {
         val url = when (provider) {
             Provider.TestPress -> "https://%s.testpress.in/api/v2.5/video_info/%s/?v=2&access_token=%s"
-            Provider.TPStreams -> "https://app.tpstreams.com/api/v1/%s/assets/%s/?access_token=%s"
+            Provider.TPStreams -> "https://relative-urgently-lizard.ngrok-free.app/api/v1/%s/assets/%s/?access_token=%s"
         }
         return url.format(orgCode, contentId, accessToken)
     }
@@ -32,7 +32,7 @@ object TPStreamsSDK {
     fun constructDRMLicenseUrl(contentId: String?, accessToken: String?): String {
         val url = when (provider) {
             Provider.TestPress -> "https://%s.testpress.in/api/v2.5/drm_license_key/%s/?access_token=%s"
-            Provider.TPStreams -> "https://app.tpstreams.com/api/v1/%s/assets/%s/drm_license/?access_token=%s"
+            Provider.TPStreams -> "https://relative-urgently-lizard.ngrok-free.app/api/v1/%s/assets/%s/drm_license/?access_token=%s"
         }
         return url.format(orgCode, contentId, accessToken)
     }

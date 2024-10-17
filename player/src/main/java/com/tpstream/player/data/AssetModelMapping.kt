@@ -85,10 +85,19 @@ internal fun TestpressNetworkAsset.asDomainAsset(): Asset {
 internal fun TPStreamsNetworkAsset.asDomainAsset(): Asset {
 
     fun getPlayVideoPlayBackUrl(): String? {
-        return if (this.video?.enableDrm == true) {
-            this.video.dashUrl
+        return if (this.video?.hasH265Tracks == true) {
+            val outputUrl = this.video.outputURLs?.get("h265")
+            if (this.video.enableDrm == true) {
+                outputUrl?.dashUrl
+            } else {
+                outputUrl?.hlsUrl
+            }
         } else {
-            this.video?.playbackUrl
+            if (this.video?.enableDrm == true) {
+                this.video.dashUrl
+            } else {
+                this.video?.playbackUrl
+            }
         }
     }
 
@@ -117,13 +126,25 @@ internal fun TPStreamsNetworkAsset.asDomainAsset(): Asset {
         }
     }
 
+    fun getOutputULRs(): Map<String, OutputUrl>? {
+        val map = mutableMapOf<String, OutputUrl>()
+        this.video?.outputURLs?.forEach {
+            map[it.key] = OutputUrl(
+                hlsUrl = it.value.hlsUrl,
+                dashUrl = it.value.dashUrl
+            )
+        }
+        return if (map.isEmpty()) null else map
+    }
+
     fun getVideo(): Video {
         return Video(
             url = getPlayVideoPlayBackUrl() ?: "",
             duration = video?.duration ?: 0,
             transcodingStatus = this.video?.status ?: "",
             tracks = getVideoTracks(),
-            isDrmProtected = video?.enableDrm
+            isDrmProtected = video?.enableDrm,
+            outputURLs = getOutputULRs()
         )
     }
 

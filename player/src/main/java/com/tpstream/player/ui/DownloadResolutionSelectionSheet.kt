@@ -244,6 +244,13 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
                         true // No filtering for non-DRM, allow all playlists
                     }
                 }
+                ?.filter { // Filter based on DRM protection
+                    if (asset.video.hasH265Tracks) {
+                        it.name.contains("h265_dash")
+                    } else {
+                        true // No filtering for non-DRM, allow all playlists
+                    }
+                }
                 ?.firstOrNull { it.height == trackInfo.videoFormat.height }
                 ?.bytes?.let { (it / 1024L) / 1024L }
         }

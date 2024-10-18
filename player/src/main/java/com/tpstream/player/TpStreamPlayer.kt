@@ -99,7 +99,9 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
                         requiresSecureDecoder,
                         requiresTunnelingDecoder
                     )
-                    if (mimeType.contains(MediaFormat.MIMETYPE_VIDEO_AVC, ignoreCase = true)) {
+                    if (mimeType.contains(MediaFormat.MIMETYPE_VIDEO_AVC, ignoreCase = true)
+                        || mimeType.contains(MediaFormat.MIMETYPE_VIDEO_HEVC, ignoreCase = true)
+                    ) {
                         // Filtering is applied only for video codecs
                         availableDecoders.filter { it.softwareOnly }
                     } else {

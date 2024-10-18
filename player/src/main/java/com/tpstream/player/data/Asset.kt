@@ -83,7 +83,8 @@ data class Video(
     var totalSize: Long = 0,
     var downloadState: DownloadStatus? = null,
     val tracks: List<Track>? = null,
-    val isDrmProtected: Boolean? = false
+    val isDrmProtected: Boolean? = false,
+    val isH265VideoCodec: Boolean = false,
 ){
     val isTranscodingCompleted: Boolean
         get() = transcodingStatus == "Completed"

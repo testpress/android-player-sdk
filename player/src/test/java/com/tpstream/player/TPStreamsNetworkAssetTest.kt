@@ -70,6 +70,7 @@ class TPStreamsNetworkAssetTest {
         assertEquals(video?.previewThumbnailUrl, "https://d384padtbeqfgy.cloudfront.net/transcoded/AQ3FFGFKq3g/thumbnails/thumbnail_4.png")
         assertEquals(video?.enableDrm, true)
         assertEquals(video?.duration, 139L)
+        assertEquals(video?.hasH265Tracks, true)
 
         // Assertions for live stream fields
         val liveStream = callbackResult?.liveStream
@@ -233,7 +234,17 @@ class TPStreamsNetworkAssetTest {
                     "transmux_only": null,
                     "duration": 139,
                     "content_protection_type": "drm",
-                    "generate_subtitle": false
+                    "generate_subtitle": false,
+                    "output_urls": {
+                        "h264": {
+                            "hls_url": "https://d28qihy7z761lk.cloudfront.net/transcoded/66RQCnD8u63/video.m3u8",
+                            "dash_url": "https://d28qihy7z761lk.cloudfront.net/transcoded/66RQCnD8u63/video.mpd"
+                        },
+                        "h265": {
+                            "hls_url": "https://d28qihy7z761lk.cloudfront.net/transcoded/66RQCnD8u63/video_h265.m3u8",
+                            "dash_url": "https://d28qihy7z761lk.cloudfront.net/transcoded/66RQCnD8u63/video_h265.mpd"
+                        }
+                    }
                 },
                 "id": "AQ3FFGFKq3g",
                 "live_stream": {

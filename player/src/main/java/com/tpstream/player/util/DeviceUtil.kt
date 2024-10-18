@@ -51,7 +51,12 @@ internal class DeviceUtil {
 
         fun MediaCodecInfo.toCodecDetails(): CodecDetails? {
             val videoCapabilities =
-                this.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC)?.videoCapabilities
+                if (this.supportedTypes.contains(MediaFormat.MIMETYPE_VIDEO_HEVC)) {
+                    this.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_HEVC)?.videoCapabilities
+                } else {
+                    this.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC)?.videoCapabilities
+                }
+
             return videoCapabilities?.let {
                 CodecDetails(
                     codecName = this.name,

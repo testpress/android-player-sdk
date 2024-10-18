@@ -41,7 +41,7 @@ internal class DeviceUtil {
                 codecList.codecInfos
                     .filterNot { codecInfo -> codecInfo.isEncoder }
                     .filter { codecInfo -> codecInfo.supportedTypes.any { it == MediaFormat.MIMETYPE_VIDEO_AVC || it == MediaFormat.MIMETYPE_VIDEO_HEVC } }
-                    .filter { codecInfo -> Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || !codecInfo.isAlias }
+                    .filter { codecInfo -> Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || !codecInfo.isAlias  }
                     .mapNotNull { it.toCodecDetails() }
             } catch (e: Exception) {
                 Log.d("DeviceUtils", "Error fetching codec capabilities: ${e.message}")

@@ -396,7 +396,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun showErrorMessage(message: String) {
         if (!this@TpStreamPlayerFragment.isAdded) return
         viewBinding.errorMessage.visibility = View.VISIBLE
-        viewBinding.errorMessage.text = Html.fromHtml(message)
+        viewBinding.errorMessage.text = message
     }
 
     private val tpStreamPlayerImplCallBack = object :TpStreamPlayerImplCallBack{

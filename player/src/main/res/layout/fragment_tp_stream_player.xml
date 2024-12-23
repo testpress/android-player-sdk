@@ -19,6 +19,7 @@
             android:layout_gravity="center"
             android:textStyle="bold"
             android:visibility="gone"
+            android:padding="32dp"
             android:textAlignment="center"
             android:linksClickable="true"
             android:autoLink="web"

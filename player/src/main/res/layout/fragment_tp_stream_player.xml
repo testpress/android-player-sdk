@@ -20,6 +20,8 @@
             android:textStyle="bold"
             android:visibility="gone"
             android:textAlignment="center"
+            android:linksClickable="true"
+            android:autoLink="web"
             android:textSize="14dp"
             android:text=""/>
 

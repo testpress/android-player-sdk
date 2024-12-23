@@ -49,6 +49,7 @@ internal fun PlaybackException.getErrorMessage(playerId: String): String {
         PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> "Oops! It seems like you're not connected to the internet. Please check your connection and try again.\n Player code: ${this.errorCode}. Player Id: $playerId"
         PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> "The request took too long to process due to a slow or unstable network connection. Please try again.\n Player code: ${this.errorCode}. Player Id: $playerId"
         PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED -> "There was an issue fetching the license key for this video. Please try again later.\n Player code: ${this.errorCode}. Player Id: $playerId"
+        PlaybackException.ERROR_CODE_DECODER_INIT_FAILED -> "There was an issue initializing the video decoder. Please try restarting your device or playing a different video. For more details, see <a href='https://example.com/troubleshooting-4001'>HELP</a>.\n Player code: ${this.errorCode}. Player Id: $playerId"
         else -> "Oops! Something went wrong. Please contact support for assistance and provide details about the issue.\n Player code: ${this.errorCode}. Player Id: $playerId"
     }
 }

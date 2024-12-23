@@ -3,7 +3,9 @@ package com.tpstream.player.ui
 import android.app.Dialog
 import android.content.pm.ActivityInfo
 import android.media.MediaCodec
+import android.net.ConnectivityManager
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -395,7 +397,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun showErrorMessage(message: String) {
         if (!this@TpStreamPlayerFragment.isAdded) return
         viewBinding.errorMessage.visibility = View.VISIBLE
-        viewBinding.errorMessage.text = message
+        viewBinding.errorMessage.text = Html.fromHtml(message)
     }
 
     private val tpStreamPlayerImplCallBack = object :TpStreamPlayerImplCallBack{

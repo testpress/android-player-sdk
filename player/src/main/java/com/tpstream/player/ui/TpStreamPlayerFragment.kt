@@ -3,7 +3,6 @@ package com.tpstream.player.ui
 import android.app.Dialog
 import android.content.pm.ActivityInfo
 import android.media.MediaCodec
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.text.Html
 import android.util.Log

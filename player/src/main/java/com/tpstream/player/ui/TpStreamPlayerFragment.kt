@@ -20,6 +20,7 @@ import com.tpstream.player.offline.*
 import com.tpstream.player.offline.VideoDownload.getDownload
 import com.tpstream.player.util.OrientationListener
 import com.tpstream.player.util.SentryLogger
+import com.tpstream.player.util.SystemBars
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -140,6 +141,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     fun exitFullScreen() {
+        SystemBars.setVisibility(fullScreenDialog.window, true)
+        
         requireActivity().requestedOrientation = preferredFullscreenExitOrientation
         (tpStreamPlayerView.parent as ViewGroup).removeView(tpStreamPlayerView)
         viewBinding.mainFrameLayout.addView(tpStreamPlayerView)
@@ -159,6 +162,8 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             R.drawable.ic_baseline_fullscreen_exit_24
         ));
         fullScreenDialog.show()
+        SystemBars.setVisibility(fullScreenDialog.window, false)
+        
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         isFullScreen = true
         player?._listener?.onFullScreenChanged(true)

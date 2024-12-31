@@ -6,12 +6,12 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 
 internal object SystemBars {
-    fun setVisibility(window: Window?, hide: Boolean) {
+    fun setVisibility(window: Window?, show: Boolean) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             window?.let { win ->
-                win.setDecorFitsSystemWindows(!hide)
+                win.setDecorFitsSystemWindows(!show)
                 win.insetsController?.let { controller ->
-                    if (hide) {
+                    if (!show) {
                         controller.hide(WindowInsets.Type.systemBars())
                         controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                     } else {
@@ -21,13 +21,13 @@ internal object SystemBars {
             }
         } else {
             @Suppress("DEPRECATION")
-            window?.decorView?.systemUiVisibility = if (hide) {
+            window?.decorView?.systemUiVisibility = if (!show) {
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_FULLSCREEN
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                        View.SYSTEM_UI_FLAG_FULLSCREEN
             } else {
                 View.SYSTEM_UI_FLAG_VISIBLE
             }

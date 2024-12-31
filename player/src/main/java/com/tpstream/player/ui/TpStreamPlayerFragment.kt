@@ -141,7 +141,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     fun exitFullScreen() {
-        SystemBars.setVisibility(fullScreenDialog.window, false)
+        SystemBars.setVisibility(fullScreenDialog.window, true)
         
         requireActivity().requestedOrientation = preferredFullscreenExitOrientation
         (tpStreamPlayerView.parent as ViewGroup).removeView(tpStreamPlayerView)
@@ -162,7 +162,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             R.drawable.ic_baseline_fullscreen_exit_24
         ));
         fullScreenDialog.show()
-        SystemBars.setVisibility(fullScreenDialog.window, true)
+        SystemBars.setVisibility(fullScreenDialog.window, false)
         
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         isFullScreen = true

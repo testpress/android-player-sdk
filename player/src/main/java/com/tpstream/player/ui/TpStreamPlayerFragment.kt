@@ -20,11 +20,10 @@ import com.tpstream.player.offline.*
 import com.tpstream.player.offline.VideoDownload.getDownload
 import com.tpstream.player.util.OrientationListener
 import com.tpstream.player.util.SentryLogger
+import com.tpstream.player.util.SystemBars
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import android.view.WindowInsets
-import android.view.WindowInsetsController
 
 class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val _playbackStateListener: PlayerListener = InternalPlayerListener()
@@ -142,7 +141,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     fun exitFullScreen() {
-        toggleSystemBarsVisibility(false)
+        SystemBars.setVisibility(fullScreenDialog.window, false)
         
         requireActivity().requestedOrientation = preferredFullscreenExitOrientation
         (tpStreamPlayerView.parent as ViewGroup).removeView(tpStreamPlayerView)
@@ -163,40 +162,11 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             R.drawable.ic_baseline_fullscreen_exit_24
         ));
         fullScreenDialog.show()
-
-        toggleSystemBarsVisibility(true)
+        SystemBars.setVisibility(fullScreenDialog.window, true)
         
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         isFullScreen = true
         player?._listener?.onFullScreenChanged(true)
-    }
-
-    private fun toggleSystemBarsVisibility(hide: Boolean) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            fullScreenDialog.window?.let { window ->
-                window.setDecorFitsSystemWindows(!hide)
-                window.insetsController?.let { controller ->
-                    if (hide) {
-                        controller.hide(WindowInsets.Type.systemBars())
-                        controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                    } else {
-                        controller.show(WindowInsets.Type.systemBars())
-                    }
-                }
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            fullScreenDialog.window?.decorView?.systemUiVisibility = if (hide) {
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_FULLSCREEN
-            } else {
-                View.SYSTEM_UI_FLAG_VISIBLE
-            }
-        }
     }
 
     private fun initializePlayer() {

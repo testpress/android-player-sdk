@@ -110,7 +110,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
                 }
             return renderersFactory.setMediaCodecSelector(softwareOnlyCodecSelector)
         }
-        return renderersFactory
+        return renderersFactory.forceEnableMediaCodecAsynchronousQueueing()
     }
 
     private fun getBandwidthMeter(): DefaultBandwidthMeter {

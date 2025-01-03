@@ -90,7 +90,9 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun getRenderersFactory(): DefaultRenderersFactory {
-        val renderersFactory = DefaultRenderersFactory(context).setEnableDecoderFallback(true)
+        val renderersFactory = DefaultRenderersFactory(context)
+            .setEnableDecoderFallback(true)
+            .forceEnableMediaCodecAsynchronousQueueing()
         if (useSoftwareDecoder) {
             val softwareOnlyCodecSelector =
                 MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
@@ -110,7 +112,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
                 }
             return renderersFactory.setMediaCodecSelector(softwareOnlyCodecSelector)
         }
-        return renderersFactory.forceEnableMediaCodecAsynchronousQueueing()
+        return renderersFactory
     }
 
     private fun getBandwidthMeter(): DefaultBandwidthMeter {

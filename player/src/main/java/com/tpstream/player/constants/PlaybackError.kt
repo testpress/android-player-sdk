@@ -35,8 +35,8 @@ internal fun PlaybackException.toError(): PlaybackError {
 
 internal fun TPException.getErrorMessage(playerId: String): String {
     return when {
-        this.isNetworkError() -> "There was an issue initializing the video decoder. Please try restarting your device or playing a different video. For more details, visit https://tpstreams.com/help/troubleshooting-steps-for-error-code-4001.\n Player code: ${4001}. Player Id: $playerId"
-            this.response?.code == 404 -> "The video is not available. Please try another one.\n Error code: 5001. Player Id: $playerId"
+        this.isNetworkError() -> "Oops! It seems like you're not connected to the internet. Please check your connection and try again.\n Error code: 5004. Player Id: $playerId"
+        this.response?.code == 404 -> "The video is not available. Please try another one.\n Error code: 5001. Player Id: $playerId"
         this.isUnauthenticated() -> "Sorry, you don't have permission to access this video. Please check your credentials and try again.\n Error code: 5002. Player Id: $playerId"
         this.isServerError() -> "We're sorry, but there's an issue on our server. Please try again later.\n Error code: 5005. Player Id: $playerId"
         else -> "Oops! Something went wrong. Please contact support for assistance and provide details about the issue.\n Error code: 5100. Player Id: $playerId"

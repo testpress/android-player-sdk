@@ -21,8 +21,6 @@
             android:visibility="gone"
             android:padding="32dp"
             android:textAlignment="center"
-            android:linksClickable="true"
-            android:autoLink="web"
             android:textSize="14dp"
             android:text=""/>
 

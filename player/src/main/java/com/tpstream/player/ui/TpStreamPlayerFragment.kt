@@ -3,12 +3,16 @@ package com.tpstream.player.ui
 import android.app.Dialog
 import android.content.pm.ActivityInfo
 import android.media.MediaCodec
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.tpstream.player.*
@@ -400,7 +404,24 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun showErrorMessage(message: String) {
         if (!this@TpStreamPlayerFragment.isAdded) return
         viewBinding.errorMessage.visibility = View.VISIBLE
-        viewBinding.errorMessage.text = message
+        if (isDecoderError(message)) {
+            viewBinding.errorMessage.setHtmlText(message)
+        } else {
+            viewBinding.errorMessage.text = message
+        }
+    }
+
+    private fun isDecoderError(message: String): Boolean {
+        return listOf("4001", "4003").any { message.contains(it) }
+    }
+
+    private fun TextView.setHtmlText(message: String) {
+        movementMethod = LinkMovementMethod.getInstance()
+        text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            Html.fromHtml(message)
+        }
     }
 
     private val tpStreamPlayerImplCallBack = object :TpStreamPlayerImplCallBack{

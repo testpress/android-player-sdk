@@ -350,6 +350,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
         override fun onLicenseFetchSuccess(keySetId: ByteArray) {
             if (!this@TpStreamPlayerFragment.isAdded) return
+            offlineLicenseApiCallCount = 0
             OfflineDRMLicenseHelper.replaceKeysInExistingDownloadedVideo(
                 player.asset?.video?.url!!,
                 requireContext(),
@@ -451,6 +452,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
 
         override fun onPlayerPrepare() {
+            assetApiCallCount = 0
             if (player != null && startPosition != -1L) {
                 player.seekTo(startPosition)
                 player.pause()

@@ -27,7 +27,7 @@
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="true" />
 
-        <meta-data android:name="io.sentry.dsn" android:value="https://df747232b33f45f5be83a8ccab2d2062@sentry.testpress.in/13" />
+        <meta-data android:name="io.sentry.dsn" android:value="https://2849676eb99f4b9bae526a9390d6fb28@sentry.testpress.in/8" />
 
         <meta-data android:name="io.sentry.traces.sample-rate" android:value="1.0" />
 

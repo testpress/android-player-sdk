@@ -91,7 +91,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         super.onPause()
         if (Util.SDK_INT <= 23) {
             storeCurrentPlayTime()
-            player?.release()
+            releasePlayer()
         }
         Log.d(TAG, "onPause: ")
     }
@@ -100,9 +100,14 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         super.onStop()
         if (Util.SDK_INT > 23) {
             storeCurrentPlayTime()
-            player?.release()
+            releasePlayer()
         }
         Log.d(TAG, "onStop: ")
+    }
+
+    private fun releasePlayer() {
+        player?.release()
+        tpStreamPlayerView.playerView.player = null
     }
 
     override fun onDestroyView() {

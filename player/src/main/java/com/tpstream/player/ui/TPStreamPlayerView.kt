@@ -180,6 +180,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun setPlayer(player: TpStreamPlayer) {
         this.player = player as TpStreamPlayerImpl
+        playerView.player = null // Detach any existing player first
         playerView.player = this.player.exoPlayer
         player.exoPlayer.addAnalyticsListener(PlayerViewAnalyticsListener(this))
         initializeLoadCompleteListener()

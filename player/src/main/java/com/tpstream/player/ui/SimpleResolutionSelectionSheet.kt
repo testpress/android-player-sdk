@@ -30,6 +30,10 @@ internal class SimpleResolutionSelectionSheet(
         const val TAG = "ModalBottomSheet"
     }
 
+    override fun getTheme(): Int {
+        return R.style.CustomBottomSheetDialogTheme
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

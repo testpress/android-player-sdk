@@ -37,6 +37,10 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
     private var onSubmitListener: OnSubmitListener? = null
     private var codec: List<DeviceUtil.CodecDetails> = emptyList()
 
+    override fun getTheme(): Int {
+        return R.style.CustomBottomSheetDialogTheme
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

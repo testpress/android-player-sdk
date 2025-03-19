@@ -26,6 +26,10 @@ internal class AdvancedResolutionSelectionSheet(
     private var selectedCodecDetails: DeviceUtil.CodecDetails? = null
     private val maxResolution: Int? by lazy { player.getMaxResolution() }
 
+    override fun getTheme(): Int {
+        return R.style.CustomBottomSheetDialogTheme
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import androidx.media3.exoplayer.util.EventLogger
 import com.google.common.collect.ImmutableList
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
@@ -78,6 +80,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     private fun initializeExoplayer() {
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerImpl initializePlayer: ")
         exoPlayer = ExoPlayerBuilder(context)
             .setSeekForwardIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_forward_increment_ms).toLong())
             .setSeekBackIncrementMs(context.resources.getString(R.string.tp_streams_player_seek_back_increment_ms).toLong())
@@ -127,10 +130,12 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     }
 
     override fun load(parameters: TpInitParams, metadata: Map<String, String>?) {
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerImpl load: ")
         params = parameters
         exoPlayer.playWhenReady = parameters.autoPlay
         assetRepository.getAsset(parameters, object : NetworkClient.TPResponse<Asset> {
             override fun onSuccess(result: Asset) {
+                Log.d(TPStreamsSDK.TAG, "TpStreamPlayerImpl onSuccess: ")
                 asset = result
                 asset?.metadata = metadata
                 asset!!.getPlaybackURL()?.let {
@@ -169,6 +174,7 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
         exoPlayer.trackSelectionParameters = getInitialTrackSelectionParameter()
         exoPlayer.seekTo(startPosition)
         exoPlayer.addAnalyticsListener(PlayerAnalyticsListener(this))
+        exoPlayer.addAnalyticsListener(EventLogger(TPStreamsSDK.TAG))
         exoPlayer.prepare()
         tpStreamPlayerImplCallBack?.onPlayerPrepare()
     }

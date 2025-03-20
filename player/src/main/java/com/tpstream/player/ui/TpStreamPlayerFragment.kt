@@ -51,6 +51,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerFragment onCreate: ")
         initializeFullScreenDialog()
     }
 
@@ -58,12 +59,14 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerFragment onCreateView: ")
         _viewBinding = FragmentTpStreamPlayerBinding.inflate(layoutInflater)
         return viewBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerFragment onViewCreated: ")
         tpStreamPlayerView = viewBinding.tpStreamPlayerView
         if (enableSecureView) {
             tpStreamPlayerView.setSecureSurfaceView()
@@ -75,6 +78,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onStart() {
         super.onStart()
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerFragment onStart: ")
         if (Util.SDK_INT > 23) {
             initializePlayer()
         }
@@ -82,6 +86,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onResume() {
         super.onResume()
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerFragment onResume: ")
         if (Util.SDK_INT <= 23 || player == null) {
             initializePlayer()
         }
@@ -89,6 +94,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onPause() {
         super.onPause()
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerFragment onPause: ")
         if (Util.SDK_INT <= 23) {
             storeCurrentPlayTime()
             releasePlayer()
@@ -98,6 +104,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onStop() {
         super.onStop()
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerFragment onStop: ")
         if (Util.SDK_INT > 23) {
             storeCurrentPlayTime()
             releasePlayer()
@@ -108,10 +115,12 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private fun releasePlayer() {
         player?.release()
         tpStreamPlayerView.playerView.player = null
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerFragment releasePlayer: ")
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerFragment onDestroyView: ")
         // Ensure that the full-screen dialog is dismissed when the Activity is destroyed
         // to prevent a WindowLeaked exception. This is necessary to handle scenarios
         // where the dialog is still visible when the Activity is no longer in the foreground.
@@ -122,6 +131,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d(TPStreamsSDK.TAG, "TpStreamPlayerFragment onDestroy: ")
         disableAutoFullScreenOnRotate()
     }
 

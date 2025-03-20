@@ -1,6 +1,7 @@
 package com.tpstream.player
 
 object TPStreamsSDK {
+    val TAG = "TpStreamPlayer"
     private var _provider: Provider = Provider.TPStreams
     private var _orgCode: String? = null
     val provider : Provider get() = _provider

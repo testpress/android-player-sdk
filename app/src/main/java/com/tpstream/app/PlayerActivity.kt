@@ -32,7 +32,7 @@ class PlayerActivity : AppCompatActivity() {
         TPStreamsSDK.initialize(provider, orgCode)
         playerFragment =
             supportFragmentManager.findFragmentById(R.id.tpstream_player_fragment) as TpStreamPlayerFragment
-        playerFragment.enableSecureView()
+        playerFragment.useSoftwareDecoder()
         playerFragment.enableAutoFullScreenOnRotate()
         playerFragment.setOnInitializationListener(object: InitializationListener {
             override fun onInitializationSuccess(player: TpStreamPlayer) {

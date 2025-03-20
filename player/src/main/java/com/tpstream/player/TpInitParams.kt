@@ -1,6 +1,7 @@
 package com.tpstream.player
 
 import android.os.Parcelable
+import android.util.Log
 import kotlinx.parcelize.Parcelize
 
 const val FIFTEEN_DAYS = 60 * 60 * 24 * 15
@@ -40,7 +41,7 @@ data class TpInitParams (
         fun build(): TpInitParams {
             require(!accessToken.isNullOrBlank()) { "accessToken must not be null or empty" }
             require(!videoId.isNullOrBlank()) { "videoId must not be null or empty" }
-
+            Log.d(TPStreamsSDK.TAG, "TpInitParams build: ")
             return TpInitParams(
                 autoPlay = autoPlay,
                 accessToken = accessToken!!,

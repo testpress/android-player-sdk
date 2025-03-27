@@ -11,6 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 
+internal typealias onDownloadRequestCreated = (DownloadRequest) -> Unit
+
 internal class VideoDownloadRequestCreationHandler(
     val context: Context,
     private val asset: Asset,
@@ -21,7 +23,7 @@ internal class VideoDownloadRequestCreationHandler(
     private val trackSelectionParameters: DefaultTrackSelectorParameters
     var listener: Listener? = null
     private val mediaItem: MediaItem
-    private var keySetId: ByteArray? = null
+    private var onDownloadRequestCreated: onDownloadRequestCreated? = null
 
     init {
         val url = asset.video.url
@@ -53,41 +55,17 @@ internal class VideoDownloadRequestCreationHandler(
     }
 
     override fun onPrepared(helper: DownloadHelper) {
-        val videoOrAudioData = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(helper)
-        val isDRMProtectedVideo = videoOrAudioData != null
-        if (isDRMProtectedVideo) {
-            if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
-                OfflineDRMLicenseHelper.fetchLicense(context, params, videoOrAudioData, this)
-            } else {
-                Toast.makeText(
-                    context,
-                    "Error in downloading video",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-            return
-        }
         listener?.onDownloadRequestHandlerPrepared(true, helper)
     }
-
-    private fun hasDRMSchemaData(drmInitData: DrmInitData): Boolean {
-        for (i in 0 until drmInitData.schemeDataCount) {
-            if (drmInitData[i].hasData()) {
-                return true
-            }
-        }
-        return false
-    }
-
 
     override fun onPrepareError(helper: DownloadHelper, e: IOException) {
         listener?.onDownloadRequestHandlerPrepareError(helper, e)
     }
 
-    fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>): DownloadRequest {
+    fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>, onDownloadRequestCreated: onDownloadRequestCreated) {
+        this.onDownloadRequestCreated = onDownloadRequestCreated
         setSelectedTracks(overrides)
-        val name = asset.title
-        return downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
+        fetchDRMLicence()
     }
 
     private fun setSelectedTracks(overrides: MutableMap<TrackGroup, TrackSelectionOverride>) {
@@ -102,8 +80,35 @@ internal class VideoDownloadRequestCreationHandler(
         }
     }
 
+    private fun fetchDRMLicence() {
+        val videoOrAudioData = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
+        val isDRMProtectedVideo = videoOrAudioData != null
+        if (isDRMProtectedVideo) {
+            if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
+                OfflineDRMLicenseHelper.fetchLicense(context, params, videoOrAudioData, this)
+            } else {
+                Toast.makeText(
+                    context,
+                    "Error in downloading video",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            return
+        }
+    }
+
+    private fun hasDRMSchemaData(drmInitData: DrmInitData): Boolean {
+        for (i in 0 until drmInitData.schemeDataCount) {
+            if (drmInitData[i].hasData()) {
+                return true
+            }
+        }
+        return false
+    }
+
     override fun onLicenseFetchSuccess(keySetId: ByteArray) {
-        this.keySetId = keySetId
+        val name = asset.title
+        onDownloadRequestCreated?.let { it(downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)) }
         CoroutineScope(Dispatchers.Main).launch {
             Log.d("TAG", "onLicenseFetchSuccess: Success")
             listener?.onDownloadRequestHandlerPrepared(true, downloadHelper)

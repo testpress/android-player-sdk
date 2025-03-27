@@ -130,9 +130,9 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
     private fun setOnClickListeners() {
         binding.startDownload.setOnClickListener {
             if (isResolutionSelected){
-                val downloadRequest =
-                    videoDownloadRequestCreateHandler.buildDownloadRequest(overrides)
-                onSubmitListener?.invoke(downloadRequest,asset)
+                videoDownloadRequestCreateHandler.buildDownloadRequest(overrides) { downloadRequest ->
+                    onSubmitListener?.invoke(downloadRequest,asset)
+                }
                 Toast.makeText(requireContext(), "Download Start", Toast.LENGTH_SHORT).show()
                 dismiss()
             } else {

@@ -108,11 +108,8 @@ internal class VideoDownloadRequestCreationHandler(
 
     override fun onLicenseFetchSuccess(keySetId: ByteArray) {
         val name = asset.title
-        onDownloadRequestCreated?.let { it(downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)) }
-        CoroutineScope(Dispatchers.Main).launch {
-            Log.d("TAG", "onLicenseFetchSuccess: Success")
-            listener?.onDownloadRequestHandlerPrepared(true, downloadHelper)
-        }
+        val downloadHelper = downloadHelper.getDownloadRequest(Util.getUtf8Bytes(name)).copyWithKeySetId(keySetId)
+        onDownloadRequestCreated?.invoke(downloadHelper)
     }
 
     override fun onLicenseFetchFailure(error: DrmSessionException) {

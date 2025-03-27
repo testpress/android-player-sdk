@@ -2,6 +2,7 @@ package com.tpstream.player.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -77,7 +78,13 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
     }
 
     override fun onDownloadRequestHandlerPrepareError(downloadHelper: DownloadHelper, e: IOException) {
-        dismiss()
+        Log.d("TAG", "onDownloadRequestHandlerPrepareError: ${e.localizedMessage}")
+
+        if (e.localizedMessage.contains("401")){
+            onAccessTokenExpiredListener?.onExpired()
+        } else {
+            dismiss()
+        }
     }
 
     private fun prepareTrackGroup(helper: DownloadHelper){
@@ -308,4 +315,18 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
         onSubmitListener = listener
     }
 
+    var onAccessTokenExpiredListener: OnAccessTokenExpiredListener? = null
+
+    fun _setOnAccessTokenExpiredListener(listener: OnAccessTokenExpiredListener){
+        onAccessTokenExpiredListener = listener
+    }
+
+    fun onAccessTokenExpire(newAccessToken: String){
+        videoDownloadRequestCreateHandler.fetchNewDRMLicence(newAccessToken)
+    }
+
+}
+
+interface OnAccessTokenExpiredListener {
+    fun onExpired()
 }

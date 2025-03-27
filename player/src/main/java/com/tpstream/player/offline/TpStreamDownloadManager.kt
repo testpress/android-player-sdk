@@ -11,6 +11,7 @@ import com.tpstream.player.util.ImageSaver
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.AssetRepository
 import com.tpstream.player.ui.DownloadResolutionSelectionSheet
+import com.tpstream.player.ui.OnAccessTokenExpiredListener
 import com.tpstream.player.util.NetworkClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,18 +34,19 @@ class TpStreamDownloadManager(val context: Context) {
     }
 
     fun startDownload(fragmentActivity: FragmentActivity, params: TpInitParams) {
-        showDownloadSelectionSheet(fragmentActivity, params, null)
+        showDownloadSelectionSheet(fragmentActivity, params, null, null)
     }
 
     fun startDownload(fragmentActivity: FragmentActivity, player: TpStreamPlayer) {
         val playerImpl = player as TpStreamPlayerImpl
-        showDownloadSelectionSheet(fragmentActivity, playerImpl.params, playerImpl.asset)
+        showDownloadSelectionSheet(fragmentActivity, playerImpl.params, playerImpl.asset, playerImpl)
     }
 
     private fun showDownloadSelectionSheet(
         fragmentActivity: FragmentActivity,
         params: TpInitParams,
-        asset: Asset?
+        asset: Asset?,
+        player: TpStreamPlayerImpl?
     ) {
         val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet()
         downloadResolutionSelectionSheet.show(
@@ -58,7 +60,7 @@ class TpStreamDownloadManager(val context: Context) {
             assetRepository.getAsset(params, object : NetworkClient.TPResponse<Asset> {
                 override fun onSuccess(result: Asset) {
                     fetchedAsset = result
-                    onFetchAssetSuccess(result, params, downloadResolutionSelectionSheet)
+                    onFetchAssetSuccess(result, params, downloadResolutionSelectionSheet, player)
                 }
 
                 override fun onFailure(exception: TPException) {
@@ -69,14 +71,15 @@ class TpStreamDownloadManager(val context: Context) {
         }
 
         assetToUse?.let {
-            onFetchAssetSuccess(it, params, downloadResolutionSelectionSheet)
+            onFetchAssetSuccess(it, params, downloadResolutionSelectionSheet, player)
         }
     }
 
     private fun onFetchAssetSuccess(
         asset: Asset,
         params: TpInitParams,
-        downloadResolutionSelectionSheet: DownloadResolutionSelectionSheet
+        downloadResolutionSelectionSheet: DownloadResolutionSelectionSheet,
+        player: TpStreamPlayerImpl?
     ) {
         EncryptionKeyRepository(context).fetchAndStore(
             params,
@@ -95,6 +98,14 @@ class TpStreamDownloadManager(val context: Context) {
                 assetRepository.insert(asset)
             }
         }
+        downloadResolutionSelectionSheet._setOnAccessTokenExpiredListener(object : OnAccessTokenExpiredListener{
+            override fun onExpired() {
+                player?._listener?.onAccessTokenExpired(params.videoId!!) {
+                    downloadResolutionSelectionSheet.onAccessTokenExpire(it)
+                }
+            }
+
+        })
     }
 
     private fun onFetchAssetFailure(

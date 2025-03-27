@@ -19,15 +19,20 @@ internal class VideoDownloadRequestCreationHandler(
     private val params: TpInitParams
 ) :
     DownloadHelperCallback, DRMLicenseFetchCallback {
-    private val downloadHelper: DownloadHelper
-    private val trackSelectionParameters: DefaultTrackSelectorParameters
+    private var downloadHelper: DownloadHelper
+    private val trackSelectionParameters: DefaultTrackSelectorParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
     var listener: Listener? = null
-    private val mediaItem: MediaItem
+    private lateinit var mediaItem: MediaItem
     private var onDownloadRequestCreated: onDownloadRequestCreated? = null
 
     init {
+        buildMediaItem()
+        downloadHelper = getDownloadHelper()
+        downloadHelper.prepare(this)
+    }
+
+    private fun buildMediaItem() {
         val url = asset.video.url
-        trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(params.videoId, params.accessToken, params.licenseDurationSeconds)
         mediaItem = MediaItemBuilder()
             .setUri(url)
@@ -38,6 +43,11 @@ internal class VideoDownloadRequestCreationHandler(
                     .build()
             )
             .build()
+    }
+
+    fun fetchNewDRMLicence(accessToken: String){
+        params.setNewAccessToken(accessToken)
+        buildMediaItem()
         downloadHelper = getDownloadHelper()
         downloadHelper.prepare(this)
     }
@@ -114,11 +124,7 @@ internal class VideoDownloadRequestCreationHandler(
 
     override fun onLicenseFetchFailure(error: DrmSessionException) {
         CoroutineScope(Dispatchers.Main).launch {
-            Toast.makeText(
-                context,
-                "Error in starting video download (License fetch error)",
-                Toast.LENGTH_LONG
-            ).show()
+            listener?.onDownloadRequestHandlerPrepareError(downloadHelper, error)
         }
     }
 

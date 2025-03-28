@@ -1,6 +1,7 @@
 package com.tpstream.player.offline
 
 import android.content.Context
+import android.media.MediaCodec
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
@@ -11,6 +12,7 @@ import com.tpstream.player.util.CustomHttpDrmMediaCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.IOException
 import java.lang.Long.min
 
 internal object OfflineDRMLicenseHelper {
@@ -133,6 +135,14 @@ internal object OfflineDRMLicenseHelper {
                 offlineLicenseHelper.release()
             }
         }
+    }
+
+    fun isDRMAuthenticationError(exception: IOException): Boolean {
+        val cause = exception.cause
+        return (cause is DrmSessionException ||
+                cause is MediaCodec.CryptoException ||
+                cause is MediaDrmCallbackException) &&
+                exception.localizedMessage?.contains("401") == true
     }
 }
 

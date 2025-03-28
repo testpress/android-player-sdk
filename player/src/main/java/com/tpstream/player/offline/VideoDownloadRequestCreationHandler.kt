@@ -24,6 +24,7 @@ internal class VideoDownloadRequestCreationHandler(
     var listener: Listener? = null
     private lateinit var mediaItem: MediaItem
     private var onDownloadRequestCreated: onDownloadRequestCreated? = null
+    private var offlineDRMLicenseApiCallCount = 0
 
     init {
         buildMediaItem()
@@ -47,9 +48,7 @@ internal class VideoDownloadRequestCreationHandler(
 
     fun fetchNewDRMLicence(accessToken: String){
         params.setNewAccessToken(accessToken)
-        buildMediaItem()
-        downloadHelper = getDownloadHelper()
-        downloadHelper.prepare(this)
+        fetchDRMLicence()
     }
 
     private fun getDownloadHelper(): DownloadHelper {
@@ -69,7 +68,10 @@ internal class VideoDownloadRequestCreationHandler(
     }
 
     override fun onPrepareError(helper: DownloadHelper, e: IOException) {
-        listener?.onDownloadRequestHandlerPrepareError(helper, e)
+        CoroutineScope(Dispatchers.Main).launch {
+            listener?.onDownloadRequestHandlerPrepareError(helper, e)
+            Toast.makeText(context, "Video download failed due to invalid access.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>, onDownloadRequestCreated: onDownloadRequestCreated) {
@@ -123,8 +125,13 @@ internal class VideoDownloadRequestCreationHandler(
     }
 
     override fun onLicenseFetchFailure(error: DrmSessionException) {
-        CoroutineScope(Dispatchers.Main).launch {
+        if (OfflineDRMLicenseHelper.isDRMAuthenticationError(error) && offlineDRMLicenseApiCallCount < 2){
+            offlineDRMLicenseApiCallCount++
             listener?.onDownloadRequestHandlerPrepareError(downloadHelper, error)
+        } else {
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, "Video download failed due to DRM license fetch error.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

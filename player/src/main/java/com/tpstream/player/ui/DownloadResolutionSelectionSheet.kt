@@ -18,6 +18,7 @@ import com.tpstream.player.R
 import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.Track
+import com.tpstream.player.offline.OfflineDRMLicenseHelper
 import com.tpstream.player.offline.VideoDownloadRequestCreationHandler
 import com.tpstream.player.util.DeviceUtil
 import okio.IOException
@@ -78,9 +79,7 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
     }
 
     override fun onDownloadRequestHandlerPrepareError(downloadHelper: DownloadHelper, e: IOException) {
-        Log.d("TAG", "onDownloadRequestHandlerPrepareError: ${e.localizedMessage}")
-
-        if (e.localizedMessage.contains("401")){
+        if (OfflineDRMLicenseHelper.isDRMAuthenticationError(e)){
             onAccessTokenExpiredListener?.onExpired()
         } else {
             dismiss()

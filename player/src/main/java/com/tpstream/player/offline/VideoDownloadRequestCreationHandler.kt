@@ -19,21 +19,16 @@ internal class VideoDownloadRequestCreationHandler(
     private val params: TpInitParams
 ) :
     DownloadHelperCallback, DRMLicenseFetchCallback {
-    private var downloadHelper: DownloadHelper
-    private val trackSelectionParameters: DefaultTrackSelectorParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
+    private val downloadHelper: DownloadHelper
+    private val trackSelectionParameters: DefaultTrackSelectorParameters
     var listener: Listener? = null
-    private lateinit var mediaItem: MediaItem
+    private val mediaItem: MediaItem
     private var onDownloadRequestCreated: onDownloadRequestCreated? = null
     private var offlineDRMLicenseApiCallCount = 0
 
     init {
-        buildMediaItem()
-        downloadHelper = getDownloadHelper()
-        downloadHelper.prepare(this)
-    }
-
-    private fun buildMediaItem() {
         val url = asset.video.url
+        trackSelectionParameters = DownloadHelper.getDefaultTrackSelectorParameters(context)
         val drmLicenseURL = TPStreamsSDK.constructOfflineDRMLicenseUrl(params.videoId, params.accessToken, params.licenseDurationSeconds)
         mediaItem = MediaItemBuilder()
             .setUri(url)
@@ -44,6 +39,8 @@ internal class VideoDownloadRequestCreationHandler(
                     .build()
             )
             .build()
+        downloadHelper = getDownloadHelper()
+        downloadHelper.prepare(this)
     }
 
     fun fetchNewDRMLicence(accessToken: String){

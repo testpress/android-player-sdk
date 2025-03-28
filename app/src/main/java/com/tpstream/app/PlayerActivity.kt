@@ -45,7 +45,6 @@ class PlayerActivity : AppCompatActivity() {
 
                     override fun onAccessTokenExpired(videoId: String, callback: (String) -> Unit) {
                         val newAccessToken = getAccessToken(videoId)
-                        Log.d("TAG", "onAccessTokenExpired: ")
                         callback.invoke(newAccessToken)
                     }
 
@@ -103,8 +102,8 @@ class PlayerActivity : AppCompatActivity() {
                 provider = TPStreamsSDK.Provider.TestPress
             }
             "TPS_DRM" -> {
-                accessToken = "f8f5ebf2-c4ed-45d1-b7ae-6fffae64b0bc"
-                videoId = "AgAFNEJn3kt"
+                accessToken = "d4986429-20e2-4b21-93ae-c70630a37e06"
+                videoId = "7RKQZj4gB2T"
                 orgCode = "6eafqn"
                 provider = TPStreamsSDK.Provider.TPStreams
             }
@@ -136,7 +135,7 @@ class PlayerActivity : AppCompatActivity() {
             "ZZb3S5OB3nY" -> "5f6355d0-62ac-4bfd-98ca-4a1e9a2857e3"
             "z1TLpfuZzXh" -> "5c49285b-0557-4cef-b214-66034d0b77c3"
             "6suEBPy7EG4" -> "ab70caed-6168-497f-89c1-1e308da2c9aa"
-            "AgAFNEJn3kt" -> "3289c956-c773-48ad-a6ab-dba9b05053c0"
+            "C65BJzhj48k" -> "48a481d0-7a7f-465f-9d18-86f52129430b"
             else -> ""
         }
     }

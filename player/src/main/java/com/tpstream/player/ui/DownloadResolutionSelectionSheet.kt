@@ -17,6 +17,7 @@ import com.tpstream.player.R
 import com.tpstream.player.databinding.TpDownloadTrackSelectionDialogBinding
 import com.tpstream.player.data.Asset
 import com.tpstream.player.data.Track
+import com.tpstream.player.offline.OfflineDRMLicenseHelper
 import com.tpstream.player.offline.VideoDownloadRequestCreationHandler
 import com.tpstream.player.util.DeviceUtil
 import okio.IOException
@@ -77,7 +78,11 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
     }
 
     override fun onDownloadRequestHandlerPrepareError(downloadHelper: DownloadHelper, e: IOException) {
-        dismiss()
+        if (OfflineDRMLicenseHelper.isDRMAuthenticationError(e)){
+            onAccessTokenExpiredListener?.onExpired()
+        } else {
+            dismiss()
+        }
     }
 
     private fun prepareTrackGroup(helper: DownloadHelper){
@@ -308,4 +313,18 @@ internal class DownloadResolutionSelectionSheet : BottomSheetDialogFragment(), V
         onSubmitListener = listener
     }
 
+    var onAccessTokenExpiredListener: OnAccessTokenExpiredListener? = null
+
+    fun _setOnAccessTokenExpiredListener(listener: OnAccessTokenExpiredListener){
+        onAccessTokenExpiredListener = listener
+    }
+
+    fun onAccessTokenExpire(newAccessToken: String){
+        videoDownloadRequestCreateHandler.fetchNewDRMLicence(newAccessToken)
+    }
+
+}
+
+interface OnAccessTokenExpiredListener {
+    fun onExpired()
 }

@@ -100,11 +100,12 @@ class TpStreamDownloadManager(val context: Context) {
         }
         downloadResolutionSelectionSheet._setOnAccessTokenExpiredListener(object : OnAccessTokenExpiredListener{
             override fun onExpired() {
-                player?._listener?.onAccessTokenExpired(params.videoId!!) {
-                    downloadResolutionSelectionSheet.onAccessTokenExpire(it)
+                params.videoId?.let { videoId ->
+                    player?._listener?.onAccessTokenExpired(videoId) {
+                        downloadResolutionSelectionSheet.onAccessTokenExpire(it)
+                    }
                 }
             }
-
         })
     }
 

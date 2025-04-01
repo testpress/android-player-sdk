@@ -55,4 +55,8 @@ internal class ExoPlayerListenerWrapper(var player: TpStreamPlayerImpl) : Player
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {
         listener?.onTimelineChanged(timeline, reason)
     }
+
+    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+        listener?.onPlaybackSpeedChange(playbackParameters.speed)
+    }
 }

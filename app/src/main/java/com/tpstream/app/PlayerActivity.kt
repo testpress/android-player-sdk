@@ -60,6 +60,10 @@ class PlayerActivity : AppCompatActivity() {
                         super.onPlayerError(playbackError)
                         Log.d("TAG", "onPlayerError: ${playbackError}")
                     }
+
+                    override fun onPlaybackSpeedChange(speed: Float) {
+                        Log.d("TAG", "onPlayBackSpeedChange: $speed")
+                    }
                 })
             }
         });

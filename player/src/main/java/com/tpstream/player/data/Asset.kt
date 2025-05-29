@@ -25,7 +25,7 @@ data class Asset(
 
     fun getPlaybackURL(): String? {
         return when {
-            this.isLiveStream && this.liveStream?.isStreaming == true -> this.liveStream!!.url
+            this.isLiveStream && this.liveStream?.isStreaming == true -> this.liveStream!!.getUrl()
             this.video.isTranscodingCompleted -> this.video.url
             else -> null
         }
@@ -91,7 +91,8 @@ data class Video(
 }
 
 data class LiveStream(
-    var url: String,
+    var hlsUrl: String,
+    var dashUrl: String,
     var status: String,
     var startTime: Date?,
     var recordingEnabled: Boolean,
@@ -130,6 +131,10 @@ data class LiveStream(
         } ?: "N/A"
 
         return formattedStartTime
+    }
+
+    fun getUrl():String {
+        return if (enabledDRMForLive) dashUrl else hlsUrl
     }
 }
 

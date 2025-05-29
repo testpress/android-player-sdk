@@ -337,7 +337,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     private fun handleNotStartedLiveStream(asset: Asset) {
         if (asset.liveStream?.isNotStarted == true) {
-            asset.liveStream?.url?.let { url ->
+            asset.liveStream?.getUrl()?.let { url ->
                 coroutineScope.launch {
                     requestWithRetry(url, 10000)
                 }

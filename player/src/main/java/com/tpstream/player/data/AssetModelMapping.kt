@@ -59,7 +59,8 @@ internal fun TestpressNetworkAsset.asDomainAsset(): Asset {
             null
         } else {
             LiveStream(
-                url = this.liveStream.streamUrl ?: "",
+                hlsUrl = this.liveStream.streamUrl ?: "",
+                dashUrl = "", // Since Testpress does not support Live DRM streaming, we always return an empty string
                 status = this.liveStream.status ?: "",
                 startTime = null,
                 recordingEnabled = this.liveStream.showRecordedVideo ?: false,
@@ -143,7 +144,8 @@ internal fun TPStreamsNetworkAsset.asDomainAsset(): Asset {
             null
         } else {
             LiveStream(
-                url = this.liveStream.hlsUrl ?: "",
+                hlsUrl = this.liveStream.hlsUrl ?:"",
+                dashUrl = this.liveStream.dashUrl ?:"",
                 status = this.liveStream.status ?: "",
                 startTime = parseDateTime(this.liveStream.start ?: ""),
                 recordingEnabled = this.liveStream.transcodeRecordedVideo ?: false,

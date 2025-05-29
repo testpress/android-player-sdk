@@ -47,6 +47,7 @@ data class TPStreamsNetworkAsset(
     data class LiveStream(
         @SerializedName("status") val status: String?,
         @SerializedName("hls_url") val hlsUrl: String?,
+        @SerializedName("dash_url") val dashUrl: String?,
         @SerializedName("start") val start: String?,
         @SerializedName("transcode_recorded_video") val transcodeRecordedVideo: Boolean?,
         @SerializedName("enable_drm_for_recording") val enableDrmForRecording: Boolean?,

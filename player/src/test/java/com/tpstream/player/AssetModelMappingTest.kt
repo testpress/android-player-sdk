@@ -1,5 +1,6 @@
 package com.tpstream.player
 
+import com.tpstream.player.data.LiveStream
 import com.tpstream.player.data.asDomainAsset
 import com.tpstream.player.data.source.network.TPStreamsNetworkAsset
 import com.tpstream.player.data.source.network.TestpressNetworkAsset
@@ -188,5 +189,20 @@ class AssetModelMappingTest {
             "The live stream has come to an end. Stay tuned, we'll have the recording ready for you shortly.",
             asset.liveStream?.noticeMessage
         )
+    }
+
+    @Test
+    fun `getUrl returns DASH URL when DRM is enabled`() {
+        val liveStream = LiveStream(
+            hlsUrl = "https://example.com/live/video.m3u8",
+            dashUrl = "https://example.com/live/video.mpd",
+            status = "Streaming",
+            startTime = Date(),
+            recordingEnabled = false,
+            enabledDRMForRecording = true,
+            enabledDRMForLive = true,
+            noticeMessage = ""
+        )
+        assertEquals("https://example.com/live/video.mpd", liveStream.getUrl())
     }
 }

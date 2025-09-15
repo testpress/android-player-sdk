@@ -76,7 +76,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     api "androidx.room:room-ktx:$room_version"
     api 'androidx.fragment:fragment-ktx:1.5.4'
-    api 'io.sentry:sentry-android:6.4.2'
+    api 'io.sentry:sentry-android:7.20.0'
     if (useMedia3Library) {
         api "androidx.media3:media3-exoplayer:$media3playerVersion"
         api "androidx.media3:media3-ui:$media3playerVersion"

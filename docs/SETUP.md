@@ -3,9 +3,8 @@
 ## Prerequisites
 
 - Android Studio (latest version recommended)
-- Android SDK API level 21 or higher
 - Java 17 (minimum required)
-- Gradle 7.4 (can be upgraded to 8.x if needed)
+- Gradle 8.7
 - Android Gradle Plugin (AGP) 7.3.1
 - Kotlin 1.7.10
 - Compile SDK: 34 (app module), 33 (player module)
@@ -42,7 +41,7 @@ cd android-player-sdk
 
 - `app/` - Sample application demonstrating SDK usage
 - `player/` - Core SDK module containing the player implementation
-- `document/` - Documentation files
+- `docs/` - Documentation files
 
 ## Integration
 
@@ -63,11 +62,9 @@ implementation project(':player')
 
 ## Troubleshooting
 
-- Ensure your project's `compileSdkVersion` and `targetSdkVersion` are set to API level 21 or higher
+- Ensure your project's `compileSdkVersion` and `targetSdkVersion` are set to API level 33 or higher
 - If you encounter build issues, try cleaning and rebuilding the project
 - Check that all required dependencies are properly resolved
 - Verify that your Gradle and AGP versions match the requirements above
-- **Important**: Ensure you're using Java 17 or higher (older versions will not work with this setup)
-- If using a different Gradle version, update `gradle-wrapper.properties` accordingly
-- **Gradle Upgrade**: The project works with Gradle 7.4 by default, but you can upgrade to Gradle 8.x if needed (requires Java 17+ for Gradle 8.x)
+- **Gradle Version**: The project uses Gradle 8.7 by default, which requires Java 17 or higher to run.
 - Check your JAVA_HOME environment variable points to a JDK 17+ installation.

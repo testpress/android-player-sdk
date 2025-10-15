@@ -4,7 +4,7 @@
 
 - Android Studio (latest version recommended)
 - Android SDK API level 21 or higher
-- Java 11 (minimum required)
+- Java 17 (minimum required)
 - Gradle 7.4 (can be upgraded to 8.x if needed)
 - Android Gradle Plugin (AGP) 7.3.1
 - Kotlin 1.7.10
@@ -67,7 +67,7 @@ implementation project(':player')
 - If you encounter build issues, try cleaning and rebuilding the project
 - Check that all required dependencies are properly resolved
 - Verify that your Gradle and AGP versions match the requirements above
-- **Important**: Ensure you're using Java 11 or higher (Java 8 will not work with this setup)
+- **Important**: Ensure you're using Java 17 or higher (older versions will not work with this setup)
 - If using a different Gradle version, update `gradle-wrapper.properties` accordingly
 - **Gradle Upgrade**: The project works with Gradle 7.4 by default, but you can upgrade to Gradle 8.x if needed (requires Java 17+ for Gradle 8.x)
-- Check your JAVA_HOME environment variable points to Java 11+
+- Check your JAVA_HOME environment variable points to a JDK 17+ installation.

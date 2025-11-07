@@ -245,17 +245,15 @@ open class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         }
     }
 
-    protected fun getPlayerContainer(): ViewGroup {
-        return viewBinding.mainFrameLayout
-    }
+    protected val playerContainer: ViewGroup
+        get() = viewBinding.mainFrameLayout
     
     protected fun notifyFullscreenChanged(isFullscreen: Boolean) {
         player?._listener?.onFullScreenChanged(isFullscreen)
     }
     
-    protected fun getPreferredFullscreenExitOrientation(): Int {
-        return preferredFullscreenExitOrientation
-    }
+    protected val preferredFullscreenExitOrientationValue: Int
+        get() = preferredFullscreenExitOrientation
 
     private inner class InternalPlayerListener : PlayerListener, DRMLicenseFetchCallback {
         private val TAG = "PlayerListener"

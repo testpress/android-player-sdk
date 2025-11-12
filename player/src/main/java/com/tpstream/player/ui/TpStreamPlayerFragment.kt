@@ -29,7 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
+open class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     private val _playbackStateListener: PlayerListener = InternalPlayerListener()
     private lateinit var player: TpStreamPlayerImpl
     private var _viewBinding: FragmentTpStreamPlayerBinding? = null
@@ -149,7 +149,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         preferredFullscreenExitOrientation  = orientation
     }
 
-    fun exitFullScreen() {
+    open fun exitFullScreen() {
         SystemBars.setVisibility(fullScreenDialog.window, true)
         
         requireActivity().requestedOrientation = preferredFullscreenExitOrientation
@@ -164,7 +164,7 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         player?._listener?.onFullScreenChanged(false)
     }
 
-    fun showFullScreen() {
+    open fun showFullScreen() {
         (tpStreamPlayerView.parent as ViewGroup).removeView(tpStreamPlayerView)
         fullScreenDialog.addContentView(tpStreamPlayerView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         tpStreamPlayerView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(),
@@ -244,6 +244,16 @@ class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
             orientationEventListener.disable()
         }
     }
+
+    protected val playerContainer: ViewGroup
+        get() = viewBinding.mainFrameLayout
+    
+    protected fun notifyFullscreenChanged(isFullscreen: Boolean) {
+        player?._listener?.onFullScreenChanged(isFullscreen)
+    }
+    
+    protected val preferredFullscreenExitOrientationValue: Int
+        get() = preferredFullscreenExitOrientation
 
     private inner class InternalPlayerListener : PlayerListener, DRMLicenseFetchCallback {
         private val TAG = "PlayerListener"

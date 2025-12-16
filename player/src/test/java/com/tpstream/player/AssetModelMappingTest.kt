@@ -1,5 +1,6 @@
 package com.tpstream.player
 
+import com.tpstream.player.data.LiveStream
 import com.tpstream.player.data.asDomainAsset
 import com.tpstream.player.data.source.network.TPStreamsNetworkAsset
 import com.tpstream.player.data.source.network.TestpressNetworkAsset
@@ -57,7 +58,8 @@ class AssetModelMappingTest {
             id = "12345",
             liveStream = TPStreamsNetworkAsset.LiveStream(
                 status = "Streaming",
-                hlsUrl = "http://example.com/live",
+                hlsUrl = "http://example.com/live.m3u8",
+                dashUrl = "http://example.com/live.mpd",
                 start = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()),
                 transcodeRecordedVideo = true,
                 enableDrmForRecording = false,
@@ -80,7 +82,8 @@ class AssetModelMappingTest {
         assertEquals(2, domainAsset.video.tracks?.size)
         assertEquals("subtitles", domainAsset.video.tracks?.get(0)?.type)
         assertEquals("http://example.com/thumbnail.jpg", domainAsset.thumbnail)
-        assertEquals("http://example.com/live", domainAsset.liveStream?.url)
+        assertEquals("http://example.com/live.m3u8", domainAsset.liveStream?.hlsUrl)
+        assertEquals("http://example.com/live.mpd", domainAsset.liveStream?.dashUrl)
         assertEquals("Streaming", domainAsset.liveStream?.status)
         assertEquals("folder1/folder2", domainAsset.folderTree)
         assertEquals(6,domainAsset.video.tracks?.first { it.type == "Playlist" }?.playlists?.size)
@@ -178,7 +181,7 @@ class AssetModelMappingTest {
         // Verify LiveStream data
         assertEquals(
             "https://d36vpug2b5drql.cloudfront.net/live/hfdr5f/9HUmcuS77fp/video.m3u8",
-            asset.liveStream?.url
+            asset.liveStream?.getUrl()
         )
         assertEquals("Completed", asset.liveStream?.status)
         assertEquals(true, asset.liveStream?.recordingEnabled)
@@ -186,5 +189,20 @@ class AssetModelMappingTest {
             "The live stream has come to an end. Stay tuned, we'll have the recording ready for you shortly.",
             asset.liveStream?.noticeMessage
         )
+    }
+
+    @Test
+    fun `getUrl returns DASH URL when DRM is enabled`() {
+        val liveStream = LiveStream(
+            hlsUrl = "https://example.com/live/video.m3u8",
+            dashUrl = "https://example.com/live/video.mpd",
+            status = "Streaming",
+            startTime = Date(),
+            recordingEnabled = false,
+            enabledDRMForRecording = true,
+            enabledDRMForLive = true,
+            noticeMessage = ""
+        )
+        assertEquals("https://example.com/live/video.mpd", liveStream.getUrl())
     }
 }

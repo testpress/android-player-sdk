@@ -76,6 +76,7 @@ class TPStreamsNetworkAssetTest {
         val liveStream = callbackResult?.liveStream
         assertEquals(liveStream?.status, "Completed")
         assertEquals(liveStream?.hlsUrl, "https://d384padtbeqfgy.cloudfront.net/live/6eafqn/AQ3FFGFKq3g/video.m3u8")
+        assertEquals(liveStream?.dashUrl, "https://d384padtbeqfgy.cloudfront.net/live/6eafqn/AQ3FFGFKq3g/video.mpd")
         assertEquals(liveStream?.start, "2024-07-15 11:53:06")
         assertEquals(liveStream?.transcodeRecordedVideo, true)
         assertEquals(liveStream?.enableDrmForRecording, true)
@@ -252,6 +253,7 @@ class TPStreamsNetworkAssetTest {
                     "stream_key": "org-6eafqn-live-AQ3FFGFKq3g-EDZu",
                     "status": "Completed",
                     "hls_url": "https://d384padtbeqfgy.cloudfront.net/live/6eafqn/AQ3FFGFKq3g/video.m3u8",
+                    "dash_url": "https://d384padtbeqfgy.cloudfront.net/live/6eafqn/AQ3FFGFKq3g/video.mpd",
                     "start": "2024-07-15 11:53:06",
                     "transcode_recorded_video": true,
                     "enable_drm_for_recording": true,

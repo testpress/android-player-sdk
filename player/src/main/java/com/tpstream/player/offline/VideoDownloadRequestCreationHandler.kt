@@ -74,7 +74,7 @@ internal class VideoDownloadRequestCreationHandler(
     fun buildDownloadRequest(overrides: MutableMap<TrackGroup, TrackSelectionOverride>, onDownloadRequestCreated: onDownloadRequestCreated) {
         this.onDownloadRequestCreated = onDownloadRequestCreated
         setSelectedTracks(overrides)
-        fetchDRMLicence()
+        prepareDownloadRequest()
     }
 
     private fun setSelectedTracks(overrides: MutableMap<TrackGroup, TrackSelectionOverride>) {
@@ -89,21 +89,30 @@ internal class VideoDownloadRequestCreationHandler(
         }
     }
 
-    private fun fetchDRMLicence() {
+    private fun prepareDownloadRequest() {
         val videoOrAudioData = VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
         val isDRMProtectedVideo = videoOrAudioData != null
-        if (isDRMProtectedVideo) {
-            if (hasDRMSchemaData(videoOrAudioData!!.drmInitData!!)) {
-                OfflineDRMLicenseHelper.fetchLicense(context, params, videoOrAudioData, this)
-            } else {
-                Toast.makeText(
-                    context,
-                    "Error in downloading video",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-            return
+        if(isDRMProtectedVideo){
+            fetchDRMLicence()
+        } else {
+            prepareDownloadRequestForNonDRMVideo()
         }
+    }
+
+    private fun fetchDRMLicence(videoOrAudioData: Format? = null) {
+        val drmData = videoOrAudioData ?: VideoPlayerUtil.getAudioOrVideoInfoWithDrmInitData(downloadHelper)
+        if (drmData != null && hasDRMSchemaData(drmData.drmInitData!!)) {
+            OfflineDRMLicenseHelper.fetchLicense(context, params, drmData, this)
+        } else {
+            Toast.makeText(
+                context,
+                "Error in downloading video",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun prepareDownloadRequestForNonDRMVideo(){
         val downloadRequest = downloadHelper.getDownloadRequest(Util.getUtf8Bytes(asset.title))
         onDownloadRequestCreated?.invoke(downloadRequest)
     }

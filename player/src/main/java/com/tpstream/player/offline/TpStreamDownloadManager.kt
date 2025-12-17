@@ -33,8 +33,8 @@ class TpStreamDownloadManager(val context: Context) {
         return assetRepository.getAssetInLiveData(assetId)
     }
 
-    fun startDownload(fragmentActivity: FragmentActivity, params: TpInitParams) {
-        showDownloadSelectionSheet(fragmentActivity, params, null, null)
+    fun startDownload(fragmentActivity: FragmentActivity, params: TpInitParams, metadata: Map<String, String>? = null) {
+        showDownloadSelectionSheet(fragmentActivity, params, null, null, metadata)
     }
 
     fun startDownload(fragmentActivity: FragmentActivity, player: TpStreamPlayer) {
@@ -46,7 +46,8 @@ class TpStreamDownloadManager(val context: Context) {
         fragmentActivity: FragmentActivity,
         params: TpInitParams,
         asset: Asset?,
-        player: TpStreamPlayerImpl?
+        player: TpStreamPlayerImpl?,
+        metadata: Map<String, String>? = null
     ) {
         val downloadResolutionSelectionSheet = DownloadResolutionSelectionSheet()
         downloadResolutionSelectionSheet.show(
@@ -60,6 +61,9 @@ class TpStreamDownloadManager(val context: Context) {
             assetRepository.getAsset(params, object : NetworkClient.TPResponse<Asset> {
                 override fun onSuccess(result: Asset) {
                     fetchedAsset = result
+                    if (metadata != null) {
+                        result.metadata = metadata
+                    }
                     onFetchAssetSuccess(result, params, downloadResolutionSelectionSheet, player)
                 }
 
@@ -71,6 +75,9 @@ class TpStreamDownloadManager(val context: Context) {
         }
 
         assetToUse?.let {
+            if (metadata != null) {
+                it.metadata = metadata
+            }
             onFetchAssetSuccess(it, params, downloadResolutionSelectionSheet, player)
         }
     }

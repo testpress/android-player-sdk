@@ -61,6 +61,9 @@ class TpStreamDownloadManager(val context: Context) {
             assetRepository.getAsset(params, object : NetworkClient.TPResponse<Asset> {
                 override fun onSuccess(result: Asset) {
                     fetchedAsset = result
+                    if (metadata != null) {
+                        result.metadata = metadata
+                    }
                     onFetchAssetSuccess(result, params, downloadResolutionSelectionSheet, player)
                 }
 

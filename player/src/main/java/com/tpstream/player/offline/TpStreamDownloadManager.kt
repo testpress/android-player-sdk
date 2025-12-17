@@ -75,7 +75,7 @@ class TpStreamDownloadManager(val context: Context) {
         }
 
         assetToUse?.let {
-            if (metadata != null && it.metadata == null) {
+            if (metadata != null) {
                 it.metadata = metadata
             }
             onFetchAssetSuccess(it, params, downloadResolutionSelectionSheet, player)

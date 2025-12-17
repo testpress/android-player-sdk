@@ -104,6 +104,8 @@ internal class VideoDownloadRequestCreationHandler(
             }
             return
         }
+        val downloadRequest = downloadHelper.getDownloadRequest(Util.getUtf8Bytes(asset.title))
+        onDownloadRequestCreated?.invoke(downloadRequest)
     }
 
     private fun hasDRMSchemaData(drmInitData: DrmInitData): Boolean {

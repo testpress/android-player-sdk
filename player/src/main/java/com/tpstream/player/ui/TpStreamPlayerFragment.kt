@@ -150,6 +150,7 @@ open class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     open fun exitFullScreen() {
+        player?._listener?.onFullScreenWillExit()
         SystemBars.setVisibility(fullScreenDialog.window, true)
         
         requireActivity().requestedOrientation = preferredFullscreenExitOrientation
@@ -165,6 +166,7 @@ open class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
     }
 
     open fun showFullScreen() {
+        player?._listener?.onFullScreenWillEnter()
         (tpStreamPlayerView.parent as ViewGroup).removeView(tpStreamPlayerView)
         fullScreenDialog.addContentView(tpStreamPlayerView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         tpStreamPlayerView.findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(requireContext(),

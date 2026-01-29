@@ -25,9 +25,15 @@ internal class SimpleResolutionSelectionSheet(
     private var _binding: TpTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     var onClickListener: DialogInterface.OnClickListener? = null
+    var onDismissListener: (() -> Unit)? = null
 
     companion object {
         const val TAG = "ModalBottomSheet"
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        onDismissListener?.invoke()
     }
 
     override fun getTheme(): Int {

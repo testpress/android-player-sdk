@@ -22,6 +22,7 @@ internal class AdvancedResolutionSelectionSheet(
     private var _binding: TpTrackSelectionDialogBinding? = null
     private val binding get() = _binding!!
     var onAdvanceResolutionClickListener: OnAdvanceResolutionClickListener? = null
+    var onDismissListener: (() -> Unit)? = null
     private val tracksGroups = player.getCurrentTrackGroups()
     private var selectedCodecDetails: DeviceUtil.CodecDetails? = null
     private val maxResolution: Int? by lazy { player.getMaxResolution() }
@@ -43,6 +44,11 @@ internal class AdvancedResolutionSelectionSheet(
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onDismiss(dialog: android.content.DialogInterface) {
+        super.onDismiss(dialog)
+        onDismissListener?.invoke()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

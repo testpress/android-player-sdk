@@ -486,6 +486,12 @@ open class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
         override fun showErrorMessage(message: String) {
             this@TpStreamPlayerFragment.showErrorMessage(message)
         }
+
+        override fun restoreSystemBarVisibility() {
+            if (isFullScreen) {
+                SystemBars.setVisibility(fullScreenDialog.window, false)
+            }
+        }
     }
 
 }

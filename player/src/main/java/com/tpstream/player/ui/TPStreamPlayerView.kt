@@ -143,6 +143,8 @@ class TPStreamPlayerView @JvmOverloads constructor(
         advancedResolutionSheet = AdvancedResolutionSelectionSheet(player!!)
         simpleResolutionSheet.onClickListener = onSimpleResolutionSelection()
         advancedResolutionSheet.onAdvanceResolutionClickListener = onAdvancedVideoResolutionSelection()
+        simpleResolutionSheet.onDismissListener = { restoreSystemBarVisibility() }
+        advancedResolutionSheet.onDismissListener = { restoreSystemBarVisibility() }
     }
 
     private fun onSimpleResolutionSelection() = DialogInterface.OnClickListener { p0, p1 ->
@@ -553,9 +555,13 @@ class TPStreamPlayerView @JvmOverloads constructor(
         }
     }
 
+    internal fun restoreSystemBarVisibility() {
+        tPStreamPlayerViewCallBack?.restoreSystemBarVisibility()
+    }
 }
 
 internal interface TPStreamPlayerViewCallBack {
     fun hideErrorView()
     fun showErrorMessage(message: String)
+    fun restoreSystemBarVisibility()
 }

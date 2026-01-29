@@ -112,6 +112,7 @@ internal class PlaybackSpeedPopupWindow(
         restoreDefaultControllerTimeout()
         playbackSpeedPopupWindow?.dismiss()
         playbackSpeedPopupWindow = null
+        tpStreamPlayerView.restoreSystemBarVisibility()
     }
 
     private fun restoreDefaultControllerTimeout() {

@@ -14,7 +14,8 @@ data class TpInitParams (
     var startAt: Long = 0L,
     var licenseDurationSeconds: Int = FIFTEEN_DAYS,
     var userId: String? = null,
-    var initialResolutionHeight: Int? = null
+    var initialResolutionHeight: Int? = null,
+    var playerPreference: TpStreamPlayerPreference? = null
 ): Parcelable {
 
     class Builder {
@@ -26,6 +27,7 @@ data class TpInitParams (
         var licenseDurationSeconds: Int = FIFTEEN_DAYS
         var userId: String? = null
         private var initialResolutionHeight: Int? = null
+        private var playerPreference: TpStreamPlayerPreference? = null
 
         fun setAutoPlay(autoPlay: Boolean) = apply { this.autoPlay = autoPlay }
         fun startAt(timeInSeconds: Long) = apply { this.startAt = timeInSeconds }
@@ -36,7 +38,8 @@ data class TpInitParams (
             apply { this.licenseDurationSeconds = expireTimeInSecond }
         fun setUserId(userId: String) = apply { this.userId = userId }
         fun setInitialResolution(height: Int) = apply { this.initialResolutionHeight = height }
-
+        fun setPlayerPreference(preference: TpStreamPlayerPreference) = apply { this.playerPreference = preference }
+        
         fun build(): TpInitParams {
             require(!accessToken.isNullOrBlank()) { "accessToken must not be null or empty" }
             require(!videoId.isNullOrBlank()) { "videoId must not be null or empty" }
@@ -49,7 +52,8 @@ data class TpInitParams (
                 startAt = startAt,
                 licenseDurationSeconds = licenseDurationSeconds,
                 userId = userId,
-                initialResolutionHeight = initialResolutionHeight
+                initialResolutionHeight = initialResolutionHeight,
+                playerPreference = playerPreference
             )
         }
     }

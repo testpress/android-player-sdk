@@ -1,5 +1,6 @@
 package com.tpstream.player.ui
 
+import com.tpstream.player.TpStreamPlayerPreference
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.content.Context
@@ -207,9 +208,26 @@ class TPStreamPlayerView @JvmOverloads constructor(
                     showNoticeScreen(it)
                 }
                 initializeSubtitleView()
-                updateSelectedResolution()
+                updateSelectedResolution()          
+                if (player.isParamsInitialized()) {
+                    applyUICustomization(player.params.playerPreference ?: TpStreamPlayerPreference())
+                }
             }
         }
+    }
+    
+    private fun applyUICustomization(preference: TpStreamPlayerPreference) {
+        if (!preference.enableFullscreen) hideFullscreenButton()
+        if (!preference.enablePlaybackSpeed) hidePlaybackSpeedButton()
+        if (!preference.enableCaptions) hideCaptionsButton()
+        if (!preference.showResolutionOptions) hideResolutionButton()
+        
+        if (!preference.enableSeekButtons) {
+            hideFastForwardButton()
+            hideRewindButton()
+        }
+        
+        preference.seekBarColor?.let { setSeekBarColor(it) }
     }
 
     private fun initializeSubtitleView() {
@@ -420,6 +438,22 @@ class TPStreamPlayerView @JvmOverloads constructor(
 
     fun useController(useController: Boolean) {
         playerView.useController = useController
+    }
+
+    fun showPlaybackSpeedButton() {
+        findViewById<Button>(R.id.playback_speed).visibility = View.VISIBLE
+    }
+
+    fun hidePlaybackSpeedButton() {
+        findViewById<Button>(R.id.playback_speed).visibility = View.GONE
+    }
+
+    fun showCaptionsButton() {
+        playerView.setShowSubtitleButton(true)
+    }
+
+    fun hideCaptionsButton() {
+        playerView.setShowSubtitleButton(false)
     }
 
     fun setFullscreenButtonClickListener(listener: FullscreenButtonClickListener?) {

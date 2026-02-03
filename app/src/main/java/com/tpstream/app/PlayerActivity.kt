@@ -11,6 +11,7 @@ import com.tpstream.player.*
 import com.tpstream.player.constants.PlaybackError
 import com.tpstream.player.ui.InitializationListener
 import com.tpstream.player.ui.TpStreamPlayerFragment
+import com.tpstream.player.TpStreamPlayerPreference
 
 const val TP_OFFLINE_PARAMS = "tp_offline_params"
 
@@ -80,9 +81,21 @@ class PlayerActivity : AppCompatActivity() {
                 .setUserId("testUser")
                 .setOfflineLicenseExpireTime(FIFTEEN_DAYS)
                 .enableDownloadSupport(true)
+                .setPlayerPreference(buildPlayerPreference())
                 .build()
         }
         return parameters!!
+    }
+
+    fun buildPlayerPreference(): TpStreamPlayerPreference {
+        return TpStreamPlayerPreference.Builder()
+            .enableFullscreen(false)
+            .enablePlaybackSpeed(false)
+            .enableCaptions(false)
+            .showResolutionOptions(false)
+            .enableSeekButtons(false)
+            .setSeekBarColor(Color.MAGENTA)
+            .build()
     }
 
     private fun selectVideoParams(videoType: String?){

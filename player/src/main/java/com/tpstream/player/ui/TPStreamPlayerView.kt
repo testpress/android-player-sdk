@@ -209,14 +209,11 @@ class TPStreamPlayerView @JvmOverloads constructor(
                 }
                 initializeSubtitleView()
                 updateSelectedResolution()          
-                if (player.isParamsInitialized()) {
-                    applyUICustomization(player.params.playerPreference ?: TpStreamPlayerPreference())
-                }
             }
         }
     }
     
-    private fun applyUICustomization(preference: TpStreamPlayerPreference) {
+    internal fun applyUICustomization(preference: TpStreamPlayerPreference) {
         if (!preference.enableFullscreen) hideFullscreenButton()
         if (!preference.enablePlaybackSpeed) hidePlaybackSpeedButton()
         if (!preference.enableCaptions) hideCaptionsButton()
@@ -231,6 +228,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
     }
 
     private fun initializeSubtitleView() {
+        if (player.isParamsInitialized() && player.params.playerPreference?.enableCaptions == false) return
         player.asset?.video?.tracks?.takeIf { it.isNotEmpty() }?.let {
             playerView.setShowSubtitleButton(true)
             val density = resources.displayMetrics.density

@@ -475,6 +475,13 @@ open class TpStreamPlayerFragment : Fragment(), DownloadCallback.Listener {
                 player.pause()
             }
         }
+
+        override fun onParamsLoaded(params: TpInitParams) {
+            if (!isAdded) return
+            requireActivity().runOnUiThread {
+                tpStreamPlayerView.applyUICustomization(params.playerPreference ?: TpStreamPlayerPreference())
+            }
+        }
     }
 
     private val tPStreamPlayerViewCallBack = object : TPStreamPlayerViewCallBack {

@@ -26,4 +26,5 @@ interface TPStreamPlayerListener {
     fun onFullScreenChanged(isFullScreen: Boolean) {}
     fun onAccessTokenExpired(videoId: String, callback: (String) -> Unit)
     fun onPlaybackSpeedChange(speed: Float) {}
+    fun onReplay() {}
 }

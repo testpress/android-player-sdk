@@ -264,6 +264,7 @@ class TPStreamPlayerView @JvmOverloads constructor(
         replayButton.setOnClickListener {
             player.seekTo(0)
             player.setPlayWhenReady(true)
+            player._listener?.onReplay()
         }
     }
 

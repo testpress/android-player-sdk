@@ -65,6 +65,10 @@ class PlayerActivity : AppCompatActivity() {
                     override fun onPlaybackSpeedChange(speed: Float) {
                         Log.d("TAG", "onPlayBackSpeedChange: $speed")
                     }
+
+                    override fun onReplay() {
+                        Log.d(TAG, "onReplay: Replay button clicked")
+                    }
                 })
             }
         });

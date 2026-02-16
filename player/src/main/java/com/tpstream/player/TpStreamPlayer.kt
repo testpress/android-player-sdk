@@ -403,6 +403,10 @@ internal class TpStreamPlayerImpl(val context: Context) : TpStreamPlayer {
     private fun getVideoTracksGroup(): List<TracksGroup> {
         return getCurrentTrackGroups().filter { it.type == C.TRACK_TYPE_VIDEO }
     }
+
+    internal fun notifyOnReplay() {
+        _listener?.onReplay()
+    }
 }
 
 internal interface TpStreamPlayerImplCallBack {

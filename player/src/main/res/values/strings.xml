@@ -10,7 +10,7 @@
     <string name="license_error">Error renewing playback license. Please try again.</string>
     <string name="license_request_failed">Couldn\'t fetch decryption key. Please try again</string>
     
-    <string name="tp_streams_player_seek_forward_increment_ms">15000</string>
-    <string name="tp_streams_player_seek_back_increment_ms">5000</string>
+    <string name="tp_streams_player_seek_forward_increment_ms">10000</string>
+    <string name="tp_streams_player_seek_back_increment_ms">10000</string>
 
 </resources>

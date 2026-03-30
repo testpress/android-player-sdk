@@ -39,6 +39,19 @@ data class TPException(
 
     fun isNetworkError() = errorType == ErrorType.NETWORK
 
+    fun isTimeoutError(): Boolean {
+        var current: Throwable? = exception
+        while (current != null) {
+            if (current is java.net.SocketTimeoutException ||
+                current is java.io.InterruptedIOException ||
+                current is java.util.concurrent.TimeoutException) {
+                return true
+            }
+            current = current.cause
+        }
+        return false
+    }
+
     fun isUnauthenticated() = statusCode == 401
 
     fun isClientError() = statusCode in 400..499 && statusCode != 401

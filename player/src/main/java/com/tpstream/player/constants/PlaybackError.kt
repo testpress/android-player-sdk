@@ -23,7 +23,7 @@ internal fun TPException.toError(): PlaybackError {
     }
 }
 
-private fun Throwable?.isTimeoutCause(): Boolean {
+internal fun Throwable?.isTimeoutCause(): Boolean {
     var current: Throwable? = this
     while (current != null) {
         if (current is java.net.SocketTimeoutException ||
@@ -59,10 +59,9 @@ internal fun TPException.getErrorMessage(playerId: String): String {
 
 internal fun PlaybackException.getErrorMessage(playerId: String): String {
     return when (this.errorCode) {
-        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> {
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED ->
             if (this.cause.isTimeoutCause()) "The request took too long to process due to a slow or unstable network connection. Please try again.\n Player code: ${this.errorCode}. Player Id: $playerId"
             else "Oops! It seems like you're not connected to the internet. Please check your connection and try again.\n Player code: ${this.errorCode}. Player Id: $playerId"
-        }
         PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> "The request took too long to process due to a slow or unstable network connection. Please try again.\n Player code: ${this.errorCode}. Player Id: $playerId"
         PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED -> "There was an issue fetching the license key for this video. Please try again later.\n Player code: ${this.errorCode}. Player Id: $playerId"
         PlaybackException.ERROR_CODE_DECODER_INIT_FAILED -> "<html><body><p>An error occurred while playing the video. Try restarting your device or playing another video. More help <a href='https://tpstreams.com/help/troubleshooting-steps-for-error-code-4001'>click here</a>.<br> Player code: ${this.errorCode}. Player Id: $playerId</p></body></html>"

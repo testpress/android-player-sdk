@@ -26,6 +26,7 @@ internal object SentryLogger {
             scope.setTag("TPStreamsAndroidPlayerSDKVersion",TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME)
             scope.setTag("playerId", playerId)
             scope.setTag("userId", params?.userId ?: "")
+            params?.videoId?.let { scope.setTag("videoId", it) }
             scope.setContexts(
                 "TPStreamsSDK",
                 mapOf(
@@ -57,6 +58,7 @@ internal object SentryLogger {
             scope.setTag("TPStreamsAndroidPlayerSDKVersion",TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME)
             scope.setTag("playerId", playerId)
             scope.setTag("userId", params?.userId ?: "")
+            params?.videoId?.let { scope.setTag("videoId", it) }
             scope.setContexts(
                 "TPStreamsSDK",
                 mapOf(
@@ -87,6 +89,7 @@ internal object SentryLogger {
             scope.setTag("TPStreamsAndroidPlayerSDKVersion",TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME)
             scope.setTag("playerId", playerId)
             scope.setTag("userId", params?.userId ?: "")
+            params?.videoId?.let { scope.setTag("videoId", it) }
             scope.setContexts(
                 "TPStreamsSDK",
                 mapOf(

@@ -4,6 +4,7 @@ import com.tpstream.player.*
 import com.tpstream.player.BuildConfig.TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME
 import com.tpstream.player.PlaybackException
 import io.sentry.Sentry
+import io.sentry.protocol.User
 
 internal object SentryLogger {
 
@@ -26,6 +27,7 @@ internal object SentryLogger {
             scope.setTag("TPStreamsAndroidPlayerSDKVersion",TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME)
             scope.setTag("playerId", playerId)
             scope.setTag("userId", params?.userId ?: "")
+            scope.setTag("videoId", params?.videoId ?: "")
             scope.setContexts(
                 "TPStreamsSDK",
                 mapOf(
@@ -57,6 +59,7 @@ internal object SentryLogger {
             scope.setTag("TPStreamsAndroidPlayerSDKVersion",TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME)
             scope.setTag("playerId", playerId)
             scope.setTag("userId", params?.userId ?: "")
+            scope.setTag("videoId", params?.videoId ?: "")
             scope.setContexts(
                 "TPStreamsSDK",
                 mapOf(
@@ -87,6 +90,7 @@ internal object SentryLogger {
             scope.setTag("TPStreamsAndroidPlayerSDKVersion",TPSTREAMS_ANDROID_PALYER_SDK_VERSION_NAME)
             scope.setTag("playerId", playerId)
             scope.setTag("userId", params?.userId ?: "")
+            scope.setTag("videoId", params?.videoId ?: "")
             scope.setContexts(
                 "TPStreamsSDK",
                 mapOf(

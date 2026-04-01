@@ -2,6 +2,7 @@ package com.tpstream.player
 
 import okhttp3.Response
 import java.io.IOException
+import com.tpstream.player.constants.isTimeoutCause
 
 data class TPException(
     val errorMessage: String?,
@@ -38,6 +39,8 @@ data class TPException(
     }
 
     fun isNetworkError() = errorType == ErrorType.NETWORK
+
+    fun isTimeoutError(): Boolean = exception.isTimeoutCause()
 
     fun isUnauthenticated() = statusCode == 401
 
